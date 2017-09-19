@@ -10,26 +10,26 @@ server:
   port: 8080
   
 spring:
-	jpa:
-		generate-ddl: true
-		properties:
-			javax:
-				persistence:
-					schema-generation:
-						create-source: metadata
-						scripts.action: create
-						scripts:
-							create-target=create.sql
+  jpa:
+    generate-ddl: true
+    properties:
+      javax:
+        persistence:
+          schema-generation:
+            create-source: metadata
+            scripts:
+              action: create
+              create-target: create.sql
 
-		hibernate:
-			ddl-auto=update
+hibernate:
+  ddl-auto=update
 
 hedvig:
-	kafka:
-		acks: all
-		retries: 3
-		bootstrap:
-			servers: localhost:9092
-			schema:
-				registry:
-					url: http://localhost:8081
+  kafka:
+    acks: all
+    retries: 3
+    bootstrap:
+      servers: localhost:9092
+      schema:
+        registry:
+          url: http://localhost:8081
