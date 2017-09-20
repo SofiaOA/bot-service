@@ -1,8 +1,8 @@
-package com.hedvig.generic.mustrename.web;
+package com.hedvig.generic.bot.web;
 
-import com.hedvig.generic.mustrename.commands.CreateUserCommand;
-import com.hedvig.generic.mustrename.query.UserRepository;
-import com.hedvig.generic.mustrename.web.dto.UserDTO;
+import com.hedvig.generic.bot.commands.CreateUserCommand;
+import com.hedvig.generic.bot.query.UserRepository;
+import com.hedvig.generic.bot.web.dto.UserDTO;
 import org.axonframework.commandhandling.CommandBus;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.commandhandling.gateway.DefaultCommandGateway;
@@ -29,7 +29,7 @@ public class UserController {
 
     @RequestMapping(path="/user/{userId}")
     public ResponseEntity<UserDTO> index(@PathVariable String userId) {
-        return userRepository
+        return (ResponseEntity<UserDTO>) userRepository
                 .findById(userId)
                 .map(u -> ResponseEntity.ok(new UserDTO(u.id, u.name, u.birthDate)))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));

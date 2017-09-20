@@ -1,4 +1,4 @@
-package com.hedvig.generic.mustrename;
+package com.hedvig.generic.bot;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

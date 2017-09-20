@@ -1,25 +1,20 @@
-package com.hedvig.generic.mustrename.externalEvents;
+package com.hedvig.generic.bot.externalEvents;
 
-import com.hedvig.generic.event.UserCreatedEvent_v1;
-import com.hedvig.generic.event.UserEvent_v1;
-import com.hedvig.generic.mustrename.events.UserCreatedEvent;
-import org.apache.jute.Record;
+import java.util.Properties;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.eventhandling.EventMessage;
-import org.axonframework.eventhandling.Timestamp;
-import org.axonframework.messaging.Message;
-import org.axonframework.messaging.MetaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
-import java.util.Properties;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import com.hedvig.generic.bot.events.UserCreatedEvent;
+import com.hedvig.generic.event.UserCreatedEvent_v1;
+import com.hedvig.generic.event.UserEvent_v1;
 
 @Component
 public class KafkaPublisher {

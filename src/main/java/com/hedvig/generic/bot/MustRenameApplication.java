@@ -1,11 +1,12 @@
-package com.hedvig.generic.mustrename;
+package com.hedvig.generic.bot;
 
-import com.hedvig.generic.mustrename.externalEvents.KafkaProperties;
 import org.axonframework.config.EventHandlingConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+
+import com.hedvig.generic.bot.externalEvents.KafkaProperties;
 
 @SpringBootApplication
 @EnableConfigurationProperties(KafkaProperties.class)

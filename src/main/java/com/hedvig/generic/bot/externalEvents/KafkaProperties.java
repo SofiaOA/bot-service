@@ -1,9 +1,10 @@
-package com.hedvig.generic.mustrename.externalEvents;
+package com.hedvig.generic.bot.externalEvents;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 @Getter
 @Setter

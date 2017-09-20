@@ -1,15 +1,16 @@
-package com.hedvig.generic.mustrename.aggregates;
+package com.hedvig.generic.bot.aggregates;
 
-import com.hedvig.generic.mustrename.commands.CreateUserCommand;
-import com.hedvig.generic.mustrename.events.UserCreatedEvent;
+import static org.axonframework.commandhandling.model.AggregateLifecycle.apply;
+
+import java.time.LocalDate;
+
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.commandhandling.model.AggregateIdentifier;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.spring.stereotype.Aggregate;
 
-import java.time.LocalDate;
-
-import static org.axonframework.commandhandling.model.AggregateLifecycle.apply;
+import com.hedvig.generic.bot.commands.CreateUserCommand;
+import com.hedvig.generic.bot.events.UserCreatedEvent;
 
 /**
  * This is an example Aggregate and should be remodeled to suit the needs of you domain.

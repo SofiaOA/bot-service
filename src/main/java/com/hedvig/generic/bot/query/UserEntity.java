@@ -1,8 +1,9 @@
-package com.hedvig.generic.mustrename.query;
+package com.hedvig.generic.bot.query;
+
+import java.time.LocalDate;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import java.time.LocalDate;
 
 @Entity
 public class UserEntity {

@@ -1,9 +1,10 @@
-package com.hedvig.generic.mustrename.query;
+package com.hedvig.generic.bot.query;
 
-import com.hedvig.generic.mustrename.events.UserCreatedEvent;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.hedvig.generic.bot.events.UserCreatedEvent;
 
 @Component
 public class UserEventListener {
