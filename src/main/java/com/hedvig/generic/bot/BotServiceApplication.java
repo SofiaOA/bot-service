@@ -15,10 +15,10 @@ import com.hedvig.generic.bot.session.UserContext;
 
 @SpringBootApplication
 @EnableConfigurationProperties(KafkaProperties.class)
-public class MustRenameApplication {
+public class BotServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MustRenameApplication.class, args);
+		SpringApplication.run(BotServiceApplication.class, args);
 	}
 
     @Autowired

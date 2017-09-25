@@ -11,8 +11,8 @@ public class OnboardingConversation extends Conversation {
 
 	private static Logger log = LoggerFactory.getLogger(OnboardingConversation.class);
 	
-	public OnboardingConversation(ChatHistory c, UserContext u) {
-		super("onboarding", c, u);
+	public OnboardingConversation(UserContext u) {
+		super("onboarding", u);
 		// TODO Auto-generated constructor stub
 	}
 

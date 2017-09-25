@@ -8,8 +8,8 @@ import com.hedvig.generic.bot.session.UserContext;
 public class SampleConversation extends Conversation {
 
 	private static Logger log = LoggerFactory.getLogger(SampleConversation.class);	
-	public SampleConversation(ChatHistory c, UserContext u) {
-		super("onboarding", c, u);
+	public SampleConversation(UserContext u) {
+		super("onboarding", u);
 		init();
 	}
 

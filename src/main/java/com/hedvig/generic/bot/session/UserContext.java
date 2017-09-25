@@ -12,12 +12,12 @@ public class UserContext {
 	
 	String hedvigToken;
 	Conversation c;
-	ChatHistory ch;
+	public ChatHistory chatHistory;
 	
 	public UserContext(String hid){
 		hedvigToken = hid;
-		ch = new ChatHistory();
-		c = new OnboardingConversation(ch, this);
+		chatHistory = new ChatHistory();
+		c = new OnboardingConversation(this);
 		c.init();
 	}
 

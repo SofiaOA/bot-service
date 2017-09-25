@@ -27,22 +27,23 @@ public class SessionManager {
 		log.info("Getting " + i + " messages for user:" + hid);
 		if(!userSessions.containsKey(hid))loadContext(hid); //New user session
 		
-		return userSessions.get(hid).ch.getLast(i);
+		return userSessions.get(hid).chatHistory.getLast(i);
 	}
 	
 	public TreeMap<Long,Message> getAllMessages(String hid){
 		log.info("Getting all messages for user:" + hid);
 		if(!userSessions.containsKey(hid))loadContext(hid); //New user session
 		
-		return userSessions.get(hid).ch.getHistory();
+		return userSessions.get(hid).chatHistory.getHistory();
 	}
 	
 	public void recieveMessage(Message m, String hid){
 		log.info("Recieving messages from user:" + hid);
 		log.info(m.toString());
+		m.header.fromId = new Long(hid);
 		if(!userSessions.containsKey(hid))loadContext(hid); //New user session
 		
-		userSessions.get(hid).ch.addMessage(System.currentTimeMillis(), m);
+		userSessions.get(hid).chatHistory.addMessage(System.currentTimeMillis(), m);
 		userSessions.get(hid).c.recieveMessage(m);
 	}
 	

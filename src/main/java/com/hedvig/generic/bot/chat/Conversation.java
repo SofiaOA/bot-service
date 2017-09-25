@@ -16,14 +16,12 @@ public abstract class Conversation {
 	public static final String regexPattern = "\\{(.*?)\\}";
 	private static Logger log = LoggerFactory.getLogger(Conversation.class);
 	public String conversationId; // Id for the conversation
-	public ChatHistory chatHistory;
 	public UserContext userContext;
 	public TreeMap<String, Message> messageList = new TreeMap<String, Message>();
 	public HashMap<String, String> conversationContext = new HashMap<String, String>(); // Context specific information learned during conversation
 	
-	public Conversation(String conversationId, ChatHistory c, UserContext u) {
+	public Conversation(String conversationId, UserContext u) {
 		this.conversationId = conversationId;
-		this.chatHistory = c;
 		this.userContext = u;
 	}
 	public String getConversationId() {
@@ -56,7 +54,7 @@ public abstract class Conversation {
 		m.body.content = replaceWithContext(m.body.content);
 		long t = System.currentTimeMillis();
 		m.header.timeStamp = t;
-		chatHistory.addMessage(t, m);
+		userContext.chatHistory.addMessage(t, m);
 	}
 
 	public abstract void recieveMessage(Message m);
