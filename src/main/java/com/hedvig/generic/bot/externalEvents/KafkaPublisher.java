@@ -42,7 +42,7 @@ public class KafkaPublisher {
 //
 //        e.setEventPayload(payload);
 
-        this.producer = new KafkaProducer<>(props);
+        //this.producer = new KafkaProducer<>(props);
 
 //        ProducerRecord<String, UserEvent_v1> pr = new ProducerRecord<>("testTopic", "nyckel", e);
 //        Future<RecordMetadata> future = producer.send(pr);
@@ -58,7 +58,7 @@ public class KafkaPublisher {
 
     }
 
-    @EventHandler
+   /* @EventHandler
     public void on(UserCreatedEvent internalEvent, EventMessage message) throws ExecutionException, InterruptedException {
         UserEvent_v1 e = new UserEvent_v1();
         e.setCreatedAt(message.getTimestamp().toString());
@@ -73,5 +73,5 @@ public class KafkaPublisher {
         Future<RecordMetadata> future = this.producer.send(pr);
         this.producer.flush();
         RecordMetadata recordMetadata = future.get();
-    }
+    }*/
 }

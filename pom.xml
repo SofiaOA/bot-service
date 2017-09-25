@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.hedvig.generic</groupId>
-	<artifactId>must-rename</artifactId>
+	<artifactId>bot</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>must-rename</name>
-	<description>Demo project for Spring Boot</description>
+	<name>bot-service</name>
+	<description>Hedvigs bot service</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>

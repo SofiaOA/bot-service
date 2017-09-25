@@ -15,5 +15,4 @@ public class UserEntity {
 
     public LocalDate birthDate;
 
-
 }
