@@ -1,5 +1,6 @@
 package com.hedvig.generic.bot.chat;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -57,6 +58,24 @@ public abstract class Conversation {
 		userContext.chatHistory.addMessage(t, m);
 	}
 
+	public void createMessage(String id, MessageHeader header, MessageBody body){
+		Message m = new Message();
+		m.id = id;
+		m.header = header;
+		m.body = body;
+		messageList.put(m.id, m);
+	}
+	
+	public void createMessage(String id,MessageBody body){
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		createMessage(id,header,body);
+	}
+	
+	public void startConversation(String startId){
+		log.info("Starting conversation with message:" + startId);
+		sendMessage(messageList.get(startId));
+	}
+	
 	public abstract void recieveMessage(Message m);
 	public abstract void init();
 }
