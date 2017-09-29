@@ -1,30 +1,10 @@
 server:
   port: 4081
-  
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost/postgres
-    username: postgres
-    password: iambatman
-  jpa:
-    generate-ddl: true
-    properties:
-      javax:
-        persistence:
-          schema-generation:
-            create-source: metadata
-            scripts:
-              action: create
-              create-target: create.sql
-  application:
-    name: bot-service
+
     
 management:
   security:
     enabled: false
-    
-hibernate:
-  ddl-auto=update
 
 hedvig:
   kafka:
