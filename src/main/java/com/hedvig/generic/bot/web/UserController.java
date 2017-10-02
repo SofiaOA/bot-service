@@ -72,7 +72,7 @@ public class UserController {
     /*
      * TODO: Change hedvig.token from optional to required
      * */
-    @RequestMapping(path = "/response", method = RequestMethod.POST)
+    @RequestMapping(path = "/response", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
     public ResponseEntity<?> create(@RequestBody Object message, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Message recieved from user:" + hid);
@@ -89,7 +89,7 @@ public class UserController {
 			e.printStackTrace();
 		}
 
-    	return null;
+    	return ResponseEntity.noContent().build();
     }
 
 }
