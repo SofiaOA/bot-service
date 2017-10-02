@@ -1,5 +1,6 @@
 language: java
-sudo: required
+sudo: false
+dist: trusty
 services:
   - docker
 after_success:
