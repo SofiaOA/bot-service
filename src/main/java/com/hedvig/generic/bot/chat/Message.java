@@ -21,11 +21,5 @@ public class Message {
 	public String toString(){
 		return "[id:" + id + " header:" + header + " body("+body.getClass()+"):" + body + "]";
 	}
-	/*
-	 * Id is unique and created with timestamp prefix and random salt
-	 * */
-	@Override
-	public boolean equals(Object other){
-		return ((Message)other).id.equals(this.id);
-	}
+
 }
