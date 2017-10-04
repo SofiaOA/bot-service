@@ -2,6 +2,7 @@ package com.hedvig.botService.chat;
 
 import java.util.ArrayList;
 
+import com.hedvig.botService.enteties.*;
 import com.hedvig.botService.session.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,37 +11,39 @@ public class OnboardingConversation extends Conversation {
 
 	private static Logger log = LoggerFactory.getLogger(OnboardingConversation.class);
 	
-	public OnboardingConversation(UserContext u) {
+	public OnboardingConversation(MemberChat u) {
 		super("onboarding", u);
 		// TODO Auto-generated constructor stub
-	}
 
-	public void init(){
-		
 		createMessage("message.hello",
-		new MessageBodyMultipleChoice("Hej, det är jag som är Hedvig, din personliga försäkringsassistent! Vad kan jag hjälpa dig med?", 
-				new ArrayList<Link>(){{
-					add(new Link("Jag vill ha en ny", "/response", "message.getname", false));
-					add(new Link("Vill byta försäkring", "/response","message.changecompany", false));
-					add(new Link("Varför behöver jag?", "/response","message.whyinsurance", false));
-					add(new Link("Vem är du, Hedvig?", "/response","message.whoishedvig", false));
-				}}
-		));
+				new MessageBodyMultipleChoice("Hej, det är jag som är Hedvig, din personliga försäkringsassistent! Vad kan jag hjälpa dig med?",
+						new ArrayList<Link>(){{
+							add(new Link("Jag vill ha en ny", "/response", "message.getname", false));
+							add(new Link("Vill byta försäkring", "/response","message.changecompany", false));
+							add(new Link("Varför behöver jag?", "/response","message.whyinsurance", false));
+							add(new Link("Vem är du, Hedvig?", "/response","message.whoishedvig", false));
+						}}
+				));
 
 		createMessage("message.getname", new MessageBodyText("Trevlig, vad heter du?"));
-		
+
 		createMessage("message.changecompany",
-		new MessageBodyMultipleChoice("Ok, vilket bolag har du idag?", 
-				new ArrayList<Link>(){{
-					add(new Link("If", "/response", "company.if", false));
-					add(new Link("TH", "/response","company.th", false));
-					add(new Link("LF", "/response","company.lf", false));
-				}}
-		));
+				new MessageBodyMultipleChoice("Ok, vilket bolag har du idag?",
+						new ArrayList<Link>(){{
+							add(new Link("If", "/response", "company.if", false));
+							add(new Link("TH", "/response","company.th", false));
+							add(new Link("LF", "/response","company.lf", false));
+						}}
+				));
 
 		createMessage("message.whyinsurance", new MessageBodyText("Hemförsäkring behöver alla!"));
 		createMessage("message.whoishedvig", new MessageBodyText("En försäkringsbot!"));
 		createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
+	}
+
+	public void init(){
+		
+
 		
 		startConversation("message.hello"); // Id of first message
 	}

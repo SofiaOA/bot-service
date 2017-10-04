@@ -1,6 +1,16 @@
-package com.hedvig.botService.chat;
+package com.hedvig.botService.enteties;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
 public class MessageHeader {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	public Integer messageId;
 
 	public MessageHeader(long hedvigUserId, String responsePath, double timeStamp) {
 		this.fromId = hedvigUserId;
@@ -20,6 +30,7 @@ public class MessageHeader {
 	public long fromId;
 	public String responsePath;
 	public double timeStamp; // Time when sent/recieved on API-GW
+
 	
 	/*@JsonSetter("type")
 	public void setType(String t){

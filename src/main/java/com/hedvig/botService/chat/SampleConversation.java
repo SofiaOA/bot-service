@@ -1,6 +1,8 @@
 package com.hedvig.botService.chat;
 
 import java.util.ArrayList;
+
+import com.hedvig.botService.enteties.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.hedvig.botService.session.UserContext;
@@ -8,7 +10,7 @@ import com.hedvig.botService.session.UserContext;
 public class SampleConversation extends Conversation {
 
 	private static Logger log = LoggerFactory.getLogger(SampleConversation.class);	
-	public SampleConversation(UserContext u) {
+	public SampleConversation(MemberChat u) {
 		super("onboarding", u);
 		init();
 	}
@@ -23,7 +25,7 @@ public class SampleConversation extends Conversation {
 		Message m2 = new Message();
 		m2.id = "2";
 		m2.header = new MessageHeader(HEDVIG_USER_ID,"/response",-1);
-		m2.body = new MessageBodySingleSelect("Trevlig att råkas {NAME}. Här kan du välja:", 
+		m2.body = new MessageBodySingleSelect("Trevlig att råkas {NAME}. Här kan du välja:",
 				new ArrayList<SelectOption>(){{
 					add(new SelectOption(1, "blå", false));
 					add(new SelectOption(2, "röd", false));
@@ -46,7 +48,7 @@ public class SampleConversation extends Conversation {
 		switch(m.id){
 		case "1": 
 			String fName = m.body.content;
-			userContext.userFirstName = fName;
+			//userContext.userFirstName = fName;
 			
 			log.info("Add to context:" + "{NAME}:" + fName);
 			conversationContext.put("{NAME}", fName);

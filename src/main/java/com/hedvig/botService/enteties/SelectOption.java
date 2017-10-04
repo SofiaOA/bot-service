@@ -1,4 +1,8 @@
-package com.hedvig.botService.chat;
+package com.hedvig.botService.enteties;
+
+import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+
 
 public class SelectOption {
 

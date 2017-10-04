@@ -16,7 +16,7 @@ public class UserContext {
 	public UserContext(String hid){
 		hedvigToken = hid;
 		chatHistory = new ChatHistory();
-		c = new OnboardingConversation(this);
+		//c = new OnboardingConversation(this);
 		c.init();
 	}
 

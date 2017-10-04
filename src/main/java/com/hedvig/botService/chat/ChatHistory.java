@@ -2,6 +2,7 @@ package com.hedvig.botService.chat;
 
 import java.util.Map.Entry;
 
+import com.hedvig.botService.enteties.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -2,6 +2,7 @@ package com.hedvig.botService;
 
 import java.util.TreeMap;
 
+import com.hedvig.botService.enteties.MemberChatRepository;
 import com.hedvig.botService.externalEvents.KafkaProperties;
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.session.UserContext;
@@ -31,7 +32,7 @@ public class BotServiceApplication {
     }
     
     @Bean
-    public SessionManager createSessionManager(TreeMap<String, UserContext> tm){
-    	return new SessionManager(tm);
+    public SessionManager createSessionManager(MemberChatRepository repo){
+    	return new SessionManager(repo);
     }
 }

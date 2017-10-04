@@ -1,6 +1,10 @@
-package com.hedvig.botService.chat;
+package com.hedvig.botService.enteties;
 
-public class Link {
+
+import java.io.Serializable;
+
+
+public class Link implements Serializable {
 
 	public Link(String text, String uRI, String param, boolean selected) {
 		this.text = text;
@@ -9,8 +13,9 @@ public class Link {
 		this.param = param;
 	}
 	public Link(){}  // NOTE! All objects need to have a default constructor in order for Jackson to marshall.
+
 	public String text;
-	public boolean selected;
+	public Boolean selected;
 	public String URI;
 	public String param;
 	

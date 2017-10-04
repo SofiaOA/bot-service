@@ -1,28 +1,33 @@
 package com.hedvig.botService.chat;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.hedvig.botService.session.UserContext;
+import com.hedvig.botService.enteties.MemberChat;
+import com.hedvig.botService.enteties.Message;
+import com.hedvig.botService.enteties.MessageBody;
+import com.hedvig.botService.enteties.MessageHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class Conversation {
 
-	public static final long  HEDVIG_USER_ID = 1; // The id hedvig uses to chat
-	public static final String regexPattern = "\\{(.*?)\\}";
+    static final long  HEDVIG_USER_ID = 1; // The id hedvig uses to chat
+	private static final String regexPattern = "\\{(.*?)\\}";
 	private static Logger log = LoggerFactory.getLogger(Conversation.class);
-	public String conversationId; // Id for the conversation
-	public UserContext userContext;
-	public TreeMap<String, Message> messageList = new TreeMap<String, Message>();
-	public HashMap<String, String> conversationContext = new HashMap<String, String>(); // Context specific information learned during conversation
+	private String conversationId; // Id for the conversation
+	MemberChat userContext;
+	TreeMap<String, Message> messageList = new TreeMap<String, Message>();
+	HashMap<String, String> conversationContext = new HashMap<String, String>(); // Context specific information learned during conversation
 	
-	public Conversation(String conversationId, UserContext u) {
+	Conversation(String conversationId, MemberChat u) {
 		this.conversationId = conversationId;
 		this.userContext = u;
 	}
+
 	public String getConversationId() {
 		return conversationId;
 	}
@@ -34,7 +39,7 @@ public abstract class Conversation {
 	}
 	private ConversationMessage current = null; // Last message sent to client
 	
-	public String replaceWithContext(String input){
+	private String replaceWithContext(String input){
 		log.debug("Contextualizing string:" + input);
 		Pattern pattern = Pattern.compile(regexPattern);
 		Matcher m = pattern.matcher(input);
@@ -48,15 +53,16 @@ public abstract class Conversation {
 		return input;
 	}
 	
-	public void sendMessage(Message m) {
+	void sendMessage(Message m) {
 		log.info("Sending message:" + m.id + " content:" + m.body.content);
+
 		m.body.content = replaceWithContext(m.body.content);
-		long t = System.currentTimeMillis();
-		m.header.timeStamp = t;
-		userContext.chatHistory.addMessage(t, m);
+		m.setTimestamp(Instant.now());
+
+		userContext.addToHistory(m);
 	}
 
-	public void createMessage(String id, MessageHeader header, MessageBody body){
+	private void createMessage(String id, MessageHeader header, MessageBody body){
 		Message m = new Message();
 		m.id = id;
 		m.header = header;
@@ -64,12 +70,12 @@ public abstract class Conversation {
 		messageList.put(m.id, m);
 	}
 	
-	public void createMessage(String id,MessageBody body){
+	void createMessage(String id, MessageBody body){
 		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
 		createMessage(id,header,body);
 	}
 	
-	public void startConversation(String startId){
+	void startConversation(String startId){
 		log.info("Starting conversation with message:" + startId);
 		sendMessage(messageList.get(startId));
 	}

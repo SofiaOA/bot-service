@@ -1,10 +1,15 @@
-package com.hedvig.botService.chat;
+package com.hedvig.botService.enteties;
 
-import org.codehaus.jackson.annotate.JsonSubTypes;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.*;
+
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "body_type")
 @JsonTypeInfo(
 	      use = JsonTypeInfo.Id.NAME, 
 	      include = JsonTypeInfo.As.PROPERTY, 
@@ -16,7 +21,12 @@ import org.slf4j.LoggerFactory;
 	    })
 public class MessageBody {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	public Integer id;
+
 	private static Logger log = LoggerFactory.getLogger(MessageBody.class);
+
 	public String content;
 
 	MessageBody(String content){this.content = content;}
