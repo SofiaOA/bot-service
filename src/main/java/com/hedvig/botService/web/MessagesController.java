@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hedvig.botService.enteties.Message;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -57,7 +58,11 @@ public class MessagesController {
     	log.info("Getting all messages for user:" + hid);
 
     	try {
-			return sessionManager.getAllMessages(hid).stream().collect(Collectors.toMap(m -> m.getTimestamp().toEpochMilli(), Function.identity()));
+			return sessionManager.getAllMessages(hid).stream()
+					.sorted((x,y)->x.getTimestamp().compareTo(y.getTimestamp()))
+					.collect(Collectors.toMap(m -> m.getTimestamp().toEpochMilli(), Function.identity(),
+							(x, y) -> y, LinkedHashMap::new)
+					);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

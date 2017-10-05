@@ -35,6 +35,10 @@ public class Message {
     @Setter
 	private Instant timestamp;
 
+	public Integer getGlobalId() {
+		return globalId;
+	}
+
 	@NotNull
 	@ManyToOne
     @JsonIgnore

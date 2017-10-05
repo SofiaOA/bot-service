@@ -18,8 +18,10 @@ import javax.persistence.*;
 	    	@JsonSubTypes.Type(value = MessageBodyText.class, name = "text"),
 	        @JsonSubTypes.Type(value = MessageBodySingleSelect.class, name = "single_select"),
 	        @JsonSubTypes.Type(value = MessageBodyMultipleSelect.class, name = "multiple_select"),
-	        @JsonSubTypes.Type(value = MessageBodyMultipleSelect.class, name = "date_picker"),
-	        @JsonSubTypes.Type(value = MessageBodyMultipleSelect.class, name = "video")
+	        @JsonSubTypes.Type(value = MessageBodyDatePicker.class, name = "date_picker"),
+	        @JsonSubTypes.Type(value = MessageBodyAudio.class, name = "audio"),
+	        @JsonSubTypes.Type(value = MessageBodyVideo.class, name = "video"),
+	        @JsonSubTypes.Type(value = MessageBodyHero.class, name = "hero")
 	    })
 public class MessageBody {
 

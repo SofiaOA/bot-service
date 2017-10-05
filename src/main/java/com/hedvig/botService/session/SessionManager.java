@@ -49,6 +49,7 @@ public class SessionManager {
                     repo.save(newChat);
                     OnboardingConversation onboardingConversation = new OnboardingConversation(newChat);
                     onboardingConversation.init();
+                    repo.saveAndFlush(newChat);
                     return newChat;
                 });
 
