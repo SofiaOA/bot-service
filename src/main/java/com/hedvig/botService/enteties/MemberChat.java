@@ -1,6 +1,7 @@
 package com.hedvig.botService.enteties;
 
 import com.hedvig.botService.chat.OnboardingConversation;
+import com.hedvig.botService.enteties.OnBoardingContext;
 import lombok.Getter;
 
 import javax.persistence.*;

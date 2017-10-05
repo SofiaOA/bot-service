@@ -46,9 +46,9 @@ public class SessionManager {
         MemberChat chat = repo.findByMemberId(hid)
                 .orElseGet(() -> {
                     MemberChat newChat = new MemberChat(hid);
+                    repo.save(newChat);
                     OnboardingConversation onboardingConversation = new OnboardingConversation(newChat);
                     onboardingConversation.init();
-                    repo.save(newChat);
                     return newChat;
                 });
 
@@ -61,7 +61,6 @@ public class SessionManager {
 
         m.header.fromId = new Long(hid);
         m.setTimestamp(Instant.now());
-
 
         MemberChat chat = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 

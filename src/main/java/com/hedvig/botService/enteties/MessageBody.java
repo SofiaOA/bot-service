@@ -17,7 +17,9 @@ import javax.persistence.*;
 	    @JsonSubTypes({
 	    	@JsonSubTypes.Type(value = MessageBodyText.class, name = "text"),
 	        @JsonSubTypes.Type(value = MessageBodySingleSelect.class, name = "single_select"),
-	        @JsonSubTypes.Type(value = MessageBodyMultipleChoice.class, name = "multiple_choice")
+	        @JsonSubTypes.Type(value = MessageBodyMultipleSelect.class, name = "multiple_select"),
+	        @JsonSubTypes.Type(value = MessageBodyMultipleSelect.class, name = "date_picker"),
+	        @JsonSubTypes.Type(value = MessageBodyMultipleSelect.class, name = "video")
 	    })
 public class MessageBody {
 

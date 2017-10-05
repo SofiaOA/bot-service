@@ -26,9 +26,9 @@ public class SampleConversation extends Conversation {
 		m2.id = "2";
 		m2.header = new MessageHeader(HEDVIG_USER_ID,"/response",-1);
 		m2.body = new MessageBodySingleSelect("Trevlig att råkas {NAME}. Här kan du välja:",
-				new ArrayList<SelectOption>(){{
-					add(new SelectOption(1, "blå", false));
-					add(new SelectOption(2, "röd", false));
+				new ArrayList<SelectItem>(){{
+					add(new SelectOption("1", "blå", false));
+					add(new SelectOption("2", "röd", false));
 				}}
 		);
 		messageList.put(m2.id, m2);
@@ -47,9 +47,7 @@ public class SampleConversation extends Conversation {
 		log.info(m.toString());
 		switch(m.id){
 		case "1": 
-			String fName = m.body.content;
-			//userContext.userFirstName = fName;
-			
+			String fName = m.body.content;			
 			log.info("Add to context:" + "{NAME}:" + fName);
 			conversationContext.put("{NAME}", fName);
 			sendMessage(messageList.get("2"));
@@ -57,10 +55,10 @@ public class SampleConversation extends Conversation {
 		case "2":
 			MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
 			
-			for(SelectOption o : body.options){
-				if(o.selected){
-					log.info("Add to context:" + "{NAME}:" + o.value);
-					conversationContext.put("{OPTION}", o.value);
+			for(SelectItem o : body.items){
+				if(SelectLink.class.isInstance(o) && SelectLink.class.cast(o).selected){
+					log.info("Add to context:" + "{OPTION}:" + SelectOption.class.cast(o).value);
+					conversationContext.put("{OPTION}", SelectOption.class.cast(o).value);
 					break;
 				}
 			}

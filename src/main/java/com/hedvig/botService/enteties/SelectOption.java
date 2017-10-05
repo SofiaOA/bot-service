@@ -1,18 +1,16 @@
 package com.hedvig.botService.enteties;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
+public class SelectOption extends SelectItem  {
 
-
-public class SelectOption {
-
-	public SelectOption(int id, String value, boolean selected) {
-		this.id = id;
+	public SelectOption(String string, String value, boolean selected) {
+		this.id = string;
 		this.value = value;
 		this.selected = selected;
 	}
 	public SelectOption(){} // NOTE! All objects need to have a default constructor in order for Jackson to marshall.
-	public int id;
+	
+	public String type = "selection";
+	public String id;
 	public String value;
 	public boolean selected;
 	

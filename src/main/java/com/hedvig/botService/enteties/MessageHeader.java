@@ -19,6 +19,7 @@ public class MessageHeader {
 		this.timeStamp = timeStamp;
 	}
 	
+	
 	/*public MessageHeader(int fromId, String type, String responsePath, double timeStamp) {
 		this(fromId, Type.valueOf(type), responsePath,timeStamp);
 	}*/
