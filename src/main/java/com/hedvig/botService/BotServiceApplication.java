@@ -3,9 +3,9 @@ package com.hedvig.botService;
 import java.util.TreeMap;
 
 import com.hedvig.botService.enteties.MemberChatRepository;
+import com.hedvig.botService.enteties.UserContextRepository;
 import com.hedvig.botService.externalEvents.KafkaProperties;
 import com.hedvig.botService.session.SessionManager;
-import com.hedvig.botService.session.UserContext;
 import org.axonframework.config.EventHandlingConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -26,13 +26,13 @@ public class BotServiceApplication {
         config.usingTrackingProcessors();
     }
     
-    @Bean
+    /*@Bean
     public TreeMap<String, UserContext> createSession(){
     	return new TreeMap<String, UserContext>();
-    }
+    }*/
     
     @Bean
-    public SessionManager createSessionManager(MemberChatRepository repo){
-    	return new SessionManager(repo);
+    public SessionManager createSessionManager(MemberChatRepository repo, UserContextRepository userrepo){
+    	return new SessionManager(repo, userrepo);
     }
 }

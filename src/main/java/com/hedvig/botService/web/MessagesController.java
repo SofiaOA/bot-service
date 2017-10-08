@@ -79,7 +79,12 @@ public class MessagesController {
      	log.info("Message recieved from user:" + hid);
 
         msg.header.fromId = new Long(hid);
-
+        
+        // Clear all key information to generate a new entry
+        msg.globalId = null;
+        msg.header.messageId = null;
+        msg.body.id = null;
+        
         sessionManager.receiveMessage(msg, hid);
 
         log.info("Of type:" + msg.body.getClass());

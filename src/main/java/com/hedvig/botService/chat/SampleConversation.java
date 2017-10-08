@@ -5,13 +5,12 @@ import java.util.ArrayList;
 import com.hedvig.botService.enteties.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.hedvig.botService.session.UserContext;
 
 public class SampleConversation extends Conversation {
 
 	private static Logger log = LoggerFactory.getLogger(SampleConversation.class);	
-	public SampleConversation(MemberChat u) {
-		super("onboarding", u);
+	public SampleConversation(MemberChat mc, UserContext uc) {
+		super("onboarding", mc, uc);
 		init();
 	}
 
@@ -47,18 +46,18 @@ public class SampleConversation extends Conversation {
 		log.info(m.toString());
 		switch(m.id){
 		case "1": 
-			String fName = m.body.content;			
+			String fName = m.body.text;			
 			log.info("Add to context:" + "{NAME}:" + fName);
-			conversationContext.put("{NAME}", fName);
+			userContext.putUserData("{NAME}", fName);
 			sendMessage(messageList.get("2"));
 			break;
 		case "2":
 			MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
 			
-			for(SelectItem o : body.items){
+			for(SelectItem o : body.choices){
 				if(SelectLink.class.isInstance(o) && SelectLink.class.cast(o).selected){
 					log.info("Add to context:" + "{OPTION}:" + SelectOption.class.cast(o).value);
-					conversationContext.put("{OPTION}", SelectOption.class.cast(o).value);
+					userContext.putUserData("{OPTION}", SelectOption.class.cast(o).value);
 					break;
 				}
 			}

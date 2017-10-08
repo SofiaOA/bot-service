@@ -1,5 +1,7 @@
 package com.hedvig.botService.enteties;
 
+import java.time.Instant;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,7 +14,7 @@ public class MessageHeader {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public Integer messageId;
 
-	public MessageHeader(long hedvigUserId, String responsePath, double timeStamp) {
+	public MessageHeader(long hedvigUserId, String responsePath, long timeStamp) {
 		this.fromId = hedvigUserId;
 		//this.type = type;
 		this.responsePath = responsePath;
@@ -30,7 +32,7 @@ public class MessageHeader {
 	 * */
 	public long fromId;
 	public String responsePath;
-	public double timeStamp; // Time when sent/recieved on API-GW
+	public long timeStamp; // Time when sent/recieved on API-GW
 
 	
 	/*@JsonSetter("type")

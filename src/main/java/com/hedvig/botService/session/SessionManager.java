@@ -7,30 +7,29 @@ package com.hedvig.botService.session;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import com.hedvig.botService.chat.OnboardingConversation;
-import com.hedvig.botService.enteties.MemberChat;
-import com.hedvig.botService.enteties.MemberChatRepository;
-import com.hedvig.botService.enteties.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.hedvig.botService.chat.OnboardingConversation;
+import com.hedvig.botService.enteties.MemberChat;
+import com.hedvig.botService.enteties.MemberChatRepository;
 import com.hedvig.botService.enteties.Message;
+import com.hedvig.botService.enteties.ResourceNotFoundException;
+import com.hedvig.botService.enteties.UserContext;
+import com.hedvig.botService.enteties.UserContextRepository;
 
 public class SessionManager {
 
     private static Logger log = LoggerFactory.getLogger(SessionManager.class);
     private final MemberChatRepository repo;
+    private final UserContextRepository userrepo;
 
     @Autowired
-    public SessionManager( MemberChatRepository repo) {
+    public SessionManager( MemberChatRepository repo, UserContextRepository userrepo) {
         this.repo = repo;
+        this.userrepo = userrepo;
     }
 
     public List<Message> getMessages(int i, String hid) {
@@ -43,16 +42,32 @@ public class SessionManager {
     public List<Message> getAllMessages(String hid) {
         log.info("Getting all messages for user:" + hid);
 
-        MemberChat chat = repo.findByMemberId(hid)
-                .orElseGet(() -> {
+        /*
+         * Find users chat and context. First time it is created
+         * */
+        MemberChat chat = repo.findByMemberId(hid).orElseGet(() -> {
                     MemberChat newChat = new MemberChat(hid);
                     repo.save(newChat);
-                    OnboardingConversation onboardingConversation = new OnboardingConversation(newChat);
-                    onboardingConversation.init();
-                    repo.saveAndFlush(newChat);
                     return newChat;
                 });
 
+        UserContext uc = userrepo.findByMemberId(hid).orElseGet(() -> {
+        	UserContext newUserContext = new UserContext(hid);
+        	userrepo.save(newUserContext);
+            return newUserContext;
+        });
+
+        OnboardingConversation onboardingConversation = new OnboardingConversation(chat, uc);
+        
+        // If this is the first message the Onboarding conversation is initiated
+        if(!uc.onboardingStarted()){
+        	uc.onboardingStarted(true);
+        	onboardingConversation.init();
+        }
+        repo.saveAndFlush(chat);
+        userrepo.saveAndFlush(uc);
+        
+        log.info(chat.toString());
         return chat.chatHistory;
     }
 
@@ -61,11 +76,19 @@ public class SessionManager {
         log.info(m.toString());
 
         m.header.fromId = new Long(hid);
-        m.setTimestamp(Instant.now());
 
-        MemberChat chat = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
-
-        chat.receiveMessage(m);
-        repo.save(chat);
+        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+        mc.receiveMessage(m);
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+        
+        /*
+         * User is onboaring:
+         * */
+        if(!uc.onboardingComplete()) {
+            OnboardingConversation onboardingConversation = new OnboardingConversation(mc, uc);
+            onboardingConversation.recieveMessage(m);
+        }
+        
+        repo.save(mc);
     }
 }

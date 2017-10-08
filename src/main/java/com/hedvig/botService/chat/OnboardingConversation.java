@@ -14,8 +14,8 @@ public class OnboardingConversation extends Conversation {
 	private static Logger log = LoggerFactory.getLogger(OnboardingConversation.class);
 	private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 	
-	public OnboardingConversation(MemberChat u) {
-		super("onboarding", u);
+	public OnboardingConversation(MemberChat mc, UserContext uc) {
+		super("onboarding", mc,uc);
 		// TODO Auto-generated constructor stub
 
 		createMessage("message.hello",
@@ -34,9 +34,19 @@ public class OnboardingConversation extends Conversation {
 
 		createMessage("message.bye", new MessageBodySingleSelect("Ok {NAME}, så det jag vet om dig är att du är förr {BIRTH_DATE}, jag hör av mig!",
 					new ArrayList<SelectItem>(){{
-						add(new SelectLink("Starta bank id", "/response", "message.getname", false));
+						add(new SelectOption("Starta bank id", "message.bankid.status", false));
+						add(new SelectOption("Spela in audio", "message.audio", false));
+						add(new SelectOption("Spela in video", "message.video", false));
+						add(new SelectOption("You need a hero!", "message.hero", false));
 					}}				
-				));		
+				));
+		
+		createMessage("message.audio", new MessageBodyAudio("Här kan du spela in en berättelse om vad som hänt...", "http://audiouploadurl"));
+		
+		createMessage("message.video", new MessageBodyAudio("Här kan du spela in en video om vad som hänt...", "http://videoploadurl"));
+		
+		createMessage("message.hero", new MessageBodyHero("You need a hero!", "http://www.comedyflavors.com/wp-content/uploads/2015/02/hero.gif"));
+		
 		
 		createMessage("message.changecompany",
 				new MessageBodyMultipleSelect("Ok, vilket bolag har du idag?",
@@ -48,6 +58,7 @@ public class OnboardingConversation extends Conversation {
 				));
 
 		createMessage("message.whyinsurance", new MessageBodyText("Hemförsäkring behöver alla!"));
+		
 		createMessage("message.whoishedvig", new MessageBodyText("En försäkringsbot!"));
 		createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 	}
@@ -63,9 +74,9 @@ public class OnboardingConversation extends Conversation {
 		switch(m.id){
 		case "message.getname": 
 
-			String fName = m.body.content;			
+			String fName = m.body.text;			
 			log.info("Add to context:" + "{NAME}:" + fName);
-			conversationContext.put("{NAME}", fName);
+			userContext.putUserData("{NAME}", fName);
 			sendMessage(messageList.get("message.greetings"));
 			
 			break;
@@ -74,7 +85,7 @@ public class OnboardingConversation extends Conversation {
 
 			LocalDateTime bDate = ((MessageBodyDatePicker)m.body).date;			
 			log.info("Add to context:" + "{BIRTH_DATE}:" + bDate.toString());
-			conversationContext.put("{BIRTH_DATE}", bDate.toString());
+			userContext.putUserData("{BIRTH_DATE}", bDate.toString());
 			sendMessage(messageList.get("message.bye"));
 			
 			break;
@@ -86,7 +97,7 @@ public class OnboardingConversation extends Conversation {
 			if(m.body.getClass().equals(MessageBodySingleSelect.class) ){
 				
 				MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
-				for(SelectItem o : body.items){
+				for(SelectItem o : body.choices){
 					if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
 						sendMessage(messageList.get(SelectOption.class.cast(o).value));
 					}

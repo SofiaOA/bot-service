@@ -31,8 +31,8 @@ public class MessageBody {
 
 	private static Logger log = LoggerFactory.getLogger(MessageBody.class);
 
-	public String content;
+	public String text;
 
-	MessageBody(String content){this.content = content;}
+	MessageBody(String text){this.text = text;}
 	MessageBody(){log.info("Instansiating MessageBody");}
 }

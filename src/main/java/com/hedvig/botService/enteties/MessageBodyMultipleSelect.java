@@ -13,11 +13,11 @@ import javax.persistence.Entity;
 public class MessageBodyMultipleSelect extends MessageBody {
 	private static Logger log = LoggerFactory.getLogger(MessageBodySingleSelect.class);
 	
-	public ArrayList<SelectItem> items = new ArrayList<SelectItem>();
+	public ArrayList<SelectItem> choices = new ArrayList<SelectItem>();
 	
     public MessageBodyMultipleSelect(String content, ArrayList<SelectItem> items) {
     	super(content);
-		this.items.addAll(items); // TODO
+		this.choices.addAll(items); // TODO
 	}
     MessageBodyMultipleSelect(){log.info("Instansiating MessageBodyMultipleChoice");}
 }

@@ -12,11 +12,11 @@ import java.util.ArrayList;
 public class MessageBodySingleSelect extends MessageBody {
 	private static Logger log = LoggerFactory.getLogger(MessageBodySingleSelect.class);
 
-	public ArrayList<SelectItem> items = new ArrayList<SelectItem>();
+	public ArrayList<SelectItem> choices = new ArrayList<SelectItem>();
 	
     public MessageBodySingleSelect(String content, ArrayList<SelectItem> items) {
     	super(content);
-    	this.items.addAll(items);
+    	this.choices.addAll(items);
 	}
     MessageBodySingleSelect(){log.info("Instansiating MessageBodySingleSelect");}
 }

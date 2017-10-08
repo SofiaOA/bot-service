@@ -10,6 +10,8 @@ import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.Message;
 import com.hedvig.botService.enteties.MessageBody;
 import com.hedvig.botService.enteties.MessageHeader;
+import com.hedvig.botService.enteties.UserContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,18 +20,20 @@ public abstract class Conversation {
     static final long  HEDVIG_USER_ID = 1; // The id hedvig uses to chat
 	private static final String regexPattern = "\\{(.*?)\\}";
 	private static Logger log = LoggerFactory.getLogger(Conversation.class);
-	private String conversationId; // Id for the conversation
-	MemberChat userContext;
+	private String conversationName; // Id for the conversation
+	MemberChat memberChat;
+	UserContext userContext;
 	TreeMap<String, Message> messageList = new TreeMap<String, Message>();
-	HashMap<String, String> conversationContext = new HashMap<String, String>(); // Context specific information learned during conversation
+	//HashMap<String, String> conversationContext = new HashMap<String, String>(); // Context specific information learned during conversation
 	
-	Conversation(String conversationId, MemberChat u) {
-		this.conversationId = conversationId;
-		this.userContext = u;
+	Conversation(String conversationId, MemberChat mc, UserContext uc) {
+		this.conversationName = conversationId;
+		this.memberChat = mc;
+		this.userContext = uc;
 	}
 
 	public String getConversationId() {
-		return conversationId;
+		return conversationName;
 	}
 	public ConversationMessage getCurrent() {
 		return current;
@@ -45,7 +49,7 @@ public abstract class Conversation {
 		Matcher m = pattern.matcher(input);
 		while (m.find()) {
 			String s = m.group();
-			String r = conversationContext.get(s);
+			String r = userContext.getDataEntry(s);
 			log.debug(s + ":" + r);
 			if(r!=null){input = input.replace(s, r);}
 		}
@@ -54,12 +58,10 @@ public abstract class Conversation {
 	}
 	
 	void sendMessage(Message m) {
-		log.info("Sending message:" + m.id + " content:" + m.body.content);
+		log.info("Sending message:" + m.id + " content:" + m.body.text);
 
-		m.body.content = replaceWithContext(m.body.content);
-		m.setTimestamp(Instant.now());
-
-		userContext.addToHistory(m);
+		m.body.text = replaceWithContext(m.body.text);
+		memberChat.addToHistory(m);
 	}
 
 	private void createMessage(String id, MessageHeader header, MessageBody body){

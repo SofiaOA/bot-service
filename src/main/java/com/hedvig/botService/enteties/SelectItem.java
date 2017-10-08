@@ -1,0 +1,22 @@
+package com.hedvig.botService.enteties;
+
+import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+/*
+ * A select item is a super type for everything one can put in a list of options
+ * An "option" triggers a post and a "link" triggers a load of a screen on the client side
+ * */
+@JsonTypeInfo(
+	      use = JsonTypeInfo.Id.NAME, 
+	      include = JsonTypeInfo.As.PROPERTY, 
+	      property = "type")
+	    @JsonSubTypes({
+	    	@JsonSubTypes.Type(value = SelectOption.class, name = "selection"),
+	        @JsonSubTypes.Type(value = SelectLink.class, name = "link")
+	    })
+public class SelectItem implements Serializable {
+
+}
