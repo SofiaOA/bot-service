@@ -55,7 +55,7 @@ public class SampleConversation extends Conversation {
 			MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
 			
 			for(SelectItem o : body.choices){
-				if(SelectLink.class.isInstance(o) && SelectLink.class.cast(o).selected){
+				if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
 					log.info("Add to context:" + "{OPTION}:" + SelectOption.class.cast(o).value);
 					userContext.putUserData("{OPTION}", SelectOption.class.cast(o).value);
 					break;
