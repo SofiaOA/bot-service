@@ -11,7 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+import org.springframework.web.multipart.support.MultipartFilter;
 
 @SpringBootApplication
 @EnableConfigurationProperties(KafkaProperties.class)
@@ -26,13 +29,14 @@ public class BotServiceApplication {
         config.usingTrackingProcessors();
     }
     
+    @Bean
+    public SessionManager createSessionManager(MemberChatRepository repo, UserContextRepository userrepo){
+    	return new SessionManager(repo, userrepo);
+    }
+
     /*@Bean
     public TreeMap<String, UserContext> createSession(){
     	return new TreeMap<String, UserContext>();
     }*/
     
-    @Bean
-    public SessionManager createSessionManager(MemberChatRepository repo, UserContextRepository userrepo){
-    	return new SessionManager(repo, userrepo);
-    }
 }

@@ -59,13 +59,4 @@ public class MemberChat {
         this.chatHistory.add(m);
     }
 
-    public void receiveMessage(Message m) {
-    	
-        Instant time = Instant.now();
-        m.header.timeStamp = time.toEpochMilli();
-        m.setTimestamp(time);
-        addToHistory(m);
-
-    }
-
 }

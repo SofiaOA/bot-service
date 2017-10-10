@@ -27,7 +27,7 @@ public class SessionManager {
     private final UserContextRepository userrepo;
 
     @Autowired
-    public SessionManager( MemberChatRepository repo, UserContextRepository userrepo) {
+    public SessionManager(MemberChatRepository repo, UserContextRepository userrepo) {
         this.repo = repo;
         this.userrepo = userrepo;
     }
@@ -70,7 +70,7 @@ public class SessionManager {
         log.info(chat.toString());
         return chat.chatHistory;
     }
-
+    
     public void receiveMessage(Message m, String hid) {
         log.info("Recieving messages from user:" + hid);
         log.info(m.toString());
@@ -78,7 +78,6 @@ public class SessionManager {
         m.header.fromId = new Long(hid);
 
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
-        mc.receiveMessage(m);
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
         
         /*
