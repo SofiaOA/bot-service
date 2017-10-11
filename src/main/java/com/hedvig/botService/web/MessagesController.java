@@ -1,24 +1,28 @@
 package com.hedvig.botService.web;
 
-import com.hedvig.botService.session.SessionManager;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.support.ByteArrayMultipartFileEditor;
 
 import com.hedvig.botService.enteties.Message;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import com.hedvig.botService.session.SessionManager;
 
 @RestController
 public class MessagesController {
@@ -32,16 +36,24 @@ public class MessagesController {
 		this.sessionManager = sessions;
     }
 
+    protected void initBinder(HttpServletRequest request, ServletRequestDataBinder binder)
+		throws ServletException {
+	
+		// Convert multipart object to byte[]
+		binder.registerCustomEditor(byte[].class, new ByteArrayMultipartFileEditor());
+	
+	}
+    
     /*
      * TODO: Change hedvig.token from optional to required
      * */
     @RequestMapping(path="/messages/{messageCount}")
-    public Map<Long, Message> messages(@PathVariable int messageCount, @RequestHeader(value="hedvig.token", required = false) String hid) {
+    public Map<Integer, Message> messages(@PathVariable int messageCount, @RequestHeader(value="hedvig.token", required = false) String hid) {
     	
     	log.info("Getting " + messageCount + " messages for user:" + hid);
 
     	try {
-			return sessionManager.getMessages(messageCount, hid).stream().collect(Collectors.toMap( m -> m.getTimestamp().toEpochMilli(), Function.identity()));
+			return sessionManager.getMessages(messageCount, hid).stream().collect(Collectors.toMap( m -> m.getGlobalId(), Function.identity()));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -53,14 +65,14 @@ public class MessagesController {
      * TODO: Change hedvig.token from optional to required
      * */
     @RequestMapping(path="/messages")
-    public Map<Long, Message> allMessages(@RequestHeader(value="hedvig.token", required = false) String hid) {
+    public Map<Integer, Message> allMessages(@RequestHeader(value="hedvig.token", required = false) String hid) {
     	
     	log.info("Getting all messages for user:" + hid);
 
     	try {
 			return sessionManager.getAllMessages(hid).stream()
 					.sorted((x,y)->x.getTimestamp().compareTo(y.getTimestamp()))
-					.collect(Collectors.toMap(m -> m.getTimestamp().toEpochMilli(), Function.identity(),
+					.collect(Collectors.toMap(m -> m.getGlobalId(), Function.identity(),
 							(x, y) -> y, LinkedHashMap::new)
 					);
 		} catch (Exception e) {
@@ -92,4 +104,21 @@ public class MessagesController {
     	return ResponseEntity.noContent().build();
     }
 
+    @RequestMapping(path = "/chat/reset/", method = RequestMethod.POST)
+    public ResponseEntity<?> resetChat(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
+
+     	log.info("Reset chat for user:" + hid);
+        //sessionManager.receiveMessage(msg, hid);
+
+    	return ResponseEntity.noContent().build();
+    }
+    
+    @RequestMapping(path = "/chat/edit/", method = RequestMethod.POST)
+    public ResponseEntity<?> editChat(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
+
+     	log.info("Edit chat for user:" + hid);
+        //sessionManager.receiveMessage(msg, hid);
+
+    	return ResponseEntity.noContent().build();
+    }
 }

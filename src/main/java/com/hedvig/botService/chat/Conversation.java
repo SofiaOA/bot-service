@@ -57,9 +57,8 @@ public abstract class Conversation {
 		return input;
 	}
 	
-	void sendMessage(Message m) {
-		log.info("Sending message:" + m.id + " content:" + m.body.text);
-
+	void putMessage(Message m) {
+		log.info("Putting message:" + m.id + " content:" + m.body.text);
 		m.body.text = replaceWithContext(m.body.text);
 		memberChat.addToHistory(m);
 	}
@@ -79,7 +78,7 @@ public abstract class Conversation {
 	
 	void startConversation(String startId){
 		log.info("Starting conversation with message:" + startId);
-		sendMessage(messageList.get(startId));
+		putMessage(messageList.get(startId));
 	}
 	
 	public abstract void recieveMessage(Message m);

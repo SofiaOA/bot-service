@@ -34,14 +34,14 @@ public class OnboardingConversation extends Conversation {
 
 		createMessage("message.bye", new MessageBodySingleSelect("Ok {NAME}, så det jag vet om dig är att du är förr {BIRTH_DATE}, jag hör av mig!",
 					new ArrayList<SelectItem>(){{
-						add(new SelectOption("Starta bank id", "message.bankid.status", false));
-						add(new SelectOption("Spela in audio", "message.audio", false));
+						add(new SelectLink("Starta bank id", "AssetTracker","bankid://", "http://hedvig.com"));
+						add(new SelectOption("Ladda upp foto", "message.photo_upload", false));
 						add(new SelectOption("Spela in video", "message.video", false));
 						add(new SelectOption("You need a hero!", "message.hero", false));
 					}}				
 				));
 		
-		createMessage("message.audio", new MessageBodyAudio("Här kan du spela in en berättelse om vad som hänt...", "http://audiouploadurl"));
+		createMessage("message.photo_upload", new MessageBodyPhotoUpload("Här kan du ladda upp en bild..", "https://gateway.hedvig.com/asset/fileupload/"));
 		
 		createMessage("message.video", new MessageBodyAudio("Här kan du spela in en video om vad som hänt...", "http://videoploadurl"));
 		
@@ -77,7 +77,9 @@ public class OnboardingConversation extends Conversation {
 			String fName = m.body.text;			
 			log.info("Add to context:" + "{NAME}:" + fName);
 			userContext.putUserData("{NAME}", fName);
-			sendMessage(messageList.get("message.greetings"));
+			m.body.text = "Jag heter " + fName;
+			putMessage(m); // Response parsed to nice format
+			putMessage(messageList.get("message.greetings"));
 			
 			break;
 
@@ -86,7 +88,7 @@ public class OnboardingConversation extends Conversation {
 			LocalDateTime bDate = ((MessageBodyDatePicker)m.body).date;			
 			log.info("Add to context:" + "{BIRTH_DATE}:" + bDate.toString());
 			userContext.putUserData("{BIRTH_DATE}", bDate.toString());
-			sendMessage(messageList.get("message.bye"));
+			putMessage(messageList.get("message.bye"));
 			
 			break;
 			
@@ -99,13 +101,15 @@ public class OnboardingConversation extends Conversation {
 				MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
 				for(SelectItem o : body.choices){
 					if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
-						sendMessage(messageList.get(SelectOption.class.cast(o).value));
+						m.body.text = SelectOption.class.cast(o).text;
+						putMessage(m);
+						putMessage(messageList.get(SelectOption.class.cast(o).value));
 					}
 				}
 			}
 			else{
 				log.info("Unknown message recieved...");
-				sendMessage(messageList.get("error"));
+				putMessage(messageList.get("error"));
 			}
 			 
 			break;

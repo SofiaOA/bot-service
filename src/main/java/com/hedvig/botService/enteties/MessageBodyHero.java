@@ -10,11 +10,11 @@ import javax.persistence.Entity;
 @DiscriminatorValue("hero")
 public class MessageBodyHero extends MessageBody {
 
-	public String URL;
+	public String imageUri;
 	private static Logger log = LoggerFactory.getLogger(MessageBodyHero.class);
     public MessageBodyHero(String content, String URL) {
     	super(content);
-    	this.URL = URL;
+    	this.imageUri = URL;
 	}
     MessageBodyHero(){log.info("Instansiating MessageBodyHero");}
 }

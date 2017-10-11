@@ -38,7 +38,7 @@ public class SampleConversation extends Conversation {
 		m3.body = new MessageBodyText("Ok {NAME}, så du gillar {OPTION}... Jag med!");
 		messageList.put(m3.id, m3);
 		
-		sendMessage(m); // Put first message on the outbox
+		putMessage(m); // Put first message on the outbox
 	}
 
 	@Override
@@ -49,19 +49,19 @@ public class SampleConversation extends Conversation {
 			String fName = m.body.text;			
 			log.info("Add to context:" + "{NAME}:" + fName);
 			userContext.putUserData("{NAME}", fName);
-			sendMessage(messageList.get("2"));
+			putMessage(messageList.get("2"));
 			break;
 		case "2":
 			MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
 			
 			for(SelectItem o : body.choices){
-				if(SelectLink.class.isInstance(o) && SelectLink.class.cast(o).selected){
+				if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
 					log.info("Add to context:" + "{OPTION}:" + SelectOption.class.cast(o).value);
 					userContext.putUserData("{OPTION}", SelectOption.class.cast(o).value);
 					break;
 				}
 			}
-			sendMessage(messageList.get("3"));
+			putMessage(messageList.get("3"));
 			break;
 		 default:
 			 log.info("Unknown message recieved...");
