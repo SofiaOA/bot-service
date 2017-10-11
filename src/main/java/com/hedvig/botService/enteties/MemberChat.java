@@ -35,11 +35,14 @@ public class MemberChat {
     public UserContext onboardingContext;*/
 
     public String toString(){
-    	return "id:" + this.id + " memberId:" + this.memberId + " #msgs:" + (chatHistory == null? null:chatHistory.size());
+    	
+    	String mId = "";
+    	if(chatHistory != null)for(Message m : chatHistory){mId += (" (" + m.globalId + ":" + m.id + ")");}
+    	return "id:" + this.id + " memberId:" + this.memberId + " #msgs:" + (chatHistory == null? null:chatHistory.size() + " [" + mId + "]");
     }
     
     public MemberChat() {
-    	log.info("Instantiating MemberChat " + this );
+    	//log.info("Instantiating MemberChat " + this );
     	//new Exception().printStackTrace(System.out);
     }
 

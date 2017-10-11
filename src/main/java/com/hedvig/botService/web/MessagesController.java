@@ -48,12 +48,12 @@ public class MessagesController {
      * TODO: Change hedvig.token from optional to required
      * */
     @RequestMapping(path="/messages/{messageCount}")
-    public Map<Long, Message> messages(@PathVariable int messageCount, @RequestHeader(value="hedvig.token", required = false) String hid) {
+    public Map<Integer, Message> messages(@PathVariable int messageCount, @RequestHeader(value="hedvig.token", required = false) String hid) {
     	
     	log.info("Getting " + messageCount + " messages for user:" + hid);
 
     	try {
-			return sessionManager.getMessages(messageCount, hid).stream().collect(Collectors.toMap( m -> m.getTimestamp().toEpochMilli(), Function.identity()));
+			return sessionManager.getMessages(messageCount, hid).stream().collect(Collectors.toMap( m -> m.getGlobalId(), Function.identity()));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -65,14 +65,14 @@ public class MessagesController {
      * TODO: Change hedvig.token from optional to required
      * */
     @RequestMapping(path="/messages")
-    public Map<Long, Message> allMessages(@RequestHeader(value="hedvig.token", required = false) String hid) {
+    public Map<Integer, Message> allMessages(@RequestHeader(value="hedvig.token", required = false) String hid) {
     	
     	log.info("Getting all messages for user:" + hid);
 
     	try {
 			return sessionManager.getAllMessages(hid).stream()
 					.sorted((x,y)->x.getTimestamp().compareTo(y.getTimestamp()))
-					.collect(Collectors.toMap(m -> m.getTimestamp().toEpochMilli(), Function.identity(),
+					.collect(Collectors.toMap(m -> m.getGlobalId(), Function.identity(),
 							(x, y) -> y, LinkedHashMap::new)
 					);
 		} catch (Exception e) {
@@ -104,4 +104,21 @@ public class MessagesController {
     	return ResponseEntity.noContent().build();
     }
 
+    @RequestMapping(path = "/chat/reset/", method = RequestMethod.POST)
+    public ResponseEntity<?> resetChat(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
+
+     	log.info("Reset chat for user:" + hid);
+        //sessionManager.receiveMessage(msg, hid);
+
+    	return ResponseEntity.noContent().build();
+    }
+    
+    @RequestMapping(path = "/chat/edit/", method = RequestMethod.POST)
+    public ResponseEntity<?> editChat(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
+
+     	log.info("Edit chat for user:" + hid);
+        //sessionManager.receiveMessage(msg, hid);
+
+    	return ResponseEntity.noContent().build();
+    }
 }
