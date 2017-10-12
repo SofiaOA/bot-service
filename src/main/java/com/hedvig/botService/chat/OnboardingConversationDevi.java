@@ -366,7 +366,8 @@ public class OnboardingConversationDevi extends Conversation {
     }
 
     public void init() {
-        startConversation("message.onboardingstart"); // Id of first message
+        //startConversation("message.onboardingstart"); // Id of first message
+        startConversation("message.sakerhet"); // Id of first message
     }
 
     public int getNumberValue(Message m){
@@ -386,7 +387,7 @@ public class OnboardingConversationDevi extends Conversation {
     }
     
     public ArrayList<String> getSelectedMultipleValue(Message m){
-		MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
+		MessageBodyMultipleSelect body = (MessageBodyMultipleSelect)m.body;
 		ArrayList<String> selectedOptions = new ArrayList<String>();
 		for(SelectItem o : body.choices){
 			if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
@@ -469,6 +470,9 @@ public class OnboardingConversationDevi extends Conversation {
 
                 break;
 
+            case "onboarding.done" :
+            	userContext.onboardingComplete(true);
+            	break;
             case "message.greetings":
 
                 LocalDateTime bDate = ((MessageBodyDatePicker) m.body).date;
