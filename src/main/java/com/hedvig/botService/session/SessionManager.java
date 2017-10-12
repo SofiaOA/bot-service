@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.hedvig.botService.chat.ClaimsConversation;
 import com.hedvig.botService.chat.OnboardingConversation;
+import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.MemberChatRepository;
 import com.hedvig.botService.enteties.Message;
@@ -70,7 +71,8 @@ public class SessionManager {
 
         // Still onboarding
         if(!uc.onboardingComplete()) {
-	        OnboardingConversation onboardingConversation = new OnboardingConversation(chat, uc);
+	        //OnboardingConversation onboardingConversation = new OnboardingConversation(chat, uc);
+	        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(chat, uc);
 	        
 	        // If this is the first message the Onboarding conversation is initiated
 	        if(!uc.onboardingStarted()){
@@ -105,7 +107,8 @@ public class SessionManager {
          * User is onboaring:
          * */
         if(!uc.onboardingComplete()) {
-            OnboardingConversation onboardingConversation = new OnboardingConversation(mc, uc);
+            //OnboardingConversation onboardingConversation = new OnboardingConversation(mc, uc);
+        	OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc);
             onboardingConversation.recieveMessage(m);
         }
        
