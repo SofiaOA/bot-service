@@ -28,7 +28,7 @@ public class OnboardingConversationDevi extends Conversation {
                 ));
 
         createMessage("message.forslagstart",
-                new MessageBodySingleSelect("👌 :ok_hand:\n\nDå sätter vi igång\n\nAllt du svarar är så klart i säkert förvar hos mig :closed_lock_with_key:\n\nBor du i lägenhet eller eget hus?",
+                new MessageBodySingleSelect(":ok_hand:\n\nDå sätter vi igång\n\nAllt du svarar är så klart i säkert förvar hos mig :closed_lock_with_key:\n\nBor du i lägenhet eller eget hus?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Lägenhet", "message.lagenhet", false));
                             add(new SelectOption("Eget hus", "message.hus", false));
@@ -45,7 +45,8 @@ public class OnboardingConversationDevi extends Conversation {
 
         //JAG LOGGAR IN = STARTA BANKID, LOGGA IN, SEN TILLBAKS TILL message.bankidja
 
-
+        // House dead-end:::
+        
         createMessage("message.hus",
                 new MessageBodySingleSelect("{HOUSE} Åh, typiskt! Just nu är det lägenheter jag kan försäkra\n\nMen jag hör gärna av mig till dig så fort jag har viktiga nyheter\n\nOch om du känner någon lägenhetsbo som du vill tipsa om mig, kan du passa på nu\n\nJag skickar ingen spam, lovar!",
                         new ArrayList<SelectItem>() {{
@@ -60,38 +61,8 @@ public class OnboardingConversationDevi extends Conversation {
         // All these goes to message.nagotmer
         createMessage("message.nyhetsbrev", new MessageBodyText("Härligt! Skriv in din mailadress så håller jag dig uppdaterad"));
         createMessage("message.tipsa", new MessageBodyText("Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmejl till"));
-        createMessage("message.frifraga", new MessageBodyText("Fråga på!\n\nSkriv vad du undrar här så hör jag och mina kollegor av oss snart 📯 :postal_horn:"));
+        createMessage("message.frifraga", new MessageBodyText("Fråga på!\n\nSkriv vad du undrar här så hör jag och mina kollegor av oss snart :postal_horn:"));
         
-        /*createMessage("message.nyhetsbrev",
-                new MessageBodySingleSelect("Härligt! Skriv in din mailadress så håller jag dig uppdaterad",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("(FUNKTION: FYLL I MAILADRESS)", "message.nagotmer", false));
-                        }}
-                ));*/
-
-        //(FUNKTION: FYLL I MAILADRESS) = FÄLT
-
-
-        /*createMessage("message.tipsa",
-                new MessageBodySingleSelect("Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmejl till",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("(FUNKTION: FYLL I MAILADRESS)", "message.nagotmer", false));
-                        }}
-                ));
-
-        //(FUNKTION: FYLL I MAILADRESS) = FÄLT
-
-
-        createMessage("message.frifraga",
-                new MessageBodySingleSelect("Fråga på!\n\nSkriv vad du undrar här så hör jag och mina kollegor av oss snart :postal_horn: ",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("(FUNKTION: SKRIV FRÅGA)", "message.nagotmer", false));
-                        }}
-                ));
-
-        //(FUNKTION: SKRIV FRÅGA) = FÄLT FÖR FRITEXT OCH SKICKA-FUNKTION SOM GÅR TILL TYP hedvig@hedvig.com
-
-*/
         createMessage("message.nagotmer",
                 new MessageBodySingleSelect("Tack! Vill du hitta på något mer nu när vi har varandra på digitråden?",
                         new ArrayList<SelectItem>() {{
@@ -102,6 +73,8 @@ public class OnboardingConversationDevi extends Conversation {
                         }}
                 ));
 
+        // ----------------------------------------------- //
+        
         createMessage("message.bankidja",
                 new MessageBodySingleSelect("Tackar! Enligt infon jag har fått bor du i en lägenhet på (ADRESS). Stämmer det?",
                         new ArrayList<SelectItem>() {{
@@ -110,26 +83,18 @@ public class OnboardingConversationDevi extends Conversation {
                         }}
                 ));
 
-
-        createMessage("message.kvadrat",
-                new MessageBodySingleSelect("Och hur många kvadrat är lägenheten?",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("(FUNKTION: FYLL I M2)", "message.student", false));
-                        }}
-                ));
-
-        //(FUNKTION: FYLL I M2) = SCROLL KANSKE?
-
+        createMessage("message.kvadrat", new MessageBodyNumber("Och hur många kvadrat är lägenheten?"));
+        
         createMessage("message.manuellpersonnr",
                 new MessageBodySingleSelect("Inga problem! Då ställer jag bara några extra frågor\n\nVad är ditt personnummer?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("(FUNKTION: FYLL I PERSONNR)", "message.manuelladress", false));
+                            add(new SelectOption("(FUNKTION: FYLL I PERSONNR)", "message.personnr", false));
                         }}
                 ));
 
         //(FUNKTION: FYLL I PERSONNR) = SCROLL KANSKE DÄR EN VÄLJER DATUM? BEHÖVS FYRA SISTA SIFFROR?
 
-        createMessage("message.manuelladress",
+        createMessage("message.personnr",
                 new MessageBodySingleSelect("Tack! Och var bor du någonstans?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("(FUNKTION: FYLL I ADRESS)", "message.kvadrat", false));
@@ -462,6 +427,10 @@ public class OnboardingConversationDevi extends Conversation {
 	        case "message.frifraga":
 	        	nxtMsg = "message.nagotmer";
 	        	break;
+	        case "message.kvadrat":
+	        	userContext.putUserData("{KVM}", getSelectedSingleValue(m));
+	        	nxtMsg = "message.student";
+	        	break;	        	
             case "message.getname":
 
                 String fName = m.body.text;
