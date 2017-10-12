@@ -18,18 +18,6 @@ public class OnboardingConversationDevi extends Conversation {
         super("onboarding", mc, uc);
         // TODO Auto-generated constructor stub
 
-        createMessage("message.hello",
-                new MessageBodySingleSelect("Hej, det är jag som är Hedvig, din personliga försäkringsassistent! Vad kan jag hjälpa dig med?",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill ha en ny", "message.getname", false));
-                            add(new SelectOption("Vill byta försäkring", "message.changecompany", false));
-                            add(new SelectOption("Varför behöver jag?", "message.whyinsurance", false));
-                            add(new SelectOption("Vem är du, Hedvig?", "message.whoishedvig", false));
-                        }}
-                ));
-
-        //BÖRJAN PÅ DEVIS FIX Å TRIX
-
         createMessage("message.onboardingstart",
                 new MessageBodySingleSelect("Hej, jag heter Hedvig!\n\nFint att ha dig här\n\nJag är en försäkringsbot så låt mig visa vad jag gör!",
                         new ArrayList<SelectItem>() {{
@@ -40,7 +28,7 @@ public class OnboardingConversationDevi extends Conversation {
                 ));
 
         createMessage("message.forslagstart",
-                new MessageBodySingleSelect(":ok_hand:\n\nDå sätter vi igång\n\nAllt du svarar är så klart i säkert förvar hos mig :closed_lock_with_key:\n\nBor du i lägenhet eller eget hus?",
+                new MessageBodySingleSelect("U+1F44C :ok_hand:\n\nDå sätter vi igång\n\nAllt du svarar är så klart i säkert förvar hos mig :closed_lock_with_key:\n\nBor du i lägenhet eller eget hus?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Lägenhet", "message.lagenhet", false));
                             add(new SelectOption("Eget hus", "message.hus", false));
@@ -59,7 +47,7 @@ public class OnboardingConversationDevi extends Conversation {
 
 
         createMessage("message.hus",
-                new MessageBodySingleSelect("Åh, typiskt! Just nu är det lägenheter jag kan försäkra\n\nMen jag hör gärna av mig till dig så fort jag har viktiga nyheter\n\nOch om du känner någon lägenhetsbo som du vill tipsa om mig, kan du passa på nu\n\nJag skickar ingen spam, lovar!",
+                new MessageBodySingleSelect("{HOUSE} Åh, typiskt! Just nu är det lägenheter jag kan försäkra\n\nMen jag hör gärna av mig till dig så fort jag har viktiga nyheter\n\nOch om du känner någon lägenhetsbo som du vill tipsa om mig, kan du passa på nu\n\nJag skickar ingen spam, lovar!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Skicka mig nyhetsbrev", "message.nyhetsbrev", false));
                             add(new SelectOption("Jag vill tipsa någon om dig", "message.tipsa", false));
@@ -69,12 +57,14 @@ public class OnboardingConversationDevi extends Conversation {
                 ));
 
 
-        createMessage("message.nyhetsbrev",
+        createMessage("message.nyhetsbrev", new MessageBodyText("Härligt! Skriv in din mailadress så håller jag dig uppdaterad"));
+        
+        /*createMessage("message.nyhetsbrev",
                 new MessageBodySingleSelect("Härligt! Skriv in din mailadress så håller jag dig uppdaterad",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("(FUNKTION: FYLL I MAILADRESS)", "message.nagotmer", false));
                         }}
-                ));
+                ));*/
 
         //(FUNKTION: FYLL I MAILADRESS) = FÄLT
 
@@ -165,9 +155,9 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.lghtyp",
                 new MessageBodySingleSelect("Då fortsätter vi! Hur bor du?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Äger bostadsrätt", "pers", false));
-                            add(new SelectOption("Hyr hyresrätt", "pers", false));
-                            add(new SelectOption("Hyr i andra hand", "pers", false));
+                            add(new SelectOption("Äger bostadsrätt", "message.pers", false));
+                            add(new SelectOption("Hyr hyresrätt", "message.pers", false));
+                            add(new SelectOption("Hyr i andra hand", "message.pers", false));
                         }}
                 ));
 
@@ -436,10 +426,21 @@ public class OnboardingConversationDevi extends Conversation {
         log.info(m.toString());
 
         switch (m.id) {
+	        case "message.forslagstart":
+	
+				MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
+				
+				for(SelectItem o : body.choices){
+					if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
+						userContext.putUserData("{HOUSE}", SelectOption.class.cast(o).value);
+						break;
+					}
+				}
+	
+	            break;        
             case "message.getname":
 
                 String fName = m.body.text;
-                log.info("Add to context:" + "{NAME}:" + fName);
                 userContext.putUserData("{NAME}", fName);
                 m.body.text = "Jag heter " + fName;
                 putMessage(m); // Response parsed to nice format
@@ -462,8 +463,8 @@ public class OnboardingConversationDevi extends Conversation {
 			  */
                 if (m.body.getClass().equals(MessageBodySingleSelect.class)) {
 
-                    MessageBodySingleSelect body = (MessageBodySingleSelect) m.body;
-                    for (SelectItem o : body.choices) {
+                    MessageBodySingleSelect body1 = (MessageBodySingleSelect) m.body;
+                    for (SelectItem o : body1.choices) {
                         if (SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected) {
                             m.body.text = SelectOption.class.cast(o).text;
                             putMessage(m);
