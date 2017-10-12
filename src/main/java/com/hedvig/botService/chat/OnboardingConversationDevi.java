@@ -1,5 +1,6 @@
 package com.hedvig.botService.chat;
 
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -14,12 +15,16 @@ public class OnboardingConversationDevi extends Conversation {
     private static Logger log = LoggerFactory.getLogger(OnboardingConversation.class);
     private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
+
+    private byte[] emojiBytes = new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0x81};
+    private String emojiAsString = new String(emojiBytes, Charset.forName("UTF-8"));
+
     public OnboardingConversationDevi(MemberChat mc, UserContext uc) {
         super("onboarding", mc, uc);
         // TODO Auto-generated constructor stub
 
         createMessage("message.onboardingstart",
-                new MessageBodySingleSelect("Hej, jag heter Hedvig!\n\nFint att ha dig här\n\nJag är en försäkringsbot så låt mig visa vad jag gör!",
+                new MessageBodySingleSelect(emojiAsString + " Hej, jag heter Hedvig!\n\nFint att ha dig här\n\nJag är en försäkringsbot så låt mig visa vad jag gör!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ge mig ett försäkringsförslag", "message.forslagstart", false));
                             add(new SelectOption("Visa mig", "message.cad", false));
@@ -87,7 +92,7 @@ public class OnboardingConversationDevi extends Conversation {
   
         //(FUNKTION: FYLL I PERSONNR) = SCROLL KANSKE DÄR EN VÄLJER DATUM? BEHÖVS FYRA SISTA SIFFROR?
 
-        createMessage("message.manuellpersonnr", new MessageBodyText("Inga problem! Då ställer jag bara några extra frågor\n\nVad är ditt personnummer?"));
+        createMessage("message.manuellpersonnr", new MessageBodyNumber("Inga problem! Då ställer jag bara några extra frågor\n\nVad är ditt personnummer?"));
         createMessage("message.varbordu", new MessageBodyText("Tack! Och var bor du någonstans?"));
 
         createMessage("message.student",
@@ -162,8 +167,8 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.forsakringidag",
                 new MessageBodySingleSelect("Då är vi snart klara!\n\nHar du någon hemförsäkring idag?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Nej", "forslag", false));
-                            add(new SelectOption("Ja", "forsakringidagja", false));
+                            add(new SelectOption("Nej", "message.forslag", false));
+                            add(new SelectOption("Ja", "message.forsakringidagja", false));
                         }}
                 ));
 
@@ -271,13 +276,14 @@ public class OnboardingConversationDevi extends Conversation {
 
         //(FUNKTION: FYLL I BANKNAMN) = SCROLL MED DE VANLIGASTE BANKERNA SAMT "ANNAN BANK"
 
-        createMessage("message.mail",
+        createMessage("message.mail", new MessageBodyText("Tackar.\nOch din mailadress så jag kan skicka en bekräftelse när vi skrivit på?"));
+        /*createMessage("message.mail",
                 new MessageBodySingleSelect("Tackar.\nOch din mailadress så jag kan skicka en bekräftelse när vi skrivit på?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("(FUNKTION: FYLL I MAILADRESS)", "message.kontrakt", false));
 
                         }}
-                ));
+                ));*/
 
         //(FUNKTION: FYLL I MAILADRESS) = FÄLT
 
@@ -371,28 +377,38 @@ public class OnboardingConversationDevi extends Conversation {
 	        case "message.nyhetsbrev":
 	        case "message.tipsa":
 	        case "message.frifraga":
+	        	userContext.putUserData("{MAIL}", m.body.text);
+	        	putMessage(m);
 	        	nxtMsg = "message.nagotmer";
 	        	break;
 	        case "message.kvadrat":
-	        	userContext.putUserData("{KVM}", getSelectedSingleValue(m));
+	        	String kvm = m.body.text;
+	        	userContext.putUserData("{KVM}", kvm);
+                m.body.text = kvm + "kvm";
+                putMessage(m);
 	        	nxtMsg = "message.student";
 	        	break;	        
 	        case "message.manuellpersonnr":
-	        	userContext.putUserData("{SSN}", getSelectedSingleValue(m));
+	        	userContext.putUserData("{SSN}", m.body.text);
+	        	putMessage(m);
 	        	nxtMsg = "message.varbordu";
 	        	break;		  
 	        case "message.varbordu":
-	        	userContext.putUserData("{ADRESS}", getSelectedSingleValue(m));
+	        	userContext.putUserData("{ADRESS}", m.body.text);
+	        	putMessage(m);
 	        	nxtMsg = "message.kvadrat";
-	        	break;	        	
+	        	break;	    
+	        case "message.mail":
+	        	userContext.putUserData("{MAIL}", m.body.text);
+	        	putMessage(m);
+	        	nxtMsg = "message.kontrakt";
+	        	break;	   	        	
             case "message.getname":
-
                 String fName = m.body.text;
                 userContext.putUserData("{NAME}", fName);
                 m.body.text = "Jag heter " + fName;
                 putMessage(m); // Response parsed to nice format
                 nxtMsg = "message.greetings";
-                //putMessage(messageList.get("message.greetings"));
 
                 break;
 
