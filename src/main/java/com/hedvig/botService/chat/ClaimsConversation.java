@@ -9,12 +9,12 @@ import org.slf4j.LoggerFactory;
 
 import com.hedvig.botService.enteties.*;
 
-public class OnboardingConversation extends Conversation {
+public class ClaimsConversation extends Conversation {
 
-	private static Logger log = LoggerFactory.getLogger(OnboardingConversation.class);
+	private static Logger log = LoggerFactory.getLogger(ClaimsConversation.class);
 	private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 	
-	public OnboardingConversation(MemberChat mc, UserContext uc) {
+	public ClaimsConversation(MemberChat mc, UserContext uc) {
 		super("onboarding", mc,uc);
 		// TODO Auto-generated constructor stub
 
@@ -28,7 +28,9 @@ public class OnboardingConversation extends Conversation {
 						}}
 				));
 
-		createMessage("message.getname", new MessageBodyText("Trevlig, vad heter du?"));
+		createMessage("message.claims.whathappened", new MessageBodyText("Vad är det som har hänt?"));
+		
+		createMessage("message.claims.init", new MessageBodyText("Jag vill rapportera en skada"));
 		
 		createMessage("message.greetings", new MessageBodyDatePicker("Hej {NAME}, kul att du gillar försäkring :). När är du född?",LocalDateTime.parse("1986-04-08 00:00", datetimeformatter)));
 
@@ -63,16 +65,18 @@ public class OnboardingConversation extends Conversation {
 		createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 	}
 
-	public void init(){
-		startConversation("message.hello"); // Id of first message
+	public void init(String hid){
+		log.info("Starting claims conversation for user:" + hid);
+		Message m = messageList.get("message.claims.init");
+		m.header.fromId = new Long(hid);
+		putMessage(m);
+		startConversation("message.claims.whathappened"); // Id of first message
 	}
 
 	@Override
 	public void recieveMessage(Message m) {
 		log.info(m.toString());
-		String nxtMsg = "";
 		
-		// Handle response
 		switch(m.id){
 		case "message.getname": 
 
@@ -81,8 +85,7 @@ public class OnboardingConversation extends Conversation {
 			userContext.putUserData("{NAME}", fName);
 			m.body.text = "Jag heter " + fName;
 			putMessage(m); // Response parsed to nice format
-			nxtMsg = "message.greetings";
-			//putMessage(messageList.get());
+			putMessage(messageList.get("message.greetings"));
 			
 			break;
 
@@ -91,10 +94,10 @@ public class OnboardingConversation extends Conversation {
 			LocalDateTime bDate = ((MessageBodyDatePicker)m.body).date;			
 			log.info("Add to context:" + "{BIRTH_DATE}:" + bDate.toString());
 			userContext.putUserData("{BIRTH_DATE}", bDate.toString());
-			nxtMsg = "message.bye";
+			putMessage(messageList.get("message.bye"));
 			
 			break;
-
+			
 		 default:
 			 /*
 			  * In a Single select, there is only one trigger event. Set default here to be a link to a new message
@@ -106,8 +109,7 @@ public class OnboardingConversation extends Conversation {
 					if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
 						m.body.text = SelectOption.class.cast(o).text;
 						putMessage(m);
-						nxtMsg = SelectOption.class.cast(o).value;
-
+						putMessage(messageList.get(SelectOption.class.cast(o).value));
 					}
 				}
 			}
@@ -119,16 +121,12 @@ public class OnboardingConversation extends Conversation {
 			break;
 		}
 		
-		// Check which next message is an act accordingly
-		switch(nxtMsg){
-			case "message.whoishedvig": 
-				log.info("Onboarding complete");
-				userContext.onboardingComplete(true);
-				break;
-			default:
-				putMessage(messageList.get(nxtMsg));
-				break;
-		}
+	}
+
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

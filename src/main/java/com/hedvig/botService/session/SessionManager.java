@@ -5,13 +5,13 @@ package com.hedvig.botService.session;
  * It is a singleton accessed through the request controller
  * */
 
-import java.time.Instant;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.hedvig.botService.chat.ClaimsConversation;
 import com.hedvig.botService.chat.OnboardingConversation;
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.MemberChatRepository;
@@ -39,6 +39,17 @@ public class SessionManager {
         return messages.subList(Math.max(messages.size() - i, 0), messages.size());
     }
 
+    public void initClaim(String hid){
+    	
+        UserContext uc = userrepo.findByMemberId(hid).orElseGet(() -> {
+        	UserContext newUserContext = new UserContext(hid);
+        	userrepo.save(newUserContext);
+            return newUserContext;
+        });
+    	uc.initClaim();
+        userrepo.saveAndFlush(uc);
+    }
+    
     public List<Message> getAllMessages(String hid) {
         log.info("Getting all messages for user:" + hid);
 
@@ -57,12 +68,22 @@ public class SessionManager {
             return newUserContext;
         });
 
-        OnboardingConversation onboardingConversation = new OnboardingConversation(chat, uc);
-        
-        // If this is the first message the Onboarding conversation is initiated
-        if(!uc.onboardingStarted()){
-        	uc.onboardingStarted(true);
-        	onboardingConversation.init();
+        // Still onboarding
+        if(!uc.onboardingComplete()) {
+	        OnboardingConversation onboardingConversation = new OnboardingConversation(chat, uc);
+	        
+	        // If this is the first message the Onboarding conversation is initiated
+	        if(!uc.onboardingStarted()){
+	        	uc.onboardingStarted(true);
+	        	onboardingConversation.init();
+	        }
+        }else{
+        	// New claims process
+        	if(uc.claimsProcessInitiated()){
+        		uc.claimStarted();
+        		ClaimsConversation claimsConversation = new ClaimsConversation(chat, uc);
+        		claimsConversation.init(hid);
+        	}
         }
         repo.saveAndFlush(chat);
         userrepo.saveAndFlush(uc);
@@ -87,7 +108,16 @@ public class SessionManager {
             OnboardingConversation onboardingConversation = new OnboardingConversation(mc, uc);
             onboardingConversation.recieveMessage(m);
         }
-        
-        repo.save(mc);
+       
+        /*
+         * User is in a claims process:
+         * */
+        if(uc.ongoingClaimsProcess()){
+            ClaimsConversation claimsConversation = new ClaimsConversation(mc, uc);
+            claimsConversation.recieveMessage(m);       	
+        }
+
+        repo.saveAndFlush(mc);
+        userrepo.saveAndFlush(uc);
     }
 }

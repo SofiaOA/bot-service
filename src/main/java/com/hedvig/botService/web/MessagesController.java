@@ -104,7 +104,15 @@ public class MessagesController {
     	return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(path = "/chat/reset/", method = RequestMethod.POST)
+    @RequestMapping(path = "/initclaim", method = RequestMethod.POST)
+    public ResponseEntity<?> initClaim(@RequestHeader(value="hedvig.token", required = false) String hid) {
+
+     	log.info("Init claims for user:" + hid);
+        sessionManager.initClaim(hid);
+    	return ResponseEntity.noContent().build();
+    }
+    
+    @RequestMapping(path = "/chat/reset", method = RequestMethod.POST)
     public ResponseEntity<?> resetChat(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Reset chat for user:" + hid);
@@ -113,7 +121,7 @@ public class MessagesController {
     	return ResponseEntity.noContent().build();
     }
     
-    @RequestMapping(path = "/chat/edit/", method = RequestMethod.POST)
+    @RequestMapping(path = "/chat/edit", method = RequestMethod.POST)
     public ResponseEntity<?> editChat(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Edit chat for user:" + hid);

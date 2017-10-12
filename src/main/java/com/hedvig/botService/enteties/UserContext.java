@@ -35,6 +35,8 @@ public class UserContext implements Serializable {
     
     private boolean onboardingStarted = false;
     private boolean onboardingComplete = false;
+    private boolean initClaimsProcess = false;
+    private boolean ongoingClaimsProcess = false;
 
     @ElementCollection
     @CollectionTable(name="user_data")
@@ -62,12 +64,32 @@ public class UserContext implements Serializable {
     	log.info("Instantiating UserContext " + this );
     }
     
+    public Boolean claimsProcessInitiated(){
+    	return initClaimsProcess;
+    }
+    
+    public void initClaim(){
+    	initClaimsProcess = true;
+    }
+    
+    public void claimStarted(){
+    	initClaimsProcess = false;
+    }
+    
     public Boolean onboardingComplete() {
         return onboardingComplete;
     }
 
     public Boolean onboardingStarted() {
         return onboardingStarted;
+    }
+    
+    public Boolean ongoingClaimsProcess() {
+        return ongoingClaimsProcess;
+    }
+    
+    public void ongoingClaimsProcess(Boolean ongoing) {
+        ongoingClaimsProcess = ongoing;
     }
     
     public void onboardingStarted(Boolean started) {

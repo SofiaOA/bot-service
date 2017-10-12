@@ -47,7 +47,7 @@ public class Message {
 	public Message(){}
 
 	public String toString(){
-		return "[id:" + id + " header:" + header + " body("+body.getClass()+"):" + body + "]";
+		return "[globalId:" + globalId + " id:" + id + " header:" + header + " body("+body.getClass()+"):" + body + "]";
 	}
 
 }
