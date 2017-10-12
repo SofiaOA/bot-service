@@ -64,7 +64,7 @@ public class MessagesController {
     /*
      * TODO: Change hedvig.token from optional to required
      * */
-    @RequestMapping(path="/messages")
+    @RequestMapping(path="/messages", produces = "application/json; charset=utf-8")
     public Map<Integer, Message> allMessages(@RequestHeader(value="hedvig.token", required = false) String hid) {
     	
     	log.info("Getting all messages for user:" + hid);
@@ -117,6 +117,15 @@ public class MessagesController {
 
      	log.info("Reset chat for user:" + hid);
         //sessionManager.receiveMessage(msg, hid);
+
+    	return ResponseEntity.noContent().build();
+    }
+    
+    @RequestMapping(path = "/chat/main", method = RequestMethod.POST)
+    public ResponseEntity<?> mainMenue(@RequestHeader(value="hedvig.token", required = false) String hid) {
+
+     	log.info("Putting main message in chat for user:" + hid);
+        sessionManager.mainMenu(hid);
 
     	return ResponseEntity.noContent().build();
     }
