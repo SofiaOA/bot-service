@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+import com.hedvig.botService.serviceIntegration.AuthService;
+import com.hedvig.botService.serviceIntegration.BankIdAuthResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +16,7 @@ public class OnboardingConversationDevi extends Conversation {
 
     private static Logger log = LoggerFactory.getLogger(OnboardingConversation.class);
     private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private final AuthService authService;
 
 
     private String emoji_smile = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0x81}, Charset.forName("UTF-8"));
@@ -27,8 +30,9 @@ public class OnboardingConversationDevi extends Conversation {
     private String emoji_thumbs_up = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8D}, Charset.forName("UTF-8"));
     
 
-    public OnboardingConversationDevi(MemberChat mc, UserContext uc) {
+    public OnboardingConversationDevi(MemberChat mc, UserContext uc, AuthService authService) {
         super("onboarding", mc, uc);
+        this.authService = authService;
         // TODO Auto-generated constructor stub
 
         createMessage("message.onboardingstart",
@@ -51,10 +55,24 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.lagenhet",
                 new MessageBodySingleSelect("Toppen\n\nLogga in med ditt BankID så kan vi snabbspola fram några frågor!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag loggar in (FUNKTION: BANKID-LOGIN)", "message.bankidja", false));
+                            add(new SelectOption("Jag loggar in (FUNKTION: BANKID-LOGIN)", "message.bankid.start", false));
                             add(new SelectOption("Jag har inget BankID", "message.manuellpersonnr", false));
                         }}
                 ));
+
+        createMessage("message.bankid.start",
+                new MessageBodySingleSelect("Då måste jag fråga\n\nhar du bankID på den enheten du använder nu?",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Klart jag har, det är ju ändå 2017", "message.bankid.autostart.send", false));
+                            add(new SelectOption("Nej det har jag inte", "message.bankid.start", false));
+                        }}
+                ));
+
+        createMessage("message.bankid.autostart.send",
+                new MessageBodySingleSelect("Ja det är faktiskt 2017 i hela 79 dagar " + emoji_postal_horn,
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectLink("Logga in", "message.bankid.autostart.respond", "bankid://?autostarttoken=694fa100-af8a-11e7-a61c-df18965671c7",  ""));
+                        }}));
 
         //JAG LOGGAR IN = STARTA BANKID, LOGGA IN, SEN TILLBAKS TILL message.bankidja
 
@@ -483,6 +501,7 @@ public class OnboardingConversationDevi extends Conversation {
 
                 break;
 
+
             default:
                 break;
         }
@@ -508,6 +527,10 @@ public class OnboardingConversationDevi extends Conversation {
 				log.info("Onboarding complete");
 				userContext.onboardingComplete(true);
 				break;
+            case "message.bankid.device.start":
+                //BankIdAuthResponse  authResponse = this.authService.auth();
+                nxtMsg = "message.bankid.autostart.send";
+
 			case "":
 		        log.info("Unknown message recieved...");
 		        putMessage(messageList.get("error"));				

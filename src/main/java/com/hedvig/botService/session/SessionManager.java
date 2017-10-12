@@ -7,6 +7,7 @@ package com.hedvig.botService.session;
 
 import java.util.List;
 
+import com.hedvig.botService.serviceIntegration.AuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +28,13 @@ public class SessionManager {
     private static Logger log = LoggerFactory.getLogger(SessionManager.class);
     private final MemberChatRepository repo;
     private final UserContextRepository userrepo;
+    private final AuthService authService;
 
     @Autowired
-    public SessionManager(MemberChatRepository repo, UserContextRepository userrepo) {
+    public SessionManager(MemberChatRepository repo, UserContextRepository userrepo, AuthService authService) {
         this.repo = repo;
         this.userrepo = userrepo;
+        this.authService = authService;
     }
 
     public List<Message> getMessages(int i, String hid) {
@@ -73,7 +76,7 @@ public class SessionManager {
         // Still onboarding
         if(!uc.onboardingComplete()) {
 	        //OnboardingConversation onboardingConversation = new OnboardingConversation(chat, uc);
-	        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(chat, uc);
+	        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(chat, uc, authService);
 	        
 	        // If this is the first message the Onboarding conversation is initiated
 	        if(!uc.onboardingStarted()){
@@ -134,7 +137,7 @@ public class SessionManager {
          * */
         if(!uc.onboardingComplete()) {
             //OnboardingConversation onboardingConversation = new OnboardingConversation(mc, uc);
-        	OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc);
+        	OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, authService);
             onboardingConversation.recieveMessage(m);
         }
        

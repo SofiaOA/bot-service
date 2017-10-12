@@ -5,6 +5,7 @@ import java.util.TreeMap;
 import com.hedvig.botService.enteties.MemberChatRepository;
 import com.hedvig.botService.enteties.UserContextRepository;
 import com.hedvig.botService.externalEvents.KafkaProperties;
+import com.hedvig.botService.serviceIntegration.AuthService;
 import com.hedvig.botService.session.SessionManager;
 import org.axonframework.config.EventHandlingConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.multipart.support.MultipartFilter;
 
@@ -28,10 +30,15 @@ public class BotServiceApplication {
     public void configure(EventHandlingConfiguration config) {
         config.usingTrackingProcessors();
     }
+
+    @Bean
+    public RestTemplate createRestTemplate() {
+	    return new RestTemplate();
+    }
     
     @Bean
-    public SessionManager createSessionManager(MemberChatRepository repo, UserContextRepository userrepo){
-    	return new SessionManager(repo, userrepo);
+    public SessionManager createSessionManager(MemberChatRepository repo, UserContextRepository userrepo, AuthService authService){
+    	return new SessionManager(repo, userrepo, authService);
     }
 
     /*@Bean
