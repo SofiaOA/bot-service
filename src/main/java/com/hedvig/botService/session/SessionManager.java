@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.hedvig.botService.chat.ClaimsConversation;
+import com.hedvig.botService.chat.MainConversation;
 import com.hedvig.botService.chat.OnboardingConversation;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.MemberChat;
@@ -79,19 +80,44 @@ public class SessionManager {
 	        	uc.onboardingStarted(true);
 	        	onboardingConversation.init();
 	        }
-        }else{
+        }
+        
         	// New claims process
-        	if(uc.claimsProcessInitiated()){
+        if(uc.claimsProcessInitiated()){
         		uc.claimStarted();
         		ClaimsConversation claimsConversation = new ClaimsConversation(chat, uc);
         		claimsConversation.init(hid);
-        	}
         }
+        
         repo.saveAndFlush(chat);
         userrepo.saveAndFlush(uc);
         
         log.info(chat.toString());
         return chat.chatHistory;
+    }
+    
+    /*
+     * Add the "what do you want to do today" message to the chat
+     * */
+    
+    public void mainMenu(String hid){
+        log.info("Main menu from user:" + hid);
+ 
+        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+        
+    	MainConversation mainConversation = new MainConversation(mc, uc);
+    	
+        /*
+         * User is chatting in the main chat:
+         * */
+        if(!uc.ongoingMainConversation()) {
+        	uc.startMainConversation();
+            mainConversation.init();
+        }
+
+        repo.saveAndFlush(mc);
+        userrepo.saveAndFlush(uc);    	
     }
     
     public void receiveMessage(Message m, String hid) {
@@ -118,6 +144,14 @@ public class SessionManager {
         if(uc.ongoingClaimsProcess()){
             ClaimsConversation claimsConversation = new ClaimsConversation(mc, uc);
             claimsConversation.recieveMessage(m);       	
+        }
+        
+        /*
+         * User is chatting with Hedvig:
+         * */
+        if(uc.ongoingMainConversation()) {
+        	MainConversation mainConversation = new MainConversation(mc, uc);
+            mainConversation.recieveMessage(m);
         }
 
         repo.saveAndFlush(mc);
