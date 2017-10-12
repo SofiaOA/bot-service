@@ -16,4 +16,9 @@ public class HedvigController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("quoteAccepted")
+    ResponseEntity<String> quoteAccepted(){
+        return ResponseEntity.ok().build();
+    }
+
 }
