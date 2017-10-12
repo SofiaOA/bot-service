@@ -16,15 +16,23 @@ public class OnboardingConversationDevi extends Conversation {
     private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 
-    private byte[] emojiBytes = new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0x81};
-    private String emojiAsString = new String(emojiBytes, Charset.forName("UTF-8"));
+    private String emoji_smile = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0x81}, Charset.forName("UTF-8"));
+    private String emoji_hand_ok = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8C}, Charset.forName("UTF-8"));
+    private String emoji_closed_lock_with_key = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x94, (byte)0x90}, Charset.forName("UTF-8"));
+    private String emoji_postal_horn = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x93, (byte)0xAF}, Charset.forName("UTF-8"));
+    private String emoji_school_satchel = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x8E, (byte)0x92}, Charset.forName("UTF-8"));
+    private String emoji_mag = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x94, (byte)0x8D}, Charset.forName("UTF-8"));
+    private String emoji_revlolving_hearts = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x92, (byte)0x9E}, Charset.forName("UTF-8"));
+    private String emoji_tada = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x8E, (byte)0x89}, Charset.forName("UTF-8"));
+    private String emoji_thumbs_up = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8D}, Charset.forName("UTF-8"));
+    
 
     public OnboardingConversationDevi(MemberChat mc, UserContext uc) {
         super("onboarding", mc, uc);
         // TODO Auto-generated constructor stub
 
         createMessage("message.onboardingstart",
-                new MessageBodySingleSelect(emojiAsString + " Hej, jag heter Hedvig!\n\nFint att ha dig här\n\nJag är en försäkringsbot så låt mig visa vad jag gör!",
+                new MessageBodySingleSelect(emoji_smile + " Hej, jag heter Hedvig!\n\nFint att ha dig här\n\nJag är en försäkringsbot så låt mig visa vad jag gör!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ge mig ett försäkringsförslag", "message.forslagstart", false));
                             add(new SelectOption("Visa mig", "message.cad", false));
@@ -33,7 +41,7 @@ public class OnboardingConversationDevi extends Conversation {
                 ));
 
         createMessage("message.forslagstart",
-                new MessageBodySingleSelect(":ok_hand:\n\nDå sätter vi igång\n\nAllt du svarar är så klart i säkert förvar hos mig :closed_lock_with_key:\n\nBor du i lägenhet eller eget hus?",
+                new MessageBodySingleSelect(emoji_hand_ok + "\n\nDå sätter vi igång\n\nAllt du svarar är så klart i säkert förvar hos mig "+emoji_closed_lock_with_key+"\n\nBor du i lägenhet eller eget hus?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Lägenhet", "message.lagenhet", false));
                             add(new SelectOption("Eget hus", "message.hus", false));
@@ -66,7 +74,7 @@ public class OnboardingConversationDevi extends Conversation {
         // All these goes to message.nagotmer
         createMessage("message.nyhetsbrev", new MessageBodyText("Härligt! Skriv in din mailadress så håller jag dig uppdaterad"));
         createMessage("message.tipsa", new MessageBodyText("Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmejl till"));
-        createMessage("message.frifraga", new MessageBodyText("Fråga på!\n\nSkriv vad du undrar här så hör jag och mina kollegor av oss snart :postal_horn:"));
+        createMessage("message.frifraga", new MessageBodyText("Fråga på!\n\nSkriv vad du undrar här så hör jag och mina kollegor av oss snart " + emoji_postal_horn));
         
         createMessage("message.nagotmer",
                 new MessageBodySingleSelect("Tack! Vill du hitta på något mer nu när vi har varandra på digitråden?",
@@ -96,7 +104,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.varbordu", new MessageBodyText("Tack! Och var bor du någonstans?"));
 
         createMessage("message.student",
-                new MessageBodySingleSelect("Tackar! Jag ser att du är [<27] år. Är du kanske student? :school_satchel:",
+                new MessageBodySingleSelect("Tackar! Jag ser att du är [<27] år. Är du kanske student? " + emoji_school_satchel,
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ja", "message.studentja", false));
                             add(new SelectOption("Nej", "message.lghtyp", false));
@@ -123,22 +131,33 @@ public class OnboardingConversationDevi extends Conversation {
 
         // ALTERNATIVT KAN DESSA SVARSALTERNATIV GÖRAS TILL SCROLL ELLER SÅ?
 
-        createMessage("message.pers",
+        createMessage("message.pers", new MessageBodyNumber("Hoppas du trivs!\n Bor du själv eller med andra? Fyll i hur många som bor i lägenheten"));
+        /*createMessage("message.pers",
                 new MessageBodySingleSelect("Hoppas du trivs!\n Bor du själv eller med andra? Fyll i hur många som bor i lägenheten",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("(FUNKTION: FYLL I ANTAL PERS)", "sakerhet", false));
+                            add(new SelectOption("(FUNKTION: FYLL I ANTAL PERS)", "message.sakerhet", false));
                         }}
-                ));
+                ));*/
 
 //(FUNKTION: FYLL I ANTAL PERS) = SCROLL KANSKE? 1-6+ ALT. FLERVALSALTERNATIVBOXAR ELLER DEN DÄR DRA-I-SKALOR-EW-DESIGNLÖSNINGEN
 
-        createMessage("message.sakerhet",
+        /*createMessage("message.sakerhet",
                 new MessageBodySingleSelect("Tack!\nFinns någon av de här säkerhetsgrejerna i lägenheten?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("(FUNKTION: FYLL I SÄKERHETSGREJER)", "message.dyrpryl", false));
                         }}
-                ));
+                ));*/
 
+		createMessage("message.sakerhet",
+				new MessageBodyMultipleSelect("Tack!\nFinns någon av de här säkerhetsgrejerna i lägenheten?",
+						new ArrayList<SelectItem>(){{
+							add(new SelectOption("Brandvarnare", "safety.alarm", false));
+							add(new SelectOption("Brandsläckare", "safety.extinguisher", false));
+							add(new SelectOption("Säkerhetsdörr", "safety.door", false));
+							add(new SelectOption("Gallergrind", "safety.gate", false));
+							add(new SelectOption("Inbrottslarm", "safety.burglaralarm", false));
+						}}
+				));
         //(FUNKTION: FYLL I SÄKERHETSGREJER) = SCROLL MED DE OLIKA GREJERNA KANSKE? ELLER FLERVALSALTERNATIVBOXAR?
 
         createMessage("message.dyrpryl",
@@ -173,14 +192,22 @@ public class OnboardingConversationDevi extends Conversation {
                 ));
 
 
-        createMessage("message.forsakringidagja",
+        /*createMessage("message.forsakringidagja",
                 new MessageBodySingleSelect("Klokt av dig att ha försäkring redan!\n\nVilket försäkringsbolag har du?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("(FUNKTION: VÄLJ FÖRSÄKRINGSBOLAG)", "message.bytesinfo", false));
                         }}
-                ));
+                ));*/
 
-
+		createMessage("message.forsakringidagja",
+				new MessageBodyMultipleSelect("Klokt av dig att ha försäkring redan!\n\nVilket försäkringsbolag har du?",
+						new ArrayList<SelectItem>(){{
+							add(new SelectOption("If", "message.company.if", false));
+							add(new SelectOption("Trygg-Hansa", "message.company.th", false));
+							add(new SelectOption("Länsförsäkringar", "message.company.lf", false));
+						}}
+				));
+		
         //(FUNKTION: FYLL I FÖRSÄKRINGSBOLAGNAMN) = SCROLL MED DE VANLIGASTE BOLAGEN SAMT "ANNAT FÖRSÄKRINGSBOLAG"
 
 
@@ -230,7 +257,7 @@ public class OnboardingConversationDevi extends Conversation {
                 ));
 
         createMessage("message.tryggt",
-                new MessageBodySingleSelect("Jag har en trygghetspartner som är ett av världens största försäkringsbolag\n\nDe är där för mig så jag kan vara där för dig, oavsett. Till exempel om en storm skulle drabba hela Sverige och alla mina medlemmar skulle behöva stöd samtidigt\n\nJag är självklart också auktoriserad av Finansinspektionen :mag:",
+                new MessageBodySingleSelect("Jag har en trygghetspartner som är ett av världens största försäkringsbolag\n\nDe är där för mig så jag kan vara där för dig, oavsett. Till exempel om en storm skulle drabba hela Sverige och alla mina medlemmar skulle behöva stöd samtidigt\n\nJag är självklart också auktoriserad av Finansinspektionen " + emoji_mag,
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ok! Jag vill bli medlem", "message.medlemjabank", false));
                             add(new SelectOption("Jag undrar om skyddet också", "message.skydd", false));
@@ -267,7 +294,7 @@ public class OnboardingConversationDevi extends Conversation {
 
 
         createMessage("message.medlemjabank",
-                new MessageBodySingleSelect("Hurra! :tada:\n\nDå behöver jag bara veta vilken bank du har innan vi skriver på så jag kan koppla upp autogiro",
+                new MessageBodySingleSelect("Hurra! "+ emoji_tada +"\n\nDå behöver jag bara veta vilken bank du har innan vi skriver på så jag kan koppla upp autogiro",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("(FUNKTION: FYLL I BANKNAMN)", "message.mail", false));
 
@@ -304,7 +331,7 @@ public class OnboardingConversationDevi extends Conversation {
                 ));
 
         createMessage("message.kontraktklar",
-                new MessageBodySingleSelect(":tada: Hurra igen! :tada:\n\nVälkommen, bästa nya medlem!\n\nI din inkorg finns nu en bekräftelse på allt\n\nOm du behöver eller vill något är det bara att chatta med mig i appen när som helst\n\nOch så till sist ett litet tips! Börja utforska appen genom att välja vilken välgörenhetsorganisation du vill stödja :revolving_hearts:",
+                new MessageBodySingleSelect(emoji_tada + " Hurra igen! "+ emoji_tada +"\n\nVälkommen, bästa nya medlem!\n\nI din inkorg finns nu en bekräftelse på allt\n\nOm du behöver eller vill något är det bara att chatta med mig i appen när som helst\n\nOch så till sist ett litet tips! Börja utforska appen genom att välja vilken välgörenhetsorganisation du vill stödja " + emoji_revlolving_hearts,
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Jag vill utforska", "message.login", false));
                             add(new SelectOption("Vi hörs, Hedvig!", "message.avslutvalkommen", false));
@@ -315,7 +342,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.avslutvalkommen",
                 new MessageBodySingleSelect("Hej så länge och ännu en gång, varmt välkommen!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill starta om chatten (FUNKTION: OMSTART)", "message.onboardingstart", false));
+                            add(new SelectOption("Jag vill starta om chatten (FUNKTION: OMSTART)", "onboarding.done", false));
 
                         }}
                 ));
@@ -342,6 +369,11 @@ public class OnboardingConversationDevi extends Conversation {
         startConversation("message.onboardingstart"); // Id of first message
     }
 
+    public int getNumberValue(Message m){
+    	MessageBodyNumber body = (MessageBodyNumber)m.body;
+    	return Integer.parseInt(m.body.text);
+    }
+    
     public String getSelectedSingleValue(Message m){
 		MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
 		
@@ -363,7 +395,7 @@ public class OnboardingConversationDevi extends Conversation {
 		}   
 		return selectedOptions;
     }
-    
+
     @Override
     public void recieveMessage(Message m) {
         log.info(m.toString());
@@ -381,6 +413,14 @@ public class OnboardingConversationDevi extends Conversation {
 	        	putMessage(m);
 	        	nxtMsg = "message.nagotmer";
 	        	break;
+	        case "message.pers":
+	        	int nr_persons = getNumberValue(m);
+	        	userContext.putUserData("{NR_PERSONS}", new Integer(nr_persons).toString());
+	        	if(nr_persons==1){ m.body.text = "Jag bor själv"; }
+	        	else{ m.body.text = "Vi är " + nr_persons + " i hushållet"; }
+	        	putMessage(m);
+	        	nxtMsg = "message.sakerhet";
+	        	break;	        	
 	        case "message.kvadrat":
 	        	String kvm = m.body.text;
 	        	userContext.putUserData("{KVM}", kvm);
@@ -402,7 +442,24 @@ public class OnboardingConversationDevi extends Conversation {
 	        	userContext.putUserData("{MAIL}", m.body.text);
 	        	putMessage(m);
 	        	nxtMsg = "message.kontrakt";
-	        	break;	   	        	
+	        	break;
+	        case "message.sakerhet":
+	        	ArrayList<String> items = getSelectedMultipleValue(m);
+	        	String safetyItems = "";
+	        	for(String s : items){
+	        		userContext.putUserData("{"+s+"}", "1");
+	        		safetyItems += (s + ",");
+	        	}
+	        	if(safetyItems.equals(""))m.body.text = "Jag har inga sådana grejer...";
+	        	else{ m.body.text = "Jag har " + safetyItems; }
+	        	putMessage(m);
+	        	nxtMsg = "message.dyrpryl";
+	        case "message.forsakringidagja":
+	        	String comp = getSelectedSingleValue(m);
+	        	userContext.putUserData("{INSURANCE_COMPANY_TODAY}", m.body.text);
+	        	m.body.text = "Idag har jag " + comp;
+	        	putMessage(m);
+	        	nxtMsg = "message.bytesinfo";	        		        	
             case "message.getname":
                 String fName = m.body.text;
                 userContext.putUserData("{NAME}", fName);
