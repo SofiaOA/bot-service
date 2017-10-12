@@ -366,8 +366,8 @@ public class OnboardingConversationDevi extends Conversation {
     }
 
     public void init() {
-        //startConversation("message.onboardingstart"); // Id of first message
-        startConversation("message.sakerhet"); // Id of first message
+        startConversation("message.onboardingstart"); // Id of first message
+        //startConversation("message.sakerhet"); // Id of first message
     }
 
     public int getNumberValue(Message m){
