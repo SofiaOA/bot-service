@@ -28,7 +28,7 @@ public class OnboardingConversationDevi extends Conversation {
                 ));
 
         createMessage("message.forslagstart",
-                new MessageBodySingleSelect("U+1F44C :ok_hand:\n\nDå sätter vi igång\n\nAllt du svarar är så klart i säkert förvar hos mig :closed_lock_with_key:\n\nBor du i lägenhet eller eget hus?",
+                new MessageBodySingleSelect("👌 :ok_hand:\n\nDå sätter vi igång\n\nAllt du svarar är så klart i säkert förvar hos mig :closed_lock_with_key:\n\nBor du i lägenhet eller eget hus?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Lägenhet", "message.lagenhet", false));
                             add(new SelectOption("Eget hus", "message.hus", false));
@@ -57,7 +57,10 @@ public class OnboardingConversationDevi extends Conversation {
                 ));
 
 
+        // All these goes to message.nagotmer
         createMessage("message.nyhetsbrev", new MessageBodyText("Härligt! Skriv in din mailadress så håller jag dig uppdaterad"));
+        createMessage("message.tipsa", new MessageBodyText("Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmejl till"));
+        createMessage("message.frifraga", new MessageBodyText("Fråga på!\n\nSkriv vad du undrar här så hör jag och mina kollegor av oss snart 📯 :postal_horn:"));
         
         /*createMessage("message.nyhetsbrev",
                 new MessageBodySingleSelect("Härligt! Skriv in din mailadress så håller jag dig uppdaterad",
@@ -69,7 +72,7 @@ public class OnboardingConversationDevi extends Conversation {
         //(FUNKTION: FYLL I MAILADRESS) = FÄLT
 
 
-        createMessage("message.tipsa",
+        /*createMessage("message.tipsa",
                 new MessageBodySingleSelect("Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmejl till",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("(FUNKTION: FYLL I MAILADRESS)", "message.nagotmer", false));
@@ -88,7 +91,7 @@ public class OnboardingConversationDevi extends Conversation {
 
         //(FUNKTION: SKRIV FRÅGA) = FÄLT FÖR FRITEXT OCH SKICKA-FUNKTION SOM GÅR TILL TYP hedvig@hedvig.com
 
-
+*/
         createMessage("message.nagotmer",
                 new MessageBodySingleSelect("Tack! Vill du hitta på något mer nu när vi har varandra på digitråden?",
                         new ArrayList<SelectItem>() {{
@@ -354,7 +357,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.avslutvalkommen",
                 new MessageBodySingleSelect("Hej så länge och ännu en gång, varmt välkommen!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill starta om chatten (FUNKTION: OMSTART)", "onboardingstart", false));
+                            add(new SelectOption("Jag vill starta om chatten (FUNKTION: OMSTART)", "message.onboardingstart", false));
 
                         }}
                 ));
@@ -365,7 +368,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.avslutok",
                 new MessageBodySingleSelect("Okej! Trevligt att chattas, ha det fint och hoppas vi hörs igen!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill starta om chatten (FUNKTION: OMSTART)", "onboardingstart", false));
+                            add(new SelectOption("Jag vill starta om chatten (FUNKTION: OMSTART)", "message.onboardingstart", false));
 
                         }}
                 ));
@@ -421,30 +424,52 @@ public class OnboardingConversationDevi extends Conversation {
         startConversation("message.onboardingstart"); // Id of first message
     }
 
+    public String getSelectedSingleValue(Message m){
+		MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
+		
+		for(SelectItem o : body.choices){
+			if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
+				return SelectOption.class.cast(o).value;
+			}
+		}   	
+		return "";
+    }
+    
+    public ArrayList<String> getSelectedMultipleValue(Message m){
+		MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
+		ArrayList<String> selectedOptions = new ArrayList<String>();
+		for(SelectItem o : body.choices){
+			if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
+				 selectedOptions.add(SelectOption.class.cast(o).value);
+			}
+		}   
+		return selectedOptions;
+    }
+    
     @Override
     public void recieveMessage(Message m) {
         log.info(m.toString());
 
+        String nxtMsg = "";
+
+        
         switch (m.id) {
 	        case "message.forslagstart":
-	
-				MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
-				
-				for(SelectItem o : body.choices){
-					if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
-						userContext.putUserData("{HOUSE}", SelectOption.class.cast(o).value);
-						break;
-					}
-				}
-	
-	            break;        
+				userContext.putUserData("{HOUSE}", getSelectedSingleValue(m));
+	            break;   
+	        case "message.nyhetsbrev":
+	        case "message.tipsa":
+	        case "message.frifraga":
+	        	nxtMsg = "message.nagotmer";
+	        	break;
             case "message.getname":
 
                 String fName = m.body.text;
                 userContext.putUserData("{NAME}", fName);
                 m.body.text = "Jag heter " + fName;
                 putMessage(m); // Response parsed to nice format
-                putMessage(messageList.get("message.greetings"));
+                nxtMsg = "message.greetings";
+                //putMessage(messageList.get("message.greetings"));
 
                 break;
 
@@ -453,31 +478,43 @@ public class OnboardingConversationDevi extends Conversation {
                 LocalDateTime bDate = ((MessageBodyDatePicker) m.body).date;
                 log.info("Add to context:" + "{BIRTH_DATE}:" + bDate.toString());
                 userContext.putUserData("{BIRTH_DATE}", bDate.toString());
-                putMessage(messageList.get("message.bye"));
+                nxtMsg = "message.bye";
+                //putMessage(messageList.get("message.bye"));
 
                 break;
 
             default:
-             /*
-			  * In a Single select, there is only one trigger event. Set default here to be a link to a new message
-			  */
-                if (m.body.getClass().equals(MessageBodySingleSelect.class)) {
-
-                    MessageBodySingleSelect body1 = (MessageBodySingleSelect) m.body;
-                    for (SelectItem o : body1.choices) {
-                        if (SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected) {
-                            m.body.text = SelectOption.class.cast(o).text;
-                            putMessage(m);
-                            putMessage(messageList.get(SelectOption.class.cast(o).value));
-                        }
-                    }
-                } else {
-                    log.info("Unknown message recieved...");
-                    putMessage(messageList.get("error"));
-                }
-
                 break;
         }
+        
+        /*
+	  * In a Single select, there is only one trigger event. Set default here to be a link to a new message
+	  */
+       if (m.body.getClass().equals(MessageBodySingleSelect.class)) {
+
+           MessageBodySingleSelect body1 = (MessageBodySingleSelect) m.body;
+           for (SelectItem o : body1.choices) {
+               if (SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected) {
+                   m.body.text = SelectOption.class.cast(o).text;
+                   putMessage(m);
+                   nxtMsg = SelectOption.class.cast(o).value;
+               }
+           }
+       } 
+       
+		// Check which next message is an act accordingly
+		switch(nxtMsg){
+			case "message.whoishedvig": 
+				log.info("Onboarding complete");
+				userContext.onboardingComplete(true);
+				break;
+			case "":
+		        log.info("Unknown message recieved...");
+		        putMessage(messageList.get("error"));				
+			default:
+				putMessage(messageList.get(nxtMsg));
+				break;
+		}
 
     }
 
