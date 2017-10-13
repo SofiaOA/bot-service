@@ -113,7 +113,7 @@ public class MessagesController {
     }
     
     @RequestMapping(path = "/chat/reset", method = RequestMethod.POST)
-    public ResponseEntity<?> resetChat(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
+    public ResponseEntity<?> resetChat(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Reset chat for user:" + hid);
         //sessionManager.receiveMessage(msg, hid);
