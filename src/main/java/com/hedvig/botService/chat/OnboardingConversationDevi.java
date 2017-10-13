@@ -229,7 +229,7 @@ public class OnboardingConversationDevi extends Conversation {
                 ));*/
 
 		createMessage("message.forsakringidagja",
-				new MessageBodyMultipleSelect("Klokt av dig att ha försäkring redan!\n\nVilket försäkringsbolag har du?",
+				new MessageBodySingleSelect("Klokt av dig att ha försäkring redan!\n\nVilket försäkringsbolag har du?",
 						new ArrayList<SelectItem>(){{
 							add(new SelectOption("If", "message.company.if", false));
 							add(new SelectOption("Trygg-Hansa", "message.company.th", false));
