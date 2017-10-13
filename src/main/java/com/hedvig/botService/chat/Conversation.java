@@ -19,7 +19,7 @@ public abstract class Conversation {
 	private String conversationName; // Id for the conversation
 	MemberChat memberChat;
 	UserContext userContext;
-	TreeMap<String, Message> messageList = new TreeMap<String, Message>();
+	private TreeMap<String, Message> messageList = new TreeMap<String, Message>();
 	//HashMap<String, String> conversationContext = new HashMap<String, String>(); // Context specific information learned during conversation
 	
 	Conversation(String conversationId, MemberChat mc, UserContext uc) {
@@ -28,6 +28,16 @@ public abstract class Conversation {
 		this.userContext = uc;
 	}
 
+	public Message getMessage(String key){
+		Message m = messageList.get(key);
+		if(m==null)throw new MessageNotFoundException("Message not found with id:" + key);
+		return m;
+	}
+	
+	public void storeMessage(String key, Message m){
+		messageList.put(key, m);
+	}
+	
 	public String getConversationId() {
 		return conversationName;
 	}
@@ -53,7 +63,7 @@ public abstract class Conversation {
 		return input;
 	}
 	
-	void putMessage(Message m) {
+	void addToChat(Message m) {
 		log.info("Putting message:" + m.id + " content:" + m.body.text);
 		m.body.text = replaceWithContext(m.body.text);
 		if(m.body.getClass() == MessageBodySingleSelect.class) {
@@ -86,7 +96,7 @@ public abstract class Conversation {
 	
 	void startConversation(String startId){
 		log.info("Starting conversation with message:" + startId);
-		putMessage(messageList.get(startId));
+		addToChat(messageList.get(startId));
 	}
 	
 	public abstract void recieveMessage(Message m);

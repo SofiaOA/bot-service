@@ -80,7 +80,7 @@ public class OnboardingConversation extends Conversation {
 			log.info("Add to context:" + "{NAME}:" + fName);
 			userContext.putUserData("{NAME}", fName);
 			m.body.text = "Jag heter " + fName;
-			putMessage(m); // Response parsed to nice format
+			addToChat(m); // Response parsed to nice format
 			nxtMsg = "message.greetings";
 			//putMessage(messageList.get());
 			
@@ -105,7 +105,7 @@ public class OnboardingConversation extends Conversation {
 				for(SelectItem o : body.choices){
 					if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
 						m.body.text = SelectOption.class.cast(o).text;
-						putMessage(m);
+						addToChat(m);
 						nxtMsg = SelectOption.class.cast(o).value;
 
 					}
@@ -113,7 +113,7 @@ public class OnboardingConversation extends Conversation {
 			}
 			else{
 				log.info("Unknown message recieved...");
-				putMessage(messageList.get("error"));
+				addToChat(getMessage("error"));
 			}
 			 
 			break;
@@ -126,7 +126,7 @@ public class OnboardingConversation extends Conversation {
 				userContext.onboardingComplete(true);
 				break;
 			default:
-				putMessage(messageList.get(nxtMsg));
+				addToChat(getMessage(nxtMsg));
 				break;
 		}
 	}

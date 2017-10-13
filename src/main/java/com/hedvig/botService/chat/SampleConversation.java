@@ -19,7 +19,7 @@ public class SampleConversation extends Conversation {
 		m.id = "1";
 		m.header = new MessageHeader(HEDVIG_USER_ID,"/response",-1); // -1 -> not sent yet
 		m.body = new MessageBodyText("Hej! Vad heter du?");
-		messageList.put(m.id, m);
+		storeMessage(m.id, m);
 		
 		Message m2 = new Message();
 		m2.id = "2";
@@ -30,15 +30,15 @@ public class SampleConversation extends Conversation {
 					add(new SelectOption("2", "röd", false));
 				}}
 		);
-		messageList.put(m2.id, m2);
+		storeMessage(m2.id, m2);
 		
 		Message m3 = new Message();
 		m3.id = "3";
 		m3.header = new MessageHeader(HEDVIG_USER_ID,"/response",-1);
 		m3.body = new MessageBodyText("Ok {NAME}, så du gillar {OPTION}... Jag med!");
-		messageList.put(m3.id, m3);
+		storeMessage(m3.id, m3);
 		
-		putMessage(m); // Put first message on the outbox
+		addToChat(m); // Put first message on the outbox
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class SampleConversation extends Conversation {
 			String fName = m.body.text;			
 			log.info("Add to context:" + "{NAME}:" + fName);
 			userContext.putUserData("{NAME}", fName);
-			putMessage(messageList.get("2"));
+			addToChat(getMessage("2"));
 			break;
 		case "2":
 			MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
@@ -61,7 +61,7 @@ public class SampleConversation extends Conversation {
 					break;
 				}
 			}
-			putMessage(messageList.get("3"));
+			addToChat(getMessage("3"));
 			break;
 		 default:
 			 log.info("Unknown message recieved...");

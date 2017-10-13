@@ -67,9 +67,9 @@ public class ClaimsConversation extends Conversation {
 
 	public void init(String hid){
 		log.info("Starting claims conversation for user:" + hid);
-		Message m = messageList.get("message.claims.init");
+		Message m = getMessage("message.claims.init");
 		m.header.fromId = new Long(hid);
-		putMessage(m);
+		addToChat(m);
 		startConversation("message.claims.whathappened"); // Id of first message
 	}
 
@@ -84,8 +84,8 @@ public class ClaimsConversation extends Conversation {
 			log.info("Add to context:" + "{NAME}:" + fName);
 			userContext.putUserData("{NAME}", fName);
 			m.body.text = "Jag heter " + fName;
-			putMessage(m); // Response parsed to nice format
-			putMessage(messageList.get("message.greetings"));
+			addToChat(m); // Response parsed to nice format
+			addToChat(getMessage("message.greetings"));
 			
 			break;
 
@@ -94,7 +94,7 @@ public class ClaimsConversation extends Conversation {
 			LocalDateTime bDate = ((MessageBodyDatePicker)m.body).date;			
 			log.info("Add to context:" + "{BIRTH_DATE}:" + bDate.toString());
 			userContext.putUserData("{BIRTH_DATE}", bDate.toString());
-			putMessage(messageList.get("message.bye"));
+			addToChat(getMessage("message.bye"));
 			
 			break;
 			
@@ -108,14 +108,14 @@ public class ClaimsConversation extends Conversation {
 				for(SelectItem o : body.choices){
 					if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
 						m.body.text = SelectOption.class.cast(o).text;
-						putMessage(m);
-						putMessage(messageList.get(SelectOption.class.cast(o).value));
+						addToChat(m);
+						addToChat(getMessage(SelectOption.class.cast(o).value));
 					}
 				}
 			}
 			else{
 				log.info("Unknown message recieved...");
-				putMessage(messageList.get("error"));
+				addToChat(getMessage("error"));
 			}
 			 
 			break;

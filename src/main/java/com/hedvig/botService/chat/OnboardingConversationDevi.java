@@ -28,7 +28,7 @@ public class OnboardingConversationDevi extends Conversation {
     private String emoji_revlolving_hearts = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x92, (byte)0x9E}, Charset.forName("UTF-8"));
     private String emoji_tada = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x8E, (byte)0x89}, Charset.forName("UTF-8"));
     private String emoji_thumbs_up = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8D}, Charset.forName("UTF-8"));
-    
+    private String emoji_hug = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0xA4, (byte)0x97}, Charset.forName("UTF-8"));    
 
     public OnboardingConversationDevi(MemberChat mc, UserContext uc, AuthService authService) {
         super("onboarding", mc, uc);
@@ -44,6 +44,13 @@ public class OnboardingConversationDevi extends Conversation {
                         }}
                 ));
 
+        createMessage("message.medlem",
+                new MessageBodySingleSelect("Välkommen tillbaka "+ emoji_hug +"\n\n Ett snabbt BankID-inlogg bara, sen är du inne i appen igen",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Logga in", "message.bankidja", false));
+                        }}
+                ));
+        
         createMessage("message.forslagstart",
                 new MessageBodySingleSelect(emoji_hand_ok + "\n\nDå sätter vi igång\n\nAllt du svarar är så klart i säkert förvar hos mig "+emoji_closed_lock_with_key+"\n\nBor du i lägenhet eller eget hus?",
                         new ArrayList<SelectItem>() {{
@@ -55,7 +62,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.lagenhet",
                 new MessageBodySingleSelect("Toppen\n\nLogga in med ditt BankID så kan vi snabbspola fram några frågor!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag loggar in", "message.bankid.start", false));
+                            add(new SelectOption("Jag loggar in", "message.bankidja", false));
                             add(new SelectOption("Jag har inget BankID", "message.manuellpersonnr", false));
                         }}
                 ));
@@ -64,7 +71,7 @@ public class OnboardingConversationDevi extends Conversation {
                 new MessageBodySingleSelect("Då måste jag fråga ifall du har bankID på den enheten du använder nu?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Klart jag har, det är ju ändå 2017", "message.bankid.autostart.send", false));
-                            add(new SelectOption("Nej det har jag inte", "message.bankid.start", false));
+                            add(new SelectOption("Nej det har jag inte", "message.bankidja", false));
                         }}
                 ));
 
@@ -433,7 +440,7 @@ public class OnboardingConversationDevi extends Conversation {
 	        case "message.tipsa":
 	        case "message.frifraga":
 	        	userContext.putUserData("{MAIL}", m.body.text);
-	        	putMessage(m);
+	        	addToChat(m);
 	        	nxtMsg = "message.nagotmer";
 	        	break;
 	        case "message.pers":
@@ -441,29 +448,29 @@ public class OnboardingConversationDevi extends Conversation {
 	        	userContext.putUserData("{NR_PERSONS}", new Integer(nr_persons).toString());
 	        	if(nr_persons==1){ m.body.text = "Jag bor själv"; }
 	        	else{ m.body.text = "Vi är " + nr_persons + " i hushållet"; }
-	        	putMessage(m);
+	        	addToChat(m);
 	        	nxtMsg = "message.sakerhet";
 	        	break;	        	
 	        case "message.kvadrat":
 	        	String kvm = m.body.text;
 	        	userContext.putUserData("{KVM}", kvm);
                 m.body.text = kvm + "kvm";
-                putMessage(m);
+                addToChat(m);
 	        	nxtMsg = "message.student";
 	        	break;	        
 	        case "message.manuellpersonnr":
 	        	userContext.putUserData("{SSN}", m.body.text);
-	        	putMessage(m);
+	        	addToChat(m);
 	        	nxtMsg = "message.varbordu";
 	        	break;		  
 	        case "message.varbordu":
 	        	userContext.putUserData("{ADRESS}", m.body.text);
-	        	putMessage(m);
+	        	addToChat(m);
 	        	nxtMsg = "message.kvadrat";
 	        	break;	    
 	        case "message.mail":
 	        	userContext.putUserData("{MAIL}", m.body.text);
-	        	putMessage(m);
+	        	addToChat(m);
 	        	nxtMsg = "message.kontrakt";
 	        	break;
 	        case "message.sakerhet":
@@ -475,19 +482,19 @@ public class OnboardingConversationDevi extends Conversation {
 	        	}
 	        	if(safetyItems.equals(""))m.body.text = "Jag har inga sådana grejer...";
 	        	else{ m.body.text = "Jag har " + safetyItems; }
-	        	putMessage(m);
+	        	addToChat(m);
 	        	nxtMsg = "message.dyrpryl";
 	        case "message.forsakringidagja":
 	        	String comp = getSelectedSingleValue(m);
 	        	userContext.putUserData("{INSURANCE_COMPANY_TODAY}", m.body.text);
 	        	m.body.text = "Idag har jag " + comp;
-	        	putMessage(m);
+	        	addToChat(m);
 	        	nxtMsg = "message.bytesinfo";	        		        	
             case "message.getname":
                 String fName = m.body.text;
                 userContext.putUserData("{NAME}", fName);
                 m.body.text = "Jag heter " + fName;
-                putMessage(m); // Response parsed to nice format
+                addToChat(m); // Response parsed to nice format
                 nxtMsg = "message.greetings";
 
                 break;
@@ -497,12 +504,12 @@ public class OnboardingConversationDevi extends Conversation {
                 //Auth with bankId
                 userContext.putUserData("{AUTOSTART_TOKEN}", "xxx");
                 userContext.putUserData("{REFERENCE_TOKEN}", "yyy");
-                putMessage(m);
+                addToChat(m);
                 break;
 
             case "message.bankid.autostart.send":
                 //selectedValue = getSelectedSingleValue(m);
-                putMessage(m);
+                addToChat(m);
                 break;
 
             case "onboarding.done" :
@@ -532,7 +539,7 @@ public class OnboardingConversationDevi extends Conversation {
            for (SelectItem o : body1.choices) {
                if(o.selected) {
                    m.body.text = o.text;
-                   putMessage(m);
+                   addToChat(m);
                    nxtMsg = o.value;
                }
            }
@@ -550,9 +557,9 @@ public class OnboardingConversationDevi extends Conversation {
 
 			case "":
 		        log.info("Unknown message recieved...");
-		        putMessage(messageList.get("error"));				
+		        addToChat(getMessage("error"));				
 			default:
-				putMessage(messageList.get(nxtMsg));
+				addToChat(getMessage(nxtMsg));
 				break;
 		}
 
