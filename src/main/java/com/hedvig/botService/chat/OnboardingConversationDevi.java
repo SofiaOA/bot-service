@@ -61,7 +61,7 @@ public class OnboardingConversationDevi extends Conversation {
                 ));
 
         createMessage("message.bankid.start",
-                new MessageBodySingleSelect("Då måste jag fråga\n\nhar du bankID på den enheten du använder nu?",
+                new MessageBodySingleSelect("Då måste jag fråga ifall du har bankID på den enheten du använder nu?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Klart jag har, det är ju ändå 2017", "message.bankid.autostart.send", false));
                             add(new SelectOption("Nej det har jag inte", "message.bankid.start", false));
