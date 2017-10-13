@@ -23,7 +23,8 @@ import javax.persistence.*;
 	        @JsonSubTypes.Type(value = MessageBodyAudio.class, name = "audio"),
 	        @JsonSubTypes.Type(value = MessageBodyPhotoUpload.class, name = "photo_upload"),
 	        @JsonSubTypes.Type(value = MessageBodyVideo.class, name = "video"),
-	        @JsonSubTypes.Type(value = MessageBodyHero.class, name = "hero")
+	        @JsonSubTypes.Type(value = MessageBodyHero.class, name = "hero"),
+			@JsonSubTypes.Type(value = MessageBodyBankIdCollect.class, name = "bankid_collect")
 	    })
 public class MessageBody {
 
@@ -34,6 +35,8 @@ public class MessageBody {
 	private static Logger log = LoggerFactory.getLogger(MessageBody.class);
 
 	public String text;
+
+
 
 	MessageBody(String text){this.text = text;}
 	MessageBody(){log.info("Instansiating MessageBody");}

@@ -34,7 +34,7 @@ public class OnboardingConversation extends Conversation {
 
 		createMessage("message.bye", new MessageBodySingleSelect("Ok {NAME}, så det jag vet om dig är att du är förr {BIRTH_DATE}, jag hör av mig!",
 					new ArrayList<SelectItem>(){{
-						add(new SelectLink("Starta bank id", "AssetTracker","bankid://", "http://hedvig.com"));
+						add(new SelectLink("Starta bank id", "", "AssetTracker","bankid://", "http://hedvig.com", false));
 						add(new SelectOption("Ladda upp foto", "message.photo_upload", false));
 						add(new SelectOption("Spela in video", "message.video", false));
 						add(new SelectOption("You need a hero!", "message.hero", false));

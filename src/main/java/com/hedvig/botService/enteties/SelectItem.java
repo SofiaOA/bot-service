@@ -19,4 +19,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 	    })
 public class SelectItem implements Serializable {
 
+	public boolean selected;
+	public String text;
+	public String value;
+
+	public SelectItem() {}
+
+	public SelectItem(boolean selected, String string, String value) {
+		this.selected = selected;
+		this.text = string;
+		this.value = value;
+	}
 }

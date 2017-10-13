@@ -55,7 +55,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.lagenhet",
                 new MessageBodySingleSelect("Toppen\n\nLogga in med ditt BankID så kan vi snabbspola fram några frågor!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag loggar in (FUNKTION: BANKID-LOGIN)", "message.bankid.start", false));
+                            add(new SelectOption("Jag loggar in", "message.bankid.start", false));
                             add(new SelectOption("Jag har inget BankID", "message.manuellpersonnr", false));
                         }}
                 ));
@@ -71,8 +71,12 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.bankid.autostart.send",
                 new MessageBodySingleSelect("Ja det är faktiskt 2017 i hela 79 dagar " + emoji_postal_horn,
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in", "message.bankid.autostart.respond", "bankid://?autostarttoken=694fa100-af8a-11e7-a61c-df18965671c7",  ""));
+                            add(new SelectLink("Logga in", "message.bankid.autostart.respond", "", "bankid://?autostarttoken={AUTOSTART_TOKEN}",  "", false));
                         }}));
+
+        createMessage("message.bankid.autostart.respond",
+                new MessageBodyBankIdCollect( "{REFERENCE_TOKEN}")
+        );
 
         //JAG LOGGAR IN = STARTA BANKID, LOGGA IN, SEN TILLBAKS TILL message.bankidja
 
@@ -488,6 +492,19 @@ public class OnboardingConversationDevi extends Conversation {
 
                 break;
 
+            case "message.bankid.start":
+                String selectedValue = getSelectedSingleValue(m);
+                //Auth with bankId
+                userContext.putUserData("{AUTOSTART_TOKEN}", "xxx");
+                userContext.putUserData("{REFERENCE_TOKEN}", "yyy");
+                putMessage(m);
+                break;
+
+            case "message.bankid.autostart.send":
+                //selectedValue = getSelectedSingleValue(m);
+                putMessage(m);
+                break;
+
             case "onboarding.done" :
             	userContext.onboardingComplete(true);
             	break;
@@ -513,11 +530,9 @@ public class OnboardingConversationDevi extends Conversation {
 
            MessageBodySingleSelect body1 = (MessageBodySingleSelect) m.body;
            for (SelectItem o : body1.choices) {
-               if (SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected) {
-                   m.body.text = SelectOption.class.cast(o).text;
-                   putMessage(m);
-                   nxtMsg = SelectOption.class.cast(o).value;
-               }
+               m.body.text = o.text;
+               putMessage(m);
+               nxtMsg = o.value;
            }
        } 
        

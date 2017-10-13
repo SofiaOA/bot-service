@@ -6,11 +6,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.hedvig.botService.enteties.MemberChat;
-import com.hedvig.botService.enteties.Message;
-import com.hedvig.botService.enteties.MessageBody;
-import com.hedvig.botService.enteties.MessageHeader;
-import com.hedvig.botService.enteties.UserContext;
+import com.hedvig.botService.enteties.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +56,18 @@ public abstract class Conversation {
 	void putMessage(Message m) {
 		log.info("Putting message:" + m.id + " content:" + m.body.text);
 		m.body.text = replaceWithContext(m.body.text);
+		if(m.body.getClass() == MessageBodySingleSelect.class) {
+		    MessageBodySingleSelect mss = (MessageBodySingleSelect) m.body;
+            mss.choices.forEach(x -> {
+                if(x.getClass() == SelectLink.class) {
+                    SelectLink link = (SelectLink) x;
+                    link.appUrl = replaceWithContext(link.appUrl);
+                }
+            });
+		}else if(m.body.getClass() == MessageBodyBankIdCollect.class) {
+		    MessageBodyBankIdCollect mbc = (MessageBodyBankIdCollect) m.body;
+		    mbc.referenceId = replaceWithContext(mbc.referenceId);
+        }
 		memberChat.addToHistory(m);
 	}
 
