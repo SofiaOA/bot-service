@@ -530,9 +530,11 @@ public class OnboardingConversationDevi extends Conversation {
 
            MessageBodySingleSelect body1 = (MessageBodySingleSelect) m.body;
            for (SelectItem o : body1.choices) {
-               m.body.text = o.text;
-               putMessage(m);
-               nxtMsg = o.value;
+               if(o.selected) {
+                   m.body.text = o.text;
+                   putMessage(m);
+                   nxtMsg = o.value;
+               }
            }
        } 
        
