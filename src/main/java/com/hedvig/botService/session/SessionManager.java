@@ -44,6 +44,10 @@ public class SessionManager {
         return messages.subList(Math.max(messages.size() - i, 0), messages.size());
     }
 
+    public void animationComplete(String hid){
+    	;
+    }
+    
     public void initClaim(String hid){
     	
         UserContext uc = userrepo.findByMemberId(hid).orElseGet(() -> {

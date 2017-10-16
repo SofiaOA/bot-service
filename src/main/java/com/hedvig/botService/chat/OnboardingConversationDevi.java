@@ -192,8 +192,8 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.dyrpryl",
                 new MessageBodySingleSelect("Och äger du något som är värt över 75 000 kr? ",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag har inget så dyrt", "dyrprylnej", false));
-                            add(new SelectOption("Jag har dyra prylar", "dyrprylja", false));
+                            add(new SelectOption("Jag har inget så dyrt", "message.dyrprylnej", false));
+                            add(new SelectOption("Jag har dyra prylar", "message.dyrprylja", false));
                         }}
                 ));
 
@@ -389,7 +389,7 @@ public class OnboardingConversationDevi extends Conversation {
 
         //(FUNKTION: OMSTART) = VORE TOPPEN MED EN FUNKTION SOM GÖR ATT FOLK KAN BÖRJA CHATTA FRÅN BÖRJAN IGEN, SÅ CHATTEN KAN BLI EN LOOP OCH GÖRAS OM IGEN OCH VISAS FÖR ANDRA PERSONER ÄN MEDLEMMEN
 
-        createMessage("message.cad", new MessageBodyText("WIP"));
+        createMessage("message.cad", new MessageBodyParagraph("WIP"),"bike"); // With avatar
 
         createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
     }
@@ -399,14 +399,14 @@ public class OnboardingConversationDevi extends Conversation {
         //startConversation("message.sakerhet"); // Id of first message
     }
 
-    public int getNumberValue(Message m){
-    	MessageBodyNumber body = (MessageBodyNumber)m.body;
-    	return Integer.parseInt(m.body.text);
+    // --------------------------------------------------------------------------- //
+    
+    public int getValue(MessageBodyNumber body){
+    	return Integer.parseInt(body.text);
     }
     
-    public String getSelectedSingleValue(Message m){
-		MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
-		
+    public String getValue(MessageBodySingleSelect body){
+
 		for(SelectItem o : body.choices){
 			if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
 				return SelectOption.class.cast(o).value;
@@ -415,8 +415,7 @@ public class OnboardingConversationDevi extends Conversation {
 		return "";
     }
     
-    public ArrayList<String> getSelectedMultipleValue(Message m){
-		MessageBodyMultipleSelect body = (MessageBodyMultipleSelect)m.body;
+    public ArrayList<String> getValue(MessageBodyMultipleSelect body){
 		ArrayList<String> selectedOptions = new ArrayList<String>();
 		for(SelectItem o : body.choices){
 			if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
@@ -426,6 +425,8 @@ public class OnboardingConversationDevi extends Conversation {
 		return selectedOptions;
     }
 
+    // ------------------------------------------------------------------------------- //
+    
     @Override
     public void recieveMessage(Message m) {
         log.info(m.toString());
@@ -434,7 +435,7 @@ public class OnboardingConversationDevi extends Conversation {
 
         switch (m.id) {
 	        case "message.forslagstart":
-				userContext.putUserData("{HOUSE}", getSelectedSingleValue(m));
+				userContext.putUserData("{HOUSE}", new Integer(getValue((MessageBodyNumber) m.body)).toString());
 	            break;   
 	        case "message.nyhetsbrev":
 	        case "message.tipsa":
@@ -444,7 +445,7 @@ public class OnboardingConversationDevi extends Conversation {
 	        	nxtMsg = "message.nagotmer";
 	        	break;
 	        case "message.pers":
-	        	int nr_persons = getNumberValue(m);
+	        	int nr_persons = getValue((MessageBodyNumber)m.body);
 	        	userContext.putUserData("{NR_PERSONS}", new Integer(nr_persons).toString());
 	        	if(nr_persons==1){ m.body.text = "Jag bor själv"; }
 	        	else{ m.body.text = "Vi är " + nr_persons + " i hushållet"; }
@@ -474,7 +475,7 @@ public class OnboardingConversationDevi extends Conversation {
 	        	nxtMsg = "message.kontrakt";
 	        	break;
 	        case "message.sakerhet":
-	        	ArrayList<String> items = getSelectedMultipleValue(m);
+	        	ArrayList<String> items = getValue((MessageBodyMultipleSelect)m.body);
 	        	String safetyItems = "";
 	        	for(String s : items){
 	        		userContext.putUserData("{"+s+"}", "1");
@@ -485,7 +486,7 @@ public class OnboardingConversationDevi extends Conversation {
 	        	addToChat(m);
 	        	nxtMsg = "message.dyrpryl";
 	        case "message.forsakringidagja":
-	        	String comp = getSelectedSingleValue(m);
+	        	String comp = getValue((MessageBodySingleSelect)m.body);
 	        	userContext.putUserData("{INSURANCE_COMPANY_TODAY}", m.body.text);
 	        	m.body.text = "Idag har jag " + comp;
 	        	addToChat(m);
@@ -500,7 +501,7 @@ public class OnboardingConversationDevi extends Conversation {
                 break;
 
             case "message.bankid.start":
-                String selectedValue = getSelectedSingleValue(m);
+                String selectedValue = getValue((MessageBodySingleSelect)m.body);
                 //Auth with bankId
                 userContext.putUserData("{AUTOSTART_TOKEN}", "xxx");
                 userContext.putUserData("{REFERENCE_TOKEN}", "yyy");

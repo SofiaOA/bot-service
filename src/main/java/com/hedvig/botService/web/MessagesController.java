@@ -1,6 +1,8 @@
 package com.hedvig.botService.web;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -11,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +26,7 @@ import org.springframework.web.multipart.support.ByteArrayMultipartFileEditor;
 
 import com.hedvig.botService.enteties.Message;
 import com.hedvig.botService.session.SessionManager;
+import com.hedvig.botService.web.dto.AvatarDTO;
 
 @RestController
 public class MessagesController {
@@ -104,10 +108,32 @@ public class MessagesController {
     	return ResponseEntity.noContent().build();
     }
 
+    @RequestMapping(path = "/avatars", method = RequestMethod.GET)
+    public ResponseEntity<List<AvatarDTO>> getAvatars(@RequestHeader(value="hedvig.token", required = false) String hid) {
+
+    	// TODO: Implement 
+     	log.info("Getting avatars user:" + hid);
+        
+     	ArrayList<AvatarDTO> avatars = new ArrayList<AvatarDTO>();
+     	AvatarDTO avatar1 = new AvatarDTO("loader", "https://www.lottiefiles.com/storage/datafiles/qm9uaAEoe13l3eQ/data.json",500,500,1000);
+     	AvatarDTO avatar2 = new AvatarDTO("bike", "https://www.lottiefiles.com/storage/datafiles/dlzGwlfS0fkCJcq/data.json",500,500,2000);
+     	avatars.add(avatar1);
+     	avatars.add(avatar2);
+    	return new ResponseEntity<List<AvatarDTO>>(avatars,HttpStatus.OK);
+    }
+    
     @RequestMapping(path = "/initclaim", method = RequestMethod.POST)
     public ResponseEntity<?> initClaim(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Init claims for user:" + hid);
+        sessionManager.initClaim(hid);
+    	return ResponseEntity.noContent().build();
+    }
+    
+    @RequestMapping(path = "/event", method = RequestMethod.POST)
+    public ResponseEntity<?> eventRecieved(@RequestHeader(value="hedvig.token", required = false) String hid) {
+
+     	log.info("Event recieved from user:" + hid);
         sessionManager.initClaim(hid);
     	return ResponseEntity.noContent().build();
     }

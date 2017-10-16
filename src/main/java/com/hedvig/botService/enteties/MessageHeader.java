@@ -19,6 +19,8 @@ public class MessageHeader {
 		//this.type = type;
 		this.responsePath = responsePath;
 		this.timeStamp = timeStamp;
+		this.pollingInterval = 1000; // Default value = 1s
+		this.loadingIndicator = "loader"; // Default value
 	}
 	
 	
@@ -33,7 +35,9 @@ public class MessageHeader {
 	public long fromId;
 	public String responsePath;
 	public long timeStamp; // Time when sent/recieved on API-GW
-
+	public String loadingIndicator; // Link to animation to show during load
+	public String avatarName; // Link to avatar animation to show over message
+	public long pollingInterval; // Frequency of next request
 	
 	/*@JsonSetter("type")
 	public void setType(String t){

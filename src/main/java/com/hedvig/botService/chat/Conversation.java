@@ -94,6 +94,12 @@ public abstract class Conversation {
 		createMessage(id,header,body);
 	}
 	
+	void createMessage(String id, MessageBody body, String avatarName){
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		header.avatarName = avatarName;
+		createMessage(id,header,body);		
+	}
+	
 	void startConversation(String startId){
 		log.info("Starting conversation with message:" + startId);
 		addToChat(messageList.get(startId));

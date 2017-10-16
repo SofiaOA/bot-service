@@ -24,6 +24,7 @@ import javax.persistence.*;
 	        @JsonSubTypes.Type(value = MessageBodyPhotoUpload.class, name = "photo_upload"),
 	        @JsonSubTypes.Type(value = MessageBodyVideo.class, name = "video"),
 	        @JsonSubTypes.Type(value = MessageBodyHero.class, name = "hero"),
+	        @JsonSubTypes.Type(value = MessageBodyParagraph.class, name = "paragraph"),
 			@JsonSubTypes.Type(value = MessageBodyBankIdCollect.class, name = "bankid_collect")
 	    })
 public class MessageBody {
