@@ -35,6 +35,8 @@ public class OnboardingConversationDevi extends Conversation {
         this.authService = authService;
         // TODO Auto-generated constructor stub
 
+        Image testImage = new Image("http://www.apa.org/Images/insurance-title-image_tcm7-198694.jpg",730,330);
+        
         createMessage("message.onboardingstart",
                 new MessageBodySingleSelect(emoji_smile + " Hej, jag heter Hedvig!\n\nFint att ha dig här\n\nJag är en försäkringsbot så låt mig visa vad jag gör!",
                         new ArrayList<SelectItem>() {{
@@ -42,7 +44,7 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Visa mig", "message.cad", false));
                             add(new SelectOption("Jag är redan medlem", "message.medlem", false));
                         }}
-                ));
+                ), testImage);
 
         createMessage("message.medlem",
                 new MessageBodySingleSelect("Välkommen tillbaka "+ emoji_hug +"\n\n Ett snabbt BankID-inlogg bara, sen är du inne i appen igen",

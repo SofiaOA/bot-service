@@ -27,6 +27,7 @@ import javax.persistence.*;
 	        @JsonSubTypes.Type(value = MessageBodyParagraph.class, name = "paragraph"),
 			@JsonSubTypes.Type(value = MessageBodyBankIdCollect.class, name = "bankid_collect")
 	    })
+
 public class MessageBody {
 
 	@Id
@@ -37,8 +38,10 @@ public class MessageBody {
 
 	public String text;
 
-
+	public String imageURL;
+	public int imageWidth;
+	public int imageHeight;
 
 	MessageBody(String text){this.text = text;}
-	MessageBody(){log.info("Instansiating MessageBody");}
+	MessageBody(){;}
 }

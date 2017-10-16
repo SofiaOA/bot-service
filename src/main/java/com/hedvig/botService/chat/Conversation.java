@@ -100,6 +100,14 @@ public abstract class Conversation {
 		createMessage(id,header,body);		
 	}
 	
+	void createMessage(String id, MessageBody body, Image image){
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		body.imageURL = image.imageURL;
+		body.imageHeight = image.imageHeight;
+		body.imageWidth = image.imageWidth;
+		createMessage(id,header,body);			
+	}
+	
 	void startConversation(String startId){
 		log.info("Starting conversation with message:" + startId);
 		addToChat(messageList.get(startId));
