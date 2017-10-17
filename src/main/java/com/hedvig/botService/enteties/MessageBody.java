@@ -39,8 +39,8 @@ public class MessageBody {
 	public String text;
 
 	public String imageURL;
-	public int imageWidth;
-	public int imageHeight;
+	public Integer imageWidth;
+	public Integer imageHeight;
 
 	MessageBody(String text){this.text = text;}
 	MessageBody(){;}
