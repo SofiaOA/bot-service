@@ -148,7 +148,7 @@ public class MessagesController {
     	return ResponseEntity.noContent().build();
     }
     
-    @RequestMapping(path = "/chat/main", method = RequestMethod.POST)
+    @RequestMapping(path = "/chat/main", method = RequestMethod.GET)
     public ResponseEntity<?> mainMenue(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Putting main message in chat for user:" + hid);

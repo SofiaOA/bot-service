@@ -33,10 +33,6 @@ public class MainConversation extends Conversation {
 		createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 	}
 
-	public void init(String hid){
-		startConversation("hedvig.main"); // Id of first message
-	}
-
 	@Override
 	public void recieveMessage(Message m) {
 		log.info(m.toString());
@@ -89,7 +85,8 @@ public class MainConversation extends Conversation {
 
 	@Override
 	public void init() {
-		// TODO Auto-generated method stub
+    	log.info("Starting main conversation");
+        startConversation("hedvig.com"); // Id of first message
 		
 	}
 

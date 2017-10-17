@@ -8,6 +8,8 @@ package com.hedvig.botService.session;
 import java.util.List;
 
 import com.hedvig.botService.serviceIntegration.AuthService;
+import com.hedvig.botService.web.dto.MemberAuthedEvent;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,6 +160,15 @@ public class SessionManager {
 
         repo.saveAndFlush(mc);
         userrepo.saveAndFlush(uc);    	
+    }
+    
+    public void receiveEvent(MemberAuthedEvent e){
+    	String hid = e.getMemberId().toString();
+    	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+    	uc.putUserData("{NAME}", e.getProfile().getFirstName());
+    	uc.putUserData("{EMAIL}", e.getProfile().getEmail());
+    	uc.putUserData("{FAMILY_NAME}", e.getProfile().getLastName());
+    	uc.putUserData("{ADDRESS}", e.getProfile().getAddress());
     }
     
     public void receiveMessage(Message m, String hid) {
