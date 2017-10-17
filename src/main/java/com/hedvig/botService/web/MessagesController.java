@@ -27,6 +27,7 @@ import org.springframework.web.multipart.support.ByteArrayMultipartFileEditor;
 import com.hedvig.botService.enteties.Message;
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.AvatarDTO;
+import com.hedvig.botService.web.dto.EventDTO;
 
 @RestController
 public class MessagesController {
@@ -131,10 +132,10 @@ public class MessagesController {
     }
     
     @RequestMapping(path = "/event", method = RequestMethod.POST)
-    public ResponseEntity<?> eventRecieved(@RequestHeader(value="hedvig.token", required = false) String hid) {
+    public ResponseEntity<?> eventRecieved(@RequestBody EventDTO e, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Event recieved from user:" + hid);
-        sessionManager.initClaim(hid);
+        sessionManager.recieveEvent(e.type, e.value, hid);
     	return ResponseEntity.noContent().build();
     }
     

@@ -129,4 +129,10 @@ public class ClaimsConversation extends Conversation {
 		
 	}
 
+	@Override
+	public void recieveEvent(EventTypes e, String value) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -1,7 +1,5 @@
 package com.hedvig.botService.chat;
 
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,6 +12,7 @@ import org.slf4j.LoggerFactory;
 public abstract class Conversation {
 
     static final long  HEDVIG_USER_ID = 1; // The id hedvig uses to chat
+    public static enum EventTypes {ANIMATION_COMPLETE};
 	private static final String regexPattern = "\\{(.*?)\\}";
 	private static Logger log = LoggerFactory.getLogger(Conversation.class);
 	private String conversationName; // Id for the conversation
@@ -107,6 +106,8 @@ public abstract class Conversation {
 		body.imageWidth = image.imageWidth;
 		createMessage(id,header,body);			
 	}
+	
+	public abstract void recieveEvent(EventTypes e, String value);
 	
 	void startConversation(String startId){
 		log.info("Starting conversation with message:" + startId);

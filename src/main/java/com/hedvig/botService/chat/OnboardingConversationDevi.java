@@ -10,6 +10,7 @@ import com.hedvig.botService.serviceIntegration.BankIdAuthResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hedvig.botService.chat.Conversation.EventTypes;
 import com.hedvig.botService.enteties.*;
 
 public class OnboardingConversationDevi extends Conversation {
@@ -391,12 +392,15 @@ public class OnboardingConversationDevi extends Conversation {
 
         //(FUNKTION: OMSTART) = VORE TOPPEN MED EN FUNKTION SOM GÖR ATT FOLK KAN BÖRJA CHATTA FRÅN BÖRJAN IGEN, SÅ CHATTEN KAN BLI EN LOOP OCH GÖRAS OM IGEN OCH VISAS FÖR ANDRA PERSONER ÄN MEDLEMMEN
 
-        createMessage("message.cad", new MessageBodyParagraph("WIP"),"bike"); // With avatar
+        createMessage("message.cad", new MessageBodyParagraph("WIP"),"animation.bike"); // With avatar
 
+        createMessage("message.bikedone", new MessageBodyText("Nu har du sett hur det funkar..."));
+        
         createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
     }
 
     public void init() {
+    	log.info("Starting onboarding conversation");
         startConversation("message.onboardingstart"); // Id of first message
         //startConversation("message.sakerhet"); // Id of first message
     }
@@ -428,6 +432,18 @@ public class OnboardingConversationDevi extends Conversation {
     }
 
     // ------------------------------------------------------------------------------- //
+    @Override
+    public void recieveEvent(EventTypes e, String value){
+    
+		switch(e){
+		case ANIMATION_COMPLETE:
+			switch(value){
+				case "animation.bike":
+					completeRequest("message.bikedone");
+					break;
+			}
+		}
+    }
     
     @Override
     public void recieveMessage(Message m) {
@@ -548,24 +564,29 @@ public class OnboardingConversationDevi extends Conversation {
            }
        } 
        
-		// Check which next message is an act accordingly
+       completeRequest(nxtMsg);
+       
+    }
+
+    /*
+     * Generate next chat message or ends conversation
+     * */
+    private void completeRequest(String nxtMsg){
+
 		switch(nxtMsg){
 			case "message.whoishedvig": 
 				log.info("Onboarding complete");
 				userContext.onboardingComplete(true);
 				break;
-            case "message.bankid.device.start":
-                //BankIdAuthResponse  authResponse = this.authService.auth();
-                nxtMsg = "message.bankid.autostart.send";
-
+		    case "message.bankid.device.start":
+		        //BankIdAuthResponse  authResponse = this.authService.auth();
+		        nxtMsg = "message.bankid.autostart.send";
 			case "":
 		        log.info("Unknown message recieved...");
 		        addToChat(getMessage("error"));				
 			default:
 				addToChat(getMessage(nxtMsg));
 				break;
-		}
-
-    }
-
+			}
+	}
 }

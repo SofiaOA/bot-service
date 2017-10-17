@@ -42,7 +42,7 @@ public class MemberChat {
     }
     
     public MemberChat() {
-    	//log.info("Instantiating MemberChat " + this );
+    	log.info("Instantiating MemberChat " + this );
     	//new Exception().printStackTrace(System.out);
     }
 

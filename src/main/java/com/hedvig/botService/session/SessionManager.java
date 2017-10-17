@@ -22,6 +22,8 @@ import com.hedvig.botService.enteties.Message;
 import com.hedvig.botService.enteties.ResourceNotFoundException;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.UserContextRepository;
+import com.hedvig.botService.chat.Conversation;
+import com.hedvig.botService.chat.Conversation.EventTypes;
 
 public class SessionManager {
 
@@ -44,10 +46,6 @@ public class SessionManager {
         return messages.subList(Math.max(messages.size() - i, 0), messages.size());
     }
 
-    public void animationComplete(String hid){
-    	;
-    }
-    
     public void initClaim(String hid){
     	
         UserContext uc = userrepo.findByMemberId(hid).orElseGet(() -> {
@@ -56,6 +54,41 @@ public class SessionManager {
             return newUserContext;
         });
     	uc.initClaim();
+        userrepo.saveAndFlush(uc);
+    }
+    
+    public void recieveEvent(String eventtype, String value, String hid){
+        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+        
+        EventTypes type = EventTypes.valueOf(eventtype);
+
+        /*
+         * User is onboaring:
+         * */
+        if(!uc.onboardingComplete()) {
+            //OnboardingConversation onboardingConversation = new OnboardingConversation(mc, uc);
+        	OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, authService);
+            onboardingConversation.recieveEvent(type, value);
+        }
+       
+        /*
+         * User is in a claims process:
+         * */
+        if(uc.ongoingClaimsProcess()){
+            ClaimsConversation claimsConversation = new ClaimsConversation(mc, uc);
+            claimsConversation.recieveEvent(type, value);       	
+        }
+        
+        /*
+         * User is chatting with Hedvig:
+         * */
+        if(uc.ongoingMainConversation()) {
+        	MainConversation mainConversation = new MainConversation(mc, uc);
+            mainConversation.recieveEvent(type, value);
+        }
+    	
+        repo.saveAndFlush(mc);
         userrepo.saveAndFlush(uc);
     }
     
