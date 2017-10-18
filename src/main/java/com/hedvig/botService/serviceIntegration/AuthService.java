@@ -30,13 +30,19 @@ public class AuthService {
 
     public Optional<BankIdAuthResponse> auth() {
         String url = "http://" + memberServiceLocation + "/member/bankid/auth";
-        ResponseEntity<BankIdAuthResponse> response = template.postForEntity(url, "", BankIdAuthResponse.class);
+        try {
 
-        if(response.getStatusCode() == HttpStatus.OK) {
-            return Optional.ofNullable(response.getBody());
+
+            ResponseEntity<BankIdAuthResponse> response = template.postForEntity(url, "", BankIdAuthResponse.class);
+            if(response.getStatusCode() == HttpStatus.OK) {
+                return Optional.ofNullable(response.getBody());
+            }else {
+                log.error("Could not make request to {}: {}", url, response.toString());
+            }
+        } catch (Exception e) {
+            log.error("Could not authenticate: ", e);
         }
 
-        log.error("Could not make request to {}: {}", url, response.toString());
         return Optional.empty();
     }
 
