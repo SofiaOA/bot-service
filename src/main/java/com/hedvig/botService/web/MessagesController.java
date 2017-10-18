@@ -104,6 +104,16 @@ public class MessagesController {
     	return ResponseEntity.noContent().build();
     }
 
+    @RequestMapping(path = "/init", method = RequestMethod.POST)
+    public ResponseEntity<?> create(@RequestHeader(value="hedvig.token", required = false) String hid) {
+
+     	log.info("Init recieved from user:" + hid);
+
+        sessionManager.init(hid);
+
+    	return ResponseEntity.noContent().build();
+    }
+    
     @GetMapping(path = "/avatars")
     public ResponseEntity<List<AvatarDTO>> getAvatars(@RequestHeader(value="hedvig.token", required = false) String hid) {
 

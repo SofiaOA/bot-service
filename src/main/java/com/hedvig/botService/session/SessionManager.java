@@ -95,6 +95,28 @@ public class SessionManager {
         userrepo.saveAndFlush(uc);
     }
     
+    /*
+     * Create a new users chat and context
+     * */
+    public void init(String hid){
+    	
+        MemberChat chat = repo.findByMemberId(hid).orElseGet(() -> {
+            MemberChat newChat = new MemberChat(hid);
+            repo.save(newChat);
+            return newChat;
+        });
+
+		UserContext uc = userrepo.findByMemberId(hid).orElseGet(() -> {
+			UserContext newUserContext = new UserContext(hid);
+			userrepo.save(newUserContext);
+		    return newUserContext;
+		});   	
+		
+        repo.saveAndFlush(chat);
+        userrepo.saveAndFlush(uc);
+        
+    }
+    
     public List<Message> getAllMessages(String hid) {
         log.info("Getting all messages for user:" + hid);
 
