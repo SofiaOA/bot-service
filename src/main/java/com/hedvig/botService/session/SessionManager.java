@@ -8,6 +8,7 @@ package com.hedvig.botService.session;
 import java.util.List;
 
 import com.hedvig.botService.serviceIntegration.AuthService;
+import com.hedvig.botService.web.dto.Member;
 import com.hedvig.botService.web.dto.MemberAuthedEvent;
 
 import org.slf4j.Logger;
@@ -165,10 +166,22 @@ public class SessionManager {
     public void receiveEvent(MemberAuthedEvent e){
     	String hid = e.getMemberId().toString();
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
-    	uc.putUserData("{NAME}", e.getProfile().getFirstName());
-    	uc.putUserData("{EMAIL}", e.getProfile().getEmail());
-    	uc.putUserData("{FAMILY_NAME}", e.getProfile().getLastName());
-    	uc.putUserData("{ADDRESS}", e.getProfile().getAddress());
+        Member member = e.getMember();
+    	uc.putUserData("{NAME}", member.getFirstName());
+    	uc.putUserData("{EMAIL}", member.getEmail());
+    	uc.putUserData("{FAMILY_NAME}", member.getLastName());
+    	uc.putUserData("{ADDRESS}", member.getStreet());
+
+        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+
+        if(!uc.onboardingComplete()) {
+            //OnboardingConversation onboardingConversation = new OnboardingConversation(mc, uc);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, authService);
+            onboardingConversation.bankIdAuthComplete();
+        }
+
+        repo.saveAndFlush(mc);
+        userrepo.saveAndFlush(uc);
     }
     
     public void receiveMessage(Message m, String hid) {

@@ -1,9 +1,11 @@
 package com.hedvig.botService.chat;
 
 import java.nio.charset.Charset;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import com.hedvig.botService.serviceIntegration.AuthService;
 import com.hedvig.botService.serviceIntegration.BankIdAuthResponse;
@@ -65,7 +67,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.lagenhet",
                 new MessageBodySingleSelect("Toppen\n\nLogga in med ditt BankID så kan vi snabbspola fram några frågor!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag loggar in", "message.bankidja", false));
+                            add(new SelectOption("Jag loggar in", "message.bankid.start", false));
                             add(new SelectOption("Jag har inget BankID", "message.manuellpersonnr", false));
                         }}
                 ));
@@ -78,8 +80,16 @@ public class OnboardingConversationDevi extends Conversation {
                         }}
                 ));
 
+        createMessage("message.bankid.error",
+                new MessageBodySingleSelect("Något blev fel när jag försökte kontakta min vän på BankId?",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Försök igen", "message.bankid.start", false));
+                            add(new SelectOption("Hoppa över", "message.bankidja", false));
+                        }}
+                ));
+
         createMessage("message.bankid.autostart.send",
-                new MessageBodySingleSelect("Ja det är faktiskt 2017 i hela 79 dagar " + emoji_postal_horn,
+                new MessageBodySingleSelect("Ja det är faktiskt 2017 i hela " + (LocalDate.now().lengthOfYear() - LocalDate.now().getDayOfYear()) + " dagar till!" + emoji_postal_horn,
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Logga in", "message.bankid.autostart.respond", "", "bankid://?autostarttoken={AUTOSTART_TOKEN}",  "", false));
                         }}));
@@ -87,6 +97,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.bankid.autostart.respond",
                 new MessageBodyBankIdCollect( "{REFERENCE_TOKEN}")
         );
+
 
         //JAG LOGGAR IN = STARTA BANKID, LOGGA IN, SEN TILLBAKS TILL message.bankidja
 
@@ -121,7 +132,7 @@ public class OnboardingConversationDevi extends Conversation {
         // ----------------------------------------------- //
         
         createMessage("message.bankidja",
-                new MessageBodySingleSelect("Tackar! Enligt infon jag har fått bor du i en lägenhet på (ADRESS). Stämmer det?",
+                new MessageBodySingleSelect("Tackar! Enligt infon jag har fått bor du i en lägenhet på {ADDRESS}. Stämmer det?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ja", "message.kvadrat", false));
                             add(new SelectOption("Nej", "message.manuellpersonnr", false));
@@ -453,7 +464,7 @@ public class OnboardingConversationDevi extends Conversation {
 
         switch (m.id) {
 	        case "message.forslagstart":
-				userContext.putUserData("{HOUSE}", new Integer(getValue((MessageBodyNumber) m.body)).toString());
+				userContext.putUserData("{HOUSE}", getValue((MessageBodySingleSelect) m.body));
 	            break;   
 	        case "message.nyhetsbrev":
 	        case "message.tipsa":
@@ -483,7 +494,7 @@ public class OnboardingConversationDevi extends Conversation {
 	        	nxtMsg = "message.varbordu";
 	        	break;		  
 	        case "message.varbordu":
-	        	userContext.putUserData("{ADRESS}", m.body.text);
+	        	userContext.putUserData("{ADDRESS}", m.body.text);
 	        	addToChat(m);
 	        	nxtMsg = "message.kvadrat";
 	        	break;	    
@@ -520,9 +531,17 @@ public class OnboardingConversationDevi extends Conversation {
 
             case "message.bankid.start":
                 String selectedValue = getValue((MessageBodySingleSelect)m.body);
-                //Auth with bankId
-                userContext.putUserData("{AUTOSTART_TOKEN}", "xxx");
-                userContext.putUserData("{REFERENCE_TOKEN}", "yyy");
+
+                Optional<BankIdAuthResponse> authResponse = authService.auth();
+
+                if(!authResponse.isPresent()) {
+                    log.error("Could not start bankIdAuthentication!");
+                    nxtMsg = "message.bankid.error";
+                }else{
+                    userContext.putUserData("{AUTOSTART_TOKEN}", authResponse.get().autoStartToken);
+                    userContext.putUserData("{REFERENCE_TOKEN}", authResponse.get().referenceToken);
+                }
+
                 addToChat(m);
                 break;
 
@@ -552,7 +571,7 @@ public class OnboardingConversationDevi extends Conversation {
         /*
 	  * In a Single select, there is only one trigger event. Set default here to be a link to a new message
 	  */
-       if (m.body.getClass().equals(MessageBodySingleSelect.class)) {
+       if (nxtMsg.equals("") && m.body.getClass().equals(MessageBodySingleSelect.class)) {
 
            MessageBodySingleSelect body1 = (MessageBodySingleSelect) m.body;
            for (SelectItem o : body1.choices) {
@@ -589,4 +608,8 @@ public class OnboardingConversationDevi extends Conversation {
 				break;
 			}
 	}
+
+	public void bankIdAuthComplete(){
+        addToChat(getMessage("message.bankidja"));
+    }
 }

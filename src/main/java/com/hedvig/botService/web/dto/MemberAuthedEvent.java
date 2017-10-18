@@ -10,5 +10,5 @@ public class MemberAuthedEvent {
     private String eventId;
     private Long memberId;
     private Instant createdAt;
-    private Profile profile;
+    private Member member;
 }
