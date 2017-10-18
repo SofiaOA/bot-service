@@ -91,7 +91,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.bankid.autostart.send",
                 new MessageBodySingleSelect("Ja det är faktiskt 2017 i hela " + (LocalDate.now().lengthOfYear() - LocalDate.now().getDayOfYear()) + " dagar till!" + emoji_postal_horn,
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in", "message.bankid.autostart.respond", null, "bankid://?autostarttoken={AUTOSTART_TOKEN}",  null, false));
+                            add(new SelectLink("Logga in", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}",  null, false));
                         }}));
 
         createMessage("message.bankid.autostart.respond",
