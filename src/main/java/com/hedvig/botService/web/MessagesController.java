@@ -16,12 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.ServletRequestDataBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.support.ByteArrayMultipartFileEditor;
 
 import com.hedvig.botService.enteties.Message;
@@ -109,7 +104,7 @@ public class MessagesController {
     	return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(path = "/avatars", method = RequestMethod.GET)
+    @GetMapping(path = "/avatars")
     public ResponseEntity<List<AvatarDTO>> getAvatars(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
     	// TODO: Implement 
@@ -123,7 +118,7 @@ public class MessagesController {
     	return new ResponseEntity<List<AvatarDTO>>(avatars,HttpStatus.OK);
     }
     
-    @RequestMapping(path = "/initclaim", method = RequestMethod.POST)
+    @PostMapping(path = "/initclaim")
     public ResponseEntity<?> initClaim(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Init claims for user:" + hid);
@@ -131,7 +126,7 @@ public class MessagesController {
     	return ResponseEntity.noContent().build();
     }
     
-    @RequestMapping(path = "/event", method = RequestMethod.POST)
+    @PostMapping(path = "/event")
     public ResponseEntity<?> eventRecieved(@RequestBody EventDTO e, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Event recieved from user:" + hid);
@@ -139,7 +134,7 @@ public class MessagesController {
     	return ResponseEntity.noContent().build();
     }
     
-    @RequestMapping(path = "/chat/reset", method = RequestMethod.POST)
+    @PostMapping(path = "/chat/reset")
     public ResponseEntity<?> resetChat(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Reset chat for user:" + hid);
@@ -148,7 +143,7 @@ public class MessagesController {
     	return ResponseEntity.noContent().build();
     }
     
-    @RequestMapping(path = "/chat/main", method = RequestMethod.GET)
+    @PostMapping("/chat/main")
     public ResponseEntity<?> mainMenue(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Putting main message in chat for user:" + hid);
@@ -157,7 +152,7 @@ public class MessagesController {
     	return ResponseEntity.noContent().build();
     }
     
-    @RequestMapping(path = "/chat/edit", method = RequestMethod.POST)
+    @PostMapping(path = "/chat/edit")
     public ResponseEntity<?> editChat(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Edit chat for user:" + hid);
