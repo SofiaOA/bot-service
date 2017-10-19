@@ -1,5 +1,7 @@
 package com.hedvig.botService.session;
 
+import java.util.ArrayList;
+
 /*
  * The session manager is the main controller class for the chat service. It contains all user sessions with chat histories, context etc
  * It is a singleton accessed through the request controller
@@ -117,6 +119,30 @@ public class SessionManager {
         
     }
     
+    /*
+     * Mark all messages (incl) last input from user deleted
+     * */
+    public void editHistory(String hid){
+    	MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+    	mc.revertLastInput();
+    	repo.saveAndFlush(mc);
+    }
+    
+    /*
+     * Mark all messages (incl) last input from user deleted
+     * */
+    public void resetOnboardingChat(String hid){
+    	MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+    	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    	
+    	mc.reset(); // Clear chat
+        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, authService);
+        onboardingConversation.init(); // Restart conversation
+        
+    	repo.saveAndFlush(mc);
+    	userrepo.saveAndFlush(uc);
+    }
+    
     public List<Message> getAllMessages(String hid) {
         log.info("Getting all messages for user:" + hid);
 
@@ -158,7 +184,15 @@ public class SessionManager {
         userrepo.saveAndFlush(uc);
         
         log.info(chat.toString());
-        return chat.chatHistory;
+        
+        ArrayList<Message> returnList = new ArrayList<Message>();
+        for(Message m : chat.chatHistory){
+        	if(m.deleted==null | !m.deleted){ // TODO:remove null test
+        		returnList.add(m); 
+        	}
+        }
+        //return chat.chatHistory;
+        return returnList;
     }
     
     /*

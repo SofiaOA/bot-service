@@ -509,12 +509,14 @@ public class OnboardingConversationDevi extends Conversation {
 	        	nxtMsg = "message.kontrakt";
 	        	break;
 	        case "message.sakerhet":
-	        	ArrayList<String> items = getValue((MessageBodyMultipleSelect)m.body);
-	        	String safetyItems = "";
-	        	for(String s : items){
-	        		userContext.putUserData("{"+s+"}", "1");
-	        		safetyItems += (s + ",");
-	        	}
+	    		String safetyItems = "";
+	    		MessageBodyMultipleSelect body = (MessageBodyMultipleSelect)m.body;
+	    		for(SelectItem o : body.choices){
+	    			if(SelectOption.class.isInstance(o)){ // Check non-link items
+	    				userContext.putUserData("{"+SelectOption.class.cast(o).value+"}", SelectOption.class.cast(o).selected?"1":"0"); // Save all options selected and-non selected ones
+		    			if(SelectOption.class.cast(o).selected)safetyItems += (SelectOption.class.cast(o).value + ",");
+	    			}
+	    		}
 	        	if(safetyItems.equals(""))m.body.text = "Jag har inga sådana grejer...";
 	        	else{ m.body.text = "Jag har " + safetyItems; }
 	        	addToChat(m);

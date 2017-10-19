@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class Conversation {
 
-    static final long  HEDVIG_USER_ID = 1; // The id hedvig uses to chat
+    public static final long  HEDVIG_USER_ID = 1; // The id hedvig uses to chat
     public static enum EventTypes {ANIMATION_COMPLETE};
 	private static final String regexPattern = "\\{(.*?)\\}";
 	private static Logger log = LoggerFactory.getLogger(Conversation.class);

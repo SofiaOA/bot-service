@@ -21,6 +21,9 @@ public class Message {
 
     public String id;
 
+    @JsonIgnore
+    public Boolean deleted; // We do not remove anything but mark deleted
+    
 	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name="header_id")
 	public MessageHeader header;

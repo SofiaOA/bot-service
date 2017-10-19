@@ -148,7 +148,7 @@ public class MessagesController {
     public ResponseEntity<?> resetChat(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Reset chat for user:" + hid);
-        //sessionManager.receiveMessage(msg, hid);
+        sessionManager.resetOnboardingChat(hid);
 
     	return ResponseEntity.noContent().build();
     }
@@ -166,7 +166,7 @@ public class MessagesController {
     public ResponseEntity<?> editChat(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Edit chat for user:" + hid);
-        //sessionManager.receiveMessage(msg, hid);
+        sessionManager.editHistory(hid);
 
     	return ResponseEntity.noContent().build();
     }

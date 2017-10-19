@@ -7,8 +7,13 @@ import javax.persistence.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hedvig.botService.chat.Conversation;
+
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /*
@@ -33,11 +38,11 @@ public class MemberChat {
 
     /*@Embedded
     public UserContext onboardingContext;*/
-
+    
     public String toString(){
     	
     	String mId = "";
-    	if(chatHistory != null)for(Message m : chatHistory){mId += (" (" + m.globalId + ":" + m.id + ")");}
+    	if(chatHistory != null)for(Message m : chatHistory){mId += (" (" + m.globalId + ":" + m.id + " d:" + m.deleted + ")");}
     	return "id:" + this.id + " memberId:" + this.memberId + " #msgs:" + (chatHistory == null? null:chatHistory.size() + " [" + mId + "]");
     }
     
@@ -46,6 +51,45 @@ public class MemberChat {
     	//new Exception().printStackTrace(System.out);
     }
 
+    /*
+     * Removes (by marking them as deleted) all messages
+     * */
+    public void reset(){
+
+    	for(Message m : chatHistory){
+    		log.info("Mark deleted:" + m.globalId + " " + m);
+    		m.deleted = true;
+    	}
+    	
+    }
+    
+    /*
+     * Removes (by marking them as deleted) all messages until the last point of user input
+     * */
+    public void revertLastInput(){
+    	Collections.sort(chatHistory, new Comparator<Message>(){
+    	     public int compare(Message m1, Message m2){
+    	         if(m1.globalId == m2.globalId)
+    	             return 0;
+    	         return m1.globalId > m2.globalId ? -1 : 1;
+    	     }
+    	});
+    	
+    	/*
+    	 * If there is no input message to revert to yet then leave the chat as is
+    	 * */
+    	boolean hasUserInput = false;
+    	for(Message m : chatHistory){if(!m.deleted && m.header.fromId != Conversation.HEDVIG_USER_ID){hasUserInput = true;break;}}
+    	if(!hasUserInput)return;
+    	
+    	for(Message m : chatHistory){
+    		log.info(m.globalId + " " + m);
+    		m.deleted = true;
+    		if(!(m.header.fromId == Conversation.HEDVIG_USER_ID)){break;}
+    	}
+    	
+    }
+    
     public MemberChat(String memberId) {
     	log.info("Instantiating MemberChat for member:" + memberId);
         this.memberId = memberId;
@@ -55,6 +99,7 @@ public class MemberChat {
     public void addToHistory(Message m) {
     	log.info("MemberChat.addToHistory(Message: " + m + " ," + "chat:" + this);
 		Instant time = Instant.now();
+		m.deleted = false;
 		m.setTimestamp(time);
 		m.header.timeStamp = time.toEpochMilli();
         m.chat = this;
