@@ -29,11 +29,15 @@ public class AuthService {
     }
 
     public Optional<BankIdAuthResponse> auth() {
+        return auth(null);
+    }
+
+    public Optional<BankIdAuthResponse> auth(String ssn) {
         String url = "http://" + memberServiceLocation + "/member/bankid/auth";
         try {
+            BankIdAuthRequest req = new BankIdAuthRequest(ssn);
 
-
-            ResponseEntity<BankIdAuthResponse> response = template.postForEntity(url, "", BankIdAuthResponse.class);
+            ResponseEntity<BankIdAuthResponse> response = template.postForEntity(url, req, BankIdAuthResponse.class);
             if(response.getStatusCode() == HttpStatus.OK) {
                 return Optional.ofNullable(response.getBody());
             }else {
@@ -45,5 +49,4 @@ public class AuthService {
 
         return Optional.empty();
     }
-
 }

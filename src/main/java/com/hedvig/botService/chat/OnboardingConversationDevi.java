@@ -76,9 +76,14 @@ public class OnboardingConversationDevi extends Conversation {
                 new MessageBodySingleSelect("Då måste jag fråga ifall du har bankID på den enheten du använder nu?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Klart jag har, det är ju ändå 2017", "message.bankid.autostart.send"));
-                            add(new SelectOption("Nej det har jag inte", "message.bankidja"));
+                            add(new SelectOption("Nej det har jag inte", "message.bankid.start.manual"));
                         }}
                 ));
+
+        createMessage("message.bankid.start.manual",
+                new MessageBodyNumber("Om du anger ditt personnumer så får du använda bankId på din andra enhet " + emoji_smile
+                ));
+
 
         createMessage("message.bankid.error",
                 new MessageBodySingleSelect("Något blev fel när jag försökte kontakta min vän på BankId?",
@@ -91,7 +96,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.bankid.autostart.send",
                 new MessageBodySingleSelect("Ja det är faktiskt 2017 i hela " + (LocalDate.now().lengthOfYear() - LocalDate.now().getDayOfYear()) + " dagar till!" + emoji_postal_horn,
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in", "message.bankid.autostart.respond", null, "bankid://?autostarttoken={AUTOSTART_TOKEN}",  null, false));
+                            add(new SelectLink("Logga in", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=expo://hedvig",  null, false));
                         }}));
 
         createMessage("message.bankid.autostart.respond",
@@ -535,12 +540,19 @@ public class OnboardingConversationDevi extends Conversation {
 
                 Optional<BankIdAuthResponse> authResponse = authService.auth();
 
-                if(!authResponse.isPresent()) {
-                    log.error("Could not start bankIdAuthentication!");
-                    nxtMsg = "message.bankid.error";
-                }else{
-                    userContext.putUserData("{AUTOSTART_TOKEN}", authResponse.get().autoStartToken);
-                    userContext.putUserData("{REFERENCE_TOKEN}", authResponse.get().referenceToken);
+                nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse);
+
+                addToChat(m);
+                break;
+
+            case "message.bankid.start.manual":
+                String ssn =  m.body.text;
+
+                Optional<BankIdAuthResponse> ssnResponse = authService.auth(ssn);
+
+                nxtMsg = handleBankIdAuthRespose(nxtMsg, ssnResponse);
+                if(nxtMsg.equals("")) {
+                    nxtMsg = "message.bankid.autostart.respond";
                 }
 
                 addToChat(m);
@@ -586,6 +598,17 @@ public class OnboardingConversationDevi extends Conversation {
        
        completeRequest(nxtMsg);
        
+    }
+
+    private String handleBankIdAuthRespose(String nxtMsg, Optional<BankIdAuthResponse> authResponse) {
+        if(!authResponse.isPresent()) {
+            log.error("Could not start bankIdAuthentication!");
+            nxtMsg = "message.bankid.error";
+        }else{
+            userContext.putUserData("{AUTOSTART_TOKEN}", authResponse.get().autoStartToken);
+            userContext.putUserData("{REFERENCE_TOKEN}", authResponse.get().referenceToken);
+        }
+        return nxtMsg;
     }
 
     /*

@@ -47,10 +47,9 @@ public class MemberChat {
     }
 
     public MemberChat(String memberId) {
-    	log.info("Instantiating MemberChat for member:" + memberId + " :" + this );
+    	log.info("Instantiating MemberChat for member:" + memberId);
         this.memberId = memberId;
-        this.chatHistory = new ArrayList<Message>();
-        //this.onboardingContext = new UserContext();
+        this.chatHistory = new ArrayList<>();
     }
 
     public void addToHistory(Message m) {
