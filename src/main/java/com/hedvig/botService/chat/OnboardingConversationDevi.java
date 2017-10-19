@@ -514,6 +514,7 @@ public class OnboardingConversationDevi extends Conversation {
 	        	else{ m.body.text = "Jag har " + safetyItems; }
 	        	addToChat(m);
 	        	nxtMsg = "message.dyrpryl";
+	        	break;
 	        case "message.forsakringidagja":
 	        	String comp = getValue((MessageBodySingleSelect)m.body);
 	        	userContext.putUserData("{INSURANCE_COMPANY_TODAY}", m.body.text);
