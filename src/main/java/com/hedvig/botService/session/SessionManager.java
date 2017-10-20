@@ -220,7 +220,8 @@ public class SessionManager {
     }
     
     public void receiveEvent(MemberAuthedEvent e){
-    	String hid = e.getMemberId().toString();
+    	log.info("Received MemberAuthedEvent {}", e.toString());
+        String hid = e.getMemberId().toString();
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
         Member member = e.getMember();
     	uc.putUserData("{NAME}", member.getFirstName());
