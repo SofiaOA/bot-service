@@ -566,7 +566,8 @@ public class OnboardingConversationDevi extends Conversation {
 	        	userContext.putUserData("{INSURANCE_COMPANY_TODAY}", m.body.text);
 	        	m.body.text = "Idag har jag " + comp;
 	        	addToChat(m);
-	        	nxtMsg = "message.bytesinfo";
+                        nxtMsg = "message.bytesinfo";	    
+                        break;
             case "message.getname":
                 String fName = m.body.text;
                 userContext.putUserData("{NAME}", fName);
