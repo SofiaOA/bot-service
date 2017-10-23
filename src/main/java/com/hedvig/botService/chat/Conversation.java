@@ -1,6 +1,7 @@
 package com.hedvig.botService.chat;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,9 +13,10 @@ import org.slf4j.LoggerFactory;
 
 public abstract class Conversation {
 
-    public static final long  HEDVIG_USER_ID = 1; // The id hedvig uses to chat
-    public static enum conversationStatus {INITIATED, ONGOING, COMPLETE}
-    public static enum EventTypes {ANIMATION_COMPLETE};
+        public static final long  HEDVIG_USER_ID = 1; // The id hedvig uses to chat
+        private Map<String, SelectItemMessageCallback> callbacks = new TreeMap<>();
+        public static enum conversationStatus {INITIATED, ONGOING, COMPLETE}
+        public static enum EventTypes {ANIMATION_COMPLETE};
 	private static final String regexPattern = "\\{(.*?)\\}";
 	private static Logger log = LoggerFactory.getLogger(Conversation.class);
 	private String conversationName; // Id for the conversation
@@ -90,7 +92,26 @@ public abstract class Conversation {
 		m.body = body;
 		messageList.put(m.id, m);
 	}
-	
+
+
+
+	void createMessage(String id, MessageBody body, SelectItemMessageCallback callback) {
+		this.createMessage(id, body);
+		this.setMessageCallback(id, callback);
+	}
+
+	private void setMessageCallback(String id, SelectItemMessageCallback callback) {
+		this.callbacks.put(id, callback);
+	}
+
+	boolean hasSelectItemCallback(String messageId) {
+	    return this.callbacks.containsKey(messageId);
+    }
+
+    String execSelectItemCallback(String messageId, UserContext uc, SelectItem item) {
+	    return this.callbacks.get(messageId).operation(uc, item);
+    }
+
 	void createMessage(String id, MessageBody body){
 		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
 		createMessage(id,header,body);

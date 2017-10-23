@@ -1,10 +1,11 @@
 package com.hedvig.botService.serviceIntegration;
 
-import org.apache.zookeeper.Op;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -13,9 +14,9 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Optional;
 
 @Component
-public class AuthService {
+public class MemberService {
 
-    Logger log = LoggerFactory.getLogger(AuthService.class);
+    Logger log = LoggerFactory.getLogger(MemberService.class);
 
     private RestTemplate template;
 
@@ -23,7 +24,7 @@ public class AuthService {
     private String memberServiceLocation;
 
     @Autowired
-    AuthService(RestTemplate restTemplate) {
+    MemberService(RestTemplate restTemplate) {
 
         this.template = restTemplate;
     }
@@ -49,4 +50,14 @@ public class AuthService {
 
         return Optional.empty();
     }
+
+    public void startBankAccountRetrieval(String memberId) {
+        String url = "http://" + memberServiceLocation + "/member/startBankAccountRetrieval";
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("hedvig.token", memberId);
+        HttpEntity<String> h = new HttpEntity<>("", headers);
+        ResponseEntity<String> response = template.postForEntity(url, h, String.class);
+    }
+
+
 }
