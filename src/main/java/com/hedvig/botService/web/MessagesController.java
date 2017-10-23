@@ -123,8 +123,10 @@ public class MessagesController {
      	ArrayList<AvatarDTO> avatars = new ArrayList<AvatarDTO>();
      	AvatarDTO avatar1 = new AvatarDTO("loader", "https://www.lottiefiles.com/storage/datafiles/qm9uaAEoe13l3eQ/data.json",500,500,1000);
      	AvatarDTO avatar2 = new AvatarDTO("bike", "https://www.lottiefiles.com/storage/datafiles/dlzGwlfS0fkCJcq/data.json",500,500,2000);
+     	AvatarDTO avatar3 = new AvatarDTO("store", "https://www.lottiefiles.com/storage/datafiles/tmS45X7K2RrciCf/data.json",500,500,2000);
      	avatars.add(avatar1);
      	avatars.add(avatar2);
+     	avatars.add(avatar3);
     	return new ResponseEntity<List<AvatarDTO>>(avatars,HttpStatus.OK);
     }
     
