@@ -62,7 +62,7 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Lägenhet", "message.lagenhet"));
                             add(new SelectOption("Eget hus", "message.hus"));
                         }}
-                ), "bike");
+                ), "store");
 
         createMessage("message.lagenhet",
                 new MessageBodySingleSelect("Toppen\n\nLogga in med ditt BankID så kan vi snabbspola fram några frågor!",
@@ -606,9 +606,6 @@ public class OnboardingConversationDevi extends Conversation {
 			case "":
 		        log.info("Unknown message recieved...");
 		        addToChat(getMessage("error"));				
-			default:
-				addToChat(getMessage(nxtMsg));
-				break;
 			}
 	}
 
