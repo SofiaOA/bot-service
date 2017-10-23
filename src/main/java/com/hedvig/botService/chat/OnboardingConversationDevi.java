@@ -450,8 +450,8 @@ public class OnboardingConversationDevi extends Conversation {
 
     public void init() {
     	log.info("Starting onboarding conversation");
-        //startConversation("message.onboardingstart"); // Id of first message
-        startConversation("message.medlemjabank"); // Id of first message
+        startConversation("message.onboardingstart"); // Id of first message
+        //startConversation("message.medlemjabank"); // Id of first message
     }
 
     // --------------------------------------------------------------------------- //
