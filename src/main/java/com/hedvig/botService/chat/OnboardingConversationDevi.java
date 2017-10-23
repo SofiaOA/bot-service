@@ -669,11 +669,11 @@ public class OnboardingConversationDevi extends Conversation {
 		        nxtMsg = "message.bankid.autostart.send";
 			case "":
 		        log.info("Unknown message recieved...");
-		        addToChat(getMessage("error"));				
-
+		        nxtMsg = "error";
 				break;
-
 			}
+		
+		if(getMessage(nxtMsg)!=null)addToChat(getMessage(nxtMsg));	
 	}
 
 	public void bankIdAuthComplete(){

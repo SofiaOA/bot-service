@@ -34,7 +34,7 @@ public abstract class Conversation {
 
 	public Message getMessage(String key){
 		Message m = messageList.get(key);
-		if(m==null)throw new MessageNotFoundException("Message not found with id:" + key);
+		if(m==null)log.info("Message not found with id:" + key);
 		return m;
 	}
 	
