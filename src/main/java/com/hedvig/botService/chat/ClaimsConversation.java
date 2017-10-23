@@ -15,7 +15,7 @@ public class ClaimsConversation extends Conversation {
 	private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 	
 	public ClaimsConversation(MemberChat mc, UserContext uc) {
-		super("onboarding", mc,uc);
+		super("claims", mc,uc);
 		// TODO Auto-generated constructor stub
 
 		createMessage("message.hello",
@@ -131,6 +131,12 @@ public class ClaimsConversation extends Conversation {
 
 	@Override
 	public void recieveEvent(EventTypes e, String value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void completeRequest(String nxtMsg) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -137,4 +137,10 @@ public class OnboardingConversation extends Conversation {
 		
 	}
 
+	@Override
+	public void completeRequest(String nxtMsg) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -1,5 +1,6 @@
 package com.hedvig.botService.chat;
 
+import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,10 +13,12 @@ import org.slf4j.LoggerFactory;
 public abstract class Conversation {
 
     public static final long  HEDVIG_USER_ID = 1; // The id hedvig uses to chat
+    public static enum conversationStatus {INITIATED, ONGOING, COMPLETE}
     public static enum EventTypes {ANIMATION_COMPLETE};
 	private static final String regexPattern = "\\{(.*?)\\}";
 	private static Logger log = LoggerFactory.getLogger(Conversation.class);
 	private String conversationName; // Id for the conversation
+
 	MemberChat memberChat;
 	UserContext userContext;
 	private TreeMap<String, Message> messageList = new TreeMap<String, Message>();
@@ -37,7 +40,7 @@ public abstract class Conversation {
 		messageList.put(key, m);
 	}
 	
-	public String getConversationId() {
+	public String getConversationName() {
 		return conversationName;
 	}
 	public ConversationMessage getCurrent() {
@@ -114,6 +117,33 @@ public abstract class Conversation {
 		addToChat(messageList.get(startId));
 	}
 	
+    public int getValue(MessageBodyNumber body){
+    	return Integer.parseInt(body.text);
+    }
+    
+    public String getValue(MessageBodySingleSelect body){
+
+		for(SelectItem o : body.choices){
+			if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
+				return SelectOption.class.cast(o).value;
+			}
+		}   	
+		return "";
+    }
+    
+    public ArrayList<String> getValue(MessageBodyMultipleSelect body){
+		ArrayList<String> selectedOptions = new ArrayList<String>();
+		for(SelectItem o : body.choices){
+			if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
+				 selectedOptions.add(SelectOption.class.cast(o).value);
+			}
+		}   
+		return selectedOptions;
+    }
+
+    // ------------------------------------------------------------------------------- //
+    
 	public abstract void recieveMessage(Message m);
+	public abstract void completeRequest(String nxtMsg);
 	public abstract void init();
 }

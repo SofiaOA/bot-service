@@ -41,13 +41,13 @@ public class OnboardingConversationDevi extends Conversation {
         Image testImage = new Image("http://www.apa.org/Images/insurance-title-image_tcm7-198694.jpg",730,330);
         
         createMessage("message.onboardingstart",
-                new MessageBodySingleSelect(emoji_smile + " Hej, jag heter Hedvig!\n\nFint att ha dig här\n\nJag är en försäkringsbot så låt mig visa vad jag gör!",
+                new MessageBodySingleSelect(emoji_smile + " Hej, jag heter Hedvig!\n\fFint att ha dig här\n\fJag är en försäkringsbot så låt mig visa vad jag gör!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ge mig ett försäkringsförslag", "message.forslagstart"));
                             add(new SelectOption("Visa mig", "message.cad"));
                             add(new SelectOption("Jag är redan medlem", "message.medlem"));
                         }}
-                ), testImage);
+                ), "bike");
 
         createMessage("message.medlem",
                 new MessageBodySingleSelect("Välkommen tillbaka "+ emoji_hug +"\n\n Ett snabbt BankID-inlogg bara, sen är du inne i appen igen",
@@ -62,7 +62,7 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Lägenhet", "message.lagenhet"));
                             add(new SelectOption("Eget hus", "message.hus"));
                         }}
-                ));
+                ), "bike");
 
         createMessage("message.lagenhet",
                 new MessageBodySingleSelect("Toppen\n\nLogga in med ditt BankID så kan vi snabbspola fram några frågor!",
@@ -423,31 +423,6 @@ public class OnboardingConversationDevi extends Conversation {
 
     // --------------------------------------------------------------------------- //
     
-    public int getValue(MessageBodyNumber body){
-    	return Integer.parseInt(body.text);
-    }
-    
-    public String getValue(MessageBodySingleSelect body){
-
-		for(SelectItem o : body.choices){
-			if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
-				return SelectOption.class.cast(o).value;
-			}
-		}   	
-		return "";
-    }
-    
-    public ArrayList<String> getValue(MessageBodyMultipleSelect body){
-		ArrayList<String> selectedOptions = new ArrayList<String>();
-		for(SelectItem o : body.choices){
-			if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
-				 selectedOptions.add(SelectOption.class.cast(o).value);
-			}
-		}   
-		return selectedOptions;
-    }
-
-    // ------------------------------------------------------------------------------- //
     @Override
     public void recieveEvent(EventTypes e, String value){
     
@@ -616,7 +591,8 @@ public class OnboardingConversationDevi extends Conversation {
     /*
      * Generate next chat message or ends conversation
      * */
-    private void completeRequest(String nxtMsg){
+    @Override
+	public void completeRequest(String nxtMsg){
 
 		switch(nxtMsg){
 			case "message.whoishedvig": 

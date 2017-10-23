@@ -10,7 +10,7 @@ public class SampleConversation extends Conversation {
 
 	private static Logger log = LoggerFactory.getLogger(SampleConversation.class);	
 	public SampleConversation(MemberChat mc, UserContext uc) {
-		super("onboarding", mc, uc);
+		super("sample", mc, uc);
 		init();
 	}
 
@@ -72,6 +72,12 @@ public class SampleConversation extends Conversation {
 
 	@Override
 	public void recieveEvent(EventTypes e, String value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void completeRequest(String nxtMsg) {
 		// TODO Auto-generated method stub
 		
 	}
