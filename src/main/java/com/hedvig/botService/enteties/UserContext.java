@@ -16,6 +16,8 @@ import javax.persistence.MapKeyColumn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hedvig.botService.chat.Conversation;
+
 import lombok.Getter;
 
 /*
@@ -55,6 +57,15 @@ public class UserContext implements Serializable {
     public void putUserData(String key, String value){
     	log.info("Adding ("+key+":"+value+") to user context:" + this.getMemberId());
     	userData.put(key, value);
+    }
+    
+    /*
+     * Check if user has an o
+     * */
+    public boolean hasOngoingConversation(String conversationClassName){
+    	if(conversationClassName.indexOf(".")==-1)conversationClassName = ("com.hedvig.botService.chat." + conversationClassName); // TODO: Refactor/remove hack
+    	String c =  getDataEntry("{" +conversationClassName+ "}") ;
+    	return(c!=null && c.equals(Conversation.conversationStatus.ONGOING.toString()));
     }
     
     public UserContext(String memberId) {
