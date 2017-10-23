@@ -1,5 +1,6 @@
 package com.hedvig.botService.enteties;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,5 +19,16 @@ public class MessageBodySingleSelect extends MessageBody {
     	super(content);
     	this.choices.addAll(items);
 	}
+
     MessageBodySingleSelect(){log.info("Instansiating MessageBodySingleSelect");}
+
+    @JsonIgnore
+    public SelectItem getSelectedItem() {
+		for (SelectItem o : this.choices) {
+			if(o.selected) {
+				return o;
+			}
+		}
+		throw new RuntimeException("No item selected.");
+	}
 }

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import java.util.List;
 
-import com.hedvig.botService.serviceIntegration.AuthService;
+import com.hedvig.botService.serviceIntegration.MemberService;
 import com.hedvig.botService.web.dto.Member;
 import com.hedvig.botService.web.dto.MemberAuthedEvent;
 
@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.hedvig.botService.chat.ClaimsConversation;
 import com.hedvig.botService.chat.MainConversation;
-import com.hedvig.botService.chat.OnboardingConversation;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.MemberChatRepository;
@@ -27,7 +26,6 @@ import com.hedvig.botService.enteties.Message;
 import com.hedvig.botService.enteties.ResourceNotFoundException;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.UserContextRepository;
-import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.Conversation.EventTypes;
 
 public class SessionManager {
@@ -35,13 +33,13 @@ public class SessionManager {
     private static Logger log = LoggerFactory.getLogger(SessionManager.class);
     private final MemberChatRepository repo;
     private final UserContextRepository userrepo;
-    private final AuthService authService;
+    private final MemberService memberService;
 
     @Autowired
-    public SessionManager(MemberChatRepository repo, UserContextRepository userrepo, AuthService authService) {
+    public SessionManager(MemberChatRepository repo, UserContextRepository userrepo, MemberService memberService) {
         this.repo = repo;
         this.userrepo = userrepo;
-        this.authService = authService;
+        this.memberService = memberService;
     }
 
     public List<Message> getMessages(int i, String hid) {
@@ -73,7 +71,7 @@ public class SessionManager {
          * */
         if(!uc.onboardingComplete()) {
             //OnboardingConversation onboardingConversation = new OnboardingConversation(mc, uc);
-        	OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, authService);
+        	OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService);
             onboardingConversation.recieveEvent(type, value);
         }
        
@@ -136,7 +134,7 @@ public class SessionManager {
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
     	
     	mc.reset(); // Clear chat
-        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, authService);
+        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService);
         onboardingConversation.init(); // Restart conversation
         
     	repo.saveAndFlush(mc);
@@ -164,7 +162,7 @@ public class SessionManager {
         // Still onboarding
         if(!uc.onboardingComplete()) {
 	        //OnboardingConversation onboardingConversation = new OnboardingConversation(chat, uc);
-	        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(chat, uc, authService);
+	        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(chat, uc, memberService);
 	        
 	        // If this is the first message the Onboarding conversation is initiated
 	        if(!uc.onboardingStarted()){
@@ -233,7 +231,7 @@ public class SessionManager {
 
         if(!uc.onboardingComplete()) {
             //OnboardingConversation onboardingConversation = new OnboardingConversation(mc, uc);
-            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, authService);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService);
             onboardingConversation.bankIdAuthComplete();
         }
 
@@ -255,7 +253,7 @@ public class SessionManager {
          * */
         if(!uc.onboardingComplete()) {
             //OnboardingConversation onboardingConversation = new OnboardingConversation(mc, uc);
-        	OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, authService);
+        	OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService);
             onboardingConversation.recieveMessage(m);
         }
        
