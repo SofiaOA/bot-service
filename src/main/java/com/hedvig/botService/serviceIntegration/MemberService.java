@@ -51,8 +51,8 @@ public class MemberService {
         return Optional.empty();
     }
 
-    public void startBankAccountRetrieval(String memberId) {
-        String url = "http://" + memberServiceLocation + "/member/startBankAccountRetrieval";
+    public void startBankAccountRetrieval(String memberId, String bankShortId) {
+        String url = "http://" + memberServiceLocation + "/i/member/" + memberId + "/startBankAccountRetrieval/" + bankShortId;
         HttpHeaders headers = new HttpHeaders();
         headers.add("hedvig.token", memberId);
         HttpEntity<String> h = new HttpEntity<>("", headers);

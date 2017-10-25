@@ -5,8 +5,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
+import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
+import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
 import com.hedvig.botService.serviceIntegration.MemberService;
 import com.hedvig.botService.serviceIntegration.BankIdAuthResponse;
 import org.slf4j.Logger;
@@ -357,30 +360,43 @@ public class OnboardingConversationDevi extends Conversation {
                         }}
                 ),
                 (UserContext userContext, SelectItem s) -> {
-                  userContext.putUserData("{BANK}", s.value);
-                  userContext.putUserData("{BANK_FULL}", s.text);
+                    userContext.getAutogiroData().selectBank(s.value, s.text);
                   return "message.start.account.retrieval";
                 });
 
-
         createMessage("message.start.account.retrieval",
-                new MessageBodySingleSelect("Då behöver vi välja det konto som pengarna ska dras ifrån. Om du har ditt BankId redor så ska jag fråga mina vänner på {BANK_FULL} om dina konotnummer.",
+                new MessageBodySingleSelect("Då behöver vi välja det konto som pengarna ska dras ifrån. Om du har ditt BankId redo så ska jag fråga mina vänner på {BANK_FULL} om dina konotnummer.",
                         new ArrayList<SelectItem>(){{
                             add(new SelectOption("Jag är redo!", "message.fetch.accounts"));
-                            add(new SelectOption("Jag är inte redo!", "message.medlemjabank"));
-                        }}));
-
-        createMessage("message.fetch.accounts",
-                new MessageBodySingleSelect("Då behöver vi välja det konto som pengarna ska dras ifrån. Om du har ditt BankId redor så ska jag fråga mina vänner på {BANK_FULL} om dina konotnummer.",
-                        new ArrayList<SelectItem>(){{
-                            add(new SelectOption("Jag är redo!", "message.fetch.accounts"));
-                            add(new SelectOption("Jag är inte redo!", "message.medlemjabank"));
+                            add(new SelectOption("Varför ska jag göra detta?", "message.fetch.accounts.explain"));
                         }}),
                 (userContext, item) -> {
-                    this.memberService.startBankAccountRetrieval(userContext.getMemberId());
-                    log.debug("HOOYWA");
+                    if(item.value.equals("message.fetch.accounts")) {
+                        this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
+                        addToChat(getMessage("message.fetch.accounts.hold"));
+
+                    }
                     return "";
                 });
+
+        createMessage("message.fetch.accounts.explain",
+                new MessageBodySingleSelect("Hedvig använder autogiro för att hantera betalningar.\n För att lägga upp en autogirobetalning behöver vi veta vilket konto pegnarna ska dras ifrån.\n" +
+                        "För att du på ett enkelt sätt ska kunna välja rätt konto kontaktar vi din bank för att hämta dina kontouppgifter.\n" +
+                        "Uppgifterna används bara under registreringen av autogiro.\nNär jag hämtar dina kontouppgifter behöver du använda bankId och autensitera dig mot din bank.",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Jag förstår", "message.fetch.accounts"));
+                        }}
+                ));
+
+        createMessage("message.fetch.accounts.hold", new MessageBodyText("Väntar på svar ifrån {BANK_FULL} " + emoji_mag));
+
+        createMessage("message.fetch.accounts.error",
+                new MessageBodySingleSelect("Nu blev någonting fel, ska vi försöka igen?",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Försök igen", "message.start.account.retrieval"));
+                        }}
+                ));
+
 
         //(FUNKTION: FYLL I BANKNAMN) = SCROLL MED DE VANLIGASTE BANKERNA SAMT "ANNAN BANK"
 
@@ -450,8 +466,8 @@ public class OnboardingConversationDevi extends Conversation {
 
     public void init() {
     	log.info("Starting onboarding conversation");
-        startConversation("message.onboardingstart"); // Id of first message
-        //startConversation("message.medlemjabank"); // Id of first message
+        //startConversation("message.onboardingstart"); // Id of first message
+        startConversation("message.start.account.retrieval"); // Id of first message
     }
 
     // --------------------------------------------------------------------------- //
@@ -580,9 +596,12 @@ public class OnboardingConversationDevi extends Conversation {
             case "message.bankid.start":
                 String selectedValue = getValue((MessageBodySingleSelect)m.body);
 
-                Optional<BankIdAuthResponse> authResponse = memberService.auth();
+                if(selectedValue.equals("message.bankid.autostart.send")) {
 
-                nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse);
+                    Optional<BankIdAuthResponse> authResponse = memberService.auth();
+
+                    nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse);
+                }
 
                 addToChat(m);
                 break;
@@ -593,6 +612,7 @@ public class OnboardingConversationDevi extends Conversation {
                 Optional<BankIdAuthResponse> ssnResponse = memberService.auth(ssn);
 
                 nxtMsg = handleBankIdAuthRespose(nxtMsg, ssnResponse);
+
                 if(nxtMsg.equals("")) {
                     nxtMsg = "message.bankid.autostart.respond";
                 }
@@ -618,6 +638,11 @@ public class OnboardingConversationDevi extends Conversation {
 
                 break;
 
+            case "message.fetch.account.complete":
+                SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
+                userContext.getAutogiroData().setSelecteBankAccount(Integer.parseInt(item.value));
+                nxtMsg = "message.kontraktklar";
+                break;
 
             default:
                 break;
@@ -677,6 +702,44 @@ public class OnboardingConversationDevi extends Conversation {
 	}
 
 	public void bankIdAuthComplete(){
-        addToChat(getMessage("message.bankidja"));
+	    addToChat(getMessage("message.bankidja"));
+    }
+
+    public void bankAccountRetrieved() {
+
+
+        AutogiroData bankAccountHelper = userContext.getAutogiroData();
+
+	    String text = String.format("Hej du har %s konton hos %s:\n",
+                bankAccountHelper.getAccountCount(),
+	            userContext.getAutogiroData().getBankFullName());
+
+        ArrayList<SelectItem> options = new ArrayList<>();
+
+        int nr = 0;
+	    for(BankAccount ba: bankAccountHelper.getAccounts()) {
+            text += String.format("* %s %s, %s %s:-\n",
+                    ba.getName(),
+                    ba.getClearingNo(),
+                    ba.getAccountNo(),
+                    ba.getAmonut().toString());
+
+            options.add(new SelectOption(ba.getAccountNo(), Objects.toString(nr)));
+            nr++;
+	    }
+
+
+	    MessageHeader header = new MessageHeader(HEDVIG_USER_ID, "/response", -1);
+	    Message message = new Message();
+        message.id = "message.fetch.account.complete";
+	    message.header = header;
+	    message.body = new MessageBodySingleSelect(text, options);
+        addToChat(message);
+    }
+
+    public void bankAccountRetrieveFailed() {
+        //Add somethingWentWrong message
+        //Add lastMessageAgain
+        addToChat(getMessage("message.fetch.accounts.error"));
     }
 }

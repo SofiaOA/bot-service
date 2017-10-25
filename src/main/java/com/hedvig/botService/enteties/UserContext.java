@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MapKeyColumn;
 
+import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,10 @@ public class UserContext implements Serializable {
     	log.info("Adding ("+key+":"+value+") to user context:" + this.getMemberId());
     	userData.put(key, value);
     }
+
+    public AutogiroData getAutogiroData(){
+        return new AutogiroData(this);
+    };
     
     /*
      * Check if user has an o
