@@ -1,11 +1,12 @@
 package com.hedvig.botService.externalAPI;
 
-import feign.Headers;
-import feign.RequestLine;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import feign.Headers;
 
 
 @Headers("Accept: application/xml")

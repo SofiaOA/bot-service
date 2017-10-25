@@ -16,7 +16,7 @@ public abstract class Conversation {
         public static final long  HEDVIG_USER_ID = 1; // The id hedvig uses to chat
         private Map<String, SelectItemMessageCallback> callbacks = new TreeMap<>();
         public static enum conversationStatus {INITIATED, ONGOING, COMPLETE}
-        public static enum EventTypes {ANIMATION_COMPLETE};
+        public static enum EventTypes {ANIMATION_COMPLETE, MODAL_CLOSED};
 	private static final String regexPattern = "\\{(.*?)\\}";
 	private static Logger log = LoggerFactory.getLogger(Conversation.class);
 	private String conversationName; // Id for the conversation
