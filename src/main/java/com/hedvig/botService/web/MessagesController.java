@@ -122,11 +122,19 @@ public class MessagesController {
         
      	ArrayList<AvatarDTO> avatars = new ArrayList<AvatarDTO>();
      	AvatarDTO avatar1 = new AvatarDTO("loader", "https://www.lottiefiles.com/storage/datafiles/qm9uaAEoe13l3eQ/data.json",500,500,1000);
-     	AvatarDTO avatar2 = new AvatarDTO("bike", "https://www.lottiefiles.com/storage/datafiles/dlzGwlfS0fkCJcq/data.json",500,500,2000);
-     	AvatarDTO avatar3 = new AvatarDTO("store", "https://www.lottiefiles.com/storage/datafiles/tmS45X7K2RrciCf/data.json",500,500,2000);
+     	
+     	AvatarDTO avatar2 = new AvatarDTO("h_symbol", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/h_symbol.json",500,500,2000);
+     	AvatarDTO avatar3 = new AvatarDTO("family_to_h", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/family_to_h.json",500,500,2000);
+     	AvatarDTO avatar4 = new AvatarDTO("h_to_family", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/h_to_family.json",500,500,2000);
+     	AvatarDTO avatar5 = new AvatarDTO("h_to_house", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/h_to_house.json",500,500,2000);
+     	AvatarDTO avatar6 = new AvatarDTO("house_to_h", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/house_to_h.json",500,500,2000);
+     	
      	avatars.add(avatar1);
      	avatars.add(avatar2);
      	avatars.add(avatar3);
+     	avatars.add(avatar4);
+     	avatars.add(avatar5);
+     	avatars.add(avatar6);
     	return new ResponseEntity<List<AvatarDTO>>(avatars,HttpStatus.OK);
     }
     
