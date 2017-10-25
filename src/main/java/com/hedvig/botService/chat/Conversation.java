@@ -100,7 +100,7 @@ public abstract class Conversation {
 		this.setMessageCallback(id, callback);
 	}
 
-	private void setMessageCallback(String id, SelectItemMessageCallback callback) {
+	protected void setMessageCallback(String id, SelectItemMessageCallback callback) {
 		this.callbacks.put(id, callback);
 	}
 

@@ -10,10 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.hedvig.botService.chat.*;
+import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
 import com.hedvig.botService.serviceIntegration.MemberService;
-import com.hedvig.botService.web.dto.Member;
-import com.hedvig.botService.web.dto.MemberAuthedEvent;
+import com.hedvig.botService.web.dto.*;
 
+import com.hedvig.botService.web.dto.events.memberService.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -276,7 +277,64 @@ public class SessionManager {
         repo.saveAndFlush(mc);
         userrepo.saveAndFlush(uc);
     }
-    
+
+    public void receiveEvent(MemberServiceEvent e){
+        log.info("Received BankAccountsRetrievedEvent {}", e.toString());
+
+        MemberServiceEventPayload payload = e.getPayload();
+        if(payload.getClass() == BankAccountRetrievalSuccess.class) {
+            this.handleBankAccountRetrievalSuccess(e, (BankAccountRetrievalSuccess)payload);
+        }else if(payload.getClass() == BankAccountRetrievalFailed.class) {
+            this.handleBankAccountRetrievalFailed(e, (BankAccountRetrievalFailed)payload);
+        }
+
+
+    }
+
+    private void handleBankAccountRetrievalFailed(MemberServiceEvent e, BankAccountRetrievalFailed payload) {
+        log.info("Handle failed event {}, {}", e, payload);
+        String hid = e.getMemberId().toString();
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+
+        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService);
+            onboardingConversation.bankAccountRetrieveFailed();
+        }
+
+        repo.saveAndFlush(mc);
+        userrepo.saveAndFlush(uc);
+    }
+
+    private void handleBankAccountRetrievalSuccess(MemberServiceEvent e, BankAccountRetrievalSuccess payload) {
+
+        String hid = e.getMemberId().toString();
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        List<BankAccountDetails> details = payload.getAccounts();
+        List<BankAccount> accounts = new ArrayList<>();
+
+        for(int i=0; i < details.size(); i++) {
+
+            BankAccountDetails bad = details.get(i);
+            BankAccount ba = new BankAccount(bad.getName(), bad.getClearingNumber(), bad.getNumber(), bad.getAmount());
+            accounts.add(ba);
+        }
+        uc.getAutogiroData().setAccounts(accounts);
+
+        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+
+        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
+            //if(!uc.onboardingComplete()) {
+            //OnboardingConversation onboardingConversation = new OnboardingConversation(mc, uc);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService);
+            onboardingConversation.bankAccountRetrieved();
+        }
+
+
+        repo.saveAndFlush(mc);
+        userrepo.saveAndFlush(uc);
+    }
+
     public void receiveMessage(Message m, String hid) {
         log.info("Recieving messages from user:" + hid);
         log.info(m.toString());
