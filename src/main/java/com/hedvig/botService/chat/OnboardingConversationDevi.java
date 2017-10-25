@@ -49,7 +49,7 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Visa mig", "message.cad"));
                             add(new SelectOption("Jag är redan medlem", "message.medlem"));
                         }}
-                ), "bike");
+                ), "h_symbol");
 
         createMessage("message.medlem",
                 new MessageBodySingleSelect("Välkommen tillbaka "+ emoji_hug +"\n\n Ett snabbt BankID-inlogg bara, sen är du inne i appen igen",
@@ -64,7 +64,7 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Lägenhet", "message.lagenhet"));
                             add(new SelectOption("Eget hus", "message.hus"));
                         }}
-                ), "store");
+                ), "h_to_house");
 
         createMessage("message.lagenhet",
                 new MessageBodySingleSelect("Toppen\n\nLogga in med ditt BankID så kan vi snabbspola fram några frågor!",
@@ -687,7 +687,8 @@ public class OnboardingConversationDevi extends Conversation {
 		switch(nxtMsg){
 			case "message.whoishedvig":
 				log.info("Onboarding complete");
-				userContext.onboardingComplete(true);
+				userContext.completeConversation(this.getClass().getName());
+				//userContext.onboardingComplete(true);
 				break;
 		    case "message.bankid.device.start":
 		        //BankIdAuthResponse  authResponse = this.memberService.auth();
@@ -698,7 +699,7 @@ public class OnboardingConversationDevi extends Conversation {
 				break;
 			}
 		
-		if(getMessage(nxtMsg)!=null)addToChat(getMessage(nxtMsg));	
+		super.completeRequest(nxtMsg);
 	}
 
 	public void bankIdAuthComplete(){
