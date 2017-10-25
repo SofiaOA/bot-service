@@ -72,7 +72,7 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Jag loggar in", "message.bankid.start"));
                             add(new SelectOption("Jag har inget BankID", "message.manuellpersonnr"));
                         }}
-                ));
+                ), "house_to_h");
 
         createMessage("message.bankid.start",
                 new MessageBodySingleSelect("Då måste jag fråga ifall du har bankID på den enheten du använder nu?",
