@@ -68,6 +68,14 @@ public class UserContext implements Serializable {
     	return(c!=null && c.equals(Conversation.conversationStatus.ONGOING.toString()));
     }
     
+    /*
+     * Set conversation to COMPLETE
+     * */
+    public void completeConversation(String conversationClassName){
+    	if(conversationClassName.indexOf(".")==-1)conversationClassName = ("com.hedvig.botService.chat." + conversationClassName); // TODO: Refactor/remove hack
+    	putUserData("{" +conversationClassName+ "}", Conversation.conversationStatus.COMPLETE.toString());
+    }
+    
     public UserContext(String memberId) {
     	log.info("Instantiating UserContext for member:" + memberId + " :" + this );
         this.memberId = memberId;

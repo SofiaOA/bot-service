@@ -165,6 +165,8 @@ public abstract class Conversation {
     // ------------------------------------------------------------------------------- //
     
 	public abstract void recieveMessage(Message m);
-	public abstract void completeRequest(String nxtMsg);
+	public void completeRequest(String nxtMsg) {
+		if(getMessage(nxtMsg)!=null)addToChat(getMessage(nxtMsg));	
+	}
 	public abstract void init();
 }

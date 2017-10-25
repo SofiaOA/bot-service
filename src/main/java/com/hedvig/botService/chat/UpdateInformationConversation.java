@@ -51,9 +51,4 @@ public class UpdateInformationConversation extends Conversation {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
-	public void completeRequest(String nxtMsg) {
-		addToChat(getMessage(nxtMsg));
-	}
-
 }

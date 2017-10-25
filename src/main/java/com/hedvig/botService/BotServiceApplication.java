@@ -2,9 +2,11 @@ package com.hedvig.botService;
 
 import com.hedvig.botService.enteties.MemberChatRepository;
 import com.hedvig.botService.enteties.UserContextRepository;
+import com.hedvig.botService.externalAPI.ProductPricingClient;
 import com.hedvig.botService.externalEvents.KafkaProperties;
 import com.hedvig.botService.serviceIntegration.MemberService;
 import com.hedvig.botService.session.SessionManager;
+
 import org.axonframework.config.EventHandlingConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -22,6 +24,9 @@ public class BotServiceApplication {
 	}
 
     @Autowired
+    ProductPricingClient client;
+    
+    @Autowired
     public void configure(EventHandlingConfiguration config) {
         config.usingTrackingProcessors();
     }
@@ -32,8 +37,8 @@ public class BotServiceApplication {
     }
     
     @Bean
-    public SessionManager createSessionManager(MemberChatRepository repo, UserContextRepository userrepo, MemberService memberService){
-    	return new SessionManager(repo, userrepo, memberService);
+    public SessionManager createSessionManager(MemberChatRepository repo, UserContextRepository userrepo, MemberService memberService, ProductPricingClient client){
+    	return new SessionManager(repo, userrepo, memberService, client);
     }
 
     /*@Bean

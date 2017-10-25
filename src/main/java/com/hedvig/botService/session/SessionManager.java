@@ -24,6 +24,7 @@ import com.hedvig.botService.enteties.Message;
 import com.hedvig.botService.enteties.ResourceNotFoundException;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.UserContextRepository;
+import com.hedvig.botService.externalAPI.ProductPricingClient;
 import com.hedvig.botService.chat.Conversation.EventTypes;
 
 public class SessionManager {
@@ -32,14 +33,16 @@ public class SessionManager {
     private final MemberChatRepository repo;
     private final UserContextRepository userrepo;
     private final MemberService memberService;
+    private final ProductPricingClient productPricingclient;
 
     public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
     
     @Autowired
-    public SessionManager(MemberChatRepository repo, UserContextRepository userrepo, MemberService memberService) {
+    public SessionManager(MemberChatRepository repo, UserContextRepository userrepo, MemberService memberService, ProductPricingClient client) {
         this.repo = repo;
         this.userrepo = userrepo;
         this.memberService = memberService;
+        this.productPricingclient = client;
     }
 
     public List<Message> getMessages(int i, String hid) {
@@ -151,6 +154,10 @@ public class SessionManager {
         
     	repo.saveAndFlush(mc);
     	userrepo.saveAndFlush(uc);
+    }
+    
+    public void setInsuranceStatus(String hid, String status){
+    	productPricingclient.setInsuranceStatus(hid, status); 
     }
     
     public List<Message> getAllMessages(String hid) {
