@@ -698,8 +698,9 @@ public class OnboardingConversationDevi extends Conversation {
 		        nxtMsg = "error";
 				break;
 			}
-		
-		super.completeRequest(nxtMsg);
+
+			if(getMessage(nxtMsg)!=null)
+			    addToChat(getMessage(nxtMsg));
 	}
 
 	public void bankIdAuthComplete(){
