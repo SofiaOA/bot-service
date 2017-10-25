@@ -12,11 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @EnableConfigurationProperties(KafkaProperties.class)
+@EnableFeignClients
 public class BotServiceApplication {
 
 	public static void main(String[] args) {
@@ -40,10 +42,4 @@ public class BotServiceApplication {
     public SessionManager createSessionManager(MemberChatRepository repo, UserContextRepository userrepo, MemberService memberService, ProductPricingClient client){
     	return new SessionManager(repo, userrepo, memberService, client);
     }
-
-    /*@Bean
-    public TreeMap<String, UserContext> createSession(){
-    	return new TreeMap<String, UserContext>();
-    }*/
-    
 }
