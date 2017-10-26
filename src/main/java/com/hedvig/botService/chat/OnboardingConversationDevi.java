@@ -75,7 +75,7 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Jag loggar in", "message.bankid.start"));
                             add(new SelectOption("Jag har inget BankID", "message.manuellpersonnr"));
                         }}
-                ));
+                ), "house_to_h");
 
         createMessage("message.bankid.start",
                 new MessageBodySingleSelect("Då måste jag fråga ifall du har bankID på den enheten du använder nu?",
@@ -454,6 +454,13 @@ public class OnboardingConversationDevi extends Conversation {
                         }}
                 ));
 
+        createMessage("message.quote.close",
+                new MessageBodySingleSelect("Verkade förslaget intressant så välj OK så fortsätter vi prata sen",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Visa igen", "message.forslagpop"));
+                        }}
+                ));
+        
         //(FUNKTION: OMSTART) = VORE TOPPEN MED EN FUNKTION SOM GÖR ATT FOLK KAN BÖRJA CHATTA FRÅN BÖRJAN IGEN, SÅ CHATTEN KAN BLI EN LOOP OCH GÖRAS OM IGEN OCH VISAS FÖR ANDRA PERSONER ÄN MEDLEMMEN
 
         createMessage("message.cad", new MessageBodyParagraph("WIP"),"animation.bike"); // With avatar
@@ -506,6 +513,14 @@ public class OnboardingConversationDevi extends Conversation {
 					completeRequest("message.bikedone");
 					break;
 			}
+			break;
+		case MODAL_CLOSED:
+			switch(value){
+				case "quote":
+					completeRequest("message.quote.close");
+					break;
+			}
+			break;
 		}
     }
 
