@@ -22,21 +22,7 @@ public interface ProductPricingClient {
     @RequestMapping(value = "/insurance/member_id/", method = RequestMethod.POST, produces = "application/json")
     ResponseEntity<?> createProduct(@RequestBody CalculateQuoteRequest request);
 
-    /*@RequestMapping(value = "/v1/debtors/debtor", method = RequestMethod.POST, produces = "application/xml")
-    Created createDebtor(@RequestHeader("Authorization") String token, @RequestBody String debtor);
-
-
-    @RequestMapping(value = "/v1/bank/accounts/{id}", method =  RequestMethod.POST, produces = "application/xml")
-    Created initiateBankAccountRetrieval(
-            @RequestBody MultiValueMap<String, String> m,
-            @RequestHeader("Authorization") String token,
-            @PathVariable("id") String id,
-            @RequestParam("bank") String bank,
-            @RequestParam("ssn") String ssn
-            );
-
-    @RequestMapping(value = "/v1/bank/accounts/{id}", method = RequestMethod.GET, produces = "application/xml")
-    ResponseEntity<BankAccountRequest> getBankAccountNumbers(@RequestHeader("Authorization") String token, @PathVariable("id") String publicId);*/
-
+    @RequestMapping(value = "/createProduct", method = RequestMethod.POST, produces = "application/json")
+    ResponseEntity<String> createQuote(@RequestBody CalculateQuoteRequest req);
 
 }
