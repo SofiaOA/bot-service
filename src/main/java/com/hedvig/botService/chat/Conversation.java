@@ -75,7 +75,10 @@ public abstract class Conversation {
             mss.choices.forEach(x -> {
                 if(x.getClass() == SelectLink.class) {
                     SelectLink link = (SelectLink) x;
-                    link.appUrl = replaceWithContext(link.appUrl);
+                    if(link.appUrl != null) {
+						link.appUrl = replaceWithContext(link.appUrl);
+					}
+
                 }
             });
 		}else if(m.body.getClass() == MessageBodyBankIdCollect.class) {
