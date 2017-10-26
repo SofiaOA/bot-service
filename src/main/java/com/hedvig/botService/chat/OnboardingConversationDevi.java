@@ -366,7 +366,8 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.start.account.retrieval",
                 new MessageBodySingleSelect("Då behöver vi välja det konto som pengarna ska dras ifrån. Om du har ditt BankId redo så ska jag fråga mina vänner på {BANK_FULL} om dina konotnummer.",
                         new ArrayList<SelectItem>(){{
-                            add(new SelectOption("Jag är redo!", "message.fetch.accounts"));
+                            //add(new SelectOption("Jag är redo!", "message.fetch.accounts"));
+                            add(new SelectLink("Öppna BankId", "message.fetch.accounts", null, "bankid:///?redirect=expo://hedvig", null, false));
                             add(new SelectOption("Varför ska jag göra detta?", "message.fetch.accounts.explain"));
                         }}),
                 (userContext, item) -> {
@@ -383,9 +384,16 @@ public class OnboardingConversationDevi extends Conversation {
                         "För att du på ett enkelt sätt ska kunna välja rätt konto kontaktar vi din bank för att hämta dina kontouppgifter.\n" +
                         "Uppgifterna används bara under registreringen av autogiro.\nNär jag hämtar dina kontouppgifter behöver du använda bankId och autensitera dig mot din bank.",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag förstår", "message.fetch.accounts"));
+                            add(new SelectLink("Öppna BankId", "message.fetch.accounts", null, "bankid:///?redirect=expo://hedvig", null, false));
                         }}
-                ));
+                ),
+                (userContext, item) -> {
+                    if(item.value.equals("message.fetch.accounts")) {
+                        this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
+                        addToChat(getMessage("message.fetch.accounts.hold"));
+                    }
+                    return "";
+                });
 
         createMessage("message.fetch.accounts.hold", new MessageBodyText("Väntar på svar ifrån {BANK_FULL} " + emoji_mag));
 
