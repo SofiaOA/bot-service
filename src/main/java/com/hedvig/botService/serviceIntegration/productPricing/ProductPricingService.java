@@ -38,7 +38,7 @@ public class ProductPricingService {
         address.setZipCode(data.getAddressZipCode());
         request.setAddress(address);
 
-        this.client.createProduct(request);
+        this.client.createQuote(request);
     }
 
     public void setInsuranceStatus(String hid, String status) {
