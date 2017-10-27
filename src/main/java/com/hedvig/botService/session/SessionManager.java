@@ -277,8 +277,6 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-        //if(!uc.onboardingComplete()) {
-            //OnboardingConversation onboardingConversation = new OnboardingConversation(mc, uc);
             OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient);
             onboardingConversation.bankIdAuthComplete();
         }

@@ -50,8 +50,7 @@ public class OnboardingConversationDevi extends Conversation {
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ge mig ett försäkringsförslag", "message.forslagstart"));
                             add(new SelectOption("Visa mig", "message.cad"));
-                            add(new SelectOption("Jag är redan medlem", "message.medlem"));
-                            add(new SelectOption("Hoppa till konto", "message.medlemjabank"));
+                            add(new SelectOption("Jag är redan medlem", "message.bankid.start"));
 
                         }}
                 ), "h_symbol");
