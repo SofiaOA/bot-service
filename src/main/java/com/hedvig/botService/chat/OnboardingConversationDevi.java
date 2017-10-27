@@ -603,7 +603,7 @@ public class OnboardingConversationDevi extends Conversation {
 	        	nxtMsg = "message.varbordu";
 	        	break;
 	        case "message.mockme":	        	
-	        	nxtMsg = m.body.text;
+	        	nxtMsg = m.body.text.toLowerCase();
 	        	m.body.text = "Jag vill gå till " + nxtMsg + " tack";
 	        	addToChat(m);
 	        	break;
