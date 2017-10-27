@@ -51,10 +51,14 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Ge mig ett försäkringsförslag", "message.forslagstart"));
                             add(new SelectOption("Visa mig", "message.cad"));
                             add(new SelectOption("Jag är redan medlem", "message.bankid.start"));
+                            add(new SelectOption("[Debug:mock my data]", "message.mockme"));
 
                         }}
                 ), "h_symbol");
 
+        createMessage("message.mockme", new MessageBodyText(
+        		"Ok! Klart"+ emoji_hand_ok + " du heter nu {NAME} och bor på {ADDRESS} i en {HOUSE}.\n\f Vilket meddelande vill du gå till?"));
+        
         createMessage("message.medlem",
                 new MessageBodySingleSelect("Välkommen tillbaka "+ emoji_hug +"\n\n Ett snabbt BankID-inlogg bara, sen är du inne i appen igen",
                         new ArrayList<SelectItem>() {{
@@ -539,6 +543,7 @@ public class OnboardingConversationDevi extends Conversation {
 
         String nxtMsg = "";
 
+        // Lamda
         if(this.hasSelectItemCallback(m.id) && m.body.getClass().equals(MessageBodySingleSelect.class)) {
             MessageBodySingleSelect body = (MessageBodySingleSelect) m.body;
             nxtMsg = this.execSelectItemCallback(m.id, userContext, body.getSelectedItem());
@@ -547,6 +552,16 @@ public class OnboardingConversationDevi extends Conversation {
 
         OnBoardingData onBoardingData = userContext.getOnBoardingData();
         switch (m.id) {
+	        case "message.onboardingstart":
+	        	String opt = getValue((MessageBodySingleSelect)m.body);
+	        	log.info("message.onboardingstart redirect to " + opt);
+	        	if(opt.equals("message.mockme")){
+	        		m.body.text = "Mocka mina uppgifter tack!";
+	        		userContext.clearContext();
+	        		userContext.mockMe();
+	        		addToChat(m);
+	        	}
+	        	break;
 	        case "message.forslagstart":
 	            onBoardingData.setHouseType(((MessageBodySingleSelect)m.body).getSelectedItem().value);
 	            break;
@@ -586,6 +601,11 @@ public class OnboardingConversationDevi extends Conversation {
 	        	onBoardingData.setSSN(m.body.text);
 	        	addToChat(m);
 	        	nxtMsg = "message.varbordu";
+	        	break;
+	        case "message.mockme":	        	
+	        	nxtMsg = m.body.text;
+	        	m.body.text = "Jag vill gå till " + nxtMsg + " tack";
+	        	addToChat(m);
 	        	break;
 	        case "message.varbordu":
 	            onBoardingData.setAddressStreet(m.body.text);
@@ -635,7 +655,7 @@ public class OnboardingConversationDevi extends Conversation {
 
 	        case "message.forsakringidagja":
 	        	String comp = getValue((MessageBodySingleSelect)m.body);
-	        	onBoardingData.setCurrentInsurer(comp);
+	        	if(comp.equals("message.mockme"));
 	        	m.body.text = "Idag har jag " + comp;
 	        	addToChat(m);
                 nxtMsg = "message.bytesinfo";

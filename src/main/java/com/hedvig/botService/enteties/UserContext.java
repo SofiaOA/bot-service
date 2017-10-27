@@ -135,12 +135,34 @@ public class UserContext implements Serializable {
         onboardingStarted = started;
     }
     
+    public void clearContext(){
+    	this.userData.clear();
+    }
+    
     public void onboardingComplete(Boolean complete) {
     	onboardingComplete = complete;
     }
 
+    public void mockMe(){
+    	putUserData("{ADDRESS}", "Margaretavägen 8D");
+    	putUserData("{ADDRESS_ZIP}","18774");
+    	putUserData("{AUTOSTART_TOKEN}","cbead301-1796-401e-bec3-26d67fd7bc9e");
+    	putUserData("{com.hedvig.botService.chat.OnboardingConversationDevi}","ONGOING");
+    	putUserData("{EMAIL}","johan@hedvi.com");
+    	putUserData("{FAMILY_NAME}","Tjelldén");
+    	putUserData("{HOUSE}","bostdsrätt");
+    	putUserData("{INSURANCE_COMPANY_TODAY}","trygg-hansa");
+    	putUserData("{KVM}","123");
+    	putUserData("{MEMBER_BIRTH_DATE}","1984-09-18");
+    	putUserData("{NAME}","Johan");
+    	putUserData("{NR_PERSONS}","3");
+    	putUserData("{REFERENCE_TOKEN}","a903a93f-a53a-4b4a-93a4-9cf4a4c9f15e");
+    	putUserData("{SECURE_ITEM_0}","safety.extinguisher");
+    	putUserData("{SECURE_ITEM_1}","safety.door");
+    	putUserData("{SECURE_ITEMS_NO}","2");
+    }
+    
     public OnBoardingData getOnBoardingData() {
-
         return new OnBoardingData(this);
     }
 }
