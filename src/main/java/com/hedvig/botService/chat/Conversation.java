@@ -96,6 +96,14 @@ public abstract class Conversation {
 		messageList.put(m.id, m);
 	}
 
+	private void createMessage(String id, MessageHeader header, MessageBody body, Integer delay){
+		Message m = new Message();
+		m.id = id;
+		m.header = header;
+		m.body = body;
+		m.header.pollingInterval = new Long(delay);
+		messageList.put(m.id, m);
+	}
 
 
 	void createMessage(String id, MessageBody body, SelectItemMessageCallback callback) {
@@ -115,6 +123,29 @@ public abstract class Conversation {
 	    return this.callbacks.get(messageId).operation(uc, item);
     }
 
+    // -------------------------
+    
+    void createMessage(String id, MessageBody body, Integer delay){
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		createMessage(id,header,body,delay);    	
+    }
+    
+	void createMessage(String id, MessageBody body, String avatarName, Integer delay){
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		header.avatarName = avatarName;
+		createMessage(id,header,body,delay);		
+	}
+	
+	void createMessage(String id, MessageBody body, Image image, Integer delay){
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		body.imageURL = image.imageURL;
+		body.imageHeight = image.imageHeight;
+		body.imageWidth = image.imageWidth;
+		createMessage(id,header,body,delay);			
+	}
+	 
+	// -------------------------
+	
 	void createMessage(String id, MessageBody body){
 		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
 		createMessage(id,header,body);

@@ -200,6 +200,9 @@ public class SessionManager {
         
         log.info(chat.toString());
         
+        // Mark last user input with as editAllowed
+        chat.markLastInput();
+        
         // Check for deleted messages
         ArrayList<Message> returnList = new ArrayList<Message>();
         for(Message m : chat.chatHistory){

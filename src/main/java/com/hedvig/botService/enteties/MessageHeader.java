@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 @Entity
 public class MessageHeader {
@@ -39,6 +40,8 @@ public class MessageHeader {
 	public String avatarName; // Link to avatar animation to show over message
 	public Long pollingInterval; // Frequency of next request
 	
+	@Transient
+	public boolean editAllowed; // For client use to indicate if the last message is editable
 	/*@JsonSetter("type")
 	public void setType(String t){
 		this.type = Type.valueOf(t);

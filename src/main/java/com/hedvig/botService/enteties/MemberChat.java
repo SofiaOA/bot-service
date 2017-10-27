@@ -90,6 +90,30 @@ public class MemberChat {
     	
     }
     
+    /*
+     * Mark ONLY last input from user as editAllowed -> pen symbol in client
+     * */
+    public void markLastInput(){
+    	Collections.sort(chatHistory, new Comparator<Message>(){
+   	     public int compare(Message m1, Message m2){
+   	         if(m1.globalId == m2.globalId)
+   	             return 0;
+   	         return m1.globalId > m2.globalId ? -1 : 1;
+   	     }
+    	});
+    	/*
+    	 * If there is no input message to revert to yet then leave the chat as is
+    	 * */
+    	boolean hasUserInput = false;
+    	for(Message m : chatHistory){if(!m.deleted && m.header.fromId != Conversation.HEDVIG_USER_ID){hasUserInput = true; m.header.editAllowed=false;}}
+    	if(!hasUserInput)return;
+    	
+    	for(Message m : chatHistory){
+    		log.info(m.globalId + " " + m.header.fromId);
+    		if(!(m.header.fromId == Conversation.HEDVIG_USER_ID)){m.header.editAllowed = true; break;}
+    	}
+    }
+    
     public MemberChat(String memberId) {
     	log.info("Instantiating MemberChat for member:" + memberId);
         this.memberId = memberId;
