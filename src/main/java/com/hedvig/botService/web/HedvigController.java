@@ -25,16 +25,7 @@ public class HedvigController {
     
     @PostMapping("initiateUpdate")
     ResponseEntity<String> initiateUpdate(@RequestParam UpdateTypes what, @RequestHeader(value="hedvig.token", required = false) String hid) {
-    	switch(what){
-    	case APARTMENT_INFORMATION: sessionManager.updateInfo(hid);
-    		break;
-    	case BANK_ACCOUNT: sessionManager.updateInfo(hid);
-    		break;
-    	case FAMILY_MEMBERS: sessionManager.updateInfo(hid);
-    		break;
-    	case PERSONAL_INFORMATOIN: sessionManager.updateInfo(hid);
-    		break;
-    	}
+    	sessionManager.updateInfo(hid, what);
         return ResponseEntity.noContent().build();
     }
 

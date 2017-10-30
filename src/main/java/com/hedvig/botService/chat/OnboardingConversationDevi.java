@@ -9,7 +9,7 @@ import java.util.Optional;
 
 import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
-import com.hedvig.botService.enteties.userContextHelpers.OnBoardingData;
+import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingClient;
 import com.hedvig.botService.serviceIntegration.MemberService;
 import com.hedvig.botService.serviceIntegration.BankIdAuthResponse;
@@ -119,7 +119,7 @@ public class OnboardingConversationDevi extends Conversation {
         // House dead-end:::
 
         createMessage("message.hus",
-                new MessageBodySingleSelect("{HOUSE} Åh, typiskt! Just nu är det lägenheter jag kan försäkra\n\nMen jag hör gärna av mig till dig så fort jag har viktiga nyheter\n\nOch om du känner någon lägenhetsbo som du vill tipsa om mig, kan du passa på nu\n\nJag skickar ingen spam, lovar!",
+                new MessageBodySingleSelect("Åh, typiskt! Just nu är det lägenheter jag kan försäkra\n\nMen jag hör gärna av mig till dig så fort jag har viktiga nyheter\n\nOch om du känner någon lägenhetsbo som du vill tipsa om mig, kan du passa på nu\n\nJag skickar ingen spam, lovar!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Skicka mig nyhetsbrev", "message.nyhetsbrev"));
                             add(new SelectOption("Jag vill tipsa någon om dig", "message.tipsa"));
@@ -186,7 +186,7 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Hyr i andra hand", "andrahand"));
                         }}
                 ),(userContext, item) -> {
-            OnBoardingData obd = userContext.getOnBoardingData();
+            UserData obd = userContext.getOnBoardingData();
                   obd.setHouseType(item.value);
                   return "message.pers";
                 });
@@ -539,7 +539,7 @@ public class OnboardingConversationDevi extends Conversation {
 
     @Override
     public void recieveMessage(Message m) {
-        log.info(m.toString());
+        log.info("recieveMessage:" + m.toString());
 
         String nxtMsg = "";
 
@@ -550,7 +550,8 @@ public class OnboardingConversationDevi extends Conversation {
             addToChat(m);
         }
 
-        OnBoardingData onBoardingData = userContext.getOnBoardingData();
+        UserData onBoardingData = userContext.getOnBoardingData();
+        
         switch (m.id) {
 	        case "message.onboardingstart":
 	        	String opt = getValue((MessageBodySingleSelect)m.body);
@@ -693,19 +694,6 @@ public class OnboardingConversationDevi extends Conversation {
                 addToChat(m);
                 break;
 
-            case "onboarding.done" :
-            	userContext.completeConversation(this.getClass().getName());
-            	break;
-            /*case "message.greetings":
-
-                LocalDateTime bDate = ((MessageBodyDatePicker) m.body).date;
-                log.info("Add to context:" + "{BIRTH_DATE}:" + bDate.toString());
-                userContext.putUserData("{BIRTH_DATE}", bDate.toString());
-                nxtMsg = "message.bye";
-                //putMessage(messageList.get("message.bye"));
-
-                break;*/
-
             case "message.fetch.account.complete":
                 SelectItem it = ((MessageBodySingleSelect)m.body).getSelectedItem();
                 userContext.getAutogiroData().setSelecteBankAccount(Integer.parseInt(it.value));
@@ -714,8 +702,6 @@ public class OnboardingConversationDevi extends Conversation {
 
             case "message.kontrakt":
                 this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
-
-            default:
                 break;
         }
 
@@ -756,7 +742,7 @@ public class OnboardingConversationDevi extends Conversation {
 	public void completeRequest(String nxtMsg){
 
 		switch(nxtMsg){
-			case "message.whoishedvig":
+			case "onboarding.done":
 				log.info("Onboarding complete");
 				userContext.completeConversation(this.getClass().getName());
 				//userContext.onboardingComplete(true);
@@ -770,8 +756,7 @@ public class OnboardingConversationDevi extends Conversation {
 				break;
 			}
 
-			if(getMessage(nxtMsg)!=null)
-			    addToChat(getMessage(nxtMsg));
+			super.completeRequest(nxtMsg);
 	}
 
 	public void bankIdAuthComplete(){

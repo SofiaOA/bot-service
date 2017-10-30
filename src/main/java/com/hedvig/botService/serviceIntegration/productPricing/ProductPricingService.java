@@ -1,6 +1,6 @@
 package com.hedvig.botService.serviceIntegration.productPricing;
 
-import com.hedvig.botService.enteties.userContextHelpers.OnBoardingData;
+import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.productPricing.dto.Address;
 import com.hedvig.botService.serviceIntegration.productPricing.dto.CalculateQuoteRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ public class ProductPricingService {
         this.client = client;
     }
 
-    public void createProduct(String memberId, OnBoardingData data) {
+    public void createProduct(String memberId, UserData data) {
 
         CalculateQuoteRequest request = new CalculateQuoteRequest();
 

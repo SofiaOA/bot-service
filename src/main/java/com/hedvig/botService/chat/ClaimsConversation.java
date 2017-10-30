@@ -77,6 +77,8 @@ public class ClaimsConversation extends Conversation {
 	public void recieveMessage(Message m) {
 		log.info(m.toString());
 		
+		String nxtMsg = "";
+		
 		switch(m.id){
 		case "message.getname": 
 
@@ -85,7 +87,7 @@ public class ClaimsConversation extends Conversation {
 			userContext.putUserData("{NAME}", fName);
 			m.body.text = "Jag heter " + fName;
 			addToChat(m); // Response parsed to nice format
-			addToChat(getMessage("message.greetings"));
+			nxtMsg = "message.greetings";
 			
 			break;
 
@@ -94,32 +96,27 @@ public class ClaimsConversation extends Conversation {
 			LocalDateTime bDate = ((MessageBodyDatePicker)m.body).date;			
 			log.info("Add to context:" + "{BIRTH_DATE}:" + bDate.toString());
 			userContext.putUserData("{BIRTH_DATE}", bDate.toString());
-			addToChat(getMessage("message.bye"));
+			nxtMsg = "message.bye";
 			
-			break;
-			
-		 default:
-			 /*
-			  * In a Single select, there is only one trigger event. Set default here to be a link to a new message
-			  */
-			if(m.body.getClass().equals(MessageBodySingleSelect.class) ){
-				
-				MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
-				for(SelectItem o : body.choices){
-					if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
-						m.body.text = SelectOption.class.cast(o).text;
-						addToChat(m);
-						addToChat(getMessage(SelectOption.class.cast(o).value));
-					}
-				}
-			}
-			else{
-				log.info("Unknown message recieved...");
-				addToChat(getMessage("error"));
-			}
-			 
 			break;
 		}
+		
+        /*
+	  * In a Single select, there is only one trigger event. Set default here to be a link to a new message
+	  */
+       if (nxtMsg.equals("") && m.body.getClass().equals(MessageBodySingleSelect.class)) {
+
+           MessageBodySingleSelect body1 = (MessageBodySingleSelect) m.body;
+           for (SelectItem o : body1.choices) {
+               if(o.selected) {
+                   m.body.text = o.text;
+                   addToChat(m);
+                   nxtMsg = o.value;
+               }
+           }
+       }
+       
+       completeRequest(nxtMsg);
 		
 	}
 

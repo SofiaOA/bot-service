@@ -13,7 +13,7 @@ import java.util.List;
 
 import com.hedvig.botService.chat.*;
 import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
-import com.hedvig.botService.enteties.userContextHelpers.OnBoardingData;
+import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.web.dto.*;
@@ -182,20 +182,6 @@ public class SessionManager {
         	userrepo.save(newUserContext);
             return newUserContext;
         });
-
-        // This is done in the init function
-        // Still onboarding
-        //if(!uc.onboardingComplete()) {
-	        //OnboardingConversation onboardingConversation = new OnboardingConversation(chat, uc);
-	      //  OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(chat, uc, authService);
-	        
-	        // If this is the first message the Onboarding conversation is initiated
-	        /*if(!uc.onboardingStarted()){
-	        	uc.onboardingStarted(true);
-	        	
-	        	onboardingConversation.init();
-	        }*/
-        //}
         
         repo.saveAndFlush(chat);
         userrepo.saveAndFlush(uc);
@@ -240,12 +226,12 @@ public class SessionManager {
     	/*
     	 * No ongoing main conversation and onboarding complete -> show menu
     	 * */
-    	if(
+    	//if(
     			//!uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString()) && 
-    			!uc.hasOngoingConversation(conversationTypes.MainConversation.toString())){
+    	//		!uc.hasOngoingConversation(conversationTypes.MainConversation.toString())){
     		MainConversation mainConversation = new MainConversation(mc, uc);
     		startConversation(mainConversation,uc);
-    	}
+    	//}
         /*
          * User is chatting in the main chat:
          * 
@@ -261,13 +247,28 @@ public class SessionManager {
     /*
      * User wants to update some information
      * */
-    public void updateInfo(String hid){
+    public void updateInfo(String hid, UpdateTypes what){
         log.info("Upate info request from user:" + hid);
  
+        String startingMessage = "";
+        
+    	switch(what){
+    	case APARTMENT_INFORMATION: startingMessage = "";
+    		break;
+    	case BANK_ACCOUNT: startingMessage = "";
+    		break;
+    	case FAMILY_MEMBERS: startingMessage = "";
+    		break;
+    	case PERSONAL_INFORMATOIN: startingMessage = "";
+    		break;
+    	case SAFETY_INCREASERS: startingMessage = "";
+			break;
+    	}
+    	
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
         
-        UpdateInformationConversation conversation = new UpdateInformationConversation(mc, uc);
+        UpdateInformationConversation conversation = new UpdateInformationConversation(mc, uc, startingMessage);
         startConversation(conversation, uc);
         /*uc.putUserData("{"+conversation.getConversationName()+"}", Conversation.conversationStatus.ONGOING.toString());
     	conversation.init();*/
@@ -282,7 +283,7 @@ public class SessionManager {
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
         Member member = e.getMember();
 
-        OnBoardingData obd = uc.getOnBoardingData();
+        UserData obd = uc.getOnBoardingData();
         obd.setBirthDate(member.getBirthDate());
         obd.setFirstName(member.getFirstName());
         obd.setFamilyName(member.getLastName());

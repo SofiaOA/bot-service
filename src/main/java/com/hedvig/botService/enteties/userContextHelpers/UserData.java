@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.OptionalInt;
 
-public class OnBoardingData {
+public class UserData {
 
     public static final String MEMBER_BIRTH_DATE = "{MEMBER_BIRTH_DATE}";
     public static final String FIRST_NAME = "{NAME}";
@@ -29,7 +29,7 @@ public class OnBoardingData {
     private final UserContext ctx;
     private String address;
 
-    public OnBoardingData(UserContext ctx) {
+    public UserData(UserContext ctx) {
         this.ctx = ctx;
     }
 

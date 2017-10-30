@@ -14,7 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.MapKeyColumn;
 
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
-import com.hedvig.botService.enteties.userContextHelpers.OnBoardingData;
+import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -162,8 +162,8 @@ public class UserContext implements Serializable {
     	putUserData("{SECURE_ITEMS_NO}","2");
     }
     
-    public OnBoardingData getOnBoardingData() {
-        return new OnBoardingData(this);
+    public UserData getOnBoardingData() {
+        return new UserData(this);
     }
 }
 
