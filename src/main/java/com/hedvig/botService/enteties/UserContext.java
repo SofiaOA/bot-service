@@ -66,7 +66,7 @@ public class UserContext implements Serializable {
     };
     
     /*
-     * Check if user has an o
+     * Check if user has an ongoing conversation of type conversationClassName
      * */
     public boolean hasOngoingConversation(String conversationClassName){
     	if(conversationClassName.indexOf(".")==-1)conversationClassName = ("com.hedvig.botService.chat." + conversationClassName); // TODO: Refactor/remove hack

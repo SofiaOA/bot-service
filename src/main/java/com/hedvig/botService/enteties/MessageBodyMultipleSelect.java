@@ -19,5 +19,5 @@ public class MessageBodyMultipleSelect extends MessageBody {
     	super(content);
 		this.choices.addAll(items); // TODO
 	}
-    MessageBodyMultipleSelect(){log.info("Instansiating MessageBodyMultipleChoice");}
+    MessageBodyMultipleSelect(){}
 }

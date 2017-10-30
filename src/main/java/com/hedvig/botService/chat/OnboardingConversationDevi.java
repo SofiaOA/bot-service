@@ -543,7 +543,7 @@ public class OnboardingConversationDevi extends Conversation {
 
         String nxtMsg = "";
 
-        // Lamda
+        // Lambda
         if(this.hasSelectItemCallback(m.id) && m.body.getClass().equals(MessageBodySingleSelect.class)) {
             MessageBodySingleSelect body = (MessageBodySingleSelect) m.body;
             nxtMsg = this.execSelectItemCallback(m.id, userContext, body.getSelectedItem());
@@ -694,7 +694,7 @@ public class OnboardingConversationDevi extends Conversation {
                 break;
 
             case "onboarding.done" :
-            	userContext.onboardingComplete(true);
+            	userContext.completeConversation(this.getClass().getName());
             	break;
             /*case "message.greetings":
 

@@ -20,7 +20,7 @@ public class MessageBodySingleSelect extends MessageBody {
     	this.choices.addAll(items);
 	}
 
-    MessageBodySingleSelect(){log.info("Instansiating MessageBodySingleSelect");}
+    MessageBodySingleSelect(){}
 
     @JsonIgnore
     public SelectItem getSelectedItem() {

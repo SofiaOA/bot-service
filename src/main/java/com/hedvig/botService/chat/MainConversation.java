@@ -1,9 +1,11 @@
 package com.hedvig.botService.chat;
 
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +15,8 @@ public class MainConversation extends Conversation {
 
 	private static Logger log = LoggerFactory.getLogger(MainConversation.class);
 	private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-	
+    private String emoji_hand_ok = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8C}, Charset.forName("UTF-8"));
+
 	public MainConversation(MemberChat mc, UserContext uc) {
 		super("main.menue", mc,uc);
 		// TODO Auto-generated constructor stub
@@ -28,7 +31,25 @@ public class MainConversation extends Conversation {
 						}}
 				));
 		
-		createMessage("message.main.callme", new MessageBodyText("Ok, ta det lugnt jag ringer!"));
+		createMessage("message.question.recieved",
+				new MessageBodySingleSelect("Tack för din fråga {NAME}, jag åtekommer så snart jag kan?",
+						new ArrayList<SelectItem>(){{
+							add(new SelectOption("Ok tack!","hedvig.com", false));
+						}}
+				));
+		
+		createMessage("message.main.refer.recieved",
+				new MessageBodySingleSelect("Då mailar din vän och tipsar om Hedvig." + emoji_hand_ok,
+						new ArrayList<SelectItem>(){{
+							add(new SelectOption("Bra, gör det","hedvig.com", false));
+						}}
+				));
+		
+		createMessage("message.main.callme", new MessageBodyParagraph("Ok, ta det lugnt jag ringer!"));
+		
+		createMessage("main.question", new MessageBodyText("Vad har du för fråga?"));
+		
+		createMessage("message.main.refer", new MessageBodyText("Kul! Vad har din vän för emailadress?"));
 		
 		createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 	}
@@ -37,49 +58,38 @@ public class MainConversation extends Conversation {
 	public void recieveMessage(Message m) {
 		log.info(m.toString());
 		
+		String nxtMsg = "";
+		
 		switch(m.id){
-		case "message.getname": 
-
-			String fName = m.body.text;			
-			log.info("Add to context:" + "{NAME}:" + fName);
-			userContext.putUserData("{NAME}", fName);
-			m.body.text = "Jag heter " + fName;
+		case "message.question": 
+			userContext.putUserData("{QUESTION_"+LocalDate.now()+"}", m.body.text);
 			addToChat(m); // Response parsed to nice format
-			addToChat(getMessage("message.greetings"));
-			
+			nxtMsg = "message.question.recieved";
 			break;
 
-		case "message.greetings": 
-
-			LocalDateTime bDate = ((MessageBodyDatePicker)m.body).date;			
-			log.info("Add to context:" + "{BIRTH_DATE}:" + bDate.toString());
-			userContext.putUserData("{BIRTH_DATE}", bDate.toString());
-			addToChat(getMessage("message.bye"));
-			
-			break;
-			
-		 default:
-			 /*
-			  * In a Single select, there is only one trigger event. Set default here to be a link to a new message
-			  */
-			if(m.body.getClass().equals(MessageBodySingleSelect.class) ){
-				
-				MessageBodySingleSelect body = (MessageBodySingleSelect)m.body;
-				for(SelectItem o : body.choices){
-					if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
-						m.body.text = SelectOption.class.cast(o).text;
-						addToChat(m);
-						addToChat(getMessage(SelectOption.class.cast(o).value));
-					}
-				}
-			}
-			else{
-				log.info("Unknown message recieved...");
-				addToChat(getMessage("error"));
-			}
-			 
+		case "message.main.refer": 
+			userContext.putUserData("{REFERAL_"+LocalDate.now()+"}", m.body.text);
+			addToChat(m); // Response parsed to nice format
+			nxtMsg = "message.main.refer.recieved";
 			break;
 		}
+		
+        /*
+	  * In a Single select, there is only one trigger event. Set default here to be a link to a new message
+	  */
+       if (nxtMsg.equals("") && m.body.getClass().equals(MessageBodySingleSelect.class)) {
+
+           MessageBodySingleSelect body1 = (MessageBodySingleSelect) m.body;
+           for (SelectItem o : body1.choices) {
+               if(o.selected) {
+                   m.body.text = o.text;
+                   addToChat(m);
+                   nxtMsg = o.value;
+               }
+           }
+       }
+       
+       completeRequest(nxtMsg);
 		
 	}
 

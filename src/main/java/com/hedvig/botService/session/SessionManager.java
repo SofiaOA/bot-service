@@ -1,6 +1,8 @@
 package com.hedvig.botService.session;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /*
  * The session manager is the main controller class for the chat service. It contains all user sessions with chat histories, context etc
@@ -203,6 +205,7 @@ public class SessionManager {
         // Mark last user input with as editAllowed
         chat.markLastInput();
         
+
         // Check for deleted messages
         ArrayList<Message> returnList = new ArrayList<Message>();
         for(Message m : chat.chatHistory){
@@ -210,6 +213,17 @@ public class SessionManager {
         		returnList.add(m); 
         	}
         }
+        
+        /*
+         * Sort in global Id order
+         * */
+    	Collections.sort(returnList, new Comparator<Message>(){
+      	     public int compare(Message m1, Message m2){
+      	         if(m1.globalId == m2.globalId)
+      	             return 0;
+      	         return m1.globalId < m2.globalId ? -1 : 1;
+      	     }
+      	});
         return returnList;
     }
     
@@ -224,9 +238,11 @@ public class SessionManager {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
     	/*
-    	 * No ongoing main conversation -> show menu
+    	 * No ongoing main conversation and onboarding complete -> show menu
     	 * */
-    	if(!uc.hasOngoingConversation(conversationTypes.MainConversation.toString())){
+    	if(
+    			//!uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString()) && 
+    			!uc.hasOngoingConversation(conversationTypes.MainConversation.toString())){
     		MainConversation mainConversation = new MainConversation(mc, uc);
     		startConversation(mainConversation,uc);
     	}
