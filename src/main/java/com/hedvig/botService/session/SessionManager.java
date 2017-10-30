@@ -388,6 +388,7 @@ public class SessionManager {
                     c = new UpdateInformationConversation(mc, uc);                      
         			break;
         		}
+        		if(c==null)throw new RuntimeException("Conversation not found for user :" + hid + " message id:" + m.id);
         		c.recieveMessage(m);
         	}
         }
