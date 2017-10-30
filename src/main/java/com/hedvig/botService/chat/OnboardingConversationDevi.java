@@ -648,8 +648,21 @@ public class OnboardingConversationDevi extends Conversation {
             case "message.bytesinfo":
             case "message.bytesinfo2":
             case "message.forsakringidag":
+            case "message.missingvalue":
+            	
                 SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
-                if(item.value.equals("message.forslag")) {
+                
+                /*
+                 * Check if there is any data missing. Keep ask until Hedvig has got all info
+                 * */
+                String missingItems = userContext.getMissingDataItem();
+                if(missingItems!=null){
+                    createMessage("message.missingvalue", new MessageBodyText(
+                    		"Oj, nu verkar det som om jag saknar lite viktig information. T.ex har jag ingen " + missingItems));
+                    addToChat(getMessage("message.missingvalue"));
+                    break;
+                }
+                if(m.id.equals("message.missingvalue") || item.value.equals("message.forslag")) {
                     this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
                 }
                 break;
@@ -657,7 +670,7 @@ public class OnboardingConversationDevi extends Conversation {
 	        case "message.forsakringidagja":
 	        	String comp = getValue((MessageBodySingleSelect)m.body);
 	        	if(comp.equals("message.mockme"));
-	        	m.body.text = "Idag har jag " + comp;
+	        	m.body.text = "Idag har jag " + comp;	
 	        	addToChat(m);
                 nxtMsg = "message.bytesinfo";
                 break;

@@ -46,7 +46,9 @@ public class UserData {
     }
 
     public LocalDate getBirthDate() {
-        return LocalDate.parse(ctx.getDataEntry(MEMBER_BIRTH_DATE));// = birthDate;
+    	String bDate = ctx.getDataEntry(MEMBER_BIRTH_DATE);
+    	if(bDate == null) return null;
+        return LocalDate.parse(bDate);// = birthDate;
     }
 
     public void setFirstName(String firstName) {

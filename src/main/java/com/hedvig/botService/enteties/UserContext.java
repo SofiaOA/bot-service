@@ -1,6 +1,7 @@
 package com.hedvig.botService.enteties;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,9 +28,21 @@ import lombok.Getter;
  * */
 @Entity
 public class UserContext implements Serializable {
-
-	private static Logger log = LoggerFactory.getLogger(UserContext.class);
 	
+	private static Logger log = LoggerFactory.getLogger(UserContext.class);
+	private static ArrayList<String> requiredData = new ArrayList<String>(){{
+		add("{ADDRESS}");
+		add("{ADDRESS_ZIP}");
+		add("{EMAIL}");
+		add("{FAMILY_NAME}");
+		add("{HOUSE}");
+		add("{KVM}");
+		add("{MEMBER_BIRTH_DATE}");
+		add("{NAME}");
+		add("{NR_PERSONS}");
+		add("{SECURE_ITEMS_NO}");
+		}};
+			
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -160,6 +173,16 @@ public class UserContext implements Serializable {
     	putUserData("{SECURE_ITEM_0}","safety.extinguisher");
     	putUserData("{SECURE_ITEM_1}","safety.door");
     	putUserData("{SECURE_ITEMS_NO}","2");
+    }
+    
+    /*
+     * Validate that all required information is collected during onboarding and if not enable Hedvig to ask for it
+     * */
+    public String getMissingDataItem(){
+    	for(String s : requiredData){
+    		if(!userData.containsKey(s)){return s;}
+    	}
+    	return null;
     }
     
     public UserData getOnBoardingData() {
