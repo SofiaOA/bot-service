@@ -591,7 +591,7 @@ public class OnboardingConversationDevi extends Conversation {
 	        	onBoardingData.setLivingSpace(Float.parseFloat(kvm));
 	        	m.body.text = kvm + "kvm";
                 addToChat(m);
-                if(onBoardingData.getAge() < 27) {
+                if(onBoardingData.getAge() > 0 && onBoardingData.getAge() < 27) {
                     nxtMsg = "message.student";
                 } else {
                     nxtMsg = "message.lghtyp";
