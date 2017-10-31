@@ -11,6 +11,7 @@ import java.util.Optional;
 import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
+import com.hedvig.botService.serviceIntegration.BankIdSignResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingClient;
 import com.hedvig.botService.serviceIntegration.MemberService;
 import com.hedvig.botService.serviceIntegration.BankIdAuthResponse;
@@ -89,7 +90,19 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Klart jag har, det är ju ändå 2017", "message.bankid.autostart.send"));
                             add(new SelectOption("Nej det har jag inte", "message.bankid.start.manual"));
                         }}
-                ));
+                ),
+                (__,i) -> {
+                    UserData obd = userContext.getOnBoardingData();
+                    if(i.value.equals("message.bankid.autostart.send"))
+                    {
+                        obd.setBankIdOnDecvie(true);
+                    } else
+                    {
+                        obd.setBankIdOnDecvie(false);
+                    }
+
+                    return "";
+                });
 
         createMessage("message.bankid.start.manual",
                 new MessageBodyNumber("Om du anger ditt personnumer så får du använda bankId på din andra enhet " + emoji_smile
@@ -113,6 +126,9 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.bankid.autostart.respond",
                 new MessageBodyBankIdCollect( "{REFERENCE_TOKEN}")
         );
+
+
+
 
 
         //JAG LOGGAR IN = STARTA BANKID, LOGGA IN, SEN TILLBAKS TILL message.bankidja
@@ -435,8 +451,34 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.kontraktpop",
                 new MessageBodySingleSelect("Vad roligt! Det som återstår för dig att att signera hedvigs allmänna villkor och en fullmakt som ger mig rätten att avsluta din nuvarande försäkring.",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill skriva på och bli Hedvig-medlem", "message.kontraktklar"));
+                            add(new SelectOption("Jag vill skriva på och bli Hedvig-medlem", "message.kontraktpop.startBankId"));
+                        }}
+                ),
+                (__, i) -> {
+                    UserData ud = userContext.getOnBoardingData();
 
+                    Optional<BankIdSignResponse> signData;
+
+                    signData = memberService.sign(ud.getSSN(), "Jag medgiver harom Hedvigs allmanne villkor och giver Hedvig en fullmakt sa att hen kan hantere mine forsakringar.");
+
+                    if(signData.isPresent()) {
+                        uc.putUserData("{AUTOSTART_TOKEN}", signData.get().getAutoStartToken());
+                        uc.putUserData("{REFERENCE_TOKEN}", signData.get().getReferenceToken());
+                    }else{
+                        log.error("Could not start signing process.");
+                        return "message.kontraktpop.error";
+                    }
+                    return "";
+        });
+
+        createMessage("message.kontraktpop.bankid.collect",
+                new MessageBodyBankIdCollect( "{REFERENCE_TOKEN}")
+        );
+
+        createMessage("message.kontraktpop.startBankId",
+                new MessageBodySingleSelect("Vi använder även denna gång BankId för att signera.",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectLink("Starta BankId", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=expo://hedvig", null, false));
                         }}
                 ));
 
@@ -712,7 +754,7 @@ public class OnboardingConversationDevi extends Conversation {
             case "message.fetch.account.complete":
                 SelectItem it = ((MessageBodySingleSelect)m.body).getSelectedItem();
                 userContext.getAutogiroData().setSelecteBankAccount(Integer.parseInt(it.value));
-                nxtMsg = "message.kontraktklar";
+                nxtMsg = "message.kontrakt";
                 break;
 
             case "message.kontrakt":
@@ -819,6 +861,16 @@ public class OnboardingConversationDevi extends Conversation {
     }
 
     public void quoteAccepted() {
-        addToChat(getMessage("message.kontrakt"));
+        addToChat(getMessage("message.medlemjabank"));
+    }
+
+    public void memberSigned(String referenceId) {
+	    Optional<Boolean> singed = userContext.getOnBoardingData().getUserHasSigned();
+
+        if(!singed.isPresent() || singed.get().equals(false)) {
+            addToChat(getMessage("message.kontraktklar"));
+            userContext.getOnBoardingData().setUserHasSigned(true);
+        }
+
     }
 }

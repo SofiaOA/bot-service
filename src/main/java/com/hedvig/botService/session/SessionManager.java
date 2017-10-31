@@ -314,9 +314,25 @@ public class SessionManager {
             this.handleBankAccountRetrievalSuccess(e, (BankAccountRetrievalSuccess)payload);
         }else if(payload.getClass() == BankAccountRetrievalFailed.class) {
             this.handleBankAccountRetrievalFailed(e, (BankAccountRetrievalFailed)payload);
+        }else if(payload.getClass() == MemberSigned.class) {
+            this.handleMemberSingedEvent(e, (MemberSigned)payload);
         }
 
 
+    }
+
+    private void handleMemberSingedEvent(MemberServiceEvent e, MemberSigned payload) {
+        String hid = e.getMemberId().toString();
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+
+        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient);
+            onboardingConversation.memberSigned(payload.getReferenceId());
+        }
+
+        repo.saveAndFlush(mc);
+        userrepo.saveAndFlush(uc);
     }
 
     private void handleBankAccountRetrievalFailed(MemberServiceEvent e, BankAccountRetrievalFailed payload) {
