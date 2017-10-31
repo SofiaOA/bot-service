@@ -9,6 +9,7 @@ import java.util.List;
 public class CalculateQuoteRequest {
 
     private String memberId;
+    private String ssn;
     private String firstName;
     private String lastName;
     private LocalDate birthDate;

@@ -10,6 +10,7 @@ import java.time.LocalDate;
 public class Member {
 
     private final Long memberId;
+    private final String ssn;
 
     private final String firstName;
     private final String lastName;

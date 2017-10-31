@@ -39,7 +39,7 @@ public class HedvigController {
 
         this.sessionManager.quoteAccepted(hid);
 
-    	return ResponseEntity.ok().build();
+    	return ResponseEntity.noContent().build();
     }
 
 }
