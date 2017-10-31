@@ -1,5 +1,6 @@
 package com.hedvig.botService.chat;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -149,7 +150,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.bankidja",
                 new MessageBodySingleSelect("Tackar! Enligt infon jag har fått bor du i en lägenhet på {ADDRESS}. Stämmer det?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Ja", "message.kvadrat"));
+                            add(new SelectOption("Ja", "message.medlemjabank"));
                             add(new SelectOption("Nej", "message.manuellpersonnr"));
                         }}
                 ));
@@ -426,13 +427,13 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.kontrakt",
                 new MessageBodySingleSelect("Tack igen.\n\nOch nu till det stora ögonblicket...\n\nHär har du allt som vi sagt samlat. Läs igenom och skriv på med ditt BankID för att godkänna din nya försäkring",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Visa kontraktet", "message.kontraktpop"));
+                            add(new SelectLink("Visa kontraktet", "message.kontraktpop", "", "", "http://gateway.hedvig.com/insurance/contract/{PRODUCT_ID}", false));
 
                         }}
                 ));
 
         createMessage("message.kontraktpop",
-                new MessageBodySingleSelect("(FÖRSLAG VISAS I POP-UP. I POP-UP FINNS NEDAN ALTERNATIV SOM TAR EN TILLBAKA TILL CHATTEN NÄR EN VALT)",
+                new MessageBodySingleSelect("Vad roligt! Det som återstår för dig att att signera hedvigs allmänna villkor och en fullmakt som ger mig rätten att avsluta din nuvarande försäkring.",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Jag vill skriva på och bli Hedvig-medlem", "message.kontraktklar"));
 
@@ -663,7 +664,8 @@ public class OnboardingConversationDevi extends Conversation {
                     break;
                 }
                 if(m.id.equals("message.missingvalue") || item.value.equals("message.forslag")) {
-                    this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
+                    String productId = this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
+                    onBoardingData.setProductId(productId);
                 }
                 break;
 
@@ -714,7 +716,9 @@ public class OnboardingConversationDevi extends Conversation {
                 break;
 
             case "message.kontrakt":
-                this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
+                String product_id = this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
+                onBoardingData.setProductId(product_id);
+            default:
                 break;
         }
 
@@ -812,5 +816,9 @@ public class OnboardingConversationDevi extends Conversation {
         //Add somethingWentWrong message
         //Add lastMessageAgain
         addToChat(getMessage("message.fetch.accounts.error"));
+    }
+
+    public void quoteAccepted() {
+        addToChat(getMessage("message.start.sign"));
     }
 }
