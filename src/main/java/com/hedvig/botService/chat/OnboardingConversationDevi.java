@@ -554,6 +554,9 @@ public class OnboardingConversationDevi extends Conversation {
         UserData onBoardingData = userContext.getOnBoardingData();
         
         switch (m.id) {
+        	case "message.forslag":
+        		log.info("Showing quote in dashboard...");
+        		return;
 	        case "message.onboardingstart":
 	        	String opt = getValue((MessageBodySingleSelect)m.body);
 	        	log.info("message.onboardingstart redirect to " + opt);
@@ -664,6 +667,7 @@ public class OnboardingConversationDevi extends Conversation {
                     break;
                 }
                 if(m.id.equals("message.missingvalue") || item.value.equals("message.forslag")) {
+                	log.info("Calling product-pricing to create product for user:" + userContext.getMemberId());
                     String productId = this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
                     onBoardingData.setProductId(productId);
                 }
