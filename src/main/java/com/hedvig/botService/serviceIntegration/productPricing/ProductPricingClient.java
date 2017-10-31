@@ -27,6 +27,6 @@ public interface ProductPricingClient {
     ResponseEntity<Created> createQuote(@RequestBody CalculateQuoteRequest req);
 
     @RequestMapping(value = "/insurance/{userId}/quoteAccepted", method = RequestMethod.POST)
-    ResponseEntity<String> quoteAccepted(@PathVariable String userId);
+    ResponseEntity<String> quoteAccepted(@PathVariable("userId") String userId);
 
 }
