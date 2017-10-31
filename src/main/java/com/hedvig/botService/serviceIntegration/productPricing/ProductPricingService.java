@@ -25,6 +25,7 @@ public class ProductPricingService {
         CalculateQuoteRequest request = new CalculateQuoteRequest();
 
         request.setMemberId(memberId);
+        request.setSsn(data.getSSN());
         request.setBirthDate(data.getBirthDate());
         request.setFirstName(data.getFirstName());
         request.setLastName(data.getFamilyName());

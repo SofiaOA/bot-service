@@ -285,6 +285,7 @@ public class SessionManager {
 
         UserData obd = uc.getOnBoardingData();
         obd.setBirthDate(member.getBirthDate());
+        obd.setSSN(member.getSsn());
         obd.setFirstName(member.getFirstName());
         obd.setFamilyName(member.getLastName());
 
@@ -367,6 +368,9 @@ public class SessionManager {
             OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient);
             onboardingConversation.quoteAccepted();
         }
+
+        repo.save(mc);
+        userrepo.save(uc);
 
     }
 

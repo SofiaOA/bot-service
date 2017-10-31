@@ -150,7 +150,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.bankidja",
                 new MessageBodySingleSelect("Tackar! Enligt infon jag har fått bor du i en lägenhet på {ADDRESS}. Stämmer det?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Ja", "message.medlemjabank"));
+                            add(new SelectOption("Ja", "message.kvadrat"));
                             add(new SelectOption("Nej", "message.manuellpersonnr"));
                         }}
                 ));
@@ -285,7 +285,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.forslag",
                 new MessageBodySingleSelect("Okej! Nu har jag allt för att ge dig ditt förslag.\nSka bara räkna lite...\n\nSådärja!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Visa mig", null, "Dashboard", null, null, false  ));
+                            add(new SelectLink("Visa mig", "message.forslag.dashboard", "Dashboard", null, null, false  ));
                         }}
                 ));
 
@@ -427,7 +427,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.kontrakt",
                 new MessageBodySingleSelect("Tack igen.\n\nOch nu till det stora ögonblicket...\n\nHär har du allt som vi sagt samlat. Läs igenom och skriv på med ditt BankID för att godkänna din nya försäkring",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Visa kontraktet", "message.kontraktpop", "", "", "http://gateway.hedvig.com/insurance/contract/{PRODUCT_ID}", false));
+                            add(new SelectLink("Visa kontraktet", "message.kontraktpop", null, null, "http://192.168.1.5:8080/insurance/contract/{PRODUCT_ID}", false));
 
                         }}
                 ));
@@ -823,6 +823,6 @@ public class OnboardingConversationDevi extends Conversation {
     }
 
     public void quoteAccepted() {
-        addToChat(getMessage("message.start.sign"));
+        addToChat(getMessage("message.kontrakt"));
     }
 }

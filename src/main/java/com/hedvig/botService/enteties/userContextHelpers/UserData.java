@@ -125,6 +125,10 @@ public class UserData {
         ctx.putUserData(SSN, text);
     }
 
+    public String getSSN() {
+        return ctx.getDataEntry(SSN);
+    }
+
     public void setCurrentInsurer(String comp) {
         ctx.putUserData(INSURANCE_COMPANY_TODAY, comp);
     }
