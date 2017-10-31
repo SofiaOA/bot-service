@@ -339,6 +339,17 @@ public class SessionManager {
         userrepo.saveAndFlush(uc);
     }
 
+    public void quoteAccepted(String hid) {
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+
+        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient);
+            onboardingConversation.quoteAccepted();
+        }
+
+    }
+
     public void receiveMessage(Message m, String hid) {
         log.info("Recieving messages from user:" + hid);
         log.info(m.toString());

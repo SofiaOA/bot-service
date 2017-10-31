@@ -1,10 +1,15 @@
 package com.hedvig.botService.serviceIntegration.productPricing;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedvig.botService.enteties.userContextHelpers.OnBoardingData;
 import com.hedvig.botService.serviceIntegration.productPricing.dto.Address;
 import com.hedvig.botService.serviceIntegration.productPricing.dto.CalculateQuoteRequest;
+import com.hedvig.botService.serviceIntegration.productPricing.dto.Created;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Component
 public class ProductPricingService {
@@ -17,7 +22,7 @@ public class ProductPricingService {
         this.client = client;
     }
 
-    public void createProduct(String memberId, OnBoardingData data) {
+    public String createProduct(String memberId, OnBoardingData data)  {
 
         CalculateQuoteRequest request = new CalculateQuoteRequest();
 
@@ -38,7 +43,12 @@ public class ProductPricingService {
         address.setZipCode(data.getAddressZipCode());
         request.setAddress(address);
 
-        this.client.createQuote(request);
+        Created result = this.client.createQuote(request).getBody();
+        return result.id;
+    }
+
+    public void quoteAccepted(String hid) {
+        this.client.quoteAccepted(hid);
     }
 
     public void setInsuranceStatus(String hid, String status) {

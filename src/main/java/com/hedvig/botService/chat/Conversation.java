@@ -78,7 +78,9 @@ public abstract class Conversation {
                     if(link.appUrl != null) {
 						link.appUrl = replaceWithContext(link.appUrl);
 					}
-
+					if(link.webUrl != null) {
+                    	link.webUrl = replaceWithContext(link.webUrl);
+					}
                 }
             });
 		}else if(m.body.getClass() == MessageBodyBankIdCollect.class) {

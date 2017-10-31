@@ -26,6 +26,7 @@ public class OnBoardingData {
     public static final String KVM = "{KVM}";
     public static final String SSN = "{SSN}";
     public static final String INSURANCE_COMPANY_TODAY = "{INSURANCE_COMPANY_TODAY}";
+    public static final String PRODUCT_ID = "{PRODUCT_ID}";
     private final UserContext ctx;
     private String address;
 
@@ -162,5 +163,9 @@ public class OnBoardingData {
 
     public String getAddressZipCode() {
         return ctx.getDataEntry(ADDRESS_ZIP);
+    }
+
+    public void setProductId(String productId) {
+        ctx.putUserData(PRODUCT_ID, productId);
     }
 }

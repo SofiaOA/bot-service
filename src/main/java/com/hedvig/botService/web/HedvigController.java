@@ -1,5 +1,6 @@
 package com.hedvig.botService.web;
 
+import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.UpdateTypes;
 
@@ -16,11 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class HedvigController {
 
 	private final SessionManager sessionManager;
-	
+    private final ProductPricingService service;
+
     @Autowired
-    public HedvigController(SessionManager sessions)
+    public HedvigController(SessionManager sessions, ProductPricingService service)
 	{
 		this.sessionManager = sessions;
+        this.service = service;
     }
     
     @PostMapping("initiateUpdate")
@@ -39,8 +42,13 @@ public class HedvigController {
     }
 
     @PostMapping("quoteAccepted")
-    ResponseEntity<String> quoteAccepted(@RequestHeader(value="hedvig.token", required = false) String hid){
-        return ResponseEntity.ok().build();
+    ResponseEntity<String> quoteAccepted(@RequestHeader(value="hedvig.token") String hid){
+
+        service.quoteAccepted(hid);
+
+        this.sessionManager.quoteAccepted(hid);
+
+    	return ResponseEntity.ok().build();
     }
 
 }
