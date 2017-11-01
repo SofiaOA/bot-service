@@ -214,6 +214,10 @@ public class SessionManager {
       	         return m1.globalId < m2.globalId ? -1 : 1;
       	     }
       	});
+    	
+    	Message lastMessage = returnList.get(returnList.size() - 1);
+    	if(lastMessage!=null)recieveEvent("MESSAGE_FETCHED", lastMessage.id, hid);
+    	
         return returnList;
     }
     
