@@ -492,7 +492,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.kontraktklar",
                 new MessageBodySingleSelect(emoji_tada + " Hurra igen! "+ emoji_tada +"\n\nVälkommen, bästa nya medlem!\n\nI din inkorg finns nu en bekräftelse på allt\n\nOm du behöver eller vill något är det bara att chatta med mig i appen när som helst\n\nOch så till sist ett litet tips! Börja utforska appen genom att välja vilken välgörenhetsorganisation du vill stödja " + emoji_revlolving_hearts,
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill utforska", "message.login"));
+                            add(new SelectLink("Jag vill utforska", "onboarding.done", "Dashboard", null, null,  false));
                             add(new SelectOption("Vi hörs, Hedvig!", "message.avslutvalkommen"));
 
                         }}
@@ -501,8 +501,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.avslutvalkommen",
                 new MessageBodySingleSelect("Hej så länge och ännu en gång, varmt välkommen!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill starta om chatten (FUNKTION: OMSTART)", "onboarding.done"));
-
+                            add(new SelectLink("Nu utforskar jag", "onboarding.done", "Dashboard", null, null, false));
                         }}
                 ));
 
