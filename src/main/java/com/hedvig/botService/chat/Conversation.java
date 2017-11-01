@@ -16,7 +16,7 @@ public abstract class Conversation {
         public static final long  HEDVIG_USER_ID = 1; // The id hedvig uses to chat
         private Map<String, SelectItemMessageCallback> callbacks = new TreeMap<>();
         public static enum conversationStatus {INITIATED, ONGOING, COMPLETE}
-        public static enum EventTypes {ANIMATION_COMPLETE, MODAL_CLOSED};
+        public static enum EventTypes {ANIMATION_COMPLETE, MODAL_CLOSED, MESSAGE_FETCHED};
 	private static final String regexPattern = "\\{(.*?)\\}";
 	private static Logger log = LoggerFactory.getLogger(Conversation.class);
 	private String conversationName; // Id for the conversation
@@ -54,7 +54,7 @@ public abstract class Conversation {
 	private ConversationMessage current = null; // Last message sent to client
 	
 	private String replaceWithContext(String input){
-		log.debug("Contextualizing string:" + input);
+		log.info("Contextualizing string:" + input);
 		Pattern pattern = Pattern.compile(regexPattern);
 		Matcher m = pattern.matcher(input);
 		while (m.find()) {
@@ -199,7 +199,7 @@ public abstract class Conversation {
     }
 
     // ------------------------------------------------------------------------------- //
-    
+
 	public abstract void recieveMessage(Message m);
 	public void completeRequest(String nxtMsg) {
 		if(getMessage(nxtMsg)!=null)addToChat(getMessage(nxtMsg));	

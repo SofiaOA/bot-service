@@ -121,7 +121,7 @@ public class MessagesController {
      	log.info("Getting avatars user:" + hid);
         
      	ArrayList<AvatarDTO> avatars = new ArrayList<AvatarDTO>();
-     	AvatarDTO avatar1 = new AvatarDTO("loader", "https://www.lottiefiles.com/storage/datafiles/qm9uaAEoe13l3eQ/data.json",500,500,1000);
+     	AvatarDTO avatar1 = new AvatarDTO("loader", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/hedvig_typing_animation.json",500,500,1000);
      	
      	AvatarDTO avatar2 = new AvatarDTO("h_symbol", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/h_symbol.json",500,500,2000);
      	AvatarDTO avatar3 = new AvatarDTO("family_to_h", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/family_to_h.json",500,500,2000);

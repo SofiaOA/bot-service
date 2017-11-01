@@ -14,5 +14,5 @@ public class MessageBodyParagraph extends MessageBody {
     public MessageBodyParagraph(String content) {
     	super(content);
 	}
-    MessageBodyParagraph(){log.info("Instansiating MessageBodyParagraph");}
+    MessageBodyParagraph(){}
 }

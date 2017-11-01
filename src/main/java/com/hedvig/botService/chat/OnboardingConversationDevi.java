@@ -46,8 +46,11 @@ public class OnboardingConversationDevi extends Conversation {
 
         Image testImage = new Image("http://www.apa.org/Images/insurance-title-image_tcm7-198694.jpg",730,330);
 
-        createMessage("message.onboardingstart",
-                new MessageBodySingleSelect(emoji_smile + " Hej, jag heter Hedvig!\n\fFint att ha dig här\n\fJag är en försäkringsbot så låt mig visa vad jag gör!",
+        createMessage("message.onboardingstart", new MessageBodyParagraph(emoji_smile + " Hej, jag heter Hedvig!"), "h_symbol",4000);
+        createMessage("message.onboardingstart2", new MessageBodyParagraph("Fint att ha dig här"), "h_symbol",4000);
+
+        createMessage("message.onboardingstart3",
+                new MessageBodySingleSelect("Jag är en försäkringsbot så låt mig visa vad jag gör!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ge mig ett försäkringsförslag", "message.forslagstart"));
                             add(new SelectOption("Visa mig", "message.cad"));
@@ -521,6 +524,30 @@ public class OnboardingConversationDevi extends Conversation {
     public void recieveEvent(EventTypes e, String value){
 
 		switch(e){
+		// This is used to let Hedvig say multiple message after another
+		case MESSAGE_FETCHED:
+			log.info("Message fetched:" + value);
+			switch(value){
+				case "message.onboardingstart":
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					completeRequest("message.onboardingstart2");
+					break;
+				case "message.onboardingstart2":
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					completeRequest("message.onboardingstart3");
+					break;
+			}
+			break;		
 		case ANIMATION_COMPLETE:
 			switch(value){
 				case "animation.bike":
@@ -554,10 +581,7 @@ public class OnboardingConversationDevi extends Conversation {
         UserData onBoardingData = userContext.getOnBoardingData();
         
         switch (m.id) {
-        	case "message.forslag":
-        		log.info("Showing quote in dashboard...");
-        		return;
-	        case "message.onboardingstart":
+	        case "message.onboardingstart3":
 	        	String opt = getValue((MessageBodySingleSelect)m.body);
 	        	log.info("message.onboardingstart redirect to " + opt);
 	        	if(opt.equals("message.mockme")){
@@ -667,7 +691,6 @@ public class OnboardingConversationDevi extends Conversation {
                     break;
                 }
                 if(m.id.equals("message.missingvalue") || item.value.equals("message.forslag")) {
-                	log.info("Calling product-pricing to create product for user:" + userContext.getMemberId());
                     String productId = this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
                     onBoardingData.setProductId(productId);
                 }
@@ -825,4 +848,5 @@ public class OnboardingConversationDevi extends Conversation {
     public void quoteAccepted() {
         addToChat(getMessage("message.kontrakt"));
     }
+
 }

@@ -14,5 +14,5 @@ public class MessageBodyNumber extends MessageBody {
     public MessageBodyNumber(String content) {
     	super(content);
 	}
-    MessageBodyNumber(){log.info("Instansiating MessageBodyNumber");}
+    MessageBodyNumber(){}
 }
