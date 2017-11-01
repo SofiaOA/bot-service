@@ -41,7 +41,7 @@ public class OnboardingConversationDevi extends Conversation {
     private String emoji_thumbs_up = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8D}, Charset.forName("UTF-8"));
     private String emoji_hug = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0xA4, (byte)0x97}, Charset.forName("UTF-8"));
 
-    @Value("{hedvig.gateway.url:http://gateway.hedvig.com")
+    @Value("{hedvig.gateway.url:http://gateway.hedvig.com}")
     public String gatewayUrl;
 
     public OnboardingConversationDevi(MemberChat mc, UserContext uc, MemberService memberService, ProductPricingService productPricingClient) {
