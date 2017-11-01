@@ -31,6 +31,7 @@ import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.UserContextRepository;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingClient;
 import com.hedvig.botService.chat.Conversation.EventTypes;
+import org.springframework.beans.factory.annotation.Value;
 
 public class SessionManager {
 
@@ -41,6 +42,9 @@ public class SessionManager {
     private final ProductPricingService productPricingclient;
 
     public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
+
+    @Value("${hedvig.gateway.url:http://gateway.hedvig.com}")
+    public String gatewayUrl;
     
     @Autowired
     public SessionManager(MemberChatRepository repo, UserContextRepository userrepo, MemberService memberService, ProductPricingService client) {
@@ -86,7 +90,7 @@ public class SessionManager {
                     c = new ClaimsConversation(mc, uc);
         			break;
         		case OnboardingConversationDevi:
-                	c = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient);
+                	c = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
         			break;
         		case UpdateInformationConversation:
                     c = new UpdateInformationConversation(mc, uc);                      
@@ -120,7 +124,7 @@ public class SessionManager {
 		/*
 		 * Kick off onboarding conversation
 		 * */
-        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient);
+        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
         startConversation(onboardingConversation, uc);
         
         repo.saveAndFlush(mc);
@@ -154,7 +158,7 @@ public class SessionManager {
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
     	
     	mc.reset(); // Clear chat
-        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient);
+        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
         startConversation(onboardingConversation, uc);
         
     	repo.saveAndFlush(mc);
@@ -302,7 +306,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
             onboardingConversation.bankIdAuthComplete();
         }
 
@@ -318,9 +322,25 @@ public class SessionManager {
             this.handleBankAccountRetrievalSuccess(e, (BankAccountRetrievalSuccess)payload);
         }else if(payload.getClass() == BankAccountRetrievalFailed.class) {
             this.handleBankAccountRetrievalFailed(e, (BankAccountRetrievalFailed)payload);
+        }else if(payload.getClass() == MemberSigned.class) {
+            this.handleMemberSingedEvent(e, (MemberSigned)payload);
         }
 
 
+    }
+
+    private void handleMemberSingedEvent(MemberServiceEvent e, MemberSigned payload) {
+        String hid = e.getMemberId().toString();
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+
+        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
+            onboardingConversation.memberSigned(payload.getReferenceId());
+        }
+
+        repo.saveAndFlush(mc);
+        userrepo.saveAndFlush(uc);
     }
 
     private void handleBankAccountRetrievalFailed(MemberServiceEvent e, BankAccountRetrievalFailed payload) {
@@ -330,7 +350,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
             onboardingConversation.bankAccountRetrieveFailed();
         }
 
@@ -356,7 +376,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
             onboardingConversation.bankAccountRetrieved();
         }
 
@@ -369,7 +389,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
             onboardingConversation.quoteAccepted();
         }
 
@@ -401,7 +421,7 @@ public class SessionManager {
                     c = new ClaimsConversation(mc, uc);
         			break;
         		case OnboardingConversationDevi:
-                	c = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient);
+                	c = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
         			break;
         		case UpdateInformationConversation:
                     c = new UpdateInformationConversation(mc, uc);                      

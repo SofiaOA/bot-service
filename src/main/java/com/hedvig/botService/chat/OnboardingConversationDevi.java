@@ -11,6 +11,7 @@ import java.util.Optional;
 import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
+import com.hedvig.botService.serviceIntegration.BankIdSignResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingClient;
 import com.hedvig.botService.serviceIntegration.MemberService;
 import com.hedvig.botService.serviceIntegration.BankIdAuthResponse;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedvig.botService.enteties.*;
+import org.springframework.beans.factory.annotation.Value;
 
 public class OnboardingConversationDevi extends Conversation {
 
@@ -39,8 +41,11 @@ public class OnboardingConversationDevi extends Conversation {
     private String emoji_thumbs_up = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8D}, Charset.forName("UTF-8"));
     private String emoji_hug = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0xA4, (byte)0x97}, Charset.forName("UTF-8"));
 
-    public OnboardingConversationDevi(MemberChat mc, UserContext uc, MemberService memberService, ProductPricingService productPricingClient) {
+    private String gatewayUrl;
+
+    public OnboardingConversationDevi(MemberChat mc, UserContext uc, MemberService memberService, ProductPricingService productPricingClient, String gatewayUrl) {
         super("onboarding", mc, uc);
+        this.gatewayUrl = gatewayUrl;
         this.memberService = memberService;
         this.productPricingClient = productPricingClient;
 
@@ -92,7 +97,19 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Klart jag har, det är ju ändå 2017", "message.bankid.autostart.send"));
                             add(new SelectOption("Nej det har jag inte", "message.bankid.start.manual"));
                         }}
-                ));
+                ),
+                (__,i) -> {
+                    UserData obd = userContext.getOnBoardingData();
+                    if(i.value.equals("message.bankid.autostart.send"))
+                    {
+                        obd.setBankIdOnDecvie(true);
+                    } else
+                    {
+                        obd.setBankIdOnDecvie(false);
+                    }
+
+                    return "";
+                });
 
         createMessage("message.bankid.start.manual",
                 new MessageBodyNumber("Om du anger ditt personnumer så får du använda bankId på din andra enhet " + emoji_smile
@@ -116,6 +133,9 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.bankid.autostart.respond",
                 new MessageBodyBankIdCollect( "{REFERENCE_TOKEN}")
         );
+
+
+
 
 
         //JAG LOGGAR IN = STARTA BANKID, LOGGA IN, SEN TILLBAKS TILL message.bankidja
@@ -381,11 +401,13 @@ public class OnboardingConversationDevi extends Conversation {
                         }}),
                 (userContext, item) -> {
                     if(item.value.equals("message.fetch.accounts")) {
-                        this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
-                        addToChat(getMessage("message.fetch.accounts.hold"));
+                        String publicId = this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
+                        uc.putUserData("{REFERENCE_TOKEN}", publicId);
 
+                        return "message.fetch.accounts.hold";
                     }
-                    return "";
+
+                    return "message.start.account.retrieval";
                 });
 
         createMessage("message.fetch.accounts.explain",
@@ -398,13 +420,14 @@ public class OnboardingConversationDevi extends Conversation {
                 ),
                 (userContext, item) -> {
                     if(item.value.equals("message.fetch.accounts")) {
-                        this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
-                        addToChat(getMessage("message.fetch.accounts.hold"));
+                        String publicId = this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
+                        uc.putUserData("{REFERENCE_TOKEN}", publicId);
+                        return "message.fetch.accounts.hold";
                     }
-                    return "";
+                    return "message.start.account.retrieval";
                 });
 
-        createMessage("message.fetch.accounts.hold", new MessageBodyText("Väntar på svar ifrån {BANK_FULL} " + emoji_mag));
+        createMessage("message.fetch.accounts.hold", new MessageBodyParagraph("Då väntar vi på svar ifrån {BANK_FULL}, det tar normalt 10-30 sekunder." + emoji_mag),1000);
 
         createMessage("message.fetch.accounts.error",
                 new MessageBodySingleSelect("Nu blev någonting fel, ska vi försöka igen?",
@@ -430,7 +453,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.kontrakt",
                 new MessageBodySingleSelect("Tack igen.\n\nOch nu till det stora ögonblicket...\n\nHär har du allt som vi sagt samlat. Läs igenom och skriv på med ditt BankID för att godkänna din nya försäkring",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Visa kontraktet", "message.kontraktpop", null, null, "http://192.168.1.5:8080/insurance/contract/{PRODUCT_ID}", false));
+                            add(new SelectLink("Visa kontraktet", "message.kontraktpop", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));
 
                         }}
                 ));
@@ -438,8 +461,34 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.kontraktpop",
                 new MessageBodySingleSelect("Vad roligt! Det som återstår för dig att att signera hedvigs allmänna villkor och en fullmakt som ger mig rätten att avsluta din nuvarande försäkring.",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill skriva på och bli Hedvig-medlem", "message.kontraktklar"));
+                            add(new SelectOption("Jag vill skriva på och bli Hedvig-medlem", "message.kontraktpop.startBankId"));
+                        }}
+                ),
+                (__, i) -> {
+                    UserData ud = userContext.getOnBoardingData();
 
+                    Optional<BankIdSignResponse> signData;
+
+                    signData = memberService.sign(ud.getSSN(), "Jag medgiver harom Hedvigs allmanne villkor och giver Hedvig en fullmakt sa att hen kan hantere mine forsakringar.");
+
+                    if(signData.isPresent()) {
+                        uc.putUserData("{AUTOSTART_TOKEN}", signData.get().getAutoStartToken());
+                        uc.putUserData("{REFERENCE_TOKEN}", signData.get().getReferenceToken());
+                    }else{
+                        log.error("Could not start signing process.");
+                        return "message.kontraktpop.error";
+                    }
+                    return "";
+        });
+
+        createMessage("message.kontraktpop.bankid.collect",
+                new MessageBodyBankIdCollect( "{REFERENCE_TOKEN}")
+        );
+
+        createMessage("message.kontraktpop.startBankId",
+                new MessageBodySingleSelect("Vi använder även denna gång BankId för att signera.",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectLink("Starta BankId", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=expo://hedvig", null, false));
                         }}
                 ));
 
@@ -739,7 +788,7 @@ public class OnboardingConversationDevi extends Conversation {
             case "message.fetch.account.complete":
                 SelectItem it = ((MessageBodySingleSelect)m.body).getSelectedItem();
                 userContext.getAutogiroData().setSelecteBankAccount(Integer.parseInt(it.value));
-                nxtMsg = "message.kontraktklar";
+                nxtMsg = "message.kontrakt";
                 break;
 
             case "message.kontrakt":
@@ -845,8 +894,18 @@ public class OnboardingConversationDevi extends Conversation {
         addToChat(getMessage("message.fetch.accounts.error"));
     }
 
+
     public void quoteAccepted() {
-        addToChat(getMessage("message.kontrakt"));
+        addToChat(getMessage("message.medlemjabank"));
     }
 
+    public void memberSigned(String referenceId) {
+	    Optional<Boolean> singed = userContext.getOnBoardingData().getUserHasSigned();
+
+        if(!singed.isPresent() || singed.get().equals(false)) {
+            addToChat(getMessage("message.kontraktklar"));
+            userContext.getOnBoardingData().setUserHasSigned(true);
+        }
+
+    }
 }

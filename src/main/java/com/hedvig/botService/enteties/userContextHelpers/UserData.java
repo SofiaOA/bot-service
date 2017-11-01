@@ -1,12 +1,11 @@
 package com.hedvig.botService.enteties.userContextHelpers;
 
 import com.hedvig.botService.enteties.UserContext;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.apache.zookeeper.Op;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.OptionalInt;
+import java.util.*;
 
 public class UserData {
 
@@ -27,6 +26,8 @@ public class UserData {
     public static final String SSN = "{SSN}";
     public static final String INSURANCE_COMPANY_TODAY = "{INSURANCE_COMPANY_TODAY}";
     public static final String PRODUCT_ID = "{PRODUCT_ID}";
+    public static final String BANK_ID_ON_DEVICE = "{BANK_ID_ON_DEVICE}";
+    public static final String USER_HAS_SIGNED = "{USER_HAS_SIGNED}";
     private final UserContext ctx;
     private String address;
 
@@ -174,5 +175,30 @@ public class UserData {
 
     public void setProductId(String productId) {
         ctx.putUserData(PRODUCT_ID, productId);
+    }
+
+    public void setBankIdOnDecvie(boolean yes) {
+        ctx.putUserData(BANK_ID_ON_DEVICE, Objects.toString(yes));
+    }
+
+    public Optional<Boolean> getBankIdOnDevice() {
+        String yes = ctx.getDataEntry(BANK_ID_ON_DEVICE);
+        if(yes == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(Boolean.parseBoolean(yes));
+    }
+
+    public Optional<Boolean> getUserHasSigned() {
+        String yes = ctx.getDataEntry(USER_HAS_SIGNED);
+        if(yes == null) {
+            return Optional.empty();
+        }
+        return Optional.of(Boolean.parseBoolean(yes));
+    }
+
+    public void setUserHasSigned(boolean b) {
+        ctx.putUserData(USER_HAS_SIGNED, Objects.toString(b));
     }
 }
