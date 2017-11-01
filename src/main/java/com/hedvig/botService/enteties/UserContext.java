@@ -33,7 +33,7 @@ public class UserContext implements Serializable {
 	private static ArrayList<String> requiredData = new ArrayList<String>(){{
 		add("{ADDRESS}");
 		add("{ADDRESS_ZIP}");
-		add("{EMAIL}");
+		//add("{EMAIL}"); Email is not required to get a quote
 		add("{FAMILY_NAME}");
 		add("{HOUSE}");
 		add("{KVM}");
