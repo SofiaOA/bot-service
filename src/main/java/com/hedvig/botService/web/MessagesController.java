@@ -121,13 +121,13 @@ public class MessagesController {
      	log.info("Getting avatars user:" + hid);
         
      	ArrayList<AvatarDTO> avatars = new ArrayList<AvatarDTO>();
-     	AvatarDTO avatar1 = new AvatarDTO("loader", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/hedvig_typing_animation.json",500,500,1000);
+     	AvatarDTO avatar1 = new AvatarDTO("loader", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/hedvig_typing_animation.json",52,78,1000);
      	
-     	AvatarDTO avatar2 = new AvatarDTO("h_symbol", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/h_symbol.json",500,500,2000);
-     	AvatarDTO avatar3 = new AvatarDTO("family_to_h", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/family_to_h.json",500,500,2000);
-     	AvatarDTO avatar4 = new AvatarDTO("h_to_family", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/h_to_family.json",500,500,2000);
-     	AvatarDTO avatar5 = new AvatarDTO("h_to_house", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/h_to_house.json",500,500,2000);
-     	AvatarDTO avatar6 = new AvatarDTO("house_to_h", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/house_to_h.json",500,500,2000);
+     	AvatarDTO avatar2 = new AvatarDTO("h_symbol", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/h_symbol.json",315,90,2000);
+     	AvatarDTO avatar3 = new AvatarDTO("family_to_h", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/family_to_h.json",280,180,2000);
+     	AvatarDTO avatar4 = new AvatarDTO("h_to_family", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/h_to_family.json",280,180,2000);
+     	AvatarDTO avatar5 = new AvatarDTO("h_to_house", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/h_to_house.json",315,90,2000);
+     	AvatarDTO avatar6 = new AvatarDTO("house_to_h", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/house_to_h.json",315,90,2000);
      	
      	avatars.add(avatar1);
      	avatars.add(avatar2);
