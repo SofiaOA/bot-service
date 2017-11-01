@@ -421,7 +421,7 @@ public class OnboardingConversationDevi extends Conversation {
                     return "";
                 });
 
-        createMessage("message.fetch.accounts.hold", new MessageBodyText("Väntar på svar ifrån {BANK_FULL} " + emoji_mag));
+        createMessage("message.fetch.accounts.hold", new MessageBodyParagraph("Då väntar vi på svar ifrån {BANK_FULL}, det tar normalt 10-30 sekunder." + emoji_mag),1000);
 
         createMessage("message.fetch.accounts.error",
                 new MessageBodySingleSelect("Nu blev någonting fel, ska vi försöka igen?",
