@@ -209,6 +209,6 @@ public class UserData {
     }
 
     public void setUserHasAuthWithBankId(boolean b) {
-        ctx.putUserData(USER_AUTHED_BANKID, b);
+        ctx.putUserData(USER_AUTHED_BANKID, Objects.toString(b));
     }
 }
