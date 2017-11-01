@@ -41,11 +41,11 @@ public class OnboardingConversationDevi extends Conversation {
     private String emoji_thumbs_up = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8D}, Charset.forName("UTF-8"));
     private String emoji_hug = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0xA4, (byte)0x97}, Charset.forName("UTF-8"));
 
-    @Value("{hedvig.gateway.url:http://gateway.hedvig.com}")
-    public String gatewayUrl;
+    private String gatewayUrl;
 
-    public OnboardingConversationDevi(MemberChat mc, UserContext uc, MemberService memberService, ProductPricingService productPricingClient) {
+    public OnboardingConversationDevi(MemberChat mc, UserContext uc, MemberService memberService, ProductPricingService productPricingClient, String gatewayUrl) {
         super("onboarding", mc, uc);
+        this.gatewayUrl = gatewayUrl;
         this.memberService = memberService;
         this.productPricingClient = productPricingClient;
 
@@ -398,11 +398,13 @@ public class OnboardingConversationDevi extends Conversation {
                         }}),
                 (userContext, item) -> {
                     if(item.value.equals("message.fetch.accounts")) {
-                        this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
-                        addToChat(getMessage("message.fetch.accounts.hold"));
+                        String publicId = this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
+                        uc.putUserData("{REFERENCE_TOKEN}", publicId);
 
+                        return "message.fetch.accounts.hold";
                     }
-                    return "";
+
+                    return "message.start.account.retrieval";
                 });
 
         createMessage("message.fetch.accounts.explain",
@@ -415,10 +417,11 @@ public class OnboardingConversationDevi extends Conversation {
                 ),
                 (userContext, item) -> {
                     if(item.value.equals("message.fetch.accounts")) {
-                        this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
-                        addToChat(getMessage("message.fetch.accounts.hold"));
+                        String publicId = this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
+                        uc.putUserData("{REFERENCE_TOKEN}", publicId);
+                        return "message.fetch.accounts.hold";
                     }
-                    return "";
+                    return "message.start.account.retrieval";
                 });
 
         createMessage("message.fetch.accounts.hold", new MessageBodyParagraph("Då väntar vi på svar ifrån {BANK_FULL}, det tar normalt 10-30 sekunder." + emoji_mag),1000);
@@ -867,6 +870,7 @@ public class OnboardingConversationDevi extends Conversation {
         //Add lastMessageAgain
         addToChat(getMessage("message.fetch.accounts.error"));
     }
+
 
     public void quoteAccepted() {
         addToChat(getMessage("message.medlemjabank"));

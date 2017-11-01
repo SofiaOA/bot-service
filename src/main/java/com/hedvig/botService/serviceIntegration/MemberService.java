@@ -51,12 +51,19 @@ public class MemberService {
         return Optional.empty();
     }
 
-    public void startBankAccountRetrieval(String memberId, String bankShortId) {
+    public String  startBankAccountRetrieval(String memberId, String bankShortId) {
         String url = "http://" + memberServiceLocation + "/i/member/" + memberId + "/startBankAccountRetrieval/" + bankShortId;
         HttpHeaders headers = new HttpHeaders();
         headers.add("hedvig.token", memberId);
         HttpEntity<String> h = new HttpEntity<>("", headers);
-        ResponseEntity<String> response = template.postForEntity(url, h, String.class);
+        ResponseEntity<Created> response = template.postForEntity(url, h, Created.class);
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException(String.format("Could not start bankaccount retrieval. Respons from memberservice: %s", response.getStatusCode()));
+        }
+
+        return response.getBody().id;
+
     }
 
 
