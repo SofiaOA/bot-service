@@ -289,25 +289,12 @@ public class SessionManager {
     	log.info("Received MemberAuthedEvent {}", e.toString());
         String hid = e.getMemberId().toString();
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
-        Member member = e.getMember();
-
-        UserData obd = uc.getOnBoardingData();
-        obd.setBirthDate(member.getBirthDate());
-        obd.setSSN(member.getSsn());
-        obd.setFirstName(member.getFirstName());
-        obd.setFamilyName(member.getLastName());
-
-    	obd.setEmail(member.getEmail());
-
-    	obd.setAddressStreet(member.getStreet());
-    	obd.setAddressCity(member.getCity());
-    	obd.setAddressZipCode(member.getZipCode());
 
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
             OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
-            onboardingConversation.bankIdAuthComplete();
+            onboardingConversation.bankIdAuthComplete(e);
         }
 
         repo.saveAndFlush(mc);

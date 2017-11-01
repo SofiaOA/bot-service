@@ -16,6 +16,8 @@ import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingCli
 import com.hedvig.botService.serviceIntegration.MemberService;
 import com.hedvig.botService.serviceIntegration.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.web.dto.Member;
+import com.hedvig.botService.web.dto.MemberAuthedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -860,8 +862,29 @@ public class OnboardingConversationDevi extends Conversation {
 			super.completeRequest(nxtMsg);
 	}
 
-	public void bankIdAuthComplete(){
-	    addToChat(getMessage("message.bankidja"));
+	public void bankIdAuthComplete(MemberAuthedEvent e){
+
+	    if(!userContext.getOnBoardingData().userHasAuthedWithBankId()) {
+            Member member = e.getMember();
+
+            UserData obd = userContext.getOnBoardingData();
+            obd.setBirthDate(member.getBirthDate());
+            obd.setSSN(member.getSsn());
+            obd.setFirstName(member.getFirstName());
+            obd.setFamilyName(member.getLastName());
+
+            //obd.setEmail(member.getEmail()); I don't think we will ever get his from bisnode
+
+            obd.setAddressStreet(member.getStreet());
+            obd.setAddressCity(member.getCity());
+            obd.setAddressZipCode(member.getZipCode());
+
+            addToChat(getMessage("message.bankidja"));
+
+            userContext.getOnBoardingData().setUserHasAuthWithBankId(true);
+        }
+
+
     }
 
     public void bankAccountRetrieved() {

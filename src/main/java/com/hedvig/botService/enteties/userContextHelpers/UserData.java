@@ -28,6 +28,7 @@ public class UserData {
     public static final String PRODUCT_ID = "{PRODUCT_ID}";
     public static final String BANK_ID_ON_DEVICE = "{BANK_ID_ON_DEVICE}";
     public static final String USER_HAS_SIGNED = "{USER_HAS_SIGNED}";
+    public static final String USER_AUTHED_BANKID = "USER_AUTHED_BANKID";
     private final UserContext ctx;
     private String address;
 
@@ -200,5 +201,14 @@ public class UserData {
 
     public void setUserHasSigned(boolean b) {
         ctx.putUserData(USER_HAS_SIGNED, Objects.toString(b));
+    }
+
+    public boolean userHasAuthedWithBankId() {
+        String b = ctx.getDataEntry(USER_AUTHED_BANKID);
+        return b != null && Boolean.parseBoolean(b);
+    }
+
+    public void setUserHasAuthWithBankId(boolean b) {
+        ctx.putUserData(USER_AUTHED_BANKID, b);
     }
 }
