@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedvig.botService.enteties.*;
+import org.springframework.beans.factory.annotation.Value;
 
 public class OnboardingConversationDevi extends Conversation {
 
@@ -39,6 +40,9 @@ public class OnboardingConversationDevi extends Conversation {
     private String emoji_tada = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x8E, (byte)0x89}, Charset.forName("UTF-8"));
     private String emoji_thumbs_up = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8D}, Charset.forName("UTF-8"));
     private String emoji_hug = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0xA4, (byte)0x97}, Charset.forName("UTF-8"));
+
+    @Value("{hedvig.gateway.url:http://gateway.hedvig.com")
+    public String gatewayUrl;
 
     public OnboardingConversationDevi(MemberChat mc, UserContext uc, MemberService memberService, ProductPricingService productPricingClient) {
         super("onboarding", mc, uc);
@@ -443,7 +447,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.kontrakt",
                 new MessageBodySingleSelect("Tack igen.\n\nOch nu till det stora ögonblicket...\n\nHär har du allt som vi sagt samlat. Läs igenom och skriv på med ditt BankID för att godkänna din nya försäkring",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Visa kontraktet", "message.kontraktpop", null, null, "http://192.168.1.5:8080/insurance/contract/{PRODUCT_ID}", false));
+                            add(new SelectLink("Visa kontraktet", "message.kontraktpop", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));
 
                         }}
                 ));
