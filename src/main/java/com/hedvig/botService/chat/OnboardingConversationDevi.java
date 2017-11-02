@@ -320,7 +320,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.forslag",
                 new MessageBodySingleSelect("Okej! Nu har jag allt för att ge dig ditt förslag.\nSka bara räkna lite...\n\nSådärja!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Visa mig", "message.forslag.dashboard", "Dashboard", null, null, false  ));
+                            add(new SelectLink("Visa mig", "message.forslag.dashboard", "Offer", null, null, false  ));
                         }}
                 ));
 
