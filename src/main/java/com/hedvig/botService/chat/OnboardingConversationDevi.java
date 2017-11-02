@@ -68,6 +68,12 @@ public class OnboardingConversationDevi extends Conversation {
 
         createMessage("message.audiotest", new MessageBodyAudio("Här kan du testa audio", "/claims/fileupload"), "h_symbol",2000);
         createMessage("message.phototest", new MessageBodyPhotoUpload("Här kan du testa fotouppladdaren", "/asset/fileupload"), "h_symbol",2000);
+        createMessage("message.fileupload.result",
+                new MessageBodySingleSelect("Ok uppladdningen gick bra!",
+                        new ArrayList<SelectItem>() {{
+                        	add(new SelectOption("Hem", "message.onboardingstart"));
+                        }}
+                ), "h_symbol");
         //createMessage("message.mail", new MessageBodyText("Vad är din email?"), "h_symbol",2000);
         
         createMessage("message.cad", new MessageBodyParagraph("Så här, egentligen ska försäkring vara en riktigt bra grej"), "h_symbol",2000);
@@ -81,6 +87,55 @@ public class OnboardingConversationDevi extends Conversation {
                         }}
                 ), "h_symbol");
 
+        createMessage("message.tellme5", new MessageBodyParagraph("Jo, vanligtvis tjänar försäkringsbolag mer ju mindre de betalar ut"), "h_symbol",2000);
+        createMessage("message.tellme6", new MessageBodyParagraph("Det gör inte jag"), "h_symbol",2000);
+        createMessage("message.tellme7", new MessageBodyParagraph("Jag lägger istället pengarna i en medlemspott som endast går till skador"), "h_symbol",2000);
+        createMessage("message.tellme8", new MessageBodyParagraph("Och fokuserar på att betala ut snabbt"), "h_symbol",2000);
+        createMessage("message.tellme9",
+                new MessageBodySingleSelect("Finns några pengar kvar efter att skadorna är betalda ges det till en välgörenhetsrganisation",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Men hur tjänar du pengar då?", "message.tellme10"));
+                        }}
+                ), "h_symbol");       
+ 
+        createMessage("message.tellme10",
+                new MessageBodySingleSelect("Jag tar en fast avgift för att hålla igång allt. Den avgiften är helt separerad från medlemspotten",
+                        new ArrayList<SelectItem>() {{
+                        	add(new SelectOption("Ok, ge mig ett försäkringsförslag", "message.forslagstart"));
+                            add(new SelectOption("Vad är poängen med att göra saker så här?", "message.tellme11"));
+                        }}
+                ), "h_symbol");             
+        
+        createMessage("message.tellme11", new MessageBodyParagraph("Att du ska vara säker på att jag alltid är schysst mot dig!"), "h_symbol",2000);
+        createMessage("message.tellme12", new MessageBodyParagraph("Eftersom jag bara tar en fast avgift vet du att jag inte kommer försöka krångla med dig för att tjäna mer pengar"), "h_symbol",2000);
+        createMessage("message.tellme13",
+                new MessageBodySingleSelect("Så mitt enda mål är att göra saker supersmidigt för dig",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Hm, hur smidigt är supersmidigt?", "message.tellme14"));
+                        }}
+                ), "h_symbol");          
+
+        createMessage("message.tellme14", new MessageBodyParagraph("Du göra det mesta direkt digitalt genom att chatta med mig"), "h_symbol",2000);
+        createMessage("message.tellme15", new MessageBodyParagraph("Från att skaffa en skräddarsydd hemförsäkring"), "h_symbol",2000);
+        createMessage("message.tellme16", new MessageBodyParagraph("Till att rapportera om något hänt och få ersättning"), "h_symbol",2000);
+        createMessage("message.tellme17", new MessageBodyParagraph("Jag är ju en bot, så jag finns i din mobil eller dator 24/7"), "h_symbol",2000);
+        createMessage("message.tellme18",
+                new MessageBodySingleSelect("Du kan också låta mig hålla koll på dina finaste saker och kvitton, i en prylbank",
+                        new ArrayList<SelectItem>() {{
+                        	add(new SelectOption("Kör på, skräddarsy mitt försäkringsförslag", "message.forslagstart"));
+                            add(new SelectOption("Men är det här tryggt?", "message.tellme19"));
+                        }}
+                ), "h_symbol"); 
+        
+        createMessage("message.tellme19", new MessageBodyParagraph("Jag samarbetar med ett av de största försäkringsbolagen i världen"), "h_symbol",2000);
+        createMessage("message.tellme20", new MessageBodyParagraph("De tryggar mig, så att jag kan betala ut ersättning till dig vad som än händer"), "h_symbol",2000);
+        createMessage("message.tellme21",
+                new MessageBodySingleSelect("Men nog om mig nu! Dags att lära känna dig",
+                        new ArrayList<SelectItem>() {{
+                        	add(new SelectOption("Helt rätt prio! Ge mig ett försäkringsförslag", "message.forslagstart"));
+                        }}
+                ), "h_symbol");         
+        
         createMessage("message.mockme", new MessageBodyText("Ok! Klart"+ emoji_hand_ok + " du heter nu {NAME} och bor på {ADDRESS} i en {HOUSE}.\n\f Vilket meddelande vill du gå till?"));
 
         createMessage("message.medlem",
@@ -103,7 +158,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.lagenhet",
                 new MessageBodySingleSelect("Toppen! Har du BankID? I så fall kan vi hoppa över några frågor!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=expo://hedvig",  null, false));
+                            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://",  null, false));
                             add(new SelectOption("Jag har inte BankID", "message.manuellpersonnr"));
                         }}
                 ), "h_symbol",
@@ -137,7 +192,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.bankid.autostart.send",
                 new MessageBodySingleSelect("Ja det är faktiskt 2017 i hela " + (LocalDate.now().lengthOfYear() - LocalDate.now().getDayOfYear()) + " dagar till!" + emoji_postal_horn,
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=expo://hedvig",  null, false));
+                            add(new SelectLink("Logga in", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://",  null, false));
                         }}));
 
         createMessage("message.bankid.autostart.respond",
@@ -426,7 +481,7 @@ public class OnboardingConversationDevi extends Conversation {
                 new MessageBodySingleSelect("Då behöver vi välja det konto som pengarna ska dras ifrån. Om du har ditt BankId redo så ska jag fråga mina vänner på {BANK_FULL} om dina konotnummer.",
                         new ArrayList<SelectItem>(){{
                             //add(new SelectOption("Jag är redo!", "message.fetch.accounts"));
-                            add(new SelectLink("Öppna BankId", "message.fetch.accounts", null, "bankid:///?redirect=expo://hedvig", null, false));
+                            add(new SelectLink("Öppna BankId", "message.fetch.accounts", null, "bankid:///?redirect=hedvig://", null, false));
                             add(new SelectOption("Varför ska jag göra detta?", "message.fetch.accounts.explain"));
                         }}),
                 (userContext, item) -> {
@@ -445,7 +500,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.fetch.accounts.explain",
                 new MessageBodySingleSelect("Jag vet inte vilka bankkonton du har, men om du loggar in med BankID kan jag hämta informationen från din bank så att du kan välja konto i en lista",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in med BankId", "message.fetch.accounts", null, "bankid:///?redirect=expo://hedvig", null, false));
+                            add(new SelectLink("Logga in med BankId", "message.fetch.accounts", null, "bankid:///?redirect=hedvig://", null, false));
                         }}
                 ),
                 (userContext, item) -> {
@@ -520,7 +575,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.kontraktpop.startBankId",
                 new MessageBodySingleSelect("Hoppas allt kändes bra! Då återstår bara signeringen",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Signera", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=expo://hedvig", null, false));
+                            add(new SelectLink("Signera", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://", null, false));
                         }}
                 ));
 
@@ -650,6 +705,19 @@ public class OnboardingConversationDevi extends Conversation {
                     case "message.kontraktklar2": completeRequest("message.kontraktklar3"); break;
                     case "message.kontraktklar3": completeRequest("message.kontraktklar4"); break;
                     case "message.fetch.accounts.explain": completeRequest("message.fetch.accounts.explain2"); break;
+                    case "message.tellme5": completeRequest("message.tellme6"); break;
+                    case "message.tellme6": completeRequest("message.tellme7"); break;
+                    case "message.tellme7": completeRequest("message.tellme8"); break;
+                    case "message.tellme8": completeRequest("message.tellme9"); break;
+                    case "message.tellme11": completeRequest("message.tellme12"); break;
+                    case "message.tellme12": completeRequest("message.tellme13"); break;
+                    case "message.tellme14": completeRequest("message.tellme15"); break;
+                    case "message.tellme15": completeRequest("message.tellme16"); break;
+                    case "message.tellme16": completeRequest("message.tellme17"); break;
+                    case "message.tellme17": completeRequest("message.tellme18"); break;
+                    case "message.tellme19": completeRequest("message.tellme20"); break;
+                    case "message.tellme20": completeRequest("message.tellme21"); break;
+
                 }
                 break;
             case ANIMATION_COMPLETE:
@@ -697,6 +765,10 @@ public class OnboardingConversationDevi extends Conversation {
                     addToChat(m);
                 }
                 break;
+            case "message.audiotest":
+            case "message.phototest":
+            	nxtMsg = "message.fileupload.result";
+            	break;
             case "message.forslagstart":
                 onBoardingData.setHouseType(((MessageBodySingleSelect)m.body).getSelectedItem().value);
                 break;
@@ -810,7 +882,7 @@ public class OnboardingConversationDevi extends Conversation {
                 nxtMsg = "message.bytesinfo";
                 break;
 
-            case "message.bankid.start":
+            case "message.forslagstart3":
                 String selectedValue = getValue((MessageBodySingleSelect)m.body);
 
                 if(selectedValue.equals("message.bankid.autostart.send")) {
