@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.hedvig.botService.dataTypes.*;
 import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
@@ -19,11 +20,6 @@ import com.hedvig.botService.web.dto.MemberAuthedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hedvig.botService.dataTypes.EmailAdress;
-import com.hedvig.botService.dataTypes.HouseholdMemberNumber;
-import com.hedvig.botService.dataTypes.LivingSpaceSquareMeters;
-import com.hedvig.botService.dataTypes.SSNSweden;
-import com.hedvig.botService.dataTypes.ZipCodeSweden;
 import com.hedvig.botService.enteties.*;
 
 public class OnboardingConversationDevi extends Conversation {

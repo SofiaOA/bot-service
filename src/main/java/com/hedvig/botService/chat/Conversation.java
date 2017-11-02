@@ -220,7 +220,7 @@ public abstract class Conversation {
     	
     	Message mCorr = getMessage(m.id);
     	
-    	if(mCorr.expectedType!=null){
+    	if(mCorr != null && mCorr.expectedType!=null){
     		boolean ok = mCorr.expectedType.validate(m.body.text);
     		if(!ok)mCorr.body.text = mCorr.expectedType.getErrorMessage();
     		addToChat(m);
