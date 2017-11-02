@@ -173,7 +173,7 @@ public class MessagesController {
     }
     
     @PostMapping(path = "/chat/edit")
-    public ResponseEntity<?> editChat(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
+    public ResponseEntity<?> editChat(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Edit chat for user:" + hid);
         sessionManager.editHistory(hid);

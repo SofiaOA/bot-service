@@ -55,7 +55,7 @@ public class OnboardingConversationDevi extends Conversation {
 
         createMessage("message.onboardingstart", new MessageBodyParagraph("Hej, jag heter Hedvig!" + emoji_waving_hand), "h_symbol",2000);
         createMessage("message.onboardingstart2", new MessageBodyParagraph("Fint att ha dig här"), "h_symbol",2000);
-        createMessage("message.onboardingstart3", new MessageBodyParagraph ("Jag är en försäkringsbot som hjälper dig när jobbiga saker händer"));
+        createMessage("message.onboardingstart3", new MessageBodyParagraph ("Jag är en försäkringsbot som hjälper dig när jobbiga saker händer"), "h_symbol",2000);
         createMessage("message.onboardingstart.final",
                 new MessageBodySingleSelect("Ska jag berätta hur det funkar?",
                         new ArrayList<SelectItem>() {{
@@ -63,10 +63,13 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Ge mig ett försäkringsförslag istället", "message.forslagstart"));
                             add(new SelectOption("Jag är redan medlem", "message.bankid.start"));
                             add(new SelectOption("[Debug:mock my data]", "message.mockme"));
-                            //add(new SelectOption("[Debug:ange email]", "message.mail"));
+                            add(new SelectOption("[Debug:audio test]", "message.audiotest"));
+                            add(new SelectOption("[Debug:photo test]", "message.phototest"));
                         }}
                 ), "h_symbol");
 
+        createMessage("message.audiotest", new MessageBodyAudio("Här kan du testa audio", "/claims/fileupload"), "h_symbol",2000);
+        createMessage("message.phototest", new MessageBodyPhotoUpload("Här kan du testa fotouppladdaren", "/asset/fileupload"), "h_symbol",2000);
         //createMessage("message.mail", new MessageBodyText("Vad är din email?"), "h_symbol",2000);
         
         createMessage("message.cad", new MessageBodyParagraph("Så här, egentligen ska försäkring vara en riktigt bra grej"), "h_symbol",2000);
