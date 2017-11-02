@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedvig.botService.dataTypes.EmailAdress;
+import com.hedvig.botService.dataTypes.HouseholdMemberNumber;
 import com.hedvig.botService.enteties.*;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -92,7 +93,7 @@ public class OnboardingConversationDevi extends Conversation {
                         }}
                 ));
 
-        createMessage("message.forslagstart1", new MessageBodyParagraph(emoji_hand_ok), "h_symbol",2000);
+        createMessage("message.forslagstart", new MessageBodyParagraph(emoji_hand_ok), "h_symbol",2000);
         createMessage("message.forslagstart2", new MessageBodyParagraph("Då sätter vi igång"), "h_symbol",2000);
         createMessage("message.forslagstart3",
                 new MessageBodySingleSelect("Bor du i lägenhet eller i hus?",
@@ -154,7 +155,7 @@ public class OnboardingConversationDevi extends Conversation {
 
         // House dead-end:::
 
-        createMessage("message.hus1", new MessageBodyParagraph("Åh, typiskt! Just nu är det lägenheter jag kan försäkra"), "h_symbol",2000);
+        createMessage("message.hus", new MessageBodyParagraph("Åh, typiskt! Just nu är det lägenheter jag kan försäkra"), "h_symbol",2000);
         createMessage("message.hus2", new MessageBodyParagraph("Men jag hör gärna av mig till dig så fort jag har viktiga nyheter"), "h_symbol",2000);
         createMessage("message.hus3",
                 new MessageBodySingleSelect("Jag skickar ingen spam. Lovar!",
@@ -250,7 +251,7 @@ public class OnboardingConversationDevi extends Conversation {
 
                         }}
                 ));
-
+        setExpectedReturnType("message.pers", new HouseholdMemberNumber());
 //(FUNKTION: FYLL I ANTAL PERS) = SCROLL KANSKE? 1-6+ ALT. FLERVALSALTERNATIVBOXAR ELLER DEN DÄR DRA-I-SKALOR-EW-DESIGNLÖSNINGEN
 
         createMessage("message.sakerhet",
@@ -442,12 +443,12 @@ public class OnboardingConversationDevi extends Conversation {
                     return "message.start.account.retrieval";
                 });
 
+        createMessage("message.fetch.accounts.explain", new MessageBodyParagraph("Jag använder autogiro för att göra betalningar smidiga. För att kunna aktivera autogiro behöver du välja vilket av dina bankkonton betalningen ska dras ifrån"), "h_symbol",2000);;
+
         createMessage("message.fetch.accounts.explain",
-                new MessageBodySingleSelect("Hedvig använder autogiro för att hantera betalningar.\n För att lägga upp en autogirobetalning behöver vi veta vilket konto pegnarna ska dras ifrån.\n" +
-                        "För att du på ett enkelt sätt ska kunna välja rätt konto kontaktar vi din bank för att hämta dina kontouppgifter.\n" +
-                        "Uppgifterna används bara under registreringen av autogiro.\nNär jag hämtar dina kontouppgifter behöver du använda bankId och autensitera dig mot din bank.",
+                new MessageBodySingleSelect("Jag vet inte vilka bankkonton du har, men om du loggar in med BankID kan jag hämta informationen från din bank så att du kan välja konto i en lista",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Öppna BankId", "message.fetch.accounts", null, "bankid:///?redirect=expo://hedvig", null, false));
+                            add(new SelectLink("Logga in med BankId", "message.fetch.accounts", null, "bankid:///?redirect=expo://hedvig", null, false));
                         }}
                 ),
                 (userContext, item) -> {
@@ -484,7 +485,7 @@ public class OnboardingConversationDevi extends Conversation {
         setExpectedReturnType("message.mail", new EmailAdress());
         
         createMessage("message.kontrakt",
-                new MessageBodySingleSelect("Tack igen.\n\nOch nu till det stora ögonblicket...\n\nHär har du allt som vi sagt samlat. Läs igenom och skriv på med ditt BankID för att godkänna din nya försäkring",
+                new MessageBodySingleSelect("ack igen! Och nu till det stora ögonblicket. Här har du allt som vi sagt samlat. Läs igenom och skriv på med ditt BankID för att godkänna din nya försäkring",
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Visa kontraktet", "message.kontraktpop", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));
 
@@ -492,8 +493,9 @@ public class OnboardingConversationDevi extends Conversation {
                 ));
 
         createMessage("message.kontraktpop",
-                new MessageBodySingleSelect("Vad roligt! Det som återstår för dig att att signera hedvigs allmänna villkor och en fullmakt som ger mig rätten att avsluta din nuvarande försäkring.",
+                new MessageBodySingleSelect("Då är du snart Hedvig-medlem! Nu behöver du bara signera de allmänna villkoren och en fullmakt som ger Hedvig lov att hantera dina försäkringar!",
                         new ArrayList<SelectItem>() {{
+                        	add(new SelectLink("Läs igenom", "message.kontraktpopread", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));
                             add(new SelectOption("Jag vill skriva på och bli Hedvig-medlem", "message.kontraktpop.startBankId"));
                         }}
                 ),
@@ -519,13 +521,25 @@ public class OnboardingConversationDevi extends Conversation {
         );
 
         createMessage("message.kontraktpop.startBankId",
-                new MessageBodySingleSelect("Vi använder även denna gång BankId för att signera.",
+                new MessageBodySingleSelect("Hoppas allt kändes bra! Då återstår bara signeringen",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Starta BankId", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=expo://hedvig", null, false));
+                            add(new SelectLink("Signera", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=expo://hedvig", null, false));
                         }}
                 ));
 
-        createMessage("message.kontraktklar",
+        createMessage("message.kontraktklar", new MessageBodyParagraph("emoji_tada + \" Hurra! \"+ emoji_tada "), "h_symbol",2000);
+        createMessage("message.kontraktklar2", new MessageBodyParagraph("Välkommen, bästa nya medlem"), "h_symbol",2000);
+        createMessage("message.kontraktklar3", new MessageBodyText("Jag skickar en bekräftelse till din mejl! Vad har du för mejladress?"), "h_symbol", 2000);
+
+
+        createMessage("message.kontraktklar4",
+            new MessageBodySingleSelect("Välkommen in i appen! Ett tips är att börja med att välja vilken välgörenhetsorganisation du vill att din del av överskottet ska gå till" + emoji_revlolving_hearts,
+                    new ArrayList<SelectItem>() {{
+                        add(new SelectLink("Utforska appen", "onboarding.done", "Dashboard", null, null,  false));
+                    }}
+            ), "h_symbol", 2000);
+        
+        createMessage("message.kontraktklar_old",
                 new MessageBodySingleSelect(emoji_tada + " Hurra igen! "+ emoji_tada +"\n\nVälkommen, bästa nya medlem!\n\nI din inkorg finns nu en bekräftelse på allt\n\nOm du behöver eller vill något är det bara att chatta med mig i appen när som helst\n\nOch så till sist ett litet tips! Börja utforska appen genom att välja vilken välgörenhetsorganisation du vill stödja " + emoji_revlolving_hearts,
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Jag vill utforska", "onboarding.done", "Dashboard", null, null,  false));
@@ -563,7 +577,7 @@ public class OnboardingConversationDevi extends Conversation {
 
         createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
     }
-
+    
     public void init() {
         log.info("Starting onboarding conversation");
         startConversation("message.onboardingstart"); // Id of first message
@@ -627,6 +641,18 @@ public class OnboardingConversationDevi extends Conversation {
                     case "message.cad": completeRequest("message.cad2"); break;
                     case "message.cad2": completeRequest("message.cad3"); break;
                     case "message.cad3": completeRequest("message.cad4"); break;
+                    case "message.forslagstart": completeRequest("message.forslagstart2"); break;
+                    case "message.forslagstart2": completeRequest("message.forslagstart3"); break;
+                    case "message.hus": completeRequest("message.hus2"); break;
+                    case "message.hus2": completeRequest("message.hus3"); break;
+                    case "message.bytesinfo3": completeRequest("message.bytesinfo4"); break;
+                    case "message.bytesinfo4": completeRequest("message.bytesinfo5"); break;
+                    case "message.bytesinfo5": completeRequest("message.bytesinfo6"); break;
+                    case "message.forslag": completeRequest("message.forslag2"); break;
+                    case "message.kontraktklar": completeRequest("message.kontraktklar2"); break;
+                    case "message.kontraktklar2": completeRequest("message.kontraktklar3"); break;
+                    case "message.kontraktklar3": completeRequest("message.kontraktklar4"); break;
+                    case "message.fetch.accounts.explain": completeRequest("message.fetch.accounts.explain2"); break;
                 }
                 break;
             case ANIMATION_COMPLETE:
