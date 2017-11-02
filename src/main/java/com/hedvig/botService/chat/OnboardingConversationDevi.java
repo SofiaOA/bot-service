@@ -162,18 +162,18 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Jag har inte BankID", "message.manuellpersonnr"));
                         }}
                 ), "h_symbol",
-	        (__,i) -> {
-	            UserData obd = userContext.getOnBoardingData();
-	            if(i.value.equals("message.bankid.autostart.send"))
-	            {
-	                obd.setBankIdOnDecvie(true);
-	            } else
-	            {
-	                obd.setBankIdOnDecvie(false);
-	            }
-	
-	            return "";
-	        }
+                (__,i) -> {
+                    UserData obd = userContext.getOnBoardingData();
+                    if(i.value.equals("message.bankid.autostart.respond"))
+                    {
+                        obd.setBankIdOnDecvie(true);
+                    } else
+                    {
+                        obd.setBankIdOnDecvie(false);
+                    }
+
+                    return "";
+                }
         );
 
         createMessage("message.bankid.start.manual",
@@ -188,12 +188,6 @@ public class OnboardingConversationDevi extends Conversation {
                             //add(new SelectOption("Hoppa över", "message.bankidja"));
                         }}
                 ));
-
-        createMessage("message.bankid.autostart.send",
-                new MessageBodySingleSelect("Ja det är faktiskt 2017 i hela " + (LocalDate.now().lengthOfYear() - LocalDate.now().getDayOfYear()) + " dagar till!" + emoji_postal_horn,
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://",  null, false));
-                        }}));
 
         createMessage("message.bankid.autostart.respond",
                 new MessageBodyBankIdCollect( "{REFERENCE_TOKEN}")
@@ -885,7 +879,7 @@ public class OnboardingConversationDevi extends Conversation {
             case "message.forslagstart3":
                 String selectedValue = getValue((MessageBodySingleSelect)m.body);
 
-                if(selectedValue.equals("message.bankid.autostart.send")) {
+                if(selectedValue.equals("message.lagenhet")) {
 
                     Optional<BankIdAuthResponse> authResponse = memberService.auth();
 
@@ -906,11 +900,6 @@ public class OnboardingConversationDevi extends Conversation {
                     nxtMsg = "message.bankid.autostart.respond";
                 }
 
-                addToChat(m);
-                break;
-
-            case "message.bankid.autostart.send":
-                //selectedValue = getSelectedSingleValue(m);
                 addToChat(m);
                 break;
 
@@ -969,9 +958,6 @@ public class OnboardingConversationDevi extends Conversation {
                 userContext.completeConversation(this.getClass().getName());
                 //userContext.onboardingComplete(true);
                 break;
-            case "message.bankid.device.start":
-                //BankIdAuthResponse  authResponse = this.memberService.auth();
-                nxtMsg = "message.bankid.autostart.send";
             case "":
                 log.info("Unknown message recieved...");
                 nxtMsg = "error";
