@@ -6,6 +6,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.hedvig.botService.dataTypes.HedvigDataType;
 import com.hedvig.botService.enteties.*;
 
 import org.slf4j.Logger;
@@ -138,6 +139,13 @@ public abstract class Conversation {
 		createMessage(id,header,body,delay);		
 	}
 	
+	void createMessage(String id, MessageBody body, String avatarName, SelectItemMessageCallback callback){
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		header.avatarName = avatarName;
+		this.setMessageCallback(id, callback);
+		createMessage(id,header,body);		
+	}
+	
 	void createMessage(String id, MessageBody body, Image image, Integer delay){
 		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
 		body.imageURL = image.imageURL;
@@ -198,6 +206,30 @@ public abstract class Conversation {
 		return selectedOptions;
     }
 
+    public void setExpectedReturnType(String messageId, HedvigDataType type){
+    	if(getMessage(messageId)!=null){
+    		log.info("Setting the expected return typ for message:" + messageId + " to " + type.getClass().getName());
+    		getMessage(messageId).expectedType = type;
+    	}else{
+    		log.error("Message not found:" + messageId);
+    	}
+    }
+    
+    // If the message has a preferred return type it is validated otherwise not
+    public boolean validateReturnType(Message m){
+    	
+    	Message mCorr = getMessage(m.id);
+    	
+    	if(mCorr.expectedType!=null){
+    		boolean ok = mCorr.expectedType.validate(m.body.text);
+    		if(!ok)mCorr.body.text = mCorr.expectedType.getErrorMessage();
+    		addToChat(m);
+    		addToChat(mCorr);
+    		return ok;
+    	}
+    	return true;
+    }
+    
     // ------------------------------------------------------------------------------- //
 
 	public abstract void recieveMessage(Message m);

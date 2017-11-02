@@ -16,14 +16,15 @@ import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingCli
 import com.hedvig.botService.serviceIntegration.MemberService;
 import com.hedvig.botService.serviceIntegration.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.web.dto.Member;
+import com.hedvig.botService.web.dto.MemberAuthedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hedvig.botService.dataTypes.EmailAdress;
 import com.hedvig.botService.enteties.*;
 import org.springframework.beans.factory.annotation.Value;
 
-public class OnboardingConversationDevi extends Conversation {
+public class OnboardingConversationDevi_old extends Conversation {
 
     private static Logger log = LoggerFactory.getLogger(OnboardingConversation.class);
     private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -45,7 +46,7 @@ public class OnboardingConversationDevi extends Conversation {
 
     private String gatewayUrl;
 
-    public OnboardingConversationDevi(MemberChat mc, UserContext uc, MemberService memberService, ProductPricingService productPricingClient, String gatewayUrl) {
+    public OnboardingConversationDevi_old(MemberChat mc, UserContext uc, MemberService memberService, ProductPricingService productPricingClient, String gatewayUrl) {
         super("onboarding", mc, uc);
         this.gatewayUrl = gatewayUrl;
         this.memberService = memberService;
@@ -53,80 +54,82 @@ public class OnboardingConversationDevi extends Conversation {
 
         Image testImage = new Image("http://www.apa.org/Images/insurance-title-image_tcm7-198694.jpg",730,330);
 
-        createMessage("message.onboardingstart", new MessageBodyParagraph("Hej, jag heter Hedvig!" + emoji_waving_hand), "h_symbol",2000);
+        createMessage("message.onboardingstart", new MessageBodyParagraph(emoji_smile + " Hej, jag heter Hedvig!"), "h_symbol",2000);
         createMessage("message.onboardingstart2", new MessageBodyParagraph("Fint att ha dig här"), "h_symbol",2000);
-        createMessage("message.onboardingstart3", new MessageBodyParagraph ("Jag är en försäkringsbot som hjälper dig när jobbiga saker händer"));
-        createMessage("message.onboardingstart.final",
-                new MessageBodySingleSelect("Ska jag berätta hur det funkar?",
+        createMessage("message.onboardingstart3",
+                new MessageBodySingleSelect("Jag är en försäkringsbot så låt mig visa vad jag gör!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Berätta!", "message.cad"));
-                            add(new SelectOption("Ge mig ett försäkringsförslag istället", "message.forslagstart"));
+                            add(new SelectOption("Ge mig ett försäkringsförslag", "message.forslagstart"));
+                            add(new SelectOption("Visa mig", "message.cad"));
                             add(new SelectOption("Jag är redan medlem", "message.bankid.start"));
                             add(new SelectOption("[Debug:mock my data]", "message.mockme"));
-                            //add(new SelectOption("[Debug:ange email]", "message.mail"));
                         }}
                 ), "h_symbol");
 
-        //createMessage("message.mail", new MessageBodyText("Vad är din email?"), "h_symbol",2000);
-        
-        createMessage("message.cad", new MessageBodyParagraph("Så här, egentligen ska försäkring vara en riktigt bra grej"), "h_symbol",2000);
+        createMessage("message.cad", new MessageBodyParagraph("Så här, egentligen ska försäkring vara en riktigt bra grej"), "h_symbol",2000);		
         createMessage("message.cad2", new MessageBodyParagraph("När något går snett, får du hjälp"), "h_symbol",2000);
         createMessage("message.cad3", new MessageBodyParagraph("Men många tycker det är krångligt"), "h_symbol",2000);
-
+        
         createMessage("message.cad4",
                 new MessageBodySingleSelect("Därför har jag ändrat på hur försäkring funkar, så det blir lättare när det är svårt, inte tvärtom",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Hur då?", "message.tellme5"));
                         }}
                 ), "h_symbol");
-
-        createMessage("message.mockme", new MessageBodyText("Ok! Klart"+ emoji_hand_ok + " du heter nu {NAME} och bor på {ADDRESS} i en {HOUSE}.\n\f Vilket meddelande vill du gå till?"));
-
+        
+        createMessage("message.mockme", new MessageBodyText(
+        		"Ok! Klart"+ emoji_hand_ok + " du heter nu {NAME} och bor på {ADDRESS} i en {HOUSE}.\n\f Vilket meddelande vill du gå till?"));
+        
         createMessage("message.medlem",
-                new MessageBodySingleSelect("Välkommen tillbaka "+ emoji_hug +"\n\n Logga in med BankID så är du inne i appen igen",
+                new MessageBodySingleSelect("Välkommen tillbaka "+ emoji_hug +"\n\n Ett snabbt BankID-inlogg bara, sen är du inne i appen igen",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Logga in", "message.bankidja"));
                         }}
                 ));
 
-        createMessage("message.forslagstart1", new MessageBodyParagraph(emoji_hand_ok), "h_symbol",2000);
-        createMessage("message.forslagstart2", new MessageBodyParagraph("Då sätter vi igång"), "h_symbol",2000);
-        createMessage("message.forslagstart3",
-                new MessageBodySingleSelect("Bor du i lägenhet eller i hus?",
+        createMessage("message.forslagstart",
+                new MessageBodySingleSelect(emoji_hand_ok + "\n\nDå sätter vi igång\n\nAllt du svarar är så klart i säkert förvar hos mig "+emoji_closed_lock_with_key+"\n\nBor du i lägenhet eller eget hus?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Lägenhet", "message.lagenhet"));
-                            add(new SelectOption("Hus", "message.hus"));
+                            add(new SelectOption("Eget hus", "message.hus"));
                         }}
                 ), "h_to_house");
 
         createMessage("message.lagenhet",
-                new MessageBodySingleSelect("Toppen! Har du BankID? I så fall kan vi hoppa över några frågor!",
+                new MessageBodySingleSelect("Toppen\n\nLogga in med ditt BankID så kan vi snabbspola fram några frågor!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=expo://hedvig",  null, false));
-                            add(new SelectOption("Jag har inte BankID", "message.manuellpersonnr"));
+                            add(new SelectOption("Jag loggar in", "message.bankid.start"));
+                            add(new SelectOption("Jag har inget BankID", "message.manuellpersonnr"));
                         }}
-                ), "h_symbol",
-	        (__,i) -> {
-	            UserData obd = userContext.getOnBoardingData();
-	            if(i.value.equals("message.bankid.autostart.send"))
-	            {
-	                obd.setBankIdOnDecvie(true);
-	            } else
-	            {
-	                obd.setBankIdOnDecvie(false);
-	            }
-	
-	            return "";
-	        }
-        );
+                ), "house_to_h");
+
+        createMessage("message.bankid.start",
+                new MessageBodySingleSelect("Då måste jag fråga ifall du har bankID på den enheten du använder nu?",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Klart jag har, det är ju ändå 2017", "message.bankid.autostart.send"));
+                            add(new SelectOption("Nej det har jag inte", "message.bankid.start.manual"));
+                        }}
+                ),
+                (__,i) -> {
+                    UserData obd = userContext.getOnBoardingData();
+                    if(i.value.equals("message.bankid.autostart.send"))
+                    {
+                        obd.setBankIdOnDecvie(true);
+                    } else
+                    {
+                        obd.setBankIdOnDecvie(false);
+                    }
+
+                    return "";
+                });
 
         createMessage("message.bankid.start.manual",
-                new MessageBodyNumber("Om du anger ditt personnumer så får du använda bankId på din andra enhet" + emoji_smile
+                new MessageBodyNumber("Om du anger ditt personnumer så får du använda bankId på din andra enhet " + emoji_smile
                 ));
 
 
         createMessage("message.bankid.error",
-                new MessageBodySingleSelect("Något gick fel när jag försökte kontakta BankId",
+                new MessageBodySingleSelect("Något blev fel när jag försökte kontakta min vän på BankId?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Försök igen", "message.bankid.start"));
                             //add(new SelectOption("Hoppa över", "message.bankidja"));
@@ -151,12 +154,11 @@ public class OnboardingConversationDevi extends Conversation {
 
         // House dead-end:::
 
-        createMessage("message.hus1", new MessageBodyParagraph("Åh, typiskt! Just nu är det lägenheter jag kan försäkra"), "h_symbol",2000);
-        createMessage("message.hus2", new MessageBodyParagraph("Men jag hör gärna av mig till dig så fort jag har viktiga nyheter"), "h_symbol",2000);
-        createMessage("message.hus3",
-                new MessageBodySingleSelect("Jag skickar ingen spam. Lovar!",
+        createMessage("message.hus",
+                new MessageBodySingleSelect("Åh, typiskt! Just nu är det lägenheter jag kan försäkra\n\nMen jag hör gärna av mig till dig så fort jag har viktiga nyheter\n\nOch om du känner någon lägenhetsbo som du vill tipsa om mig, kan du passa på nu\n\nJag skickar ingen spam, lovar!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Skicka mig nyhetsbrev", "message.nyhetsbrev"));
+                            add(new SelectOption("Jag vill tipsa någon om dig", "message.tipsa"));
                             add(new SelectOption("Tack, men nej tack", "message.avslutforstar"));
 
                         }}
@@ -164,12 +166,12 @@ public class OnboardingConversationDevi extends Conversation {
 
 
         // All these goes to message.nagotmer
-        createMessage("message.nyhetsbrev", new MessageBodyText("Vad är din mailadress?"));
+        createMessage("message.nyhetsbrev", new MessageBodyText("Härligt! Skriv in din mailadress så håller jag dig uppdaterad"));
         createMessage("message.tipsa", new MessageBodyText("Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmejl till"));
-        createMessage("message.frifraga", new MessageBodyText("Fråga på! Skriv vad du undrar här så hör jag och mina kollegor av oss snart " + emoji_postal_horn));
+        createMessage("message.frifraga", new MessageBodyText("Fråga på!\n\nSkriv vad du undrar här så hör jag och mina kollegor av oss snart " + emoji_postal_horn));
 
         createMessage("message.nagotmer",
-                new MessageBodySingleSelect("Tack! Vill du hitta på något mer nu när vi har varandra på tråden?",
+                new MessageBodySingleSelect("Tack! Vill du hitta på något mer nu när vi har varandra på digitråden?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Jag vill tipsa någon om dig", "message.tipsa"));
                             add(new SelectOption("Jag har en fråga", "message.frifraga"));
@@ -181,26 +183,22 @@ public class OnboardingConversationDevi extends Conversation {
         // ----------------------------------------------- //
 
         createMessage("message.bankidja",
-                new MessageBodySingleSelect("Tack {NAME}! Stämmer det att du bor i en lägenhet på {ADDRESS}?",
+                new MessageBodySingleSelect("Tackar! Enligt infon jag har fått bor du i en lägenhet på {ADDRESS}. Stämmer det?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ja", "message.kvadrat"));
-                            add(new SelectOption("Nej", "message.varbordufeladress"));
+                            add(new SelectOption("Nej", "message.manuellpersonnr"));
                         }}
                 ));
 
-        createMessage("message.varbordufeladress", new MessageBodyText("Inga problem! Vilken gatuadress bor du på?"));
-        createMessage("message.varbordufelpostnr", new MessageBodyNumber("Och vad har du för postnummer?"));
-
-        createMessage("message.kvadrat", new MessageBodyNumber("Och hur många kvadratmeter är lägenheten?"));
+        createMessage("message.kvadrat", new MessageBodyNumber("Och hur många kvadrat är lägenheten?"));
 
         //(FUNKTION: FYLL I PERSONNR) = SCROLL KANSKE DÄR EN VÄLJER DATUM? BEHÖVS FYRA SISTA SIFFROR?
 
-        createMessage("message.manuellpersonnr", new MessageBodyNumber("Inga problem! Då ställer jag bara några extra frågor. Vad är ditt personnummer?"));
-        createMessage("message.varborduadress", new MessageBodyText("Tack! Och vilken gatuadress bor du på?"));
-        createMessage("message.varbordupostnr", new MessageBodyNumber("Vad är ditt postnummer?"));
+        createMessage("message.manuellpersonnr", new MessageBodyNumber("Inga problem! Då ställer jag bara några extra frågor\n\nVad är ditt personnummer?"));
+        createMessage("message.varbordu", new MessageBodyText("Tack! Och var bor du någonstans?"));
 
         createMessage("message.student",
-                new MessageBodySingleSelect("Tackar! Jag ser att du är under 27. Är du kanske student? " + emoji_school_satchel,
+                new MessageBodySingleSelect("Tackar! Jag ser att du är [<27] år. Är du kanske student? " + emoji_school_satchel,
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ja", "message.studentja"));
                             add(new SelectOption("Nej", "message.lghtyp"));
@@ -219,125 +217,110 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.lghtyp",
                 new MessageBodySingleSelect("Då fortsätter vi! Hur bor du?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Äger bostadsrätt", "ägerbostdsrätt"));
+                            add(new SelectOption("Äger bostadsrätt", "bostdsrätt"));
                             add(new SelectOption("Hyr hyresrätt", "hyresrätt"));
-                            add(new SelectOption("Hyr bostadsrätt", "hyrbostadsrätt"));
-                            add(new SelectOption("Hyr studentrum", "studentrum"));
-                            add(new SelectOption("Är inneboende", "inneboende"));
-
+                            add(new SelectOption("Hyr i andra hand", "andrahand"));
                         }}
                 ),(userContext, item) -> {
-                    UserData obd = userContext.getOnBoardingData();
-                    obd.setHouseType(item.value);
-                    return "message.pers";
+            UserData obd = userContext.getOnBoardingData();
+                  obd.setHouseType(item.value);
+                  return "message.pers";
                 });
 
         // ALTERNATIVT KAN DESSA SVARSALTERNATIV GÖRAS TILL SCROLL ELLER SÅ?
 
-       // createMessage("message.pers", new MessageBodyNumber("Hoppas du trivs! Bor du själv eller med andra? Fyll i hur många som bor i lägenheten"));
-        createMessage("message.pers",
-                new MessageBodySingleSelect("Hoppas du trivs! Bor du själv eller med andra? Fyll i hur många som bor i lägenheten",
+        createMessage("message.pers", new MessageBodyNumber("Hoppas du trivs!\n Bor du själv eller med andra? Fyll i hur många som bor i lägenheten"));
+        /*createMessage("message.pers",
+                new MessageBodySingleSelect("Hoppas du trivs!\n Bor du själv eller med andra? Fyll i hur många som bor i lägenheten",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("1 person", "message.sakerhet", false));
-                            add(new SelectOption("2 personer", "message.sakerhet", false));
-                            add(new SelectOption("3 personer", "message.sakerhet", false));
-                            add(new SelectOption("4 personer", "message.sakerhet", false));
-                            add(new SelectOption("5 personer", "message.sakerhet", false));
-                            add(new SelectOption("Mer än 6 personer", "message.sakerhet", false));
-
+                            add(new SelectOption("(FUNKTION: FYLL I ANTAL PERS)", "message.sakerhet", false));
                         }}
-                ));
+                ));*/
 
 //(FUNKTION: FYLL I ANTAL PERS) = SCROLL KANSKE? 1-6+ ALT. FLERVALSALTERNATIVBOXAR ELLER DEN DÄR DRA-I-SKALOR-EW-DESIGNLÖSNINGEN
 
-        createMessage("message.sakerhet",
-                new MessageBodyMultipleSelect("Tack! Finns någon av de här säkerhetsgrejerna i lägenheten?",
-                        new ArrayList<SelectItem>(){{
-                            add(new SelectOption("Brandvarnare", "safety.alarm"));
-                            add(new SelectOption("Brandsläckare", "safety.extinguisher"));
-                            add(new SelectOption("Säkerhetsdörr", "safety.door"));
-                            add(new SelectOption("Gallergrind", "safety.gate"));
-                            add(new SelectOption("Inbrottslarm", "safety.burglaralarm"));
+        /*createMessage("message.sakerhet",
+                new MessageBodySingleSelect("Tack!\nFinns någon av de här säkerhetsgrejerna i lägenheten?",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("(FUNKTION: FYLL I SÄKERHETSGREJER)", "message.dyrpryl", false));
                         }}
-                ));
+                ));*/
+
+		createMessage("message.sakerhet",
+				new MessageBodyMultipleSelect("Tack!\nFinns någon av de här säkerhetsgrejerna i lägenheten?",
+						new ArrayList<SelectItem>(){{
+							add(new SelectOption("Brandvarnare", "safety.alarm"));
+							add(new SelectOption("Brandsläckare", "safety.extinguisher"));
+							add(new SelectOption("Säkerhetsdörr", "safety.door"));
+							add(new SelectOption("Gallergrind", "safety.gate"));
+							add(new SelectOption("Inbrottslarm", "safety.burglaralarm"));
+						}}
+				));
         //(FUNKTION: FYLL I SÄKERHETSGREJER) = SCROLL MED DE OLIKA GREJERNA KANSKE? ELLER FLERVALSALTERNATIVBOXAR?
 
-        //createMessage("message.dyrpryl",
-                new MessageBodySingleSelect("Äger du någon pryl som är värd över 50 000 kr? ",
+        createMessage("message.dyrpryl",
+                new MessageBodySingleSelect("Och äger du något som är värt över 75 000 kr? ",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Jag har inget så dyrt", "message.dyrprylnej"));
                             add(new SelectOption("Jag har dyra prylar", "message.dyrprylja"));
                         }}
-                );
+                ));
 
-        //createMessage("message.dyrprylnej",
+        createMessage("message.dyrprylnej",
                 new MessageBodySingleSelect("Okej!\nOm du skulle skaffa en dyr pryl senare är det bara att lägga till den direkt i appen så täcker jag den åt dig",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ok", "message.forsakringidag"));
                         }}
-                );
+                ));
 
 
-        //createMessage("message.dyrprylja",
-                 new MessageBodySingleSelect("Flott! Alla dina prylar värda upp till 50 000 kr täcker jag automatiskt. Allt värt mer än så kan du enkelt lägga till direkt i appen sen. Det kostar en slant extra men oftast mindre än om du har prylen försäkrad idag",
+        createMessage("message.dyrprylja",
+                new MessageBodySingleSelect("Flott!\nAlla dina prylar värda upp till 75 000 kr täcker jag automatiskt\n\nAllt värt mer än så kan du enkelt lägga till direkt i appen sen\n\nDet kostar en slant extra men oftast mindre än om du har prylen försäkrad idag",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ok", "message.forsakringidag"));
                         }}
-                );
+                ));
 
         createMessage("message.forsakringidag",
-                new MessageBodySingleSelect("Då är vi snart klara! Har du någon hemförsäkring idag?",
+                new MessageBodySingleSelect("Då är vi snart klara!\n\nHar du någon hemförsäkring idag?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Ja", "message.forsakringidagja"));
                             add(new SelectOption("Nej", "message.forslag")); //Create product
-
+                            add(new SelectOption("Ja", "message.forsakringidagja"));
                         }}
                 ));
 
-        createMessage("message.forsakringidagja",
-                new MessageBodySingleSelect("Klokt av dig att redan ha försäkring! Vilket försäkringsbolag har du?",
-                        new ArrayList<SelectItem>(){{
-                            add(new SelectOption("Folksam", "folksam"));
-                            add(new SelectOption("Länsförsäkringar", "länsförsäkringar"));
-                            add(new SelectOption("Trygg-Hansa", "trygg-hansa"));
-                            add(new SelectOption("If", "if"));
-                            add(new SelectOption("Moderna", "moderna"));
-                            add(new SelectOption("Annat bolag", "message.annatbolag"));
-                            add(new SelectOption("Ingen aning", "vetej"));
-
-                        }}
-                ));
+		createMessage("message.forsakringidagja",
+				new MessageBodySingleSelect("Klokt av dig att ha försäkring redan!\n\nVilket försäkringsbolag har du?",
+						new ArrayList<SelectItem>(){{
+							add(new SelectOption("If", "if"));
+							add(new SelectOption("Trygg-Hansa", "trygg-hansa"));
+							add(new SelectOption("Länsförsäkringar", "länsförsäkringar"));
+						}}
+				));
 
         //(FUNKTION: FYLL I FÖRSÄKRINGSBOLAGNAMN) = SCROLL MED DE VANLIGASTE BOLAGEN SAMT "ANNAT FÖRSÄKRINGSBOLAG"
 
-        createMessage("message.annatbolag", new MessageBodyParagraph("Ok! Kan du skriva vad bolaget heter?"), "h_symbol",2000);
 
-        createMessage("message.bytesinfo1", new MessageBodyParagraph("Ja, ibland är det dags att prova något nytt. De kommer nog förstå"), "h_symbol",2000);
-        createMessage("message.bytesinfo2",
-                new MessageBodySingleSelect("Om du blir medlem hos mig sköter jag bytet åt dig. Så när din gamla försäkring går ut, flyttas du automatiskt till din nya hos mig",
+        createMessage("message.bytesinfo",
+                new MessageBodySingleSelect("Ja, ibland är det dags att prova något nytt. De kommer nog förstå\n\nOm du blir medlem hos mig sköter jag bytet åt dig\n\nSå när din gamla försäkring går ut, flyttas du automatiskt till din nya hos mig",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ok jag förstår", "message.forslag")); //Create product
-                            add(new SelectOption("Förklara mer", "message.bytesinfo3"));
+                            add(new SelectOption("Förklara mer", "message.bytesinfo2"));
                         }}
                 ));
 
 
-        createMessage("message.bytesinfo3", new MessageBodyParagraph("Självklart!"), "h_symbol",2000);
-        createMessage("message.bytesinfo4", new MessageBodyParagraph("Oftast har du ett tag kvar på bindningstiden på din gamla försäkring. Om du väljer att byta till Hedvig så hör jag av mig till ditt försäkringsbolag och meddelar att du vill byta försäkring så fort bindningstiden går ut. Till det behöver jag en fullmakt från dig som du kan skriva under med BankID"), "h_symbol",2000);
-        createMessage("message.bytesinfo5", new MessageBodyParagraph("Sen börjar din nya försäkring gälla direkt när den gamla går ut"), "h_symbol",2000);
-        createMessage("message.bytesinfo6",
-                new MessageBodySingleSelect("Så du behöver aldrig vara orolig att gå utan försäkring efter att du skrivit på med mig",
+        createMessage("message.bytesinfo2",
+                new MessageBodySingleSelect("Självklart!\n\nOftast så har du ett tag kvar på bindningstiden på din gamla försäkring\n\nSå jag hör av mig till ditt försäkringsbolag med en fullmakt jag får av dig, och säger upp din gamla försäkring\n\nFullmakten skapas automatiskt när du skriver på för din nya försäkring hos mig med ditt BankID\n\nSen börjar din nya försäkring gälla direkt när bindningstiden för den gamla försäkringen gått ut\n\nDin gamla försäkring täcker dig under hela uppsägningstiden, så du behöver aldrig vara orolig att gå utan försäkring efter att du skrivit på med mig",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ok", "message.forslag")); //Create product
                         }}
                 ));
 
-        createMessage("message.forslag", new MessageBodyParagraph("Okej! Nu har jag allt för att ge dig ett förslag. Ska bara räkna lite..."),2000);
-        createMessage("message.forslag2",
-                new MessageBodySingleSelect("Sådärja!",
+        createMessage("message.forslag",
+                new MessageBodySingleSelect("Okej! Nu har jag allt för att ge dig ditt förslag.\nSka bara räkna lite...\n\nSådärja!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Visa förslag", "message.forslag.dashboard", "Offer", null, null, false  ));
-
+                            add(new SelectLink("Visa mig", "message.forslag.dashboard", "Dashboard", null, null, false  ));
                         }}
                 ));
 
@@ -401,7 +384,7 @@ public class OnboardingConversationDevi extends Conversation {
 
 
         createMessage("message.medlemjabank",
-                new MessageBodySingleSelect("Hurra! "+ emoji_tada +" Då behöver jag bara veta vilken bank du har så jag kan koppla upp autogiro",
+                new MessageBodySingleSelect("Hurra! "+ emoji_tada +"\n\nDå behöver jag bara veta vilken bank du har innan vi skriver på så jag kan koppla upp autogiro",
                         new ArrayList<SelectItem>() {{
 
                             add(new SelectOption("Swedbank", "FSPA"));
@@ -418,7 +401,7 @@ public class OnboardingConversationDevi extends Conversation {
                 ),
                 (UserContext userContext, SelectItem s) -> {
                     userContext.getAutogiroData().selectBank(s.value, s.text);
-                    return "message.start.account.retrieval";
+                  return "message.start.account.retrieval";
                 });
 
         createMessage("message.start.account.retrieval",
@@ -478,8 +461,7 @@ public class OnboardingConversationDevi extends Conversation {
                 ));*/
 
         //(FUNKTION: FYLL I MAILADRESS) = FÄLT
-        setExpectedReturnType("message.mail", new EmailAdress());
-        
+
         createMessage("message.kontrakt",
                 new MessageBodySingleSelect("Tack igen.\n\nOch nu till det stora ögonblicket...\n\nHär har du allt som vi sagt samlat. Läs igenom och skriv på med ditt BankID för att godkänna din nya försäkring",
                         new ArrayList<SelectItem>() {{
@@ -509,7 +491,7 @@ public class OnboardingConversationDevi extends Conversation {
                         return "message.kontraktpop.error";
                     }
                     return "";
-                });
+        });
 
         createMessage("message.kontraktpop.bankid.collect",
                 new MessageBodyBankIdCollect( "{REFERENCE_TOKEN}")
@@ -555,14 +537,14 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Visa igen", "message.forslagpop"));
                         }}
                 ));
-
+        
         createMessage("message.bikedone", new MessageBodyText("Nu har du sett hur det funkar..."));
 
         createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
     }
 
     public void init() {
-        log.info("Starting onboarding conversation");
+    	log.info("Starting onboarding conversation");
         startConversation("message.onboardingstart"); // Id of first message
         //startConversation("message.start.account.retrieval"); // Id of first message
     }
@@ -570,77 +552,76 @@ public class OnboardingConversationDevi extends Conversation {
     // --------------------------------------------------------------------------- //
 
     public int getValue(MessageBodyNumber body){
-        return Integer.parseInt(body.text);
+    	return Integer.parseInt(body.text);
     }
 
     public String getValue(MessageBodySingleSelect body){
 
-        for(SelectItem o : body.choices){
-            if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
-                return SelectOption.class.cast(o).value;
-            }
-        }
-        return "";
+		for(SelectItem o : body.choices){
+			if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
+				return SelectOption.class.cast(o).value;
+			}
+		}
+		return "";
     }
 
     public ArrayList<String> getValue(MessageBodyMultipleSelect body){
-        ArrayList<String> selectedOptions = new ArrayList<String>();
-        for(SelectItem o : body.choices){
-            if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
-                selectedOptions.add(SelectOption.class.cast(o).value);
-            }
-        }
-        return selectedOptions;
+		ArrayList<String> selectedOptions = new ArrayList<String>();
+		for(SelectItem o : body.choices){
+			if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
+				 selectedOptions.add(SelectOption.class.cast(o).value);
+			}
+		}
+		return selectedOptions;
     }
 
     // ------------------------------------------------------------------------------- //
     @Override
     public void recieveEvent(EventTypes e, String value){
 
-        switch(e){
-            // This is used to let Hedvig say multiple message after another
-            case MESSAGE_FETCHED:
-                log.info("Message fetched:" + value);
-                switch(value){
-                    case "message.onboardingstart":
+		switch(e){
+		// This is used to let Hedvig say multiple message after another
+		case MESSAGE_FETCHED:
+			log.info("Message fetched:" + value);
+			switch(value){
+				case "message.onboardingstart":
 					/*try {
 						Thread.sleep(1000);
 					} catch (InterruptedException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}*/
-                        completeRequest("message.onboardingstart2");
-                        break;
-                    case "message.onboardingstart2":
+					completeRequest("message.onboardingstart2");
+					break;
+				case "message.onboardingstart2":
 					/*try {
 						Thread.sleep(1000);
 					} catch (InterruptedException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}*/
-                        completeRequest("message.onboardingstart3");
-                        break;
-                    case "message.onboardingstart3": completeRequest("message.onboardingstart.final"); break;
-                    case "message.cad": completeRequest("message.cad2"); break;
-                    case "message.cad2": completeRequest("message.cad3"); break;
-                    case "message.cad3": completeRequest("message.cad4"); break;
-                }
-                break;
-            case ANIMATION_COMPLETE:
-                switch(value){
-                    case "animation.bike":
-                        completeRequest("message.bikedone");
-                        break;
-                }
-                break;
-            case MODAL_CLOSED:
-                switch(value){
-                    case "quote":
-                        completeRequest("message.quote.close");
-                        break;
-                }
-                break;
-        }
+					completeRequest("message.onboardingstart3");
+					break;
+				case "message.cad": completeRequest("message.cad2"); break;
+				case "message.cad2": completeRequest("message.cad3"); break;
+				case "message.cad3": completeRequest("message.cad4"); break;
+			}
+			break;		
+		case ANIMATION_COMPLETE:
+			switch(value){
+				case "animation.bike":
+					completeRequest("message.bikedone");
+					break;
+			}
+			break;
+		case MODAL_CLOSED:
+			switch(value){
+				case "quote":
+					completeRequest("message.quote.close");
+					break;
+			}
+			break;
+		}
     }
 
     @Override
@@ -649,8 +630,6 @@ public class OnboardingConversationDevi extends Conversation {
 
         String nxtMsg = "";
 
-        if(!validateReturnType(m)){return;}
-        
         // Lambda
         if(this.hasSelectItemCallback(m.id) && m.body.getClass().equals(MessageBodySingleSelect.class)) {
             MessageBodySingleSelect body = (MessageBodySingleSelect) m.body;
@@ -659,45 +638,45 @@ public class OnboardingConversationDevi extends Conversation {
         }
 
         UserData onBoardingData = userContext.getOnBoardingData();
-
+        
         switch (m.id) {
-            case "message.onboardingstart.final":
-                String opt = getValue((MessageBodySingleSelect)m.body);
-                log.info("message.onboardingstart redirect to " + opt);
-                if(opt.equals("message.mockme")){
-                    m.body.text = "Mocka mina uppgifter tack!";
-                    userContext.clearContext();
-                    userContext.mockMe();
-                    addToChat(m);
-                }
-                break;
-            case "message.forslagstart":
-                onBoardingData.setHouseType(((MessageBodySingleSelect)m.body).getSelectedItem().value);
-                break;
-            case "message.nyhetsbrev":
-                onBoardingData.setNewsLetterEmail(m.body.text);
+	        case "message.onboardingstart3":
+	        	String opt = getValue((MessageBodySingleSelect)m.body);
+	        	log.info("message.onboardingstart redirect to " + opt);
+	        	if(opt.equals("message.mockme")){
+	        		m.body.text = "Mocka mina uppgifter tack!";
+	        		userContext.clearContext();
+	        		userContext.mockMe();
+	        		addToChat(m);
+	        	}
+	        	break;
+	        case "message.forslagstart":
+	            onBoardingData.setHouseType(((MessageBodySingleSelect)m.body).getSelectedItem().value);
+	            break;
+	        case "message.nyhetsbrev":
+	            onBoardingData.setNewsLetterEmail(m.body.text);
                 nxtMsg = "message.nagotmer";
                 break;
-            case "message.tipsa":
+	        case "message.tipsa":
                 onBoardingData.setRecommendFriendEmail(m.body.text);
                 nxtMsg = "message.nagotmer";
                 break;
             case "message.frifraga":
-                addToChat(m);
-                nxtMsg = "message.nagotmer";
-                break;
-            case "message.pers":
-                int nr_persons = getValue((MessageBodyNumber)m.body);
-                onBoardingData.setPersonInHouseHold(nr_persons);
-                if(nr_persons==1){ m.body.text = "Jag bor själv"; }
-                else{ m.body.text = "Vi är " + nr_persons + " i hushållet"; }
-                addToChat(m);
-                nxtMsg = "message.sakerhet";
-                break;
-            case "message.kvadrat":
-                String kvm = m.body.text;
-                onBoardingData.setLivingSpace(Float.parseFloat(kvm));
-                m.body.text = kvm + "kvm";
+	        	addToChat(m);
+	        	nxtMsg = "message.nagotmer";
+	        	break;
+	        case "message.pers":
+	        	int nr_persons = getValue((MessageBodyNumber)m.body);
+	        	onBoardingData.setPersonInHouseHold(nr_persons);
+	        	if(nr_persons==1){ m.body.text = "Jag bor själv"; }
+	        	else{ m.body.text = "Vi är " + nr_persons + " i hushållet"; }
+	        	addToChat(m);
+	        	nxtMsg = "message.sakerhet";
+	        	break;
+	        case "message.kvadrat":
+	        	String kvm = m.body.text;
+	        	onBoardingData.setLivingSpace(Float.parseFloat(kvm));
+	        	m.body.text = kvm + "kvm";
                 addToChat(m);
                 if(onBoardingData.getAge() > 0 && onBoardingData.getAge() < 27) {
                     nxtMsg = "message.student";
@@ -705,33 +684,33 @@ public class OnboardingConversationDevi extends Conversation {
                     nxtMsg = "message.lghtyp";
                 }
 
-                break;
-            case "message.manuellpersonnr":
-                onBoardingData.setSSN(m.body.text);
-                addToChat(m);
-                nxtMsg = "message.varbordu";
-                break;
-            case "message.mockme":
-                nxtMsg = m.body.text.toLowerCase();
-                m.body.text = "Jag vill gå till " + nxtMsg + " tack";
-                addToChat(m);
-                break;
-            case "message.varbordu":
-                onBoardingData.setAddressStreet(m.body.text);
-                addToChat(m);
-                nxtMsg = "message.kvadrat";
-                break;
-            case "message.mail":
-                onBoardingData.setEmail(m.body.text);
-                addToChat(m);
-                nxtMsg = "message.kontrakt";
-                break;
-            case "message.sakerhet":
-                String safetyItems = "";
-                MessageBodyMultipleSelect body = (MessageBodyMultipleSelect)m.body;
+	        	break;
+	        case "message.manuellpersonnr":
+	        	onBoardingData.setSSN(m.body.text);
+	        	addToChat(m);
+	        	nxtMsg = "message.varbordu";
+	        	break;
+	        case "message.mockme":	        	
+	        	nxtMsg = m.body.text.toLowerCase();
+	        	m.body.text = "Jag vill gå till " + nxtMsg + " tack";
+	        	addToChat(m);
+	        	break;
+	        case "message.varbordu":
+	            onBoardingData.setAddressStreet(m.body.text);
+	        	addToChat(m);
+	        	nxtMsg = "message.kvadrat";
+	        	break;
+	        case "message.mail":
+	        	onBoardingData.setEmail(m.body.text);
+	            addToChat(m);
+	        	nxtMsg = "message.kontrakt";
+	        	break;
+	        case "message.sakerhet":
+	    		String safetyItems = "";
+	    		MessageBodyMultipleSelect body = (MessageBodyMultipleSelect)m.body;
                 String separator = "";
-                for(SelectItem o : body.choices){
-                    if(SelectOption.class.isInstance(o)){ // Check non-link items
+	    		for(SelectItem o : body.choices){
+	    			if(SelectOption.class.isInstance(o)){ // Check non-link items
                         {
                             SelectOption option = SelectOption.class.cast(o);
 
@@ -741,32 +720,32 @@ public class OnboardingConversationDevi extends Conversation {
                                 onBoardingData.addSecurityItem(option.value);
                             }
                         }
-                    }
+	    			}
+	    		}
+	        	if(safetyItems.equals("")) {
+	    		    m.body.text = "Jag har inga sådana grejer...";
                 }
-                if(safetyItems.equals("")) {
-                    m.body.text = "Jag har inga sådana grejer...";
-                }
-                else{
-                    m.body.text = "Jag har " + safetyItems + ".";
-                }
-                addToChat(m);
-                nxtMsg = "message.dyrpryl";
-                break;
+	        	else{
+	    		    m.body.text = "Jag har " + safetyItems + ".";
+	    		}
+	        	addToChat(m);
+	        	nxtMsg = "message.dyrpryl";
+	        	break;
 
             case "message.bytesinfo":
             case "message.bytesinfo2":
             case "message.forsakringidag":
             case "message.missingvalue":
-
+            	
                 SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
-
+                
                 /*
                  * Check if there is any data missing. Keep ask until Hedvig has got all info
                  * */
                 String missingItems = userContext.getMissingDataItem();
                 if(missingItems!=null){
                     createMessage("message.missingvalue", new MessageBodyText(
-                            "Oj, nu verkar det som om jag saknar lite viktig information. T.ex har jag ingen " + missingItems));
+                    		"Oj, nu verkar det som om jag saknar lite viktig information. T.ex har jag ingen " + missingItems));
                     addToChat(getMessage("message.missingvalue"));
                     break;
                 }
@@ -776,11 +755,11 @@ public class OnboardingConversationDevi extends Conversation {
                 }
                 break;
 
-            case "message.forsakringidagja":
-                String comp = getValue((MessageBodySingleSelect)m.body);
-                if(comp.equals("message.mockme"));
-                m.body.text = "Idag har jag " + comp;
-                addToChat(m);
+	        case "message.forsakringidagja":
+	        	String comp = getValue((MessageBodySingleSelect)m.body);
+	        	if(comp.equals("message.mockme"));
+	        	m.body.text = "Idag har jag " + comp;	
+	        	addToChat(m);
                 nxtMsg = "message.bytesinfo";
                 break;
 
@@ -819,7 +798,7 @@ public class OnboardingConversationDevi extends Conversation {
             case "message.fetch.account.complete":
                 SelectItem it = ((MessageBodySingleSelect)m.body).getSelectedItem();
                 userContext.getAutogiroData().setSelecteBankAccount(Integer.parseInt(it.value));
-                nxtMsg = "message.mail";
+                nxtMsg = "message.kontrakt";
                 break;
 
             case "message.kontrakt":
@@ -832,19 +811,19 @@ public class OnboardingConversationDevi extends Conversation {
         /*
 	  * In a Single select, there is only one trigger event. Set default here to be a link to a new message
 	  */
-        if (nxtMsg.equals("") && m.body.getClass().equals(MessageBodySingleSelect.class)) {
+       if (nxtMsg.equals("") && m.body.getClass().equals(MessageBodySingleSelect.class)) {
 
-            MessageBodySingleSelect body1 = (MessageBodySingleSelect) m.body;
-            for (SelectItem o : body1.choices) {
-                if(o.selected) {
-                    m.body.text = o.text;
-                    addToChat(m);
-                    nxtMsg = o.value;
-                }
-            }
-        }
+           MessageBodySingleSelect body1 = (MessageBodySingleSelect) m.body;
+           for (SelectItem o : body1.choices) {
+               if(o.selected) {
+                   m.body.text = o.text;
+                   addToChat(m);
+                   nxtMsg = o.value;
+               }
+           }
+       }
 
-        completeRequest(nxtMsg);
+       completeRequest(nxtMsg);
 
     }
 
@@ -863,28 +842,49 @@ public class OnboardingConversationDevi extends Conversation {
      * Generate next chat message or ends conversation
      * */
     @Override
-    public void completeRequest(String nxtMsg){
+	public void completeRequest(String nxtMsg){
 
-        switch(nxtMsg){
-            case "onboarding.done":
-                log.info("Onboarding complete");
-                userContext.completeConversation(this.getClass().getName());
-                //userContext.onboardingComplete(true);
-                break;
-            case "message.bankid.device.start":
-                //BankIdAuthResponse  authResponse = this.memberService.auth();
-                nxtMsg = "message.bankid.autostart.send";
-            case "":
-                log.info("Unknown message recieved...");
-                nxtMsg = "error";
-                break;
+		switch(nxtMsg){
+			case "onboarding.done":
+				log.info("Onboarding complete");
+				userContext.completeConversation(this.getClass().getName());
+				//userContext.onboardingComplete(true);
+				break;
+		    case "message.bankid.device.start":
+		        //BankIdAuthResponse  authResponse = this.memberService.auth();
+		        nxtMsg = "message.bankid.autostart.send";
+			case "":
+		        log.info("Unknown message recieved...");
+		        nxtMsg = "error";
+				break;
+			}
+
+			super.completeRequest(nxtMsg);
+	}
+
+	public void bankIdAuthComplete(MemberAuthedEvent e){
+
+	    if(!userContext.getOnBoardingData().userHasAuthedWithBankId()) {
+            Member member = e.getMember();
+
+            UserData obd = userContext.getOnBoardingData();
+            obd.setBirthDate(member.getBirthDate());
+            obd.setSSN(member.getSsn());
+            obd.setFirstName(member.getFirstName());
+            obd.setFamilyName(member.getLastName());
+
+            //obd.setEmail(member.getEmail()); I don't think we will ever get his from bisnode
+
+            obd.setAddressStreet(member.getStreet());
+            obd.setAddressCity(member.getCity());
+            obd.setAddressZipCode(member.getZipCode());
+
+            addToChat(getMessage("message.bankidja"));
+
+            userContext.getOnBoardingData().setUserHasAuthWithBankId(true);
         }
 
-        super.completeRequest(nxtMsg);
-    }
 
-    public void bankIdAuthComplete(){
-        addToChat(getMessage("message.bankidja"));
     }
 
     public void bankAccountRetrieved() {
@@ -892,14 +892,14 @@ public class OnboardingConversationDevi extends Conversation {
 
         AutogiroData bankAccountHelper = userContext.getAutogiroData();
 
-        String text = String.format("Hej du har %s konton hos %s:\n",
+	    String text = String.format("Hej du har %s konton hos %s:\n",
                 bankAccountHelper.getAccountCount(),
-                userContext.getAutogiroData().getBankFullName());
+	            userContext.getAutogiroData().getBankFullName());
 
         ArrayList<SelectItem> options = new ArrayList<>();
 
         int nr = 0;
-        for(BankAccount ba: bankAccountHelper.getAccounts()) {
+	    for(BankAccount ba: bankAccountHelper.getAccounts()) {
             text += String.format("* %s %s, %s %s:-\n",
                     ba.getName(),
                     ba.getClearingNo(),
@@ -908,14 +908,14 @@ public class OnboardingConversationDevi extends Conversation {
 
             options.add(new SelectOption(ba.getAccountNo(), Objects.toString(nr)));
             nr++;
-        }
+	    }
 
 
-        MessageHeader header = new MessageHeader(HEDVIG_USER_ID, "/response", -1);
-        Message message = new Message();
+	    MessageHeader header = new MessageHeader(HEDVIG_USER_ID, "/response", -1);
+	    Message message = new Message();
         message.id = "message.fetch.account.complete";
-        message.header = header;
-        message.body = new MessageBodySingleSelect(text, options);
+	    message.header = header;
+	    message.body = new MessageBodySingleSelect(text, options);
         addToChat(message);
     }
 
@@ -931,7 +931,7 @@ public class OnboardingConversationDevi extends Conversation {
     }
 
     public void memberSigned(String referenceId) {
-        Optional<Boolean> singed = userContext.getOnBoardingData().getUserHasSigned();
+	    Optional<Boolean> singed = userContext.getOnBoardingData().getUserHasSigned();
 
         if(!singed.isPresent() || singed.get().equals(false)) {
             addToChat(getMessage("message.kontraktklar"));
