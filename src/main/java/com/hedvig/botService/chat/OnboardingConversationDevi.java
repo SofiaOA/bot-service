@@ -21,6 +21,9 @@ import org.slf4j.LoggerFactory;
 
 import com.hedvig.botService.dataTypes.EmailAdress;
 import com.hedvig.botService.dataTypes.HouseholdMemberNumber;
+import com.hedvig.botService.dataTypes.LivingSpaceSquareMeters;
+import com.hedvig.botService.dataTypes.SSNSweden;
+import com.hedvig.botService.dataTypes.ZipCodeSweden;
 import com.hedvig.botService.enteties.*;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -79,12 +82,12 @@ public class OnboardingConversationDevi extends Conversation {
                 ), "h_symbol");
         //createMessage("message.mail", new MessageBodyText("Vad är din email?"), "h_symbol",2000);
         
-        createMessage("message.cad", new MessageBodyParagraph("Så här, egentligen ska försäkring vara en riktigt bra grej"), "h_symbol",2000);
+        createMessage("message.cad", new MessageBodyParagraph("Så här, egentligen är försäkring en riktigt bra grej"), "h_symbol",2000);
         createMessage("message.cad2", new MessageBodyParagraph("När något går snett, får du hjälp"), "h_symbol",2000);
         createMessage("message.cad3", new MessageBodyParagraph("Men många tycker det är krångligt"), "h_symbol",2000);
 
         createMessage("message.cad4",
-                new MessageBodySingleSelect("Därför har jag ändrat på hur försäkring funkar, så det blir lättare när det är svårt, inte tvärtom",
+                new MessageBodySingleSelect("Därför har jag ändrat på hur försäkring funkar, för det ska vara lätt när det är svårt",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Hur då?", "message.tellme5"));
                         }}
@@ -95,7 +98,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.tellme7", new MessageBodyParagraph("Jag lägger istället pengarna i en medlemspott som endast går till skador"), "h_symbol",2000);
         createMessage("message.tellme8", new MessageBodyParagraph("Och fokuserar på att betala ut snabbt"), "h_symbol",2000);
         createMessage("message.tellme9",
-                new MessageBodySingleSelect("Finns några pengar kvar efter att skadorna är betalda ges det till en välgörenhetsrganisation",
+                new MessageBodySingleSelect("Finns några pengar kvar efter att skadorna är betalda ges det till en välgörenhetsorganisation",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Men hur tjänar du pengar då?", "message.tellme10"));
                         }}
@@ -118,7 +121,7 @@ public class OnboardingConversationDevi extends Conversation {
                         }}
                 ), "h_symbol");          
 
-        createMessage("message.tellme14", new MessageBodyParagraph("Du göra det mesta direkt digitalt genom att chatta med mig"), "h_symbol",2000);
+        createMessage("message.tellme14", new MessageBodyParagraph("Du kan göra det mesta direkt digitalt genom att chatta med mig"), "h_symbol",2000);
         createMessage("message.tellme15", new MessageBodyParagraph("Från att skaffa en skräddarsydd hemförsäkring"), "h_symbol",2000);
         createMessage("message.tellme16", new MessageBodyParagraph("Till att rapportera om något hänt och få ersättning"), "h_symbol",2000);
         createMessage("message.tellme17", new MessageBodyParagraph("Jag är ju en bot, så jag finns i din mobil eller dator 24/7"), "h_symbol",2000);
@@ -224,7 +227,9 @@ public class OnboardingConversationDevi extends Conversation {
 
         // All these goes to message.nagotmer
         createMessage("message.nyhetsbrev", new MessageBodyText("Vad är din mailadress?"));
+        setExpectedReturnType("message.nyhetsbrev", new EmailAdress());
         createMessage("message.tipsa", new MessageBodyText("Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmejl till"));
+        setExpectedReturnType("message.tipsa", new EmailAdress());
         createMessage("message.frifraga", new MessageBodyText("Fråga på! Skriv vad du undrar här så hör jag och mina kollegor av oss snart " + emoji_postal_horn));
 
         createMessage("message.nagotmer",
@@ -249,15 +254,19 @@ public class OnboardingConversationDevi extends Conversation {
 
         createMessage("message.varbordufeladress", new MessageBodyText("Inga problem! Vilken gatuadress bor du på?"));
         createMessage("message.varbordufelpostnr", new MessageBodyNumber("Och vad har du för postnummer?"));
+        setExpectedReturnType("message.varbordufelpostnr", new ZipCodeSweden());
 
         createMessage("message.kvadrat", new MessageBodyNumber("Och hur många kvadratmeter är lägenheten?"));
+        setExpectedReturnType("message.kvadrat", new LivingSpaceSquareMeters());
 
         //(FUNKTION: FYLL I PERSONNR) = SCROLL KANSKE DÄR EN VÄLJER DATUM? BEHÖVS FYRA SISTA SIFFROR?
 
         createMessage("message.manuellpersonnr", new MessageBodyNumber("Inga problem! Då ställer jag bara några extra frågor. Vad är ditt personnummer?"));
+        setExpectedReturnType("message.manuellpersonnr", new SSNSweden());
         createMessage("message.varborduadress", new MessageBodyText("Tack! Och vilken gatuadress bor du på?"));
         createMessage("message.varbordupostnr", new MessageBodyNumber("Vad är ditt postnummer?"));
-
+        setExpectedReturnType("message.varbordupostnr", new ZipCodeSweden());
+        
         createMessage("message.student",
                 new MessageBodySingleSelect("Tackar! Jag ser att du är under 27. Är du kanske student? " + emoji_school_satchel,
                         new ArrayList<SelectItem>() {{
@@ -293,8 +302,8 @@ public class OnboardingConversationDevi extends Conversation {
 
         // ALTERNATIVT KAN DESSA SVARSALTERNATIV GÖRAS TILL SCROLL ELLER SÅ?
 
-       // createMessage("message.pers", new MessageBodyNumber("Hoppas du trivs! Bor du själv eller med andra? Fyll i hur många som bor i lägenheten"));
-        createMessage("message.pers",
+        createMessage("message.pers", new MessageBodyNumber("Hoppas du trivs! Bor du själv eller med andra? Fyll i hur många som bor i lägenheten"));
+       /* createMessage("message.pers",
                 new MessageBodySingleSelect("Hoppas du trivs! Bor du själv eller med andra? Fyll i hur många som bor i lägenheten",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("1 person", "message.sakerhet", false));
@@ -305,7 +314,7 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Mer än 6 personer", "message.sakerhet", false));
 
                         }}
-                ));
+                ));*/
         setExpectedReturnType("message.pers", new HouseholdMemberNumber());
 //(FUNKTION: FYLL I ANTAL PERS) = SCROLL KANSKE? 1-6+ ALT. FLERVALSALTERNATIVBOXAR ELLER DEN DÄR DRA-I-SKALOR-EW-DESIGNLÖSNINGEN
 
@@ -321,7 +330,7 @@ public class OnboardingConversationDevi extends Conversation {
                 ));
         //(FUNKTION: FYLL I SÄKERHETSGREJER) = SCROLL MED DE OLIKA GREJERNA KANSKE? ELLER FLERVALSALTERNATIVBOXAR?
 
-        //createMessage("message.dyrpryl",
+        /*createMessage("message.dyrpryl",
                 new MessageBodySingleSelect("Äger du någon pryl som är värd över 50 000 kr? ",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Jag har inget så dyrt", "message.dyrprylnej"));
@@ -329,7 +338,7 @@ public class OnboardingConversationDevi extends Conversation {
                         }}
                 );
 
-        //createMessage("message.dyrprylnej",
+        createMessage("message.dyrprylnej",
                 new MessageBodySingleSelect("Okej!\nOm du skulle skaffa en dyr pryl senare är det bara att lägga till den direkt i appen så täcker jag den åt dig",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ok", "message.forsakringidag"));
@@ -337,12 +346,12 @@ public class OnboardingConversationDevi extends Conversation {
                 );
 
 
-        //createMessage("message.dyrprylja",
+        createMessage("message.dyrprylja",
                  new MessageBodySingleSelect("Flott! Alla dina prylar värda upp till 50 000 kr täcker jag automatiskt. Allt värt mer än så kan du enkelt lägga till direkt i appen sen. Det kostar en slant extra men oftast mindre än om du har prylen försäkrad idag",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ok", "message.forsakringidag"));
                         }}
-                );
+                );*/
 
         createMessage("message.forsakringidag",
                 new MessageBodySingleSelect("Då är vi snart klara! Har du någon hemförsäkring idag?",
@@ -371,7 +380,7 @@ public class OnboardingConversationDevi extends Conversation {
 
         createMessage("message.annatbolag", new MessageBodyParagraph("Ok! Kan du skriva vad bolaget heter?"), "h_symbol",2000);
 
-        createMessage("message.bytesinfo1", new MessageBodyParagraph("Ja, ibland är det dags att prova något nytt. De kommer nog förstå"), "h_symbol",2000);
+        createMessage("message.bytesinfo", new MessageBodyParagraph("Ja, ibland är det dags att prova något nytt. De kommer nog förstå"), "h_symbol",2000);
         createMessage("message.bytesinfo2",
                 new MessageBodySingleSelect("Om du blir medlem hos mig sköter jag bytet åt dig. Så när din gamla försäkring går ut, flyttas du automatiskt till din nya hos mig",
                         new ArrayList<SelectItem>() {{
@@ -585,7 +594,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.kontraktklar", new MessageBodyParagraph("emoji_tada + \" Hurra! \"+ emoji_tada "), "h_symbol",2000);
         createMessage("message.kontraktklar2", new MessageBodyParagraph("Välkommen, bästa nya medlem"), "h_symbol",2000);
         createMessage("message.kontraktklar3", new MessageBodyText("Jag skickar en bekräftelse till din mejl! Vad har du för mejladress?"), "h_symbol", 2000);
-
+        setExpectedReturnType("message.kontraktklar3", new EmailAdress());
 
         createMessage("message.kontraktklar4",
             new MessageBodySingleSelect("Välkommen in i appen! Ett tips är att börja med att välja vilken välgörenhetsorganisation du vill att din del av överskottet ska gå till" + emoji_revlolving_hearts,
@@ -700,6 +709,7 @@ public class OnboardingConversationDevi extends Conversation {
                     case "message.forslagstart2": completeRequest("message.forslagstart3"); break;
                     case "message.hus": completeRequest("message.hus2"); break;
                     case "message.hus2": completeRequest("message.hus3"); break;
+                    case "message.bytesinfo": completeRequest("message.bytesinfo2"); break;
                     case "message.bytesinfo3": completeRequest("message.bytesinfo4"); break;
                     case "message.bytesinfo4": completeRequest("message.bytesinfo5"); break;
                     case "message.bytesinfo5": completeRequest("message.bytesinfo6"); break;
@@ -810,8 +820,18 @@ public class OnboardingConversationDevi extends Conversation {
             case "message.manuellpersonnr":
                 onBoardingData.setSSN(m.body.text);
                 addToChat(m);
-                nxtMsg = "message.varbordu";
+                nxtMsg = "message.varborduadress";
                 break;
+            case "message.varborduadress":
+                onBoardingData.setAddressStreet(m.body.text);
+                addToChat(m);
+                nxtMsg = "message.varbordupostnr";
+                break;
+            case "message.varbordupostnr":
+                onBoardingData.setAddressZipCode(m.body.text);
+                addToChat(m);
+                nxtMsg = "message.kvadrat";
+                break;                
             case "message.mockme":
                 nxtMsg = m.body.text.toLowerCase();
                 m.body.text = "Jag vill gå till " + nxtMsg + " tack";
@@ -851,10 +871,10 @@ public class OnboardingConversationDevi extends Conversation {
                     m.body.text = "Jag har " + safetyItems + ".";
                 }
                 addToChat(m);
-                nxtMsg = "message.dyrpryl";
+                nxtMsg = "message.forsakringidag";
                 break;
 
-            case "message.bytesinfo":
+            //case "message.bytesinfo":
             case "message.bytesinfo2":
             case "message.forsakringidag":
             case "message.missingvalue":
