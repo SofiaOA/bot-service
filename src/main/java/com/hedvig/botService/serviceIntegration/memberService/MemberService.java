@@ -1,5 +1,6 @@
-package com.hedvig.botService.serviceIntegration;
+package com.hedvig.botService.serviceIntegration.memberService;
 
+import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
@@ -84,5 +86,28 @@ public class MemberService {
         }
 
         return Optional.empty();
+    }
+
+    public void finalizeOnBoarding(String memberId, UserData data) {
+        String url = "http://" + memberServiceLocation + "/i/member/finalizeOnboarding";
+        try {
+            FinalizeOnBoardingRequest req = new FinalizeOnBoardingRequest();
+            req.firstName = data.getFirstName();
+            req.lastName = data.getFamilyName();
+            req.memberId = memberId;
+            req.ssn = data.getSSN();
+            req.email = data.getEmail();
+
+            Address address = new Address();
+            address.setStreet(data.getAddressStreet());
+            address.setCity(data.getAddressCity());
+            address.setZipCode(data.getAddressZipCode());
+            req.address = address;
+
+            ResponseEntity<FinalizeOnBoardingResponse> response = template.postForEntity(url, req, FinalizeOnBoardingResponse.class);
+
+        }catch (RestClientResponseException ex) {
+            log.error("Could not finalize member {}", memberId, ex);
+        }
     }
 }

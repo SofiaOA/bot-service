@@ -11,10 +11,9 @@ import java.util.Optional;
 import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
-import com.hedvig.botService.serviceIntegration.BankIdSignResponse;
-import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingClient;
-import com.hedvig.botService.serviceIntegration.MemberService;
-import com.hedvig.botService.serviceIntegration.BankIdAuthResponse;
+import com.hedvig.botService.serviceIntegration.memberService.BankIdAuthResponse;
+import com.hedvig.botService.serviceIntegration.memberService.BankIdSignResponse;
+import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.web.dto.Member;
 import com.hedvig.botService.web.dto.MemberAuthedEvent;
@@ -22,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedvig.botService.enteties.*;
-import org.springframework.beans.factory.annotation.Value;
 
 public class OnboardingConversationDevi_old extends Conversation {
 

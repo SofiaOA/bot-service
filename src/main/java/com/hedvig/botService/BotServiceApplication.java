@@ -3,7 +3,7 @@ package com.hedvig.botService;
 import com.hedvig.botService.enteties.MemberChatRepository;
 import com.hedvig.botService.enteties.UserContextRepository;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingClient;
-import com.hedvig.botService.serviceIntegration.MemberService;
+import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.SessionManager;
 

@@ -1,4 +1,4 @@
-package com.hedvig.botService.serviceIntegration;
+package com.hedvig.botService.serviceIntegration.memberService;
 
 import lombok.Value;
 
