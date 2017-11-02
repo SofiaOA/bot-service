@@ -50,6 +50,7 @@ public class Message {
 	public MemberChat chat;
 
 	@Transient
+	@JsonIgnore
 	public HedvigDataType expectedType;
 	
 	public Message(){}
