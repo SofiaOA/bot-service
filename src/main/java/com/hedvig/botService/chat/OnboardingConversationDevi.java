@@ -71,6 +71,12 @@ public class OnboardingConversationDevi extends Conversation {
 
         createMessage("message.audiotest", new MessageBodyAudio("Här kan du testa audio", "/claims/fileupload"), "h_symbol",2000);
         createMessage("message.phototest", new MessageBodyPhotoUpload("Här kan du testa fotouppladdaren", "/asset/fileupload"), "h_symbol",2000);
+        createMessage("message.fileupload.result",
+                new MessageBodySingleSelect("Ok uppladdningen gick bra!",
+                        new ArrayList<SelectItem>() {{
+                        	add(new SelectOption("Hem", "message.onboardingstart"));
+                        }}
+                ), "h_symbol");
         //createMessage("message.mail", new MessageBodyText("Vad är din email?"), "h_symbol",2000);
         
         createMessage("message.cad", new MessageBodyParagraph("Så här, egentligen ska försäkring vara en riktigt bra grej"), "h_symbol",2000);
@@ -762,6 +768,10 @@ public class OnboardingConversationDevi extends Conversation {
                     addToChat(m);
                 }
                 break;
+            case "message.audiotest":
+            case "message.phototest":
+            	nxtMsg = "message.fileupload.result";
+            	break;
             case "message.forslagstart":
                 onBoardingData.setHouseType(((MessageBodySingleSelect)m.body).getSelectedItem().value);
                 break;
