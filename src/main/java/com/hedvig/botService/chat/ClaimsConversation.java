@@ -1,7 +1,5 @@
 package com.hedvig.botService.chat;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
@@ -12,56 +10,54 @@ import com.hedvig.botService.enteties.*;
 public class ClaimsConversation extends Conversation {
 
 	private static Logger log = LoggerFactory.getLogger(ClaimsConversation.class);
-	private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-	
+
 	public ClaimsConversation(MemberChat mc, UserContext uc) {
 		super("claims", mc,uc);
 		// TODO Auto-generated constructor stub
 
-		createMessage("message.hello",
-				new MessageBodySingleSelect("Hej, det är jag som är Hedvig, din personliga försäkringsassistent! Vad kan jag hjälpa dig med?",
-						new ArrayList<SelectItem>(){{
-							add(new SelectOption("Jag vill ha en ny","message.getname", false));
-							add(new SelectOption("Vill byta försäkring","message.changecompany", false));
-							add(new SelectOption("Varför behöver jag?","message.whyinsurance", false));
-							add(new SelectOption("Vem är du, Hedvig?","message.whoishedvig", false));
-						}}
-				));
+		createMessage("message.claims.start", new MessageBodyParagraph("Jag förstår, hoppas du mår ok under omständigheterna. Självklart tar jag tag i det här"), "h_symbol",2000);
+		
+        createMessage("message.claim.menu",
+                new MessageBodySingleSelect("Är du i en krissituation just nu? Om det är akut så ser jag till att en kollega ringer upp dig",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Det är kris, ring mig!", "message.claim.callme"));
+                            add(new SelectOption("Jag vill chatta", "message.claims.chat"));
+                        }}
+                ), "h_symbol");
+        
+		createMessage("message.claim.callme", new MessageBodyText("Vilket telefonnummer nås du på?"));
+		createMessage("message.claims.callme.end", new MessageBodyParagraph("Tack! En kollega ringer dig så snart som möjligt"), "h_symbol",2000);
 
-		createMessage("message.claims.whathappened", new MessageBodyText("Vad är det som har hänt?"));
-		
-		createMessage("message.claims.init", new MessageBodyText("Jag vill rapportera en skada"));
-		
-		createMessage("message.greetings", new MessageBodyDatePicker("Hej {NAME}, kul att du gillar försäkring :). När är du född?",LocalDateTime.parse("1986-04-08 00:00", datetimeformatter)));
+		createMessage("message.claims.chat", new MessageBodyParagraph("Ok! Då kommer du strax få berätta vad som hänt genom att spela in ett röstmeddelande"), "h_symbol",2000);
+		createMessage("message.claims.chat2", new MessageBodyParagraph("Först vill jag bara be dig skriva under detta"), "h_symbol",2000);
 
-		createMessage("message.bye", new MessageBodySingleSelect("Ok {NAME}, så det jag vet om dig är att du är förr {BIRTH_DATE}, jag hör av mig!",
-					new ArrayList<SelectItem>(){{
-						add(new SelectLink("Starta bank id", "", "AssetTracker","bankid://", "http://hedvig.com", false));
-						add(new SelectOption("Ladda upp foto", "message.photo_upload", false));
-						add(new SelectOption("Spela in video", "message.video", false));
-						add(new SelectOption("You need a hero!", "message.hero", false));
-					}}				
-				));
-		
-		createMessage("message.photo_upload", new MessageBodyPhotoUpload("Här kan du ladda upp en bild..", "https://gateway.hedvig.com/asset/fileupload/"));
-		
-		createMessage("message.video", new MessageBodyAudio("Här kan du spela in en video om vad som hänt...", "http://videoploadurl"));
-		
-		createMessage("message.hero", new MessageBodyHero("You need a hero!", "http://www.comedyflavors.com/wp-content/uploads/2015/02/hero.gif"));
-		
-		
-		createMessage("message.changecompany",
-				new MessageBodyMultipleSelect("Ok, vilket bolag har du idag?",
-						new ArrayList<SelectItem>(){{
-							add(new SelectOption("If", "message.company.if", false));
-							add(new SelectOption("TH", "message.company.th", false));
-							add(new SelectOption("LF", "message.company.lf", false));
-						}}
-				));
+        createMessage("message.claim.promise",
+                new MessageBodySingleSelect("HEDVIGS HEDERSLÖFTE\nJag vet att Hedvig bygger på tillit medlemmar emellan.\nJag lovar att berätta om händelsen precis som den var, och bara ta ut den ersättning jag har rätt till ur vår gemensamma medlemspott.",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Jag lovar!", "message.claims.ok"));
+                        }}
+                ), "h_symbol");
+        
+        createMessage("message.claims.ok", new MessageBodyParagraph("Tusen tack!"), "h_symbol",2000);
+        createMessage("message.claims.record", new MessageBodyParagraph("Berätta vad som har hänt genom att spela in ett röstmeddelande"), "h_symbol",2000);
+        createMessage("message.claims.record2", new MessageBodyParagraph("Ju mer detaljer du ger, desto snabbare hjälp kan jag ge. Så om du svarar på dessa frågor är vi en god bit på väg: "), "h_symbol",2000);
+        createMessage("message.claims.record3", new MessageBodyParagraph("Vad har hänt?"), "h_symbol",2000);
+        createMessage("message.claims.record4", new MessageBodyParagraph("Var och när hände det?"), "h_symbol",2000);
+        createMessage("message.claims.record5", new MessageBodyParagraph("Vad eller vem drabbades?"), "h_symbol",2000);
+        
+        createMessage("message.claims.audio", new MessageBodyAudio("Starta inspelning", "/claims/fileupload"), "h_symbol",2000);
+        
+        createMessage("message.claims.record.ok", new MessageBodyParagraph("Tack! Det är allt jag behöver just nu"), "h_symbol",2000);
+        createMessage("message.claims.record.ok2", new MessageBodyParagraph("Jag återkommer till dig här i chatten om jag behöver något mer, eller för att meddela att jag kan betala ut ersättning direkt"), "h_symbol",2000);
+        createMessage("message.claims.record.ok3", new MessageBodyParagraph("Tack för att du delat med dig om det som hänt. Ta hand om dig så länge, så hörs vi snart!"), "h_symbol",2000);
 
-		createMessage("message.whyinsurance", new MessageBodyText("Hemförsäkring behöver alla!"));
-		
-		createMessage("message.whoishedvig", new MessageBodyText("En försäkringsbot!"));
+        createMessage("message.claims.record.ok3",
+                new MessageBodySingleSelect("Tack för att du delat med dig om det som hänt. Ta hand om dig så länge, så hörs vi snart!",
+                        new ArrayList<SelectItem>() {{
+                        	add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
+                        }}
+                ), "h_symbol");
+        
 		createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 	}
 
@@ -80,25 +76,15 @@ public class ClaimsConversation extends Conversation {
 		String nxtMsg = "";
 		
 		switch(m.id){
-		case "message.getname": 
+		case "message.claims.audio": 
 
-			String fName = m.body.text;			
-			log.info("Add to context:" + "{NAME}:" + fName);
-			userContext.putUserData("{NAME}", fName);
-			m.body.text = "Jag heter " + fName;
+			// TODO: Send to claims service!
+			m.body.text = "Inspelning klar";
 			addToChat(m); // Response parsed to nice format
-			nxtMsg = "message.greetings";
+			nxtMsg = "message.claims.record.ok";
 			
 			break;
 
-		case "message.greetings": 
-
-			LocalDateTime bDate = ((MessageBodyDatePicker)m.body).date;			
-			log.info("Add to context:" + "{BIRTH_DATE}:" + bDate.toString());
-			userContext.putUserData("{BIRTH_DATE}", bDate.toString());
-			nxtMsg = "message.bye";
-			
-			break;
 		}
 		
         /*
@@ -123,13 +109,30 @@ public class ClaimsConversation extends Conversation {
 	@Override
 	public void init() {
 		// TODO Auto-generated method stub
-		
+		startConversation("message.claims.start");
 	}
 
-	@Override
-	public void recieveEvent(EventTypes e, String value) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void recieveEvent(EventTypes e, String value){
+
+        switch(e){
+            // This is used to let Hedvig say multiple message after another
+            case MESSAGE_FETCHED:
+                log.info("Message fetched:" + value);
+                switch(value){                
+                case "message.claims.start": completeRequest("message.claim.menu"); break;
+                case "message.claims.chat": completeRequest("message.claims.chat2"); break;
+                case "message.claims.chat2": completeRequest("message.claim.promise"); break;
+                case "message.claims.ok": completeRequest("message.claims.record"); break;
+                case "message.claims.record": completeRequest("message.claims.record2"); break;
+                case "message.claims.record2": completeRequest("message.claims.record3"); break;
+                case "message.claims.record3": completeRequest("message.claims.record4"); break;
+                case "message.claims.record4": completeRequest("message.claims.record5"); break;
+                case "message.claims.record5": completeRequest("message.claims.audio"); break;
+                case "message.claims.record.ok": completeRequest("message.claims.record.ok2"); break;
+                case "message.claims.record.ok2": completeRequest("message.claims.record.ok3"); break;
+                }
+        }
+    }
 
 }
