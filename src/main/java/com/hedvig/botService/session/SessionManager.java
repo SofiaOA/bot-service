@@ -13,8 +13,7 @@ import java.util.List;
 
 import com.hedvig.botService.chat.*;
 import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
-import com.hedvig.botService.enteties.userContextHelpers.UserData;
-import com.hedvig.botService.serviceIntegration.MemberService;
+import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.web.dto.*;
 
@@ -29,7 +28,6 @@ import com.hedvig.botService.enteties.Message;
 import com.hedvig.botService.enteties.ResourceNotFoundException;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.UserContextRepository;
-import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingClient;
 import com.hedvig.botService.chat.Conversation.EventTypes;
 import org.springframework.beans.factory.annotation.Value;
 
