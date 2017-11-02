@@ -5,6 +5,8 @@ package com.hedvig.botService.enteties;
  * */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hedvig.botService.dataTypes.HedvigDataType;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -47,6 +49,9 @@ public class Message {
     @JsonIgnore
 	public MemberChat chat;
 
+	@Transient
+	public HedvigDataType expectedType;
+	
 	public Message(){}
 
 	public String toString(){

@@ -292,7 +292,8 @@ public class SessionManager {
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
             OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
-            onboardingConversation.bankIdAuthComplete(e);
+            //onboardingConversation.bankIdAuthComplete(e);
+            onboardingConversation.bankIdAuthComplete();
         }
 
         repo.saveAndFlush(mc);

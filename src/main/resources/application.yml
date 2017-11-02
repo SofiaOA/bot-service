@@ -1,12 +1,14 @@
 server:
   port: 4081
 
+hedvig.product-pricing.url: 
     
 management:
   security:
     enabled: false
 
 hedvig:
+  product-pricing.url: localhost:4085
   kafka:
     acks: all
     retries: 3
@@ -45,5 +47,5 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/bot-service
     username: postgres
-    password: hedvig
+    password: iambatman
     platform: POSTGRESQL
