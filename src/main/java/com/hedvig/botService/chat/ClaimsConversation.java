@@ -6,13 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedvig.botService.enteties.*;
+import com.hedvig.botService.session.SessionManager;
 
 public class ClaimsConversation extends Conversation {
 
 	private static Logger log = LoggerFactory.getLogger(ClaimsConversation.class);
 
-	public ClaimsConversation(MemberChat mc, UserContext uc) {
-		super("claims", mc,uc);
+	public ClaimsConversation(MemberChat mc, UserContext uc, SessionManager session) {
+		super("claims", mc,uc, session);
 		// TODO Auto-generated constructor stub
 
 		createMessage("message.claims.start", new MessageBodyParagraph("Jag förstår, hoppas du mår ok under omständigheterna. Självklart tar jag tag i det här"), "h_symbol",2000);

@@ -8,14 +8,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedvig.botService.enteties.*;
+import com.hedvig.botService.session.SessionManager;
 
 public class OnboardingConversation extends Conversation {
 
 	private static Logger log = LoggerFactory.getLogger(OnboardingConversation.class);
 	private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 	
-	public OnboardingConversation(MemberChat mc, UserContext uc) {
-		super("onboarding", mc,uc);
+	public OnboardingConversation(MemberChat mc, UserContext uc, SessionManager session) {
+		super("onboarding", mc,uc, session);
 		// TODO Auto-generated constructor stub
 
 		createMessage("message.hello",

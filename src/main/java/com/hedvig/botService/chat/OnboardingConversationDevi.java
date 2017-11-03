@@ -15,6 +15,7 @@ import com.hedvig.botService.serviceIntegration.memberService.BankIdSignResponse
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.Member;
 import com.hedvig.botService.web.dto.MemberAuthedEvent;
 import org.slf4j.Logger;
@@ -45,8 +46,8 @@ public class OnboardingConversationDevi extends Conversation {
 
     private String gatewayUrl;
 
-    public OnboardingConversationDevi(MemberChat mc, UserContext uc, MemberService memberService, ProductPricingService productPricingClient, String gatewayUrl) {
-        super("onboarding", mc, uc);
+    public OnboardingConversationDevi(MemberChat mc, UserContext uc, MemberService memberService, SessionManager session, ProductPricingService productPricingClient, String gatewayUrl) {
+        super("onboarding", mc, uc, session);
         this.gatewayUrl = gatewayUrl;
         this.memberService = memberService;
         this.productPricingClient = productPricingClient;
@@ -307,11 +308,7 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Är inneboende", "inneboende"));
 
                         }}
-                ),(userContext, item) -> {
-                    UserData obd = userContext.getOnBoardingData();
-                    obd.setHouseType(item.value);
-                    return "message.pers";
-                });
+                ));
 
         // ALTERNATIVT KAN DESSA SVARSALTERNATIV GÖRAS TILL SCROLL ELLER SÅ?
 
@@ -765,6 +762,12 @@ public class OnboardingConversationDevi extends Conversation {
         UserData onBoardingData = userContext.getOnBoardingData();
 
         switch (m.id) {
+	        case "message.lghtyp":{
+	        	SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
+	            UserData obd = userContext.getOnBoardingData();
+	            obd.setHouseType(item.value);
+	            m.body.text = item.text;
+	            nxtMsg = "message.pers";}
 	        case "message.start.account.retrieval":
 	        	SelectItem sitem = ((MessageBodySingleSelect)m.body).getSelectedItem();
 

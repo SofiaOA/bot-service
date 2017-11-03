@@ -15,6 +15,7 @@ import com.hedvig.botService.serviceIntegration.memberService.BankIdAuthResponse
 import com.hedvig.botService.serviceIntegration.memberService.BankIdSignResponse;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.Member;
 import com.hedvig.botService.web.dto.MemberAuthedEvent;
 import org.slf4j.Logger;
@@ -44,8 +45,8 @@ public class OnboardingConversationDevi_old extends Conversation {
 
     private String gatewayUrl;
 
-    public OnboardingConversationDevi_old(MemberChat mc, UserContext uc, MemberService memberService, ProductPricingService productPricingClient, String gatewayUrl) {
-        super("onboarding", mc, uc);
+    public OnboardingConversationDevi_old(MemberChat mc, UserContext uc, MemberService memberService, SessionManager session, ProductPricingService productPricingClient, String gatewayUrl) {
+        super("onboarding", mc, uc, session);
         this.gatewayUrl = gatewayUrl;
         this.memberService = memberService;
         this.productPricingClient = productPricingClient;
@@ -847,7 +848,7 @@ public class OnboardingConversationDevi_old extends Conversation {
 				log.info("Onboarding complete");
 				userContext.completeConversation(this.getClass().getName());
 				//userContext.onboardingComplete(true);
-				break;
+				return;
 		    case "message.bankid.device.start":
 		        //BankIdAuthResponse  authResponse = this.memberService.auth();
 		        nxtMsg = "message.bankid.autostart.send";

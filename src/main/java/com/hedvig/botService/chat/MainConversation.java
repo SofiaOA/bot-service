@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedvig.botService.enteties.*;
+import com.hedvig.botService.session.SessionManager;
 
 public class MainConversation extends Conversation {
 
@@ -17,8 +18,8 @@ public class MainConversation extends Conversation {
 	private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private String emoji_hand_ok = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8C}, Charset.forName("UTF-8"));
 
-	public MainConversation(MemberChat mc, UserContext uc) {
-		super("main.menue", mc,uc);
+	public MainConversation(MemberChat mc, UserContext uc, SessionManager session) {
+		super("main.menue", mc,uc,session);
 		// TODO Auto-generated constructor stub
 
 		createMessage("hedvig.com",
@@ -61,6 +62,11 @@ public class MainConversation extends Conversation {
 		String nxtMsg = "";
 		
 		switch(m.id){
+		case "message.main.report": 
+			addToChat(m); // Response parsed to nice format
+			nxtMsg = "conversation.done";
+			sessionManager.initClaim(userContext.getMemberId()); // Start claim here
+			break;
 		case "message.question": 
 			userContext.putUserData("{QUESTION_"+LocalDate.now()+"}", m.body.text);
 			addToChat(m); // Response parsed to nice format
@@ -93,6 +99,27 @@ public class MainConversation extends Conversation {
 		
 	}
 
+    /*
+     * Generate next chat message or ends conversation
+     * */
+    @Override
+    public void completeRequest(String nxtMsg){
+
+        switch(nxtMsg){
+            case "conversation.done":
+                log.info("conversation complete");
+                userContext.completeConversation(this.getClass().getName());
+                //userContext.onboardingComplete(true);
+                return;
+            case "":
+                log.error("I dont know where to go next...");
+                nxtMsg = "error";
+                break;
+        }
+
+        super.completeRequest(nxtMsg);
+    }
+    
 	@Override
 	public void init() {
     	log.info("Starting main conversation");

@@ -5,14 +5,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedvig.botService.enteties.*;
+import com.hedvig.botService.session.SessionManager;
 
 public class UpdateInformationConversation extends Conversation {
 
 	private static Logger log = LoggerFactory.getLogger(UpdateInformationConversation.class);
 	private String startMessage = "message.info.update";
 	
-	public UpdateInformationConversation(MemberChat mc, UserContext uc) {
-		super("info.update", mc,uc);
+	public UpdateInformationConversation(MemberChat mc, UserContext uc, SessionManager session) {
+		super("info.update", mc,uc, session);
 		
 		// TODO Auto-generated constructor stub
 
@@ -30,8 +31,8 @@ public class UpdateInformationConversation extends Conversation {
 
 	}
 
-	public UpdateInformationConversation(MemberChat mc, UserContext uc, String startMessage) {
-		this(mc,uc);
+	public UpdateInformationConversation(MemberChat mc, UserContext uc, SessionManager session, String startMessage) {
+		this(mc,uc, session);
 		this.startMessage = startMessage;		
 	}	
 	

@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import com.hedvig.botService.dataTypes.HedvigDataType;
 import com.hedvig.botService.enteties.*;
+import com.hedvig.botService.session.SessionManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +25,15 @@ public abstract class Conversation {
 
 	MemberChat memberChat;
 	UserContext userContext;
+	SessionManager sessionManager;
 	private TreeMap<String, Message> messageList = new TreeMap<String, Message>();
 	//HashMap<String, String> conversationContext = new HashMap<String, String>(); // Context specific information learned during conversation
 	
-	Conversation(String conversationId, MemberChat mc, UserContext uc) {
+	Conversation(String conversationId, MemberChat mc, UserContext uc, SessionManager session) {
 		this.conversationName = conversationId;
 		this.memberChat = mc;
 		this.userContext = uc;
+		this.sessionManager = sessionManager;
 	}
 
 	public Message getMessage(String key){

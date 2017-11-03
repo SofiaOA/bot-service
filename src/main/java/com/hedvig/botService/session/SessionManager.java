@@ -64,7 +64,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
-		ClaimsConversation claimsConversation = new ClaimsConversation(mc, uc);
+		ClaimsConversation claimsConversation = new ClaimsConversation(mc, uc, this);
 		startConversation(claimsConversation, uc);
 		
     	uc.initClaim();
@@ -82,16 +82,16 @@ public class SessionManager {
         		Conversation c = null;
         		switch(name){
         		case MainConversation:
-                	c = new MainConversation(mc, uc);
+                	c = new MainConversation(mc, uc, this);
         			break;
         		case ClaimsConversation:
-                    c = new ClaimsConversation(mc, uc);
+                    c = new ClaimsConversation(mc, uc, this);
         			break;
         		case OnboardingConversationDevi:
-                	c = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
+                	c = new OnboardingConversationDevi(mc, uc, memberService, this, this.productPricingclient, gatewayUrl);
         			break;
         		case UpdateInformationConversation:
-                    c = new UpdateInformationConversation(mc, uc);                      
+                    c = new UpdateInformationConversation(mc, uc, this);                      
         			break;
         		}
         		c.recieveEvent(type, value);
@@ -122,7 +122,7 @@ public class SessionManager {
 		/*
 		 * Kick off onboarding conversation
 		 * */
-        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
+        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this, this.productPricingclient, gatewayUrl);
         startConversation(onboardingConversation, uc);
         
         repo.saveAndFlush(mc);
@@ -156,7 +156,7 @@ public class SessionManager {
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
     	
     	mc.reset(); // Clear chat
-        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
+        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this, this.productPricingclient, gatewayUrl);
         startConversation(onboardingConversation, uc);
         
     	repo.saveAndFlush(mc);
@@ -235,7 +235,7 @@ public class SessionManager {
     	//if(
     			//!uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString()) && 
     	//		!uc.hasOngoingConversation(conversationTypes.MainConversation.toString())){
-    		MainConversation mainConversation = new MainConversation(mc, uc);
+    		MainConversation mainConversation = new MainConversation(mc, uc, this);
     		startConversation(mainConversation,uc);
     	//}
         /*
@@ -274,7 +274,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
         
-        UpdateInformationConversation conversation = new UpdateInformationConversation(mc, uc, startingMessage);
+        UpdateInformationConversation conversation = new UpdateInformationConversation(mc, uc, this, startingMessage);
         startConversation(conversation, uc);
         /*uc.putUserData("{"+conversation.getConversationName()+"}", Conversation.conversationStatus.ONGOING.toString());
     	conversation.init();*/
@@ -291,7 +291,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService,this, this.productPricingclient, gatewayUrl);
             //onboardingConversation.bankIdAuthComplete(e);
             onboardingConversation.bankIdAuthComplete(e);
         }
@@ -321,7 +321,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this, this.productPricingclient, gatewayUrl);
             onboardingConversation.memberSigned(payload.getReferenceId());
         }
 
@@ -336,7 +336,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this, this.productPricingclient, gatewayUrl);
             onboardingConversation.bankAccountRetrieveFailed();
         }
 
@@ -362,7 +362,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService,this, this.productPricingclient, gatewayUrl);
             onboardingConversation.bankAccountRetrieved();
         }
 
@@ -375,7 +375,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(mc, uc, memberService, this, this.productPricingclient, gatewayUrl);
             onboardingConversation.quoteAccepted();
         }
 
@@ -401,16 +401,16 @@ public class SessionManager {
         		Conversation c = null;
         		switch(name){
         		case MainConversation:
-                	c = new MainConversation(mc, uc);
+                	c = new MainConversation(mc, uc, this);
         			break;
         		case ClaimsConversation:
-                    c = new ClaimsConversation(mc, uc);
+                    c = new ClaimsConversation(mc, uc, this);
         			break;
         		case OnboardingConversationDevi:
-                	c = new OnboardingConversationDevi(mc, uc, memberService, this.productPricingclient, gatewayUrl);
+                	c = new OnboardingConversationDevi(mc, uc, memberService,this, this.productPricingclient, gatewayUrl);
         			break;
         		case UpdateInformationConversation:
-                    c = new UpdateInformationConversation(mc, uc);                      
+                    c = new UpdateInformationConversation(mc, uc, this);                      
         			break;
         		}
         		if(c==null)throw new RuntimeException("Conversation not found for user :" + hid + " message id:" + m.id);

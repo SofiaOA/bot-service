@@ -3,14 +3,16 @@ package com.hedvig.botService.chat;
 import java.util.ArrayList;
 
 import com.hedvig.botService.enteties.*;
+import com.hedvig.botService.session.SessionManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SampleConversation extends Conversation {
 
 	private static Logger log = LoggerFactory.getLogger(SampleConversation.class);	
-	public SampleConversation(MemberChat mc, UserContext uc) {
-		super("sample", mc, uc);
+	public SampleConversation(MemberChat mc, UserContext uc, SessionManager session) {
+		super("sample", mc, uc, session);
 		init();
 	}
 
