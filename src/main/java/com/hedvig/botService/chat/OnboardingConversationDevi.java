@@ -160,7 +160,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.lagenhet",
                 new MessageBodySingleSelect("Toppen! Har du BankID? I så fall kan vi hoppa över några frågor!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig:///",  null, false));
+                            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://",  null, false));
                             add(new SelectOption("Jag har inte BankID", "message.manuellnamn"));
                         }}
                 ), "h_symbol",
@@ -181,7 +181,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.bankid.start",
                 new MessageBodySingleSelect("Välkommen tillbaka! Bara att logga in så ser du din försäkring",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig:///",  null, false));
+                            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://",  null, false));
                         }}
                 ), "h_symbol",
                 (__,i) -> {
@@ -494,36 +494,22 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Skandia", "SKB"));
                             add(new SelectOption("Sparbanken Syd ", "SYD"));
                         }}
-                ),
-                (UserContext userContext, SelectItem s) -> {
-                    userContext.getAutogiroData().selectBank(s.value, s.text);
-                    return "message.start.account.retrieval";
-                });
+                ));
 
         createMessage("message.start.account.retrieval",
                 new MessageBodySingleSelect("Då behöver vi välja det konto som pengarna ska dras ifrån. Om du har ditt BankId redo så ska jag fråga mina vänner på {BANK_FULL} om dina konotnummer.",
                         new ArrayList<SelectItem>(){{
                             //add(new SelectOption("Jag är redo!", "message.fetch.accounts"));
-                            add(new SelectLink("Öppna BankId", "message.fetch.accounts", null, "bankid:///?redirect=hedvig:///", null, false));
+                            add(new SelectLink("Öppna BankId", "message.fetch.accounts", null, "bankid:///?redirect=hedvig://", null, false));
                             add(new SelectOption("Varför ska jag göra detta?", "message.fetch.accounts.explain"));
-                        }}),
-                (userContext, item) -> {
-                    if(item.value.equals("message.fetch.accounts")) {
-                        String publicId = this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
-                        uc.putUserData("{REFERENCE_TOKEN}", publicId);
-
-                        return "message.fetch.accounts.hold";
-                    }
-
-                    return "message.start.account.retrieval";
-                });
+                        }}));
 
         createMessage("message.fetch.accounts.explain", new MessageBodyParagraph("Jag använder autogiro för att göra betalningar smidiga. För att kunna aktivera autogiro behöver du välja vilket av dina bankkonton betalningen ska dras ifrån"), "h_symbol",2000);;
 
         createMessage("message.fetch.accounts.explain",
                 new MessageBodySingleSelect("Jag vet inte vilka bankkonton du har, men om du loggar in med BankID kan jag hämta informationen från din bank så att du kan välja konto i en lista",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in med BankId", "message.fetch.accounts", null, "bankid:///?redirect=hedvig:///", null, false));
+                            add(new SelectLink("Logga in med BankId", "message.fetch.accounts", null, "bankid:///?redirect=hedvig://", null, false));
                         }}
                 ),
                 (userContext, item) -> {
@@ -560,7 +546,7 @@ public class OnboardingConversationDevi extends Conversation {
         setExpectedReturnType("message.mail", new EmailAdress());
         
         createMessage("message.kontrakt",
-                new MessageBodySingleSelect("ack igen! Och nu till det stora ögonblicket. Här har du allt som vi sagt samlat. Läs igenom och skriv på med ditt BankID för att godkänna din nya försäkring",
+                new MessageBodySingleSelect("Tack igen! Och nu till det stora ögonblicket. Här har du allt som vi sagt samlat. Läs igenom och skriv på med ditt BankID för att godkänna din nya försäkring",
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Visa kontraktet", "message.kontraktpop", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));
 
@@ -598,11 +584,11 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.kontraktpop.startBankId",
                 new MessageBodySingleSelect("Hoppas allt kändes bra! Då återstår bara signeringen",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Signera", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig:///", null, false));
+                            add(new SelectLink("Signera", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://", null, false));
                         }}
                 ));
 
-        createMessage("message.kontraktklar", new MessageBodyParagraph("emoji_tada + \" Hurra! \"+ emoji_tada "), "h_symbol",2000);
+        createMessage("message.kontraktklar", new MessageBodyParagraph(emoji_tada + " Hurra! "+ emoji_tada ), "h_symbol",2000);
         createMessage("message.kontraktklar2", new MessageBodyParagraph("Välkommen, bästa nya medlem"), "h_symbol",2000);
         createMessage("message.kontraktklar3", new MessageBodyText("Jag skickar en bekräftelse till din mejl! Vad har du för mejladress?"), "h_symbol", 2000);
         setExpectedReturnType("message.kontraktklar3", new EmailAdress());
@@ -779,6 +765,23 @@ public class OnboardingConversationDevi extends Conversation {
         UserData onBoardingData = userContext.getOnBoardingData();
 
         switch (m.id) {
+	        case "message.start.account.retrieval":
+	        	SelectItem sitem = ((MessageBodySingleSelect)m.body).getSelectedItem();
+
+                if(sitem.value.equals("message.fetch.accounts")) {
+                    String publicId = this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
+                    userContext.putUserData("{REFERENCE_TOKEN}", publicId);
+                    nxtMsg = "message.fetch.accounts.hold";
+                }
+                m.body.text = sitem.text;
+                nxtMsg = "message.start.account.retrieval";
+		        break;
+	        case "message.medlemjabank":
+	        	SelectItem s = ((MessageBodySingleSelect)m.body).getSelectedItem();
+		        userContext.getAutogiroData().selectBank(s.value, s.text);
+		        m.body.text = s.text;
+		        nxtMsg = "message.start.account.retrieval";
+		        break;
             case "message.onboardingstart.final":
             	
             	String opt = getValue((MessageBodySingleSelect)m.body);
@@ -976,7 +979,7 @@ public class OnboardingConversationDevi extends Conversation {
             case "message.fetch.account.complete":
                 SelectItem it = ((MessageBodySingleSelect)m.body).getSelectedItem();
                 userContext.getAutogiroData().setSelecteBankAccount(Integer.parseInt(it.value));
-                nxtMsg = "message.mail";
+                nxtMsg = "message.kontrakt";
                 break;
 
             case "message.kontrakt":
