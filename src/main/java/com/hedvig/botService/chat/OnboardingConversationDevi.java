@@ -762,22 +762,26 @@ public class OnboardingConversationDevi extends Conversation {
         UserData onBoardingData = userContext.getOnBoardingData();
 
         switch (m.id) {
-	        case "message.lghtyp":{
+	        case "message.lghtyp": {
 	        	SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
 	            UserData obd = userContext.getOnBoardingData();
 	            obd.setHouseType(item.value);
 	            m.body.text = item.text;
-	            nxtMsg = "message.pers";}
+	            nxtMsg = "message.pers";
+	            break;
+	        }
 	        case "message.start.account.retrieval":
 	        	SelectItem sitem = ((MessageBodySingleSelect)m.body).getSelectedItem();
 
+                m.body.text = sitem.text;
                 if(sitem.value.equals("message.fetch.accounts")) {
                     String publicId = this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
                     userContext.putUserData("{REFERENCE_TOKEN}", publicId);
                     nxtMsg = "message.fetch.accounts.hold";
+                }else {
+                    nxtMsg = "message.start.account.retrieval";
                 }
-                m.body.text = sitem.text;
-                nxtMsg = "message.start.account.retrieval";
+
 		        break;
 	        case "message.medlemjabank":
 	        	SelectItem s = ((MessageBodySingleSelect)m.body).getSelectedItem();
