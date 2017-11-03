@@ -30,17 +30,18 @@ public class OnboardingConversationDevi extends Conversation {
     private final ProductPricingService productPricingClient;
 
 
-    private String emoji_smile = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0x81}, Charset.forName("UTF-8"));
-    private String emoji_hand_ok = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8C}, Charset.forName("UTF-8"));
-    private String emoji_closed_lock_with_key = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x94, (byte)0x90}, Charset.forName("UTF-8"));
-    private String emoji_postal_horn = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x93, (byte)0xAF}, Charset.forName("UTF-8"));
-    private String emoji_school_satchel = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x8E, (byte)0x92}, Charset.forName("UTF-8"));
-    private String emoji_mag = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x94, (byte)0x8D}, Charset.forName("UTF-8"));
-    private String emoji_revlolving_hearts = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x92, (byte)0x9E}, Charset.forName("UTF-8"));
-    private String emoji_tada = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x8E, (byte)0x89}, Charset.forName("UTF-8"));
-    private String emoji_thumbs_up = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8D}, Charset.forName("UTF-8"));
-    private String emoji_hug = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0xA4, (byte)0x97}, Charset.forName("UTF-8"));
-    private String emoji_waving_hand = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8B}, Charset.forName("UTF-8"));
+    public final static String emoji_smile = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0x81}, Charset.forName("UTF-8"));
+    public final static String emoji_hand_ok = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8C}, Charset.forName("UTF-8"));
+    public final static String emoji_closed_lock_with_key = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x94, (byte)0x90}, Charset.forName("UTF-8"));
+    public final static String emoji_postal_horn = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x93, (byte)0xAF}, Charset.forName("UTF-8"));
+    public final static String emoji_school_satchel = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x8E, (byte)0x92}, Charset.forName("UTF-8"));
+    public final static String emoji_mag = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x94, (byte)0x8D}, Charset.forName("UTF-8"));
+    public final static String emoji_revlolving_hearts = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x92, (byte)0x9E}, Charset.forName("UTF-8"));
+    public final static String emoji_tada = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x8E, (byte)0x89}, Charset.forName("UTF-8"));
+    public final static String emoji_thumbs_up = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8D}, Charset.forName("UTF-8"));
+    public final static String emoji_hug = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0xA4, (byte)0x97}, Charset.forName("UTF-8"));
+    public final static String emoji_waving_hand = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8B}, Charset.forName("UTF-8"));
+    public final static String emoji_flushed_face = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0xB3}, Charset.forName("UTF-8"));
 
     private String gatewayUrl;
 
@@ -160,7 +161,7 @@ public class OnboardingConversationDevi extends Conversation {
                 new MessageBodySingleSelect("Toppen! Har du BankID? I så fall kan vi hoppa över några frågor!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig:///",  null, false));
-                            add(new SelectOption("Jag har inte BankID", "message.manuellpersonnr"));
+                            add(new SelectOption("Jag har inte BankID", "message.manuellnamn"));
                         }}
                 ), "h_symbol",
                 (__,i) -> {
@@ -270,7 +271,10 @@ public class OnboardingConversationDevi extends Conversation {
 
         //(FUNKTION: FYLL I PERSONNR) = SCROLL KANSKE DÄR EN VÄLJER DATUM? BEHÖVS FYRA SISTA SIFFROR?
 
-        createMessage("message.manuellpersonnr", new MessageBodyNumber("Inga problem! Då ställer jag bara några extra frågor. Vad är ditt personnummer?"));
+        createMessage("message.manuellnamn", new MessageBodyText("Inga problem! Då ställer jag bara några extra frågor. Vad heter du i förnamn?"));
+        createMessage("message.manuellfamilyname", new MessageBodyText("Kul att ha dig här {NAME}! " + emoji_hug + " Vad heter du i efternamn?"));
+        
+        createMessage("message.manuellpersonnr", new MessageBodyNumber("Tack! Vad är ditt personnummer?"));
         setExpectedReturnType("message.manuellpersonnr", new SSNSweden());
         createMessage("message.varborduadress", new MessageBodyText("Tack! Och vilken gatuadress bor du på?"));
         createMessage("message.varbordupostnr", new MessageBodyNumber("Vad är ditt postnummer?"));
@@ -828,6 +832,17 @@ public class OnboardingConversationDevi extends Conversation {
                     nxtMsg = "message.lghtyp";
                 }
 
+                break;                
+                
+            case "message.manuellnamn":
+                onBoardingData.setFirstName(m.body.text);
+                addToChat(m);
+                nxtMsg = "message.manuellfamilyname";
+                break;
+            case "message.manuellfamilyname":
+            	onBoardingData.setFamilyName(m.body.text);
+                addToChat(m);
+                nxtMsg = "message.manuellpersonnr";
                 break;
             case "message.manuellpersonnr":
                 onBoardingData.setSSN(m.body.text);
@@ -898,12 +913,17 @@ public class OnboardingConversationDevi extends Conversation {
                  * */
                 String missingItems = userContext.getMissingDataItem();
                 if(missingItems!=null){
+                	
                     createMessage("message.missingvalue", new MessageBodyText(
-                            "Oj, nu verkar det som om jag saknar lite viktig information. T.ex har jag ingen " + missingItems));
+                            "Oj, nu verkar det som om jag saknar lite viktig information." + missingItems));
+                    
+                    m.body.text = item.text;
+                    nxtMsg = "message.missingvalue";
+                    addToChat(m);
                     addToChat(getMessage("message.missingvalue"));
                     break;
                 }
-                if(m.id.equals("message.missingvalue") || item.value.equals("message.forslag")) {
+                else if(m.id.equals("message.missingvalue") || item.value.equals("message.forslag")) {
                     String productId = this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
                     onBoardingData.setProductId(productId);
                 }
@@ -922,9 +942,18 @@ public class OnboardingConversationDevi extends Conversation {
 
                 if(selectedValue.equals("message.lagenhet")) {
 
-                    Optional<BankIdAuthResponse> authResponse = memberService.auth();
-
-                    nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse);
+                	try{
+	                    Optional<BankIdAuthResponse> authResponse = memberService.auth();
+	                    if(!authResponse.isPresent()){
+	                    	nxtMsg = "message.manuellnamn";
+	                    }
+	                    else{
+	                    	nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse);
+	                    }
+                	}catch(Exception e){
+                		log.error(e.getMessage());
+                		nxtMsg = "message.manuellnamn";
+                	}
                 }
 
                 addToChat(m);

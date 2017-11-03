@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedvig.botService.chat.Conversation;
+import com.hedvig.botService.chat.OnboardingConversationDevi;
 
 import lombok.Getter;
 
@@ -30,17 +31,17 @@ import lombok.Getter;
 public class UserContext implements Serializable {
 	
 	private static Logger log = LoggerFactory.getLogger(UserContext.class);
-	private static ArrayList<String> requiredData = new ArrayList<String>(){{
-		add("{ADDRESS}");
-		add("{ADDRESS_ZIP}");
-		//add("{EMAIL}"); Email is not required to get a quote
-		add("{FAMILY_NAME}");
-		add("{HOUSE}");
-		add("{KVM}");
-		add("{MEMBER_BIRTH_DATE}");
-		add("{NAME}");
-		add("{NR_PERSONS}");
-		add("{SECURE_ITEMS_NO}");
+	private static HashMap<String, String> requiredData = new HashMap<String, String>(){{
+		put("{ADDRESS}","T.ex har jag vet jag inte var du bor. Vad har du för gatuadress?");
+		put("{ADDRESS_ZIP}", "T.ex har jag inte ditt postnummer?");
+		//put("{EMAIL}"); Email is not required to get a quote
+		put("{FAMILY_NAME}","T.ex vet jag inte vad heter i efternamn... " + OnboardingConversationDevi.emoji_flushed_face + " ?");
+		put("{HOUSE}", "T.ex vet jag inte om du bor i hus eller lägenhet?");
+		put("{KVM}","T.ex vet jag inte hur stor din bostad är?");
+		put("{SSN}", "T.ex har jag inte ditt personnummer?");
+		put("{NAME}", "T.ex vet jag inte vad heter... " + OnboardingConversationDevi.emoji_flushed_face + " ?");
+		put("{NR_PERSONS}", "Tex. hur många är ni i hushållet");
+		put("{SECURE_ITEMS_NO}", "T.ex skulle jag behöver veta hur många säkerhetsgrejer du har?"); // TODO: Redirect...
 		}};
 			
     @Id
@@ -179,8 +180,10 @@ public class UserContext implements Serializable {
      * Validate that all required information is collected during onboarding and if not enable Hedvig to ask for it
      * */
     public String getMissingDataItem(){
-    	for(String s : requiredData){
-    		if(!userData.containsKey(s)){return s;}
+    	for(String s : requiredData.keySet()){
+    		if(!userData.containsKey(s)){
+    			return requiredData.get(s);
+    		}
     	}
     	return null;
     }
