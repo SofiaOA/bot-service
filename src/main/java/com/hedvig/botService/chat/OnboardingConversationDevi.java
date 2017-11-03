@@ -177,6 +177,26 @@ public class OnboardingConversationDevi extends Conversation {
                 }
         );
 
+        createMessage("message.bankid.start",
+                new MessageBodySingleSelect("Välkommen tillbaka! Bara att logga in så ser du din försäkring",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://",  null, false));
+                        }}
+                ), "h_symbol",
+                (__,i) -> {
+                    UserData obd = userContext.getOnBoardingData();
+                    if(i.value.equals("message.bankid.autostart.respond"))
+                    {
+                        obd.setBankIdOnDecvie(true);
+                    } else
+                    {
+                        obd.setBankIdOnDecvie(false);
+                    }
+
+                    return "";
+                }
+        );
+        
         createMessage("message.bankid.start.manual",
                 new MessageBodyNumber("Om du anger ditt personnumer så får du använda bankId på din andra enhet" + emoji_smile
                 ));

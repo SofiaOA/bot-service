@@ -211,7 +211,7 @@ public abstract class Conversation {
     		log.info("Setting the expected return typ for message:" + messageId + " to " + type.getClass().getName());
     		getMessage(messageId).expectedType = type;
     	}else{
-    		log.error("Message not found:" + messageId);
+    		log.error("ERROR: ------------> Message not found:" + messageId);
     	}
     }
     
