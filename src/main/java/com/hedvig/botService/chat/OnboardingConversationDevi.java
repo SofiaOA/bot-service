@@ -159,7 +159,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.lagenhet",
                 new MessageBodySingleSelect("Toppen! Har du BankID? I så fall kan vi hoppa över några frågor!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://",  null, false));
+                            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig:///",  null, false));
                             add(new SelectOption("Jag har inte BankID", "message.manuellpersonnr"));
                         }}
                 ), "h_symbol",
@@ -180,7 +180,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.bankid.start",
                 new MessageBodySingleSelect("Välkommen tillbaka! Bara att logga in så ser du din försäkring",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://",  null, false));
+                            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig:///",  null, false));
                         }}
                 ), "h_symbol",
                 (__,i) -> {
@@ -500,7 +500,7 @@ public class OnboardingConversationDevi extends Conversation {
                 new MessageBodySingleSelect("Då behöver vi välja det konto som pengarna ska dras ifrån. Om du har ditt BankId redo så ska jag fråga mina vänner på {BANK_FULL} om dina konotnummer.",
                         new ArrayList<SelectItem>(){{
                             //add(new SelectOption("Jag är redo!", "message.fetch.accounts"));
-                            add(new SelectLink("Öppna BankId", "message.fetch.accounts", null, "bankid:///?redirect=hedvig://", null, false));
+                            add(new SelectLink("Öppna BankId", "message.fetch.accounts", null, "bankid:///?redirect=hedvig:///", null, false));
                             add(new SelectOption("Varför ska jag göra detta?", "message.fetch.accounts.explain"));
                         }}),
                 (userContext, item) -> {
@@ -519,7 +519,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.fetch.accounts.explain",
                 new MessageBodySingleSelect("Jag vet inte vilka bankkonton du har, men om du loggar in med BankID kan jag hämta informationen från din bank så att du kan välja konto i en lista",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in med BankId", "message.fetch.accounts", null, "bankid:///?redirect=hedvig://", null, false));
+                            add(new SelectLink("Logga in med BankId", "message.fetch.accounts", null, "bankid:///?redirect=hedvig:///", null, false));
                         }}
                 ),
                 (userContext, item) -> {
@@ -594,7 +594,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.kontraktpop.startBankId",
                 new MessageBodySingleSelect("Hoppas allt kändes bra! Då återstår bara signeringen",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Signera", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://", null, false));
+                            add(new SelectLink("Signera", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig:///", null, false));
                         }}
                 ));
 
