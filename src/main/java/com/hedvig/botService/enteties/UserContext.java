@@ -60,7 +60,7 @@ public class UserContext implements Serializable {
     @ElementCollection
     @CollectionTable(name="user_data")
     @MapKeyColumn(name="key")
-    @Column(name="value")
+    @Column(name="value", length = 3000)
     private Map<String, String> userData = new HashMap<String, String>();
 
     /*

@@ -36,8 +36,10 @@ public class MessageBody {
 
 	private static Logger log = LoggerFactory.getLogger(MessageBody.class);
 
+	@Column(length=10485760)
 	public String text;
 
+	@Column(length=10485)
 	public String imageURL;
 	public Integer imageWidth;
 	public Integer imageHeight;
