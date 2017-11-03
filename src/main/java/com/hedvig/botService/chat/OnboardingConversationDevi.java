@@ -630,7 +630,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.quote.close",
                 new MessageBodySingleSelect("Verkade förslaget intressant så välj OK så fortsätter vi prata sen",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Visa igen", "message.forslagpop"));
+                        	add(new SelectLink("Visa igen", "message.forslag.dashboard", "Offer", null, null, false  ));
                         }}
                 ));
 
