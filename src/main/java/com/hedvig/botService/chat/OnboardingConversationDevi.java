@@ -418,7 +418,6 @@ public class OnboardingConversationDevi extends Conversation {
                         }}
                 ));
 
-
         createMessage("message.forslagpop",
                 new MessageBodySingleSelect("(FÖRSLAG VISAS I POP-UP. I POP-UP FINNS NEDAN ALTERNATIV SOM TAR EN TILLBAKA TILL CHATTEN NÄR EN VALT)",
                         new ArrayList<SelectItem>() {{
@@ -427,7 +426,6 @@ public class OnboardingConversationDevi extends Conversation {
 
                         }}
                 ));
-
 
         createMessage("message.fundera",
                 new MessageBodySingleSelect("Smart att fundera när ett viktigt val ska göras\n\nJag kanske kan ge dig mer stoff till funderande. Undrar du något av det här?",
@@ -778,14 +776,19 @@ public class OnboardingConversationDevi extends Conversation {
 
         switch (m.id) {
             case "message.onboardingstart.final":
-                String opt = getValue((MessageBodySingleSelect)m.body);
-                log.info("message.onboardingstart redirect to " + opt);
-                if(opt.equals("message.mockme")){
+            	
+            	String opt = getValue((MessageBodySingleSelect)m.body);
+                if(opt.equals("message.bankid.start")) {
+                    Optional<BankIdAuthResponse> authResponse = memberService.auth();
+                    nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse);
+                }                            
+                else if(opt.equals("message.mockme")){
+                	log.info("message.onboardingstart redirect to " + opt);
                     m.body.text = "Mocka mina uppgifter tack!";
                     userContext.clearContext();
                     userContext.mockMe();
-                    addToChat(m);
                 }
+                addToChat(m);
                 break;
             case "message.audiotest":
             case "message.phototest":
@@ -926,7 +929,7 @@ public class OnboardingConversationDevi extends Conversation {
 
                 addToChat(m);
                 break;
-
+                
             case "message.bankid.start.manual":
                 String ssn =  m.body.text;
 
