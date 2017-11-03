@@ -579,7 +579,7 @@ public class OnboardingConversationDevi extends Conversation {
 
                     Optional<BankIdSignResponse> signData;
 
-                    signData = memberService.sign(ud.getSSN(), "Jag medgiver harom Hedvigs allmanne villkor och giver Hedvig en fullmakt sa att hen kan hantere mine forsakringar.");
+                    signData = memberService.sign(ud.getSSN(), "Jag godkänner att jag har tagit del av Hedvigs förköpsinformation och försäkringsvillkor.");
 
                     if(signData.isPresent()) {
                         uc.putUserData("{AUTOSTART_TOKEN}", signData.get().getAutoStartToken());
