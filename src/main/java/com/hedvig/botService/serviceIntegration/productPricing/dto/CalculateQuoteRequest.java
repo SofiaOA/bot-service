@@ -21,5 +21,5 @@ public class CalculateQuoteRequest {
     private String currentInsurer;
     private int personsInHouseHold;
 
-    private List<String> goodToHaveItems;
+    private List<SafetyIncreaserType> safetyIncreasers;
 }

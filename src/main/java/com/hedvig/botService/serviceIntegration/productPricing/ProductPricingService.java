@@ -4,10 +4,12 @@ import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.productPricing.dto.Address;
 import com.hedvig.botService.serviceIntegration.productPricing.dto.CalculateQuoteRequest;
 import com.hedvig.botService.serviceIntegration.productPricing.dto.Created;
+import com.hedvig.botService.serviceIntegration.productPricing.dto.SafetyIncreaserType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class ProductPricingService {
@@ -32,7 +34,33 @@ public class ProductPricingService {
         request.setHouseType(data.getHouseType());
         request.setLivingSpace(data.getLivingSpace());
         request.setPersonsInHouseHold(data.getPersonsInHouseHold());
-        request.setGoodToHaveItems(data.getSecurityItems());
+
+        List<SafetyIncreaserType> increasers = new ArrayList<>();
+        for(String s :data.getSecurityItems()) {
+            SafetyIncreaserType increaser;
+            switch (s) {
+                case "safety.alarm":
+                    increaser = SafetyIncreaserType.SMOKE_ALARM;
+                    break;
+                case "safety.extinguisher":
+                    increaser = SafetyIncreaserType.FIRE_EXTINGUISHER;
+                    break;
+                case "safety.door":
+                    increaser = SafetyIncreaserType.SAFETY_DOOR;
+                    break;
+                case "safety.gate":
+                    increaser = SafetyIncreaserType.GATE;
+                    break;
+                case "safety.burglaralarm":
+                    increaser = SafetyIncreaserType.BURGLAR_ALARM;
+                    break;
+                default:
+                    throw new RuntimeException(String.format("Unknown safety increaser: %s", s));
+            }
+            increasers.add(increaser);
+        }
+
+        request.setSafetyIncreasers(increasers);
 
         request.setCurrentInsurer(data.getCurrentInsurer());
 
