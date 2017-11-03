@@ -159,7 +159,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.lagenhet",
                 new MessageBodySingleSelect("Toppen! Har du BankID? I så fall kan vi hoppa över några frågor!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://",  null, false));
+                            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig:///",  null, false));
                             add(new SelectOption("Jag har inte BankID", "message.manuellpersonnr"));
                         }}
                 ), "h_symbol",
@@ -177,6 +177,26 @@ public class OnboardingConversationDevi extends Conversation {
                 }
         );
 
+        createMessage("message.bankid.start",
+                new MessageBodySingleSelect("Välkommen tillbaka! Bara att logga in så ser du din försäkring",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig:///",  null, false));
+                        }}
+                ), "h_symbol",
+                (__,i) -> {
+                    UserData obd = userContext.getOnBoardingData();
+                    if(i.value.equals("message.bankid.autostart.respond"))
+                    {
+                        obd.setBankIdOnDecvie(true);
+                    } else
+                    {
+                        obd.setBankIdOnDecvie(false);
+                    }
+
+                    return "";
+                }
+        );
+        
         createMessage("message.bankid.start.manual",
                 new MessageBodyNumber("Om du anger ditt personnumer så får du använda bankId på din andra enhet" + emoji_smile
                 ));
@@ -398,7 +418,6 @@ public class OnboardingConversationDevi extends Conversation {
                         }}
                 ));
 
-
         createMessage("message.forslagpop",
                 new MessageBodySingleSelect("(FÖRSLAG VISAS I POP-UP. I POP-UP FINNS NEDAN ALTERNATIV SOM TAR EN TILLBAKA TILL CHATTEN NÄR EN VALT)",
                         new ArrayList<SelectItem>() {{
@@ -407,7 +426,6 @@ public class OnboardingConversationDevi extends Conversation {
 
                         }}
                 ));
-
 
         createMessage("message.fundera",
                 new MessageBodySingleSelect("Smart att fundera när ett viktigt val ska göras\n\nJag kanske kan ge dig mer stoff till funderande. Undrar du något av det här?",
@@ -482,7 +500,7 @@ public class OnboardingConversationDevi extends Conversation {
                 new MessageBodySingleSelect("Då behöver vi välja det konto som pengarna ska dras ifrån. Om du har ditt BankId redo så ska jag fråga mina vänner på {BANK_FULL} om dina konotnummer.",
                         new ArrayList<SelectItem>(){{
                             //add(new SelectOption("Jag är redo!", "message.fetch.accounts"));
-                            add(new SelectLink("Öppna BankId", "message.fetch.accounts", null, "bankid:///?redirect=hedvig://", null, false));
+                            add(new SelectLink("Öppna BankId", "message.fetch.accounts", null, "bankid:///?redirect=hedvig:///", null, false));
                             add(new SelectOption("Varför ska jag göra detta?", "message.fetch.accounts.explain"));
                         }}),
                 (userContext, item) -> {
@@ -501,7 +519,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.fetch.accounts.explain",
                 new MessageBodySingleSelect("Jag vet inte vilka bankkonton du har, men om du loggar in med BankID kan jag hämta informationen från din bank så att du kan välja konto i en lista",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in med BankId", "message.fetch.accounts", null, "bankid:///?redirect=hedvig://", null, false));
+                            add(new SelectLink("Logga in med BankId", "message.fetch.accounts", null, "bankid:///?redirect=hedvig:///", null, false));
                         }}
                 ),
                 (userContext, item) -> {
@@ -576,7 +594,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.kontraktpop.startBankId",
                 new MessageBodySingleSelect("Hoppas allt kändes bra! Då återstår bara signeringen",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Signera", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://", null, false));
+                            add(new SelectLink("Signera", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig:///", null, false));
                         }}
                 ));
 
@@ -758,14 +776,19 @@ public class OnboardingConversationDevi extends Conversation {
 
         switch (m.id) {
             case "message.onboardingstart.final":
-                String opt = getValue((MessageBodySingleSelect)m.body);
-                log.info("message.onboardingstart redirect to " + opt);
-                if(opt.equals("message.mockme")){
+            	
+            	String opt = getValue((MessageBodySingleSelect)m.body);
+                if(opt.equals("message.bankid.start")) {
+                    Optional<BankIdAuthResponse> authResponse = memberService.auth();
+                    nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse);
+                }                            
+                else if(opt.equals("message.mockme")){
+                	log.info("message.onboardingstart redirect to " + opt);
                     m.body.text = "Mocka mina uppgifter tack!";
                     userContext.clearContext();
                     userContext.mockMe();
-                    addToChat(m);
                 }
+                addToChat(m);
                 break;
             case "message.audiotest":
             case "message.phototest":
@@ -906,7 +929,7 @@ public class OnboardingConversationDevi extends Conversation {
 
                 addToChat(m);
                 break;
-
+                
             case "message.bankid.start.manual":
                 String ssn =  m.body.text;
 
@@ -977,7 +1000,7 @@ public class OnboardingConversationDevi extends Conversation {
                 //userContext.onboardingComplete(true);
                 break;
             case "":
-                log.info("Unknown message recieved...");
+                log.error("I dont know where to go next...");
                 nxtMsg = "error";
                 break;
         }
