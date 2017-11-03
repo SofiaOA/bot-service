@@ -208,7 +208,7 @@ public abstract class Conversation {
 
     public void setExpectedReturnType(String messageId, HedvigDataType type){
     	if(getMessage(messageId)!=null){
-    		log.info("Setting the expected return typ for message:" + messageId + " to " + type.getClass().getName());
+    		log.debug("Setting the expected return typ for message:" + messageId + " to " + type.getClass().getName());
     		getMessage(messageId).expectedType = type;
     	}else{
     		log.error("ERROR: ------------> Message not found:" + messageId);

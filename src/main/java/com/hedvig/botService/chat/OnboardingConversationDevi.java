@@ -997,7 +997,7 @@ public class OnboardingConversationDevi extends Conversation {
                 //userContext.onboardingComplete(true);
                 break;
             case "":
-                log.info("Unknown message recieved...");
+                log.error("I dont know where to go next...");
                 nxtMsg = "error";
                 break;
         }
