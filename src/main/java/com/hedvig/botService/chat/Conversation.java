@@ -33,7 +33,7 @@ public abstract class Conversation {
 		this.conversationName = conversationId;
 		this.memberChat = mc;
 		this.userContext = uc;
-		this.sessionManager = sessionManager;
+		this.sessionManager = session;
 	}
 
 	public Message getMessage(String key){

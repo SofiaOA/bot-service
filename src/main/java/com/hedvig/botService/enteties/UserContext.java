@@ -87,6 +87,11 @@ public class UserContext implements Serializable {
     	String c =  getDataEntry("{" +conversationClassName+ "}") ;
     	return(c!=null && c.equals(Conversation.conversationStatus.ONGOING.toString()));
     }
+
+    public void startOngoingConversation(String conversationClassName){
+        if(conversationClassName.indexOf(".")==-1)conversationClassName = ("com.hedvig.botService.chat." + conversationClassName); // TODO: Refactor/remove hack
+        this.putUserData("{" +conversationClassName+ "}", Conversation.conversationStatus.ONGOING.toString());
+    }
     
     /*
      * Set conversation to COMPLETE

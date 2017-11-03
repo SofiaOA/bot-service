@@ -62,11 +62,15 @@ public class MainConversation extends Conversation {
 		String nxtMsg = "";
 		
 		switch(m.id){
-		case "message.main.report": 
-			addToChat(m); // Response parsed to nice format
-			nxtMsg = "conversation.done";
-			sessionManager.initClaim(userContext.getMemberId()); // Start claim here
-			break;
+			case "hedvig.com": {
+				SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
+				if(item.value.equals("message.main.report")) {
+					nxtMsg = "conversation.done";
+					//sessionManager.initClaim(userContext.getMemberId()); // Start claim here
+				}
+				addToChat(m); // Response parsed to nice format
+				break;
+			}
 		case "message.question": 
 			userContext.putUserData("{QUESTION_"+LocalDate.now()+"}", m.body.text);
 			addToChat(m); // Response parsed to nice format
@@ -109,6 +113,8 @@ public class MainConversation extends Conversation {
             case "conversation.done":
                 log.info("conversation complete");
                 userContext.completeConversation(this.getClass().getName());
+                new ClaimsConversation(this.memberChat, this.userContext, this.sessionManager).init();
+				userContext.startOngoingConversation(ClaimsConversation.class.getName());
                 //userContext.onboardingComplete(true);
                 return;
             case "":
