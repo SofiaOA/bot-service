@@ -1,4 +1,4 @@
-package com.hedvig.botService.enteties;
+package com.hedvig.botService.enteties.message;
 
 import java.time.Instant;
 

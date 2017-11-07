@@ -28,7 +28,7 @@ public class BotServiceApplication {
     
     @Autowired
     public void configure(EventHandlingConfiguration config) {
-        config.usingTrackingProcessors();
+        //config.usingTrackingProcessors();
     }
 
     @Bean

@@ -19,7 +19,7 @@ import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.support.ByteArrayMultipartFileEditor;
 
-import com.hedvig.botService.enteties.Message;
+import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.AvatarDTO;
 import com.hedvig.botService.web.dto.EventDTO;

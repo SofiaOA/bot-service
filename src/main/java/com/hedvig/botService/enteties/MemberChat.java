@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hedvig.botService.chat.Conversation;
+import com.hedvig.botService.enteties.message.Message;
 
 import java.time.Instant;
 import java.util.ArrayList;

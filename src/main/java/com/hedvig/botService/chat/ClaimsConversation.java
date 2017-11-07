@@ -1,19 +1,32 @@
 package com.hedvig.botService.chat;
 
 import java.util.ArrayList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import com.hedvig.botService.enteties.*;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodyAudio;
+import com.hedvig.botService.enteties.message.MessageBodyParagraph;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyText;
+import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.enteties.message.SelectLink;
+import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.session.SessionManager;
 
+@Component
 public class ClaimsConversation extends Conversation {
 
+	/*
+	 * Need to be stateless. I.e no variables apart from logger
+	 * */
 	private static Logger log = LoggerFactory.getLogger(ClaimsConversation.class);
 
-	public ClaimsConversation(MemberChat mc, UserContext uc, SessionManager session) {
-		super("claims", mc,uc, session);
+	@Autowired
+	public ClaimsConversation() {
+		super("claims");
 		// TODO Auto-generated constructor stub
 
 		createMessage("message.claims.start", new MessageBodyParagraph("Jag förstår, hoppas du mår ok under omständigheterna. Självklart tar jag tag i det här"), "h_symbol",2000);
@@ -62,16 +75,16 @@ public class ClaimsConversation extends Conversation {
 		createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 	}
 
-	public void init(String hid){
-		log.info("Starting claims conversation for user:" + hid);
-		Message m = getMessage("message.claims.init");
-		m.header.fromId = new Long(hid);
-		addToChat(m);
-		startConversation("message.claims.whathappened"); // Id of first message
+	public void init(UserContext userContext, MemberChat memberChat){
+		log.info("Starting claims conversation for user:" + userContext.getMemberId());
+		Message m = getMessage("message.claims.start");
+		m.header.fromId = new Long(userContext.getMemberId());
+		addToChat(m, userContext, memberChat);
+		startConversation(userContext, memberChat, "message.claims.whathappened"); // Id of first message
 	}
 
 	@Override
-	public void recieveMessage(Message m) {
+	public void recieveMessage(UserContext userContext, MemberChat memberChat, Message m) {
 		log.info(m.toString());
 		
 		String nxtMsg = "";
@@ -81,7 +94,7 @@ public class ClaimsConversation extends Conversation {
 
 			// TODO: Send to claims service!
 			m.body.text = "Inspelning klar";
-			addToChat(m); // Response parsed to nice format
+			addToChat(m,userContext, memberChat); // Response parsed to nice format
 			nxtMsg = "message.claims.record.ok";
 			
 			break;
@@ -97,41 +110,35 @@ public class ClaimsConversation extends Conversation {
            for (SelectItem o : body1.choices) {
                if(o.selected) {
                    m.body.text = o.text;
-                   addToChat(m);
+                   addToChat(m,userContext, memberChat);
                    nxtMsg = o.value;
                }
            }
        }
        
-       completeRequest(nxtMsg);
+       completeRequest(nxtMsg,userContext, memberChat);
 		
 	}
 
-	@Override
-	public void init() {
-		// TODO Auto-generated method stub
-		startConversation("message.claims.start");
-	}
-
     @Override
-    public void recieveEvent(EventTypes e, String value){
+    public void recieveEvent(EventTypes e, String value, UserContext userContext, MemberChat memberChat){
 
         switch(e){
             // This is used to let Hedvig say multiple message after another
             case MESSAGE_FETCHED:
                 log.info("Message fetched:" + value);
                 switch(value){                
-                case "message.claims.start": completeRequest("message.claim.menu"); break;
-                case "message.claims.chat": completeRequest("message.claims.chat2"); break;
-                case "message.claims.chat2": completeRequest("message.claim.promise"); break;
-                case "message.claims.ok": completeRequest("message.claims.record"); break;
-                case "message.claims.record": completeRequest("message.claims.record2"); break;
-                case "message.claims.record2": completeRequest("message.claims.record3"); break;
-                case "message.claims.record3": completeRequest("message.claims.record4"); break;
-                case "message.claims.record4": completeRequest("message.claims.record5"); break;
-                case "message.claims.record5": completeRequest("message.claims.audio"); break;
-                case "message.claims.record.ok": completeRequest("message.claims.record.ok2"); break;
-                case "message.claims.record.ok2": completeRequest("message.claims.record.ok3"); break;
+                case "message.claims.start": completeRequest("message.claim.menu", userContext, memberChat); break;
+                case "message.claims.chat": completeRequest("message.claims.chat2", userContext, memberChat); break;
+                case "message.claims.chat2": completeRequest("message.claim.promise", userContext, memberChat); break;
+                case "message.claims.ok": completeRequest("message.claims.record", userContext, memberChat); break;
+                case "message.claims.record": completeRequest("message.claims.record2", userContext, memberChat); break;
+                case "message.claims.record2": completeRequest("message.claims.record3", userContext, memberChat); break;
+                case "message.claims.record3": completeRequest("message.claims.record4", userContext, memberChat); break;
+                case "message.claims.record4": completeRequest("message.claims.record5", userContext, memberChat); break;
+                case "message.claims.record5": completeRequest("message.claims.audio", userContext, memberChat); break;
+                case "message.claims.record.ok": completeRequest("message.claims.record.ok2", userContext, memberChat); break;
+                case "message.claims.record.ok2": completeRequest("message.claims.record.ok3", userContext, memberChat); break;
                 }
         }
     }

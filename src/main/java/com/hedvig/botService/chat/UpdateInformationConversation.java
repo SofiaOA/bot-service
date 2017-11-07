@@ -3,26 +3,29 @@ package com.hedvig.botService.chat;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.hedvig.botService.enteties.*;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodyParagraph;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyText;
+import com.hedvig.botService.enteties.message.SelectItem;
 import com.hedvig.botService.session.SessionManager;
 
+@Component
 public class UpdateInformationConversation extends Conversation {
 
+	/*
+	 * Need to be stateless. I.e no variables apart from logger
+	 * */
 	private static Logger log = LoggerFactory.getLogger(UpdateInformationConversation.class);
-	private String startMessage = "message.info.update";
-	
-	public UpdateInformationConversation(MemberChat mc, UserContext uc, SessionManager session) {
-		super("info.update", mc,uc, session);
-		
-		// TODO Auto-generated constructor stub
 
-	    /*PERSONAL_INFORMATOIN,
-	    FAMILY_MEMBERS,
-	    APARTMENT_INFORMATION,
-	    BANK_ACCOUNT
-	    SAFETY_INCREASERS*/
-	    
+	@Autowired
+	public UpdateInformationConversation() {
+		super("info.update");
+
 		createMessage("message.info.update.email", new MessageBodyText("Ok, vad har du för mailadress?"));
 		createMessage("message.info.update", new MessageBodyText("Ok, vad är det för information du vill uppdatera?\f Beskriv vad det gäller så ändrar jag"));
 		createMessage("message.info.complete", new MessageBodyParagraph("Toppen, tack! Jag säger till när informationen är uppdaterad"));
@@ -31,13 +34,8 @@ public class UpdateInformationConversation extends Conversation {
 
 	}
 
-	public UpdateInformationConversation(MemberChat mc, UserContext uc, SessionManager session, String startMessage) {
-		this(mc,uc, session);
-		this.startMessage = startMessage;		
-	}	
-	
 	@Override
-	public void recieveMessage(Message m) {
+	public void recieveMessage(UserContext userContext, MemberChat memberChat, Message m) {
 		log.info(m.toString());
 		String nxtMsg = "";
 		
@@ -61,18 +59,18 @@ public class UpdateInformationConversation extends Conversation {
            for (SelectItem o : body1.choices) {
                if(o.selected) {
                    m.body.text = o.text;
-                   addToChat(m);
+                   addToChat(m, userContext, memberChat);
                    nxtMsg = o.value;
                }
            }
        }
        
-       completeRequest(nxtMsg);
+       completeRequest(nxtMsg, userContext, memberChat);
 		
 	}
 
     @Override
-	public void completeRequest(String nxtMsg){
+    public void completeRequest(String nxtMsg, UserContext userContext, MemberChat memberChat){
 
 		switch(nxtMsg){
 			case "message.info.complete":
@@ -82,18 +80,13 @@ public class UpdateInformationConversation extends Conversation {
 				break;
 			}
 
-			super.completeRequest(nxtMsg);
-	}
-    
-	@Override
-	public void init() {
-    	log.info("Starting main conversation");
-        startConversation(startMessage); // Id of first message
+			super.completeRequest(nxtMsg, userContext, memberChat);
 	}
 
-	@Override
-	public void recieveEvent(EventTypes e, String value) {
-		// TODO Auto-generated method stub
+	public void init(UserContext userContext, MemberChat memberChat, String startMessage) {
+    	log.info("Starting main conversation");
+        startConversation(userContext, memberChat, startMessage); // Id of first message
 	}
+
 
 }

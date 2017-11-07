@@ -20,12 +20,32 @@ import com.hedvig.botService.web.dto.Member;
 import com.hedvig.botService.web.dto.MemberAuthedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import com.hedvig.botService.enteties.*;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodyAudio;
+import com.hedvig.botService.enteties.message.MessageBodyBankIdCollect;
+import com.hedvig.botService.enteties.message.MessageBodyMultipleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyNumber;
+import com.hedvig.botService.enteties.message.MessageBodyParagraph;
+import com.hedvig.botService.enteties.message.MessageBodyPhotoUpload;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyText;
+import com.hedvig.botService.enteties.message.MessageHeader;
+import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.enteties.message.SelectLink;
+import com.hedvig.botService.enteties.message.SelectOption;
 
+@Component
 public class OnboardingConversationDevi extends Conversation {
 
-    private static Logger log = LoggerFactory.getLogger(OnboardingConversation.class);
+	/*
+	 * Need to be stateless. I.e no data beyond response scope
+	 * */
+    private static Logger log = LoggerFactory.getLogger(OnboardingConversationDevi.class);
     private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private final MemberService memberService;
     private final ProductPricingService productPricingClient;
@@ -44,11 +64,12 @@ public class OnboardingConversationDevi extends Conversation {
     public final static String emoji_waving_hand = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8B}, Charset.forName("UTF-8"));
     public final static String emoji_flushed_face = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0xB3}, Charset.forName("UTF-8"));
 
-    private String gatewayUrl;
-
-    public OnboardingConversationDevi(MemberChat mc, UserContext uc, MemberService memberService, SessionManager session, ProductPricingService productPricingClient, String gatewayUrl) {
-        super("onboarding", mc, uc, session);
-        this.gatewayUrl = gatewayUrl;
+    @Value("${hedvig.gateway.url:http://gateway.hedvig.com}")
+    public String gatewayUrl;
+    
+    @Autowired
+    public OnboardingConversationDevi(MemberService memberService, ProductPricingService productPricingClient) {
+        super("onboarding");
         this.memberService = memberService;
         this.productPricingClient = productPricingClient;
 
@@ -165,8 +186,8 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Jag har inte BankID", "message.manuellnamn"));
                         }}
                 ), "h_symbol",
-                (__,i) -> {
-                    UserData obd = userContext.getOnBoardingData();
+                (uc2,i) -> {
+                    UserData obd = uc2.getOnBoardingData();
                     if(i.value.equals("message.bankid.autostart.respond"))
                     {
                         obd.setBankIdOnDecvie(true);
@@ -185,8 +206,8 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://",  null, false));
                         }}
                 ), "h_symbol",
-                (__,i) -> {
-                    UserData obd = userContext.getOnBoardingData();
+                (uc2,i) -> {
+                    UserData obd = uc2.getOnBoardingData();
                     if(i.value.equals("message.bankid.autostart.respond"))
                     {
                         obd.setBankIdOnDecvie(true);
@@ -512,7 +533,7 @@ public class OnboardingConversationDevi extends Conversation {
                 (userContext, item) -> {
                     if(item.value.equals("message.fetch.accounts")) {
                         String publicId = this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
-                        uc.putUserData("{REFERENCE_TOKEN}", publicId);
+                        userContext.putUserData("{REFERENCE_TOKEN}", publicId);
                         return "message.fetch.accounts.hold";
                     }
                     return "message.start.account.retrieval";
@@ -557,7 +578,7 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Jag vill skriva på och bli Hedvig-medlem", "message.kontraktpop.startBankId"));
                         }}
                 ),
-                (__, i) -> {
+                (userContext, i) -> {
                     UserData ud = userContext.getOnBoardingData();
 
                     Optional<BankIdSignResponse> signData;
@@ -565,8 +586,8 @@ public class OnboardingConversationDevi extends Conversation {
                     signData = memberService.sign(ud.getSSN(), "Jag godkänner att jag har tagit del av Hedvigs förköpsinformation och försäkringsvillkor.");
 
                     if(signData.isPresent()) {
-                        uc.putUserData("{AUTOSTART_TOKEN}", signData.get().getAutoStartToken());
-                        uc.putUserData("{REFERENCE_TOKEN}", signData.get().getReferenceToken());
+                    	userContext.putUserData("{AUTOSTART_TOKEN}", signData.get().getAutoStartToken());
+                    	userContext.putUserData("{REFERENCE_TOKEN}", signData.get().getReferenceToken());
                     }else{
                         log.error("Could not start signing process.");
                         return "message.kontraktpop.error";
@@ -636,9 +657,9 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
     }
     
-    public void init() {
+    public void init(UserContext userContext, MemberChat memberChat) {
         log.info("Starting onboarding conversation");
-        startConversation("message.onboardingstart"); // Id of first message
+        startConversation(userContext, memberChat, "message.onboardingstart"); // Id of first message
         //startConversation("message.start.account.retrieval"); // Id of first message
     }
 
@@ -670,7 +691,7 @@ public class OnboardingConversationDevi extends Conversation {
 
     // ------------------------------------------------------------------------------- //
     @Override
-    public void recieveEvent(EventTypes e, String value){
+    public void recieveEvent(EventTypes e, String value, UserContext userContext, MemberChat memberChat){
 
         switch(e){
             // This is used to let Hedvig say multiple message after another
@@ -684,7 +705,7 @@ public class OnboardingConversationDevi extends Conversation {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}*/
-                        completeRequest("message.onboardingstart2");
+                        completeRequest("message.onboardingstart2", userContext, memberChat );
                         break;
                     case "message.onboardingstart2":
 					/*try {
@@ -693,51 +714,51 @@ public class OnboardingConversationDevi extends Conversation {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}*/
-                        completeRequest("message.onboardingstart3");
+                        completeRequest("message.onboardingstart3", userContext, memberChat);
                         break;
-                    case "message.onboardingstart3": completeRequest("message.onboardingstart.final"); break;
-                    case "message.cad": completeRequest("message.cad2"); break;
-                    case "message.cad2": completeRequest("message.cad3"); break;
-                    case "message.cad3": completeRequest("message.cad4"); break;
-                    case "message.forslagstart": completeRequest("message.forslagstart2"); break;
-                    case "message.forslagstart2": completeRequest("message.forslagstart3"); break;
-                    case "message.hus": completeRequest("message.hus2"); break;
-                    case "message.hus2": completeRequest("message.hus3"); break;
-                    case "message.bytesinfo": completeRequest("message.bytesinfo2"); break;
-                    case "message.bytesinfo3": completeRequest("message.bytesinfo4"); break;
-                    case "message.bytesinfo4": completeRequest("message.bytesinfo5"); break;
-                    case "message.bytesinfo5": completeRequest("message.bytesinfo6"); break;
-                    case "message.forslag": completeRequest("message.forslag2"); break;
-                    case "message.kontraktklar": completeRequest("message.kontraktklar2"); break;
-                    case "message.kontraktklar2": completeRequest("message.kontraktklar3"); break;
-                    case "message.kontraktklar3": completeRequest("message.kontraktklar4"); break;
-                    case "message.fetch.accounts.explain": completeRequest("message.fetch.accounts.explain2"); break;
-                    case "message.tellme5": completeRequest("message.tellme6"); break;
-                    case "message.tellme6": completeRequest("message.tellme7"); break;
-                    case "message.tellme7": completeRequest("message.tellme8"); break;
-                    case "message.tellme8": completeRequest("message.tellme9"); break;
-                    case "message.tellme11": completeRequest("message.tellme12"); break;
-                    case "message.tellme12": completeRequest("message.tellme13"); break;
-                    case "message.tellme14": completeRequest("message.tellme15"); break;
-                    case "message.tellme15": completeRequest("message.tellme16"); break;
-                    case "message.tellme16": completeRequest("message.tellme17"); break;
-                    case "message.tellme17": completeRequest("message.tellme18"); break;
-                    case "message.tellme19": completeRequest("message.tellme20"); break;
-                    case "message.tellme20": completeRequest("message.tellme21"); break;
+                    case "message.onboardingstart3": completeRequest("message.onboardingstart.final", userContext, memberChat); break;
+                    case "message.cad": completeRequest("message.cad2", userContext, memberChat); break;
+                    case "message.cad2": completeRequest("message.cad3", userContext, memberChat); break;
+                    case "message.cad3": completeRequest("message.cad4", userContext, memberChat); break;
+                    case "message.forslagstart": completeRequest("message.forslagstart2", userContext, memberChat); break;
+                    case "message.forslagstart2": completeRequest("message.forslagstart3", userContext, memberChat); break;
+                    case "message.hus": completeRequest("message.hus2", userContext, memberChat); break;
+                    case "message.hus2": completeRequest("message.hus3", userContext, memberChat); break;
+                    case "message.bytesinfo": completeRequest("message.bytesinfo2", userContext, memberChat); break;
+                    case "message.bytesinfo3": completeRequest("message.bytesinfo4", userContext, memberChat); break;
+                    case "message.bytesinfo4": completeRequest("message.bytesinfo5", userContext, memberChat); break;
+                    case "message.bytesinfo5": completeRequest("message.bytesinfo6", userContext, memberChat); break;
+                    case "message.forslag": completeRequest("message.forslag2", userContext, memberChat); break;
+                    case "message.kontraktklar": completeRequest("message.kontraktklar2", userContext, memberChat); break;
+                    case "message.kontraktklar2": completeRequest("message.kontraktklar3", userContext, memberChat); break;
+                    case "message.kontraktklar3": completeRequest("message.kontraktklar4", userContext, memberChat); break;
+                    case "message.fetch.accounts.explain": completeRequest("message.fetch.accounts.explain2", userContext, memberChat); break;
+                    case "message.tellme5": completeRequest("message.tellme6", userContext, memberChat); break;
+                    case "message.tellme6": completeRequest("message.tellme7", userContext, memberChat); break;
+                    case "message.tellme7": completeRequest("message.tellme8", userContext, memberChat); break;
+                    case "message.tellme8": completeRequest("message.tellme9", userContext, memberChat); break;
+                    case "message.tellme11": completeRequest("message.tellme12", userContext, memberChat); break;
+                    case "message.tellme12": completeRequest("message.tellme13", userContext, memberChat); break;
+                    case "message.tellme14": completeRequest("message.tellme15", userContext, memberChat); break;
+                    case "message.tellme15": completeRequest("message.tellme16", userContext, memberChat); break;
+                    case "message.tellme16": completeRequest("message.tellme17", userContext, memberChat); break;
+                    case "message.tellme17": completeRequest("message.tellme18", userContext, memberChat); break;
+                    case "message.tellme19": completeRequest("message.tellme20", userContext, memberChat); break;
+                    case "message.tellme20": completeRequest("message.tellme21", userContext, memberChat); break;
 
                 }
                 break;
             case ANIMATION_COMPLETE:
                 switch(value){
                     case "animation.bike":
-                        completeRequest("message.bikedone");
+                        completeRequest("message.bikedone", userContext, memberChat);
                         break;
                 }
                 break;
             case MODAL_CLOSED:
                 switch(value){
                     case "quote":
-                        completeRequest("message.quote.close");
+                        completeRequest("message.quote.close", userContext, memberChat);
                         break;
                 }
                 break;
@@ -745,18 +766,18 @@ public class OnboardingConversationDevi extends Conversation {
     }
 
     @Override
-    public void recieveMessage(Message m) {
+    public void recieveMessage(UserContext userContext, MemberChat memberChat, Message m) {
         log.info("recieveMessage:" + m.toString());
 
         String nxtMsg = "";
 
-        if(!validateReturnType(m)){return;}
+        if(!validateReturnType(m,userContext, memberChat)){return;}
         
         // Lambda
         if(this.hasSelectItemCallback(m.id) && m.body.getClass().equals(MessageBodySingleSelect.class)) {
             MessageBodySingleSelect body = (MessageBodySingleSelect) m.body;
             nxtMsg = this.execSelectItemCallback(m.id, userContext, body.getSelectedItem());
-            addToChat(m);
+            addToChat(m, userContext, memberChat);
         }
 
         UserData onBoardingData = userContext.getOnBoardingData();
@@ -794,7 +815,7 @@ public class OnboardingConversationDevi extends Conversation {
             	String opt = getValue((MessageBodySingleSelect)m.body);
                 if(opt.equals("message.bankid.start")) {
                     Optional<BankIdAuthResponse> authResponse = memberService.auth();
-                    nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse);
+                    nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse, userContext);
                 }                            
                 else if(opt.equals("message.mockme")){
                 	log.info("message.onboardingstart redirect to " + opt);
@@ -802,7 +823,7 @@ public class OnboardingConversationDevi extends Conversation {
                     userContext.clearContext();
                     userContext.mockMe();
                 }
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 break;
             case "message.audiotest":
             case "message.phototest":
@@ -820,7 +841,7 @@ public class OnboardingConversationDevi extends Conversation {
                 nxtMsg = "message.nagotmer";
                 break;
             case "message.frifraga":
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 nxtMsg = "message.nagotmer";
                 break;
             case "message.pers":
@@ -828,14 +849,14 @@ public class OnboardingConversationDevi extends Conversation {
                 onBoardingData.setPersonInHouseHold(nr_persons);
                 if(nr_persons==1){ m.body.text = "Jag bor själv"; }
                 else{ m.body.text = "Vi är " + nr_persons + " i hushållet"; }
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 nxtMsg = "message.sakerhet";
                 break;
             case "message.kvadrat":
                 String kvm = m.body.text;
                 onBoardingData.setLivingSpace(Float.parseFloat(kvm));
                 m.body.text = kvm + "kvm";
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 if(onBoardingData.getAge() > 0 && onBoardingData.getAge() < 27) {
                     nxtMsg = "message.student";
                 } else {
@@ -846,42 +867,42 @@ public class OnboardingConversationDevi extends Conversation {
                 
             case "message.manuellnamn":
                 onBoardingData.setFirstName(m.body.text);
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 nxtMsg = "message.manuellfamilyname";
                 break;
             case "message.manuellfamilyname":
             	onBoardingData.setFamilyName(m.body.text);
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 nxtMsg = "message.manuellpersonnr";
                 break;
             case "message.manuellpersonnr":
                 onBoardingData.setSSN(m.body.text);
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 nxtMsg = "message.varborduadress";
                 break;
             case "message.varborduadress":
                 onBoardingData.setAddressStreet(m.body.text);
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 nxtMsg = "message.varbordupostnr";
                 break;
             case "message.varbordupostnr":
                 onBoardingData.setAddressZipCode(m.body.text);
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 nxtMsg = "message.kvadrat";
                 break;                
             case "message.mockme":
                 nxtMsg = m.body.text.toLowerCase();
                 m.body.text = "Jag vill gå till " + nxtMsg + " tack";
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 break;
             case "message.varbordu":
                 onBoardingData.setAddressStreet(m.body.text);
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 nxtMsg = "message.kvadrat";
                 break;
             case "message.mail":
                 onBoardingData.setEmail(m.body.text);
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 nxtMsg = "message.kontrakt";
                 break;
             case "message.sakerhet":
@@ -907,7 +928,7 @@ public class OnboardingConversationDevi extends Conversation {
                 else{
                     m.body.text = "Jag har " + safetyItems + ".";
                 }
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 nxtMsg = "message.forsakringidag";
                 break;
 
@@ -929,8 +950,8 @@ public class OnboardingConversationDevi extends Conversation {
                     
                     m.body.text = item.text;
                     nxtMsg = "message.missingvalue";
-                    addToChat(m);
-                    addToChat(getMessage("message.missingvalue"));
+                    addToChat(m, userContext, memberChat);
+                    addToChat(getMessage("message.missingvalue"), userContext, memberChat);
                     break;
                 }
                 else if(m.id.equals("message.missingvalue") || item.value.equals("message.forslag")) {
@@ -943,7 +964,7 @@ public class OnboardingConversationDevi extends Conversation {
                 String comp = getValue((MessageBodySingleSelect)m.body);
                 if(comp.equals("message.mockme"));
                 m.body.text = "Idag har jag " + comp;
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 nxtMsg = "message.bytesinfo";
                 break;
 
@@ -958,7 +979,7 @@ public class OnboardingConversationDevi extends Conversation {
 	                    	nxtMsg = "message.manuellnamn";
 	                    }
 	                    else{
-	                    	nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse);
+	                    	nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse, userContext);
 	                    }
                 	}catch(Exception e){
                 		log.error(e.getMessage());
@@ -966,7 +987,7 @@ public class OnboardingConversationDevi extends Conversation {
                 	}
                 }
 
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 break;
                 
             case "message.bankid.start.manual":
@@ -974,13 +995,13 @@ public class OnboardingConversationDevi extends Conversation {
 
                 Optional<BankIdAuthResponse> ssnResponse = memberService.auth(ssn);
 
-                nxtMsg = handleBankIdAuthRespose(nxtMsg, ssnResponse);
+                nxtMsg = handleBankIdAuthRespose(nxtMsg, ssnResponse, userContext);
 
                 if(nxtMsg.equals("")) {
                     nxtMsg = "message.bankid.autostart.respond";
                 }
 
-                addToChat(m);
+                addToChat(m, userContext, memberChat);
                 break;
 
             case "message.fetch.account.complete":
@@ -1005,17 +1026,17 @@ public class OnboardingConversationDevi extends Conversation {
             for (SelectItem o : body1.choices) {
                 if(o.selected) {
                     m.body.text = o.text;
-                    addToChat(m);
+                    addToChat(m, userContext, memberChat);
                     nxtMsg = o.value;
                 }
             }
         }
 
-        completeRequest(nxtMsg);
+        completeRequest(nxtMsg, userContext, memberChat);
 
     }
 
-    private String handleBankIdAuthRespose(String nxtMsg, Optional<BankIdAuthResponse> authResponse) {
+    private String handleBankIdAuthRespose(String nxtMsg, Optional<BankIdAuthResponse> authResponse, UserContext userContext) {
         if(!authResponse.isPresent()) {
             log.error("Could not start bankIdAuthentication!");
             nxtMsg = "message.bankid.error";
@@ -1030,7 +1051,7 @@ public class OnboardingConversationDevi extends Conversation {
      * Generate next chat message or ends conversation
      * */
     @Override
-    public void completeRequest(String nxtMsg){
+    public void completeRequest(String nxtMsg, UserContext userContext, MemberChat memberChat){
 
         switch(nxtMsg){
             case "onboarding.done":
@@ -1044,10 +1065,10 @@ public class OnboardingConversationDevi extends Conversation {
                 break;
         }
 
-        super.completeRequest(nxtMsg);
+        super.completeRequest(nxtMsg, userContext, memberChat);
     }
 
-    public void bankIdAuthComplete(MemberAuthedEvent e) {
+    public void bankIdAuthComplete(MemberAuthedEvent e, UserContext userContext, MemberChat memberChat) {
 
         if (!userContext.getOnBoardingData().userHasAuthedWithBankId()) {
             Member member = e.getMember();
@@ -1064,13 +1085,13 @@ public class OnboardingConversationDevi extends Conversation {
             obd.setAddressCity(member.getCity());
             obd.setAddressZipCode(member.getZipCode());
 
-            addToChat(getMessage("message.bankidja"));
+            addToChat(getMessage("message.bankidja"), userContext, memberChat);
 
             userContext.getOnBoardingData().setUserHasAuthWithBankId(true);
         }
     }
 
-    public void bankAccountRetrieved() {
+    public void bankAccountRetrieved(UserContext userContext, MemberChat memberChat) {
 
 
         AutogiroData bankAccountHelper = userContext.getAutogiroData();
@@ -1099,25 +1120,25 @@ public class OnboardingConversationDevi extends Conversation {
         message.id = "message.fetch.account.complete";
         message.header = header;
         message.body = new MessageBodySingleSelect(text, options);
-        addToChat(message);
+        addToChat(message, userContext, memberChat);
     }
 
-    public void bankAccountRetrieveFailed() {
+    public void bankAccountRetrieveFailed(UserContext userContext, MemberChat memberChat) {
         //Add somethingWentWrong message
         //Add lastMessageAgain
-        addToChat(getMessage("message.fetch.accounts.error"));
+        addToChat(getMessage("message.fetch.accounts.error"), userContext, memberChat);
     }
 
 
-    public void quoteAccepted() {
-        addToChat(getMessage("message.medlemjabank"));
+    public void quoteAccepted(UserContext userContext, MemberChat memberChat) {
+        addToChat(getMessage("message.medlemjabank"), userContext, memberChat);
     }
 
-    public void memberSigned(String referenceId) {
+    public void memberSigned(String referenceId, UserContext userContext, MemberChat memberChat) {
         Optional<Boolean> singed = userContext.getOnBoardingData().getUserHasSigned();
 
         if(!singed.isPresent() || singed.get().equals(false)) {
-            addToChat(getMessage("message.kontraktklar"));
+            addToChat(getMessage("message.kontraktklar"), userContext, memberChat);
             userContext.getOnBoardingData().setUserHasSigned(true);
         }
 

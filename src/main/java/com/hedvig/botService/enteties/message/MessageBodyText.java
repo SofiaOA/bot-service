@@ -1,4 +1,4 @@
-package com.hedvig.botService.enteties;
+package com.hedvig.botService.enteties.message;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

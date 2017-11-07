@@ -6,9 +6,19 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.hedvig.botService.chat.Conversation.EventTypes;
 import com.hedvig.botService.dataTypes.HedvigDataType;
 import com.hedvig.botService.enteties.*;
-import com.hedvig.botService.session.SessionManager;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBody;
+import com.hedvig.botService.enteties.message.MessageBodyBankIdCollect;
+import com.hedvig.botService.enteties.message.MessageBodyMultipleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyNumber;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageHeader;
+import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.enteties.message.SelectLink;
+import com.hedvig.botService.enteties.message.SelectOption;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,21 +29,22 @@ public abstract class Conversation {
         private Map<String, SelectItemMessageCallback> callbacks = new TreeMap<>();
         public static enum conversationStatus {INITIATED, ONGOING, COMPLETE}
         public static enum EventTypes {ANIMATION_COMPLETE, MODAL_CLOSED, MESSAGE_FETCHED};
+        
 	private static final String regexPattern = "\\{(.*?)\\}";
 	private static Logger log = LoggerFactory.getLogger(Conversation.class);
 	private String conversationName; // Id for the conversation
 
-	MemberChat memberChat;
-	UserContext userContext;
-	SessionManager sessionManager;
+	//MemberChat memberChat;
+	//UserContext userContext;
+	//SessionManager sessionManager;
 	private TreeMap<String, Message> messageList = new TreeMap<String, Message>();
 	//HashMap<String, String> conversationContext = new HashMap<String, String>(); // Context specific information learned during conversation
 	
-	Conversation(String conversationId, MemberChat mc, UserContext uc, SessionManager session) {
+	Conversation(String conversationId) {
 		this.conversationName = conversationId;
-		this.memberChat = mc;
-		this.userContext = uc;
-		this.sessionManager = session;
+		//this.memberChat = mc;
+		//this.userContext = uc;
+		//this.sessionManager = session;
 	}
 
 	public Message getMessage(String key){
@@ -49,15 +60,8 @@ public abstract class Conversation {
 	public String getConversationName() {
 		return conversationName;
 	}
-	public ConversationMessage getCurrent() {
-		return current;
-	}
-	public void setCurrent(ConversationMessage current) {
-		this.current = current;
-	}
-	private ConversationMessage current = null; // Last message sent to client
-	
-	private String replaceWithContext(String input){
+
+	private String replaceWithContext(UserContext userContext, String input){
 		log.info("Contextualizing string:" + input);
 		Pattern pattern = Pattern.compile(regexPattern);
 		Matcher m = pattern.matcher(input);
@@ -71,25 +75,25 @@ public abstract class Conversation {
 		return input;
 	}
 	
-	void addToChat(Message m) {
+	void addToChat(Message m, UserContext userContext, MemberChat memberChat) {
 		log.info("Putting message:" + m.id + " content:" + m.body.text);
-		m.body.text = replaceWithContext(m.body.text);
+		m.body.text = replaceWithContext(userContext, m.body.text);
 		if(m.body.getClass() == MessageBodySingleSelect.class) {
 		    MessageBodySingleSelect mss = (MessageBodySingleSelect) m.body;
             mss.choices.forEach(x -> {
                 if(x.getClass() == SelectLink.class) {
                     SelectLink link = (SelectLink) x;
                     if(link.appUrl != null) {
-						link.appUrl = replaceWithContext(link.appUrl);
+						link.appUrl = replaceWithContext(userContext, link.appUrl);
 					}
 					if(link.webUrl != null) {
-                    	link.webUrl = replaceWithContext(link.webUrl);
+                    	link.webUrl = replaceWithContext(userContext, link.webUrl);
 					}
                 }
             });
 		}else if(m.body.getClass() == MessageBodyBankIdCollect.class) {
 		    MessageBodyBankIdCollect mbc = (MessageBodyBankIdCollect) m.body;
-		    mbc.referenceId = replaceWithContext(mbc.referenceId);
+		    mbc.referenceId = replaceWithContext(userContext, mbc.referenceId);
         }
 		memberChat.addToHistory(m);
 	}
@@ -177,12 +181,10 @@ public abstract class Conversation {
 		body.imageWidth = image.imageWidth;
 		createMessage(id,header,body);			
 	}
-	
-	public abstract void recieveEvent(EventTypes e, String value);
-	
-	void startConversation(String startId){
+
+	void startConversation(UserContext userContext, MemberChat memberChat, String startId){
 		log.info("Starting conversation with message:" + startId);
-		addToChat(messageList.get(startId));
+		addToChat(messageList.get(startId), userContext, memberChat);
 	}
 	
     public int getValue(MessageBodyNumber body){
@@ -219,15 +221,15 @@ public abstract class Conversation {
     }
     
     // If the message has a preferred return type it is validated otherwise not
-    public boolean validateReturnType(Message m){
+    public boolean validateReturnType(Message m, UserContext userContext, MemberChat memberChat){
     	
     	Message mCorr = getMessage(m.id);
     	
     	if(mCorr != null && mCorr.expectedType!=null){
     		boolean ok = mCorr.expectedType.validate(m.body.text);
     		if(!ok)mCorr.body.text = mCorr.expectedType.getErrorMessage();
-    		addToChat(m);
-    		addToChat(mCorr);
+    		addToChat(m, userContext, memberChat);
+    		addToChat(mCorr, userContext, memberChat);
     		return ok;
     	}
     	return true;
@@ -235,9 +237,16 @@ public abstract class Conversation {
     
     // ------------------------------------------------------------------------------- //
 
-	public abstract void recieveMessage(Message m);
-	public void completeRequest(String nxtMsg) {
-		if(getMessage(nxtMsg)!=null)addToChat(getMessage(nxtMsg));	
+	public abstract void recieveMessage(UserContext userContext, MemberChat memberChat, Message m);
+	public void completeRequest(String nxtMsg, UserContext userContext, MemberChat memberChat) {
+		if(getMessage(nxtMsg)!=null)addToChat(getMessage(nxtMsg), userContext, memberChat);	
 	}
-	public abstract void init();
+
+	public void recieveEvent(EventTypes e, String value, UserContext userContext, MemberChat memberChat) {}
+
+	public void init(UserContext userContext, MemberChat memberChat) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

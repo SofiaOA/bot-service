@@ -8,18 +8,28 @@ import java.util.ArrayList;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.hedvig.botService.enteties.*;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyText;
+import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.enteties.message.SelectLink;
+import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.session.SessionManager;
 
+@Component
 public class MainConversation extends Conversation {
 
 	private static Logger log = LoggerFactory.getLogger(MainConversation.class);
 	private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private String emoji_hand_ok = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8C}, Charset.forName("UTF-8"));
 
-	public MainConversation(MemberChat mc, UserContext uc, SessionManager session) {
-		super("main.menue", mc,uc,session);
+    @Autowired
+	public MainConversation() {
+		super("main.menue");
 		// TODO Auto-generated constructor stub
 
 		createMessage("hedvig.com",
@@ -46,7 +56,14 @@ public class MainConversation extends Conversation {
 						}}
 				));
 		
-		createMessage("message.main.callme", new MessageBodyParagraph("Ok, ta det lugnt jag ringer!"));
+        createMessage("message.main.end",
+                new MessageBodySingleSelect("Tack, jag ringer!",
+                        new ArrayList<SelectItem>() {{
+                        	add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
+                        }}
+                ), "h_symbol");
+        
+		createMessage("message.main.callme", new MessageBodyText("Ok, ta det lugnt! Vad når jag dig på för nummer?"));
 		
 		createMessage("main.question", new MessageBodyText("Vad har du för fråga?"));
 		
@@ -56,7 +73,7 @@ public class MainConversation extends Conversation {
 	}
 
 	@Override
-	public void recieveMessage(Message m) {
+	public void recieveMessage(UserContext userContext, MemberChat memberChat, Message m) {
 		log.info(m.toString());
 		
 		String nxtMsg = "";
@@ -68,18 +85,21 @@ public class MainConversation extends Conversation {
 					nxtMsg = "conversation.done";
 					//sessionManager.initClaim(userContext.getMemberId()); // Start claim here
 				}
-				addToChat(m); // Response parsed to nice format
+				addToChat(m, userContext, memberChat); // Response parsed to nice format
 				break;
 			}
+		case "message.main.callme": 
+			nxtMsg = "message.main.end";
+			addToChat(m, userContext, memberChat); // Response parsed to nice format
+			break;
 		case "message.question": 
 			userContext.putUserData("{QUESTION_"+LocalDate.now()+"}", m.body.text);
-			addToChat(m); // Response parsed to nice format
+			addToChat(m, userContext, memberChat); // Response parsed to nice format
 			nxtMsg = "message.question.recieved";
 			break;
-
 		case "message.main.refer": 
 			userContext.putUserData("{REFERAL_"+LocalDate.now()+"}", m.body.text);
-			addToChat(m); // Response parsed to nice format
+			addToChat(m, userContext, memberChat); // Response parsed to nice format
 			nxtMsg = "message.main.refer.recieved";
 			break;
 		}
@@ -93,13 +113,13 @@ public class MainConversation extends Conversation {
            for (SelectItem o : body1.choices) {
                if(o.selected) {
                    m.body.text = o.text;
-                   addToChat(m);
+                   addToChat(m, userContext, memberChat);
                    nxtMsg = o.value;
                }
            }
        }
        
-       completeRequest(nxtMsg);
+       completeRequest(nxtMsg, userContext, memberChat);
 		
 	}
 
@@ -107,13 +127,13 @@ public class MainConversation extends Conversation {
      * Generate next chat message or ends conversation
      * */
     @Override
-    public void completeRequest(String nxtMsg){
+    public void completeRequest(String nxtMsg, UserContext userContext, MemberChat memberChat){
 
         switch(nxtMsg){
             case "conversation.done":
                 log.info("conversation complete");
                 userContext.completeConversation(this.getClass().getName());
-                new ClaimsConversation(this.memberChat, this.userContext, this.sessionManager).init();
+                new ClaimsConversation().init(userContext, memberChat);
 				userContext.startOngoingConversation(ClaimsConversation.class.getName());
                 //userContext.onboardingComplete(true);
                 return;
@@ -123,19 +143,13 @@ public class MainConversation extends Conversation {
                 break;
         }
 
-        super.completeRequest(nxtMsg);
+        super.completeRequest(nxtMsg, userContext, memberChat);
     }
     
 	@Override
-	public void init() {
+	public void init(UserContext userContext, MemberChat memberChat) {
     	log.info("Starting main conversation");
-        startConversation("hedvig.com"); // Id of first message
-		
-	}
-
-	@Override
-	public void recieveEvent(EventTypes e, String value) {
-		// TODO Auto-generated method stub
+        startConversation(userContext, memberChat, "hedvig.com"); // Id of first message
 		
 	}
 

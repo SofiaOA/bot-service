@@ -1,4 +1,4 @@
-package com.hedvig.botService.enteties;
+package com.hedvig.botService.enteties.message;
 
 /*
  * Base class for interaction between Hedvig and members
@@ -6,6 +6,7 @@ package com.hedvig.botService.enteties;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hedvig.botService.dataTypes.HedvigDataType;
+import com.hedvig.botService.enteties.MemberChat;
 
 import lombok.Getter;
 import lombok.Setter;
