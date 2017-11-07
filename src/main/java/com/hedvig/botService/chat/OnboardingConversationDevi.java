@@ -75,11 +75,25 @@ public class OnboardingConversationDevi extends Conversation {
 
         Image testImage = new Image("http://www.apa.org/Images/insurance-title-image_tcm7-198694.jpg",730,330);
 
-        createMessage("message.onboardingstart", new MessageBodyParagraph("Hej, jag heter Hedvig!" + emoji_waving_hand), "h_symbol",2000);
+        createMessage("message.intro", new MessageBodyParagraph(""), "h_symbol",2000);
+        
+        createChatMessage("message.begin",
+                new MessageBodySingleSelect("Hej jag heter hedvig\fHej jag heter hedvigHej jag heter hedvigHej jag heter hedvigHej jag heter hedvig\fHej jag heter hedvigHej jag heter hedvigHej jag heter hedvigHej jag heter hedvigHej jag heter hedvigHej jag heter hedvigHej jag heter hedvigHej jag heter hedvigHej jag heter hedvigHej jag heter hedvig",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Berätta!", "message.cad"));
+                            add(new SelectOption("Ge mig ett försäkringsförslag istället", "message.forslagstart"));
+                            add(new SelectOption("Jag är redan medlem", "message.bankid.start"));
+                            add(new SelectOption("[Debug:mock my data]", "message.mockme"));
+                            add(new SelectOption("[Debug:audio test]", "message.audiotest"));
+                            add(new SelectOption("[Debug:photo test]", "message.phototest"));
+                        }}
+                ));
+        
+        createMessage("message.onboardingstart", new MessageBodyParagraph("Hej, jag heter Hedvig!" + emoji_waving_hand),2000);
         createMessage("message.onboardingstart2", new MessageBodyParagraph("Fint att ha dig här"), "h_symbol",2000);
         createMessage("message.onboardingstart3", new MessageBodyParagraph ("Jag är en försäkringsbot som hjälper dig när jobbiga saker händer"), "h_symbol",2000);
         createMessage("message.onboardingstart.final",
-                new MessageBodySingleSelect("Ska jag berätta hur det funkar?",
+                new MessageBodySingleSelect("Hej jag heter hedvig \f Vad vill du göra \fSka jag berätta hur det funkar?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Berätta!", "message.cad"));
                             add(new SelectOption("Ge mig ett försäkringsförslag istället", "message.forslagstart"));
@@ -89,6 +103,11 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("[Debug:photo test]", "message.phototest"));
                         }}
                 ), "h_symbol");
+        
+		addRelay("message.intro","message.onboardingstart");
+		addRelay("message.onboardingstart","message.onboardingstart2");
+		addRelay("message.onboardingstart2","message.onboardingstart3");
+	    addRelay("message.onboardingstart3","message.onboardingstart.final");
 
         createMessage("message.audiotest", new MessageBodyAudio("Här kan du testa audio", "/claims/fileupload"), "h_symbol",2000);
         createMessage("message.phototest", new MessageBodyPhotoUpload("Här kan du testa fotouppladdaren", "/asset/fileupload"), "h_symbol",2000);
@@ -655,11 +674,43 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.bikedone", new MessageBodyText("Nu har du sett hur det funkar..."));
 
         createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
+        
+
+	    addRelay("message.cad","message.cad2");
+	    addRelay("message.cad2","message.cad3");
+	    addRelay("message.cad3","message.cad4");
+	    addRelay("message.forslagstart","message.forslagstart2");
+	    addRelay("message.forslagstart2","message.forslagstart3");
+	    addRelay("message.hus","message.hus2");
+	    addRelay("message.hus2","message.hus3");
+	    addRelay("message.bytesinfo","message.bytesinfo2");
+	    addRelay("message.bytesinfo3","message.bytesinfo4");
+	    addRelay("message.bytesinfo4","message.bytesinfo5");
+	    addRelay("message.bytesinfo5","message.bytesinfo6");
+	    addRelay("message.forslag","message.forslag2");
+	    addRelay("message.kontraktklar","message.kontraktklar2");
+	    addRelay("message.kontraktklar2","message.kontraktklar3");
+	    addRelay("message.kontraktklar3","message.kontraktklar4");
+	    addRelay("message.fetch.accounts.explain","message.fetch.accounts.explain2");
+	    addRelay("message.tellme5","message.tellme6");
+	    addRelay("message.tellme6","message.tellme7");
+	    addRelay("message.tellme7","message.tellme8");
+	    addRelay("message.tellme8","message.tellme9");
+	    addRelay("message.tellme11","message.tellme12");
+	    addRelay("message.tellme12","message.tellme13");
+	    addRelay("message.tellme14","message.tellme15");
+	    addRelay("message.tellme15","message.tellme16");
+	    addRelay("message.tellme16","message.tellme17");
+	    addRelay("message.tellme17","message.tellme18");
+	    addRelay("message.tellme19","message.tellme20");
+	    addRelay("message.tellme20","message.tellme21");
     }
     
     public void init(UserContext userContext, MemberChat memberChat) {
         log.info("Starting onboarding conversation");
-        startConversation(userContext, memberChat, "message.onboardingstart"); // Id of first message
+        //startConversation(userContext, memberChat, "message.onboardingstart"); // Id of first message
+        //startConversation(userContext, memberChat, "message.intro"); // Id of first message
+        startConversation(userContext, memberChat,"message.begin");
         //startConversation("message.start.account.retrieval"); // Id of first message
     }
 
@@ -697,25 +748,15 @@ public class OnboardingConversationDevi extends Conversation {
             // This is used to let Hedvig say multiple message after another
             case MESSAGE_FETCHED:
                 log.info("Message fetched:" + value);
-                switch(value){
-                    case "message.onboardingstart":
-					/*try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}*/
-                        completeRequest("message.onboardingstart2", userContext, memberChat );
-                        break;
-                    case "message.onboardingstart2":
-					/*try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}*/
-                        completeRequest("message.onboardingstart3", userContext, memberChat);
-                        break;
+                
+                // New way of handeling relay messages
+                String relay = getRelay(value);
+                if(relay!=null)completeRequest(relay, userContext, memberChat);
+                
+                /*switch(value){
+                	case "message.intro": completeRequest("message.onboardingstart", userContext, memberChat );break;
+                    case "message.onboardingstart": completeRequest("message.onboardingstart2", userContext, memberChat ); break;
+                    case "message.onboardingstart2": completeRequest("message.onboardingstart3", userContext, memberChat);break;
                     case "message.onboardingstart3": completeRequest("message.onboardingstart.final", userContext, memberChat); break;
                     case "message.cad": completeRequest("message.cad2", userContext, memberChat); break;
                     case "message.cad2": completeRequest("message.cad3", userContext, memberChat); break;
@@ -745,8 +786,7 @@ public class OnboardingConversationDevi extends Conversation {
                     case "message.tellme17": completeRequest("message.tellme18", userContext, memberChat); break;
                     case "message.tellme19": completeRequest("message.tellme20", userContext, memberChat); break;
                     case "message.tellme20": completeRequest("message.tellme21", userContext, memberChat); break;
-
-                }
+                }*/
                 break;
             case ANIMATION_COMPLETE:
                 switch(value){

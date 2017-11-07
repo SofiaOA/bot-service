@@ -6,7 +6,6 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.hedvig.botService.chat.Conversation.EventTypes;
 import com.hedvig.botService.dataTypes.HedvigDataType;
 import com.hedvig.botService.enteties.*;
 import com.hedvig.botService.enteties.message.Message;
@@ -14,6 +13,7 @@ import com.hedvig.botService.enteties.message.MessageBody;
 import com.hedvig.botService.enteties.message.MessageBodyBankIdCollect;
 import com.hedvig.botService.enteties.message.MessageBodyMultipleSelect;
 import com.hedvig.botService.enteties.message.MessageBodyNumber;
+import com.hedvig.botService.enteties.message.MessageBodyParagraph;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
 import com.hedvig.botService.enteties.message.MessageHeader;
 import com.hedvig.botService.enteties.message.SelectItem;
@@ -25,26 +25,20 @@ import org.slf4j.LoggerFactory;
 
 public abstract class Conversation {
 
-        public static final long  HEDVIG_USER_ID = 1; // The id hedvig uses to chat
-        private Map<String, SelectItemMessageCallback> callbacks = new TreeMap<>();
-        public static enum conversationStatus {INITIATED, ONGOING, COMPLETE}
-        public static enum EventTypes {ANIMATION_COMPLETE, MODAL_CLOSED, MESSAGE_FETCHED};
+    public static final long  HEDVIG_USER_ID = 1; // The id hedvig uses to chat
+    private Map<String, SelectItemMessageCallback> callbacks = new TreeMap<>();
+    public static enum conversationStatus {INITIATED, ONGOING, COMPLETE}
+    public static enum EventTypes {ANIMATION_COMPLETE, MODAL_CLOSED, MESSAGE_FETCHED};
         
 	private static final String regexPattern = "\\{(.*?)\\}";
 	private static Logger log = LoggerFactory.getLogger(Conversation.class);
 	private String conversationName; // Id for the conversation
 
-	//MemberChat memberChat;
-	//UserContext userContext;
-	//SessionManager sessionManager;
 	private TreeMap<String, Message> messageList = new TreeMap<String, Message>();
-	//HashMap<String, String> conversationContext = new HashMap<String, String>(); // Context specific information learned during conversation
-	
+	private TreeMap<String, String> relayList = new TreeMap<String, String>();
+
 	Conversation(String conversationId) {
 		this.conversationName = conversationId;
-		//this.memberChat = mc;
-		//this.userContext = uc;
-		//this.sessionManager = session;
 	}
 
 	public Message getMessage(String key){
@@ -52,15 +46,19 @@ public abstract class Conversation {
 		if(m==null)log.info("Message not found with id:" + key);
 		return m;
 	}
-	
-	public void storeMessage(String key, Message m){
-		messageList.put(key, m);
-	}
-	
+
 	public String getConversationName() {
 		return conversationName;
 	}
 
+	public void addRelay(String s1, String s2){
+		relayList.put(s1, s2);
+	}
+	
+	public String getRelay(String s1){
+		return relayList.get(s1);
+	}
+	
 	private String replaceWithContext(UserContext userContext, String input){
 		log.info("Contextualizing string:" + input);
 		Pattern pattern = Pattern.compile(regexPattern);
@@ -246,6 +244,42 @@ public abstract class Conversation {
 
 	public void init(UserContext userContext, MemberChat memberChat) {
 		// TODO Auto-generated method stub
+		
+	}
+	
+	// ----------------------------------------------------------------------------------------------------------------- //
+	
+	/*
+	 * Splits the message text into separate messages based on \f and adds 'Hedvig is thinking' messages in between
+	 * */
+	public void createChatMessage(String id, MessageBody body){
+		String[] paragraphs = body.text.split("\f");
+		Integer pId = 0;
+		Integer delayFactor = 200; // Milliseconds per character TODO: Externalize this!
+		
+		ArrayList<String> msgs = new ArrayList<String>();
+		
+		for(int i = 0; i< (paragraphs.length-1); i++){
+			String s = paragraphs[i];
+			String s1 = i==0?id:(id + "." + (pId++).toString());
+			String s2 = id + "." + (pId++).toString();
+			log.info("Create message of size "+(s.length())+" with load time:" + (s.length()*delayFactor));
+			createMessage(s1, new MessageBodyParagraph(""), "h_symbol",(s.length()*delayFactor));
+			createMessage(s2, new MessageBodyParagraph(s),100);
+			msgs.add(s1); msgs.add(s2);
+		}
+		
+		// The 'actual' message
+		String sWrite = id + "." + (pId++).toString();
+		String sFinal = id + "." + (pId++).toString();
+		String s = paragraphs[paragraphs.length-1]; // Last paragraph is put on actual message
+		body.text = s;
+		createMessage(sWrite, new MessageBodyParagraph(""), "h_symbol",(s.length()*delayFactor));
+		createMessage(sFinal, body);
+		msgs.add(sWrite); msgs.add(sFinal);
+		
+		// Connect all messages in relay chain
+		for(int i = 0; i< (msgs.size()-1); i++)addRelay(msgs.get(i), msgs.get(i+1));
 		
 	}
 

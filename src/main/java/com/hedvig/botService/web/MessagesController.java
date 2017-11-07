@@ -122,7 +122,7 @@ public class MessagesController {
         
      	ArrayList<AvatarDTO> avatars = new ArrayList<AvatarDTO>();
      	//AvatarDTO avatar1 = new AvatarDTO("loader", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/hedvig_typing_animation.json",78,52,1000);
-     	AvatarDTO avatar1 = new AvatarDTO("loader", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/hedvig_typing_animation_2.json",78,52,1000);
+     	AvatarDTO avatar1 = new AvatarDTO("loader", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/hedvig_typing_animation_2.json",78,52,100000);
 
      	AvatarDTO avatar2 = new AvatarDTO("h_symbol", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/hedvig_h_symbol.json",315,90,2000);
      	//AvatarDTO avatar2 = new AvatarDTO("h_symbol", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/h_symbol.json",315,90,2000);
