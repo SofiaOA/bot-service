@@ -18,6 +18,8 @@ import com.hedvig.botService.enteties.message.MessageBodyText;
 import com.hedvig.botService.enteties.message.SelectItem;
 import com.hedvig.botService.enteties.message.SelectLink;
 import com.hedvig.botService.enteties.message.SelectOption;
+import com.hedvig.botService.serviceIntegration.memberService.MemberService;
+import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.SessionManager;
 
 @Component
@@ -28,8 +30,8 @@ public class MainConversation extends Conversation {
     private String emoji_hand_ok = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8C}, Charset.forName("UTF-8"));
 
     @Autowired
-	public MainConversation() {
-		super("main.menue");
+	public MainConversation(MemberService memberService, ProductPricingService productPricingClient) {
+		super("main.menue", memberService, productPricingClient);
 		// TODO Auto-generated constructor stub
 
 		createMessage("hedvig.com",
@@ -133,7 +135,7 @@ public class MainConversation extends Conversation {
             case "conversation.done":
                 log.info("conversation complete");
                 userContext.completeConversation(this.getClass().getName());
-                new ClaimsConversation().init(userContext, memberChat);
+                new ClaimsConversation(memberService, productPricingClient).init(userContext, memberChat);
 				userContext.startOngoingConversation(ClaimsConversation.class.getName());
                 //userContext.onboardingComplete(true);
                 return;

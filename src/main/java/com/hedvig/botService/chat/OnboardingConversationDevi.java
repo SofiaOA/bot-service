@@ -47,8 +47,8 @@ public class OnboardingConversationDevi extends Conversation {
 	 * */
     private static Logger log = LoggerFactory.getLogger(OnboardingConversationDevi.class);
     private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    private final MemberService memberService;
-    private final ProductPricingService productPricingClient;
+    //private final MemberService memberService;
+    //private final ProductPricingService productPricingClient;
 
 
     public final static String emoji_smile = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0x81}, Charset.forName("UTF-8"));
@@ -69,9 +69,7 @@ public class OnboardingConversationDevi extends Conversation {
     
     @Autowired
     public OnboardingConversationDevi(MemberService memberService, ProductPricingService productPricingClient) {
-        super("onboarding");
-        this.memberService = memberService;
-        this.productPricingClient = productPricingClient;
+        super("onboarding", memberService, productPricingClient);
 
         Image testImage = new Image("http://www.apa.org/Images/insurance-title-image_tcm7-198694.jpg",730,330);
 
@@ -562,7 +560,7 @@ public class OnboardingConversationDevi extends Conversation {
                 ),
                 (userContext, item) -> {
                     if(item.value.equals("message.fetch.accounts")) {
-                        String publicId = this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
+                        String publicId = memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
                         userContext.putUserData("{REFERENCE_TOKEN}", publicId);
                         return "message.fetch.accounts.hold";
                     }
@@ -792,7 +790,7 @@ public class OnboardingConversationDevi extends Conversation {
 
                 m.body.text = sitem.text;
                 if(sitem.value.equals("message.fetch.accounts")) {
-                    String publicId = this.memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
+                    String publicId = memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
                     userContext.putUserData("{REFERENCE_TOKEN}", publicId);
                     nxtMsg = "message.fetch.accounts.hold";
                 }else {
@@ -809,11 +807,12 @@ public class OnboardingConversationDevi extends Conversation {
             case "message.onboardingstart.final":
             	
             	String opt = getValue((MessageBodySingleSelect)m.body);
-                if(opt.equals("message.bankid.start")) {
+                /*if(opt.equals("message.bankid.start")) {
                     Optional<BankIdAuthResponse> authResponse = memberService.auth();
                     nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse, userContext);
-                }                            
-                else if(opt.equals("message.mockme")){
+                }                           
+                else */
+                if(opt.equals("message.mockme")){
                 	log.info("message.onboardingstart redirect to " + opt);
                     m.body.text = "Mocka mina uppgifter tack!";
                     userContext.clearContext();

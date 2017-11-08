@@ -12,6 +12,8 @@ import com.hedvig.botService.enteties.message.MessageBodyParagraph;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
 import com.hedvig.botService.enteties.message.MessageBodyText;
 import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.serviceIntegration.memberService.MemberService;
+import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.SessionManager;
 
 @Component
@@ -23,8 +25,8 @@ public class UpdateInformationConversation extends Conversation {
 	private static Logger log = LoggerFactory.getLogger(UpdateInformationConversation.class);
 
 	@Autowired
-	public UpdateInformationConversation() {
-		super("info.update");
+	public UpdateInformationConversation(MemberService memberService, ProductPricingService productPricingClient) {
+		super("info.update", memberService, productPricingClient);
 
 		createMessage("message.info.update.email", new MessageBodyText("Ok, vad har du för mailadress?"));
 		createMessage("message.info.update", new MessageBodyText("Ok, vad är det för information du vill uppdatera?\f Beskriv vad det gäller så ändrar jag"));
