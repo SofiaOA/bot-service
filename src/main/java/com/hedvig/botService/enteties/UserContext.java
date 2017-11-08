@@ -6,24 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.MapKeyColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.session.SessionManager;
 
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +58,17 @@ public class UserContext implements Serializable {
 	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name="conversationManager_id")
     private ConversationManager conversationManager;
+
+	@OneToOne(cascade = CascadeType.ALL)
+	@Getter
+	@Setter
+	private MemberChat memberChat;
+
+	@Getter
+	@Setter
+	@OneToMany(mappedBy = "userContext")
+	@MapKey(name="referenceToken")
+	private Map<String, CollectionStatus> bankIdStatus;
     
     /*
      * Lookup if there is a value for the key in the user context
@@ -146,6 +147,8 @@ public class UserContext implements Serializable {
     	putUserData("{SECURE_ITEM_0}","safety.extinguisher");
     	putUserData("{SECURE_ITEM_1}","safety.door");
     	putUserData("{SECURE_ITEMS_NO}","2");
+    	putUserData("{SSN}", "190101013443");
+
     }
     
     /*
@@ -163,6 +166,21 @@ public class UserContext implements Serializable {
     public UserData getOnBoardingData() {
         return new UserData(this);
     }
+
+	public CollectionStatus getBankIdCollectStatus(String referenceToken) {
+		CollectionStatus collectionStatus = bankIdStatus.get(referenceToken);
+		return collectionStatus;
+	}
+
+	public void startBankIdAuth(BankIdAuthResponse bankIdAuthResponse) {
+		CollectionStatus collectionStatus = new CollectionStatus();
+		collectionStatus.setCollectionType(CollectionStatus.CollectionType.AUTH);
+		collectionStatus.setLastStatus(bankIdAuthResponse.getBankIdStatus().name());
+		String referenceToken = bankIdAuthResponse.getReferenceToken();
+		collectionStatus.setReferenceToken(referenceToken);
+		collectionStatus.setAutoStartToken(bankIdAuthResponse.getAutoStartToken());
+		this.bankIdStatus.put(referenceToken, collectionStatus);
+	}
 }
 
 

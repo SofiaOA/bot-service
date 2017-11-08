@@ -74,6 +74,10 @@ public abstract class Conversation {
 		log.debug("-->" + input);
 		return input;
 	}
+
+	void addToChat(Message m, UserContext uc) {
+		this.addToChat(m, uc, uc.getMemberChat());
+	}
 	
 	void addToChat(Message m, UserContext userContext, MemberChat memberChat) {
 		log.info("Putting message:" + m.id + " content:" + m.body.text);

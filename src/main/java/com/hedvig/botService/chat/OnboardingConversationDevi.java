@@ -1,7 +1,6 @@
 package com.hedvig.botService.chat;
 
 import java.nio.charset.Charset;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -11,9 +10,10 @@ import com.hedvig.botService.dataTypes.*;
 import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
-import com.hedvig.botService.serviceIntegration.memberService.BankIdSignResponse;
+import com.hedvig.botService.serviceIntegration.memberService.BankIdChatStrategy;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.serviceIntegration.memberService.BankIdAuthResponse;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.Member;
@@ -38,6 +38,7 @@ import com.hedvig.botService.enteties.message.MessageHeader;
 import com.hedvig.botService.enteties.message.SelectItem;
 import com.hedvig.botService.enteties.message.SelectLink;
 import com.hedvig.botService.enteties.message.SelectOption;
+import org.springframework.web.client.HttpClientErrorException;
 
 @Component
 public class OnboardingConversationDevi extends Conversation {
@@ -1041,8 +1042,9 @@ public class OnboardingConversationDevi extends Conversation {
             log.error("Could not start bankIdAuthentication!");
             nxtMsg = "message.bankid.error";
         }else{
-            userContext.putUserData("{AUTOSTART_TOKEN}", authResponse.get().autoStartToken);
-            userContext.putUserData("{REFERENCE_TOKEN}", authResponse.get().referenceToken);
+            userContext.startBankIdAuth(authResponse.get());
+            userContext.putUserData("{AUTOSTART_TOKEN}", authResponse.get().getAutoStartToken());
+            userContext.putUserData("{REFERENCE_TOKEN}", authResponse.get().getReferenceToken());
         }
         return nxtMsg;
     }
@@ -1068,27 +1070,14 @@ public class OnboardingConversationDevi extends Conversation {
         super.completeRequest(nxtMsg, userContext, memberChat);
     }
 
-    public void bankIdAuthComplete(MemberAuthedEvent e, UserContext userContext, MemberChat memberChat) {
+    public void bankIdAuthComplete(UserContext userContext) {
 
-        if (!userContext.getOnBoardingData().userHasAuthedWithBankId()) {
-            Member member = e.getMember();
+        addToChat(getMessage("message.bankidja"), userContext);
 
-            UserData obd = userContext.getOnBoardingData();
-            obd.setBirthDate(member.getBirthDate());
-            obd.setSSN(member.getSsn());
-            obd.setFirstName(member.getFirstName());
-            obd.setFamilyName(member.getLastName());
+    }
 
-            //obd.setEmail(member.getEmail()); I don't think we will ever get his from bisnode
-
-            obd.setAddressStreet(member.getStreet());
-            obd.setAddressCity(member.getCity());
-            obd.setAddressZipCode(member.getZipCode());
-
-            addToChat(getMessage("message.bankidja"), userContext, memberChat);
-
-            userContext.getOnBoardingData().setUserHasAuthWithBankId(true);
-        }
+    public void bankIdAuthError(UserContext userContext) {
+        addToChat(getMessage("message.bankid.error"), userContext);
     }
 
     public void bankAccountRetrieved(UserContext userContext, MemberChat memberChat) {
@@ -1142,5 +1131,53 @@ public class OnboardingConversationDevi extends Conversation {
             userContext.getOnBoardingData().setUserHasSigned(true);
         }
 
+    }
+
+    public BankIdChatStrategy bankIdChatStrategy(UserContext userContext) {
+        return new BankIdChatStrategy() {
+            @Override
+            public void onError() {
+                log.info("BankIdCollectStatus: {}, memberId: {}", "Error", userContext.getMemberId());
+                addToChat(getMessage("message.bankid.error"), userContext);
+            }
+
+            @Override
+            public void onComplete() {
+                log.info("BankIdCollectStatus: {}, memberId: {}", "Complete", userContext.getMemberId());
+                addToChat(getMessage("message.bankIdComplete"), userContext);
+            }
+
+            @Override
+            public void onNoClient() {
+                log.info("BankIdCollectStatus: {}, memberId: {}", "onNoClient", userContext.getMemberId());
+                addToChat(getMessage("message.bankIdError"), userContext);
+            }
+
+            @Override
+            public void onOutstandingTransaction() {
+                log.info("BankIdCollectStatus: {}, memberId: {}", "OutstandingTransaction", userContext.getMemberId());
+
+            }
+
+            @Override
+            public void onStarted() {
+                log.info("BankIdCollectStatus: {}, memberId: {}", "Started", userContext.getMemberId());
+            }
+
+            @Override
+            public void onUserReq() {
+                log.info("BankIdCollectStatus: {}, memberId: {}", "UserReq", userContext.getMemberId());
+            }
+
+            @Override
+            public void onUserSign() {
+                log.info("BankIdCollectStatus: {}, memberId: {}", "UserSign", userContext.getMemberId());
+            }
+
+            @Override
+            public void onException(HttpClientErrorException ex) {
+                addToChat(getMessage("message.bankIdError"), userContext);
+            }
+        };
     }
 }

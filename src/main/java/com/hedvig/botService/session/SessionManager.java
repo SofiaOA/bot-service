@@ -1,41 +1,35 @@
 package com.hedvig.botService.session;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import com.hedvig.botService.chat.*;
+import com.hedvig.botService.chat.Conversation.EventTypes;
+import com.hedvig.botService.enteties.*;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
+import com.hedvig.botService.enteties.userContextHelpers.UserData;
+import com.hedvig.botService.serviceIntegration.memberService.MemberService;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdStatusType;
+import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.web.dto.Member;
+import com.hedvig.botService.web.dto.MemberAuthedEvent;
+import com.hedvig.botService.web.dto.UpdateTypes;
+import com.hedvig.botService.web.dto.events.memberService.*;
+import org.apache.zookeeper.Op;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.client.HttpClientErrorException;
+
+import java.util.*;
 
 /*
  * The session manager is the main controller class for the chat service. It contains all user sessions with chat histories, context etc
  * It is a singleton accessed through the request controller
  * */
 
-import java.util.List;
-
-import com.hedvig.botService.chat.*;
-import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
-import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.web.dto.*;
-
-import com.hedvig.botService.web.dto.events.memberService.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.hedvig.botService.enteties.ConversationEntity;
-import com.hedvig.botService.enteties.MemberChat;
-import com.hedvig.botService.enteties.MemberChatRepository;
-import com.hedvig.botService.enteties.ResourceNotFoundException;
-import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.UserContextRepository;
-import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.chat.Conversation.EventTypes;
-import org.springframework.beans.factory.annotation.Value;
-
 public class SessionManager {
 
     private static Logger log = LoggerFactory.getLogger(SessionManager.class);
-    private final MemberChatRepository repo;
     private final UserContextRepository userrepo;
     private final MemberService memberService;
     private final ProductPricingService productPricingclient;
@@ -52,8 +46,7 @@ public class SessionManager {
 	private UpdateInformationConversation infoConversation;
 	
     @Autowired
-    public SessionManager(MemberChatRepository repo, UserContextRepository userrepo, MemberService memberService, ProductPricingService client) {
-        this.repo = repo;
+    public SessionManager(UserContextRepository userrepo, MemberService memberService, ProductPricingService client) {
         this.userrepo = userrepo;
         this.memberService = memberService;
         this.productPricingclient = client;
@@ -67,21 +60,18 @@ public class SessionManager {
     }
 
     public void initClaim(String hid){
-    	
-        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-
-		//ClaimsConversation claimsConversation = new ClaimsConversation();
+        MemberChat mc = uc.getMemberChat();
 		startConversation(claimsConversation, uc, mc);
-		
-    	//uc.initClaim();
+
         userrepo.saveAndFlush(uc);
     }
     
     public void recieveEvent(String eventtype, String value, String hid){
-        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-        
+        MemberChat mc = uc.getMemberChat();
+
         EventTypes type = EventTypes.valueOf(eventtype);
 
         for(ConversationEntity c : uc.getConversations()){
@@ -104,56 +94,89 @@ public class SessionManager {
 					break;
 			}
         }
-        
-        /*for(conversationTypes name : conversationTypes.values()){
-        	if(uc.hasOngoingConversation(name.toString())){
-        		Conversation c = null;
-        		switch(name){
-        		case MainConversation:
-                	c = new MainConversation();
-        			break;
-        		case ClaimsConversation:
-                    c = new ClaimsConversation();
-        			break;
-        		case OnboardingConversationDevi:
-                	c = new OnboardingConversationDevi(memberService, this.productPricingclient);
-        			break;
-        		case UpdateInformationConversation:
-                    c = new UpdateInformationConversation();                      
-        			break;
-        		}
-        		c.recieveEvent(type, value, uc, mc);
-        	}
-        }*/
-        
-        repo.saveAndFlush(mc);
+
         userrepo.saveAndFlush(uc);
+    }
+
+    public Optional<BankIdAuthResponse> collect(String hid, String referenceToken) {
+
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+
+        try {
+            BankIdAuthResponse collect = memberService.collect(referenceToken, hid);
+
+            CollectionStatus collectionStatus = uc.getBankIdCollectStatus(referenceToken);
+            if(collectionStatus == null) {
+                onboardingConversation.bankIdAuthError(uc);
+                return Optional.of(collect);
+            }
+
+
+            BankIdStatusType bankIdStatus = collect.getBankIdStatus();
+            log.info("BankIdStatus after collect:{}, memberId:{}, lastCollectionStatus: {}", bankIdStatus.name(), hid, collectionStatus.getLastStatus());
+            if (!collectionStatus.done()) {
+
+                if (bankIdStatus == BankIdStatusType.COMPLETE) {
+                    //Fetch member data from member service.
+                    //Try three times
+                    Member member = memberService.getProfile(hid);
+
+                    UserData obd = uc.getOnBoardingData();
+                    obd.setBirthDate(member.getBirthDate());
+                    obd.setSSN(member.getSsn());
+                    obd.setFirstName(member.getFirstName());
+                    obd.setFamilyName(member.getLastName());
+
+                    //obd.setEmail(member.getEmail()); I don't think we will ever get his from bisnode
+
+                    obd.setAddressStreet(member.getStreet());
+                    obd.setAddressCity(member.getCity());
+                    obd.setAddressZipCode(member.getZipCode());
+
+                    uc.getOnBoardingData().setUserHasAuthWithBankId(referenceToken);
+
+                } else if (bankIdStatus == BankIdStatusType.ERROR) {
+                    //Handle error
+                    onboardingConversation.bankIdAuthError(uc);
+                }
+
+                collectionStatus.update(bankIdStatus);
+            }
+
+            userrepo.saveAndFlush(uc);
+
+            return Optional.of(collect);
+        }catch( HttpClientErrorException ex) {
+            log.error("Error collecting result from member-service: ", ex);
+            onboardingConversation.bankIdAuthError(uc);
+            //Have hedvig respond with error
+        }
+        return Optional.empty();
     }
     
     /*
      * Create a new users chat and context
      * */
     public void init(String hid){
-    	
-        MemberChat mc = repo.findByMemberId(hid).orElseGet(() -> {
+
+        UserContext uc = userrepo.findByMemberId(hid).orElseGet(() -> {
+            UserContext newUserContext = new UserContext(hid);
             MemberChat newChat = new MemberChat(hid);
-            repo.save(newChat);
-            return newChat;
+            newChat.userContext = newUserContext;
+            newUserContext.setMemberChat(newChat);
+            userrepo.save(newUserContext);
+
+            return newUserContext;
         });
 
-		UserContext uc = userrepo.findByMemberId(hid).orElseGet(() -> {
-			UserContext newUserContext = new UserContext(hid);
-			userrepo.save(newUserContext);
-		    return newUserContext;
-		});   	
-		
+        MemberChat mc = uc.getMemberChat();
+
 		/*
 		 * Kick off onboarding conversation
 		 * */
         //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
         startConversation(onboardingConversation, uc, mc);
-        
-        repo.saveAndFlush(mc);
+
         userrepo.saveAndFlush(uc);
         
     }
@@ -162,9 +185,10 @@ public class SessionManager {
      * Mark all messages (incl) last input from user deleted
      * */
     public void editHistory(String hid){
-    	MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    	MemberChat mc = uc.getMemberChat();
     	mc.revertLastInput();
-    	repo.saveAndFlush(mc);
+    	userrepo.saveAndFlush(uc);
     }
     
     /*
@@ -179,9 +203,7 @@ public class SessionManager {
     	conv.setConversationStatus(Conversation.conversationStatus.ONGOING);
     	c.init(uc, mc);
     	uc.addConversation(conv);
-    	
-    	//uc.putUserData("{"+ c.getClass().getName() +"}", Conversation.conversationStatus.ONGOING.toString());
-    	//c.init(uc, mc);
+
     }
     
     private void startConversation(Conversation c, UserContext uc, MemberChat mc, String startMessage){
@@ -203,14 +225,12 @@ public class SessionManager {
      * Mark all messages (incl) last input from user deleted
      * */
     public void resetOnboardingChat(String hid){
-    	MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-    	
+        MemberChat mc = uc.getMemberChat();
     	mc.reset(); // Clear chat
         //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
         startConversation(onboardingConversation, uc, mc);
-        
-    	repo.saveAndFlush(mc);
+
     	userrepo.saveAndFlush(uc);
     }
     
@@ -224,26 +244,19 @@ public class SessionManager {
         /*
          * Find users chat and context. First time it is created
          * */
-        MemberChat chat = repo.findByMemberId(hid).orElseGet(() -> {
-                    MemberChat newChat = new MemberChat(hid);
-                    repo.save(newChat);
-                    return newChat;
-                });
 
         UserContext uc = userrepo.findByMemberId(hid).orElseGet(() -> {
         	UserContext newUserContext = new UserContext(hid);
-        	userrepo.save(newUserContext);
+        	userrepo.saveAndFlush(newUserContext);
             return newUserContext;
         });
-        
-        repo.saveAndFlush(chat);
-        userrepo.saveAndFlush(uc);
-        
-        log.info(chat.toString());
-        
+
+        log.info(uc.getMemberChat().toString());
+
         // Mark last user input with as editAllowed
-        chat.markLastInput();
-        
+        uc.getMemberChat().markLastInput();
+
+        MemberChat chat = uc.getMemberChat();
 
         // Check for deleted messages
         ArrayList<Message> returnList = new ArrayList<Message>();
@@ -280,8 +293,8 @@ public class SessionManager {
     public void mainMenu(String hid){
         log.info("Main menu from user:" + hid);
  
-        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+        MemberChat mc = uc.getMemberChat();
 
     	/*
     	 * No ongoing main conversation and onboarding complete -> show menu
@@ -290,7 +303,7 @@ public class SessionManager {
     			//!uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString()) && 
     	//		!uc.hasOngoingConversation(conversationTypes.MainConversation.toString())){
     		//MainConversation mainConversation = new MainConversation();
-    		startConversation(mainConversation,uc, mc);
+        startConversation(mainConversation,uc, mc);
     	//}
         /*
          * User is chatting in the main chat:
@@ -300,7 +313,6 @@ public class SessionManager {
             mainConversation.init();
         }*/
 
-        repo.saveAndFlush(mc);
         userrepo.saveAndFlush(uc);    	
     }
     
@@ -325,34 +337,29 @@ public class SessionManager {
 			break;
     	}
     	
-        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-        
+        MemberChat mc = uc.getMemberChat();
+
         //UpdateInformationConversation conversation = new UpdateInformationConversation();
         //conversation.setStartingMessage(startingMessage);
         startConversation(infoConversation, uc, mc, startingMessage);
         /*uc.putUserData("{"+conversation.getConversationName()+"}", Conversation.conversationStatus.ONGOING.toString());
     	conversation.init();*/
 
-        repo.saveAndFlush(mc);
-        userrepo.saveAndFlush(uc);    	
+        userrepo.saveAndFlush(uc);
     }
     
     public void receiveEvent(MemberAuthedEvent e){
     	log.info("Received MemberAuthedEvent {}", e.toString());
-        String hid = e.getMemberId().toString();
-    	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        //String hid = e.getMemberId().toString();
+    	//UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        //MemberChat mc = uc.getMemberChat();
 
-        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+        //if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
+            //onboardingConversation.bankIdAuthComplete(e, uc, mc);
+        //}
 
-        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
-            //onboardingConversation.bankIdAuthComplete(e);
-            onboardingConversation.bankIdAuthComplete(e, uc, mc);
-        }
-
-        repo.saveAndFlush(mc);
-        userrepo.saveAndFlush(uc);
+        //userrepo.saveAndFlush(uc);
     }
 
     public void receiveEvent(MemberServiceEvent e){
@@ -372,14 +379,13 @@ public class SessionManager {
     private void handleMemberSingedEvent(MemberServiceEvent e, MemberSigned payload) {
         String hid = e.getMemberId().toString();
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
-        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+        MemberChat mc = uc.getMemberChat();
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
             //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.memberSigned(payload.getReferenceId(), uc, mc);
         }
 
-        repo.saveAndFlush(mc);
         userrepo.saveAndFlush(uc);
     }
 
@@ -387,14 +393,13 @@ public class SessionManager {
         log.info("Handle failed event {}, {}", e, payload);
         String hid = e.getMemberId().toString();
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
-        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+        MemberChat mc = uc.getMemberChat();
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
             //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.bankAccountRetrieveFailed(uc, mc);
         }
 
-        repo.saveAndFlush(mc);
         userrepo.saveAndFlush(uc);
     }
 
@@ -413,27 +418,25 @@ public class SessionManager {
         }
         uc.getAutogiroData().setAccounts(accounts);
 
-        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+        MemberChat mc = uc.getMemberChat();
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
             //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.bankAccountRetrieved(uc, mc);
         }
 
-        repo.saveAndFlush(mc);
         userrepo.saveAndFlush(uc);
     }
 
     public void quoteAccepted(String hid) {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
-        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
+        MemberChat mc = uc.getMemberChat();
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
             //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.quoteAccepted(uc, mc);
         }
 
-        repo.save(mc);
         userrepo.save(uc);
 
     }
@@ -444,9 +447,9 @@ public class SessionManager {
 
         m.header.fromId = new Long(hid);
 
-        MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-        
+        MemberChat mc = uc.getMemberChat();
+
         for(ConversationEntity c : uc.getConversations()){
         	
         	// Only deliver messages to ongoing conversations
@@ -467,34 +470,7 @@ public class SessionManager {
 					break;
 			}
         }
-        
-        
-        /*
-         * Check all conversations I am involved in
-         * */
-        /*for(conversationTypes name : conversationTypes.values()){
-        	if(uc.hasOngoingConversation(name.toString())){
-        		Conversation c = null;
-        		switch(name){
-        		case MainConversation:
-                	c = new MainConversation(this);
-        			break;
-        		case ClaimsConversation:
-                    c = new ClaimsConversation(this);
-        			break;
-        		case OnboardingConversationDevi:
-                	c = new OnboardingConversationDevi(memberService,this, this.productPricingclient);
-        			break;
-        		case UpdateInformationConversation:
-                    c = new UpdateInformationConversation(this);                      
-        			break;
-        		}
-        		if(c==null)throw new RuntimeException("Conversation not found for user :" + hid + " message id:" + m.id);
-        		c.recieveMessage(uc, mc, m);
-        	}
-        }*/
 
-        repo.saveAndFlush(mc);
         userrepo.saveAndFlush(uc);
     }
 }

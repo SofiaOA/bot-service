@@ -1,4 +1,4 @@
-package com.hedvig.botService.serviceIntegration.memberService;
+package com.hedvig.botService.serviceIntegration.memberService.dto;
 
 import lombok.Data;
 

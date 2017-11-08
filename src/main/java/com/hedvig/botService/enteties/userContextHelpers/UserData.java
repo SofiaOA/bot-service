@@ -203,12 +203,12 @@ public class UserData {
         ctx.putUserData(USER_HAS_SIGNED, Objects.toString(b));
     }
 
-    public boolean userHasAuthedWithBankId() {
+    public boolean userHasAuthedWithBankId(String referenceId) {
         String b = ctx.getDataEntry(USER_AUTHED_BANKID);
-        return b != null && Boolean.parseBoolean(b);
+        return b != null && b.equals(referenceId);
     }
 
-    public void setUserHasAuthWithBankId(boolean b) {
-        ctx.putUserData(USER_AUTHED_BANKID, Objects.toString(b));
+    public void setUserHasAuthWithBankId(String referenceId) {
+        ctx.putUserData(USER_AUTHED_BANKID, referenceId);
     }
 }

@@ -1,16 +1,12 @@
 package com.hedvig.botService.enteties;
 
+import com.hedvig.botService.chat.Conversation;
+import com.hedvig.botService.enteties.message.Message;
 import lombok.Getter;
-
-import javax.persistence.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.hedvig.botService.chat.Conversation;
-import com.hedvig.botService.enteties.message.Message;
-
+import javax.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,8 +33,8 @@ public class MemberChat {
     @MapKey(name="timestamp")
     public List<Message> chatHistory;
 
-    /*@Embedded
-    public UserContext onboardingContext;*/
+    @OneToOne()
+	public UserContext userContext;
     
     public String toString(){
     	
