@@ -249,13 +249,16 @@ public abstract class Conversation {
 	
 	// ----------------------------------------------------------------------------------------------------------------- //
 	
+	public void createChatMessage(String id, MessageBody body){
+		this.createChatMessage(id, body, null);
+	}
 	/*
 	 * Splits the message text into separate messages based on \f and adds 'Hedvig is thinking' messages in between
 	 * */
-	public void createChatMessage(String id, MessageBody body){
+	public void createChatMessage(String id, MessageBody body, String avatar){
 		String[] paragraphs = body.text.split("\f");
 		Integer pId = 0;
-		Integer delayFactor = 200; // Milliseconds per character TODO: Externalize this!
+		Integer delayFactor = 25; // Milliseconds per character TODO: Externalize this!
 		
 		ArrayList<String> msgs = new ArrayList<String>();
 		
@@ -264,8 +267,15 @@ public abstract class Conversation {
 			String s1 = i==0?id:(id + "." + (pId++).toString());
 			String s2 = id + "." + (pId++).toString();
 			log.info("Create message of size "+(s.length())+" with load time:" + (s.length()*delayFactor));
-			createMessage(s1, new MessageBodyParagraph(""), "h_symbol",(s.length()*delayFactor));
-			createMessage(s2, new MessageBodyParagraph(s),100);
+			//createMessage(s1, new MessageBodyParagraph(""), "h_symbol",(s.length()*delayFactor));
+			//createMessage(s1, new MessageBodyParagraph(""),(s.length()*delayFactor));
+			createMessage(s2, new MessageBodyParagraph(s));
+			
+			if(i==0){
+				createMessage(s1, new MessageBodyParagraph(""),"h_symbol",(s.length()*delayFactor));
+			}else{
+				createMessage(s1, new MessageBodyParagraph(""),(s.length()*delayFactor));
+			}
 			msgs.add(s1); msgs.add(s2);
 		}
 		
@@ -274,8 +284,13 @@ public abstract class Conversation {
 		String sFinal = id + "." + (pId++).toString();
 		String s = paragraphs[paragraphs.length-1]; // Last paragraph is put on actual message
 		body.text = s;
-		createMessage(sWrite, new MessageBodyParagraph(""), "h_symbol",(s.length()*delayFactor));
-		createMessage(sFinal, body);
+		//createMessage(sWrite, new MessageBodyParagraph(""), "h_symbol",(s.length()*delayFactor));
+		createMessage(sWrite, new MessageBodyParagraph(""),(s.length()*delayFactor));
+		if(avatar!=null){
+			createMessage(sFinal, body, avatar);
+		}else{
+			createMessage(sFinal, body, "h_symbol");
+		}
 		msgs.add(sWrite); msgs.add(sFinal);
 		
 		// Connect all messages in relay chain
