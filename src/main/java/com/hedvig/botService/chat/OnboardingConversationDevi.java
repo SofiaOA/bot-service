@@ -775,7 +775,24 @@ public class OnboardingConversationDevi extends Conversation {
         }
 
         UserData onBoardingData = userContext.getOnBoardingData();
-
+        
+        String selectedOption = (m.body.getClass().equals(MessageBodySingleSelect.class))?
+        		getValue((MessageBodySingleSelect)m.body):null;
+        		
+        if(selectedOption != null){ // TODO: Think this over
+	        // Check the selected option first...
+	        switch(selectedOption){
+		        case "message.mockme":
+		        	log.info("Mocking data...");
+		            m.body.text = "Mocka mina uppgifter tack!";
+		            userContext.clearContext();
+		            userContext.mockMe();	        
+		            addToChat(m, userContext, memberChat);
+		        break;
+	        }
+        }
+        
+        // ... and then the incomming message id
         switch (m.id) {
 	        case "message.lghtyp": {
 	        	SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
@@ -804,14 +821,8 @@ public class OnboardingConversationDevi extends Conversation {
 		        m.body.text = s.text;
 		        nxtMsg = "message.start.account.retrieval";
 		        break;
-            case "message.onboardingstart.final":
-            	
-            	String opt = getValue((MessageBodySingleSelect)m.body);
-                /*if(opt.equals("message.bankid.start")) {
-                    Optional<BankIdAuthResponse> authResponse = memberService.auth();
-                    nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse, userContext);
-                }                           
-                else */
+            /*case "message.onboardingstart":
+
                 if(opt.equals("message.mockme")){
                 	log.info("message.onboardingstart redirect to " + opt);
                     m.body.text = "Mocka mina uppgifter tack!";
@@ -819,7 +830,7 @@ public class OnboardingConversationDevi extends Conversation {
                     userContext.mockMe();
                 }
                 addToChat(m, userContext, memberChat);
-                break;
+                break;*/
             case "message.audiotest":
             case "message.phototest":
             	nxtMsg = "message.fileupload.result";

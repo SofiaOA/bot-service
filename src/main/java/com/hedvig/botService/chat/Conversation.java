@@ -101,7 +101,7 @@ public abstract class Conversation {
 			for(SelectItem x : mbody.choices){
 				if(x.getClass() == SelectLink.class) {
 					SelectLink link = (SelectLink) x;
-					if(link.appUrl.contains("{AUTOSTART_TOKEN}")){ // A bankid link
+					if(link.appUrl!=null && link.appUrl.contains("{AUTOSTART_TOKEN}")){ // A bankid link
 						Optional<BankIdAuthResponse> authResponse = memberService.auth();		
 
 						if(!authResponse.isPresent()) {
