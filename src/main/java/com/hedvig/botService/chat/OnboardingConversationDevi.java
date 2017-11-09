@@ -1135,7 +1135,8 @@ public class OnboardingConversationDevi extends Conversation {
 
 
     public void quoteAccepted(UserContext userContext, MemberChat memberChat) {
-        addToChat(getMessage("message.medlemjabank"), userContext, memberChat);
+        //addToChat(getMessage("message.medlemjabank"), userContext, memberChat);
+        addToChat(getMessage("message.kontrakt"), userContext);
     }
 
     public void memberSigned(String referenceId, UserContext userContext, MemberChat memberChat) {

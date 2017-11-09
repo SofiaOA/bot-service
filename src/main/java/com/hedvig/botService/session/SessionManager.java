@@ -109,7 +109,7 @@ public class SessionManager {
 
             CollectionStatus collectionStatus = uc.getBankIdCollectStatus(referenceToken);
             if(collectionStatus == null) {
-                onboardingConversation.bankIdAuthError(uc);
+                //onboardingConversation.bankIdAuthError(uc);
                 return Optional.of(collect);
             }
 
