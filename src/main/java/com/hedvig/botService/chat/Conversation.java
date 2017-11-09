@@ -98,14 +98,18 @@ public abstract class Conversation {
 				if(x.getClass() == SelectLink.class) {
 					SelectLink link = (SelectLink) x;
 					if(link.appUrl!=null && link.appUrl.contains("{AUTOSTART_TOKEN}")){ // A bankid link
-						Optional<BankIdAuthResponse> authResponse = memberService.auth();		
 
-						if(!authResponse.isPresent()) {
-							log.error("Could not start bankIdAuthentication!");
-							m = getMessage("message.bankid.error");
-						}else{
-							BankIdAuthResponse bankIdAuthResponse = authResponse.get();
-							userContext.startBankIdAuth(bankIdAuthResponse);
+						if(!link.value.equals("message.kontraktpop.bankid.collect")) {
+							Optional<BankIdAuthResponse> authResponse = memberService.auth();//authResponse = memberService.sign()
+
+							if(!authResponse.isPresent()) {
+								log.error("Could not start bankIdAuthentication!");
+								m = getMessage("message.bankid.error");
+							}else{
+								BankIdAuthResponse bankIdAuthResponse = authResponse.get();
+								userContext.startBankIdAuth(bankIdAuthResponse);
+							}
+
 						}
 						//nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse, userContext);
 					}

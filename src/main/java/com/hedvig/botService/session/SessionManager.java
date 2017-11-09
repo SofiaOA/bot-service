@@ -110,6 +110,7 @@ public class SessionManager {
             CollectionStatus collectionStatus = uc.getBankIdCollectStatus(referenceToken);
             if(collectionStatus == null) {
                 //onboardingConversation.bankIdAuthError(uc);
+
                 return Optional.of(collect);
             }
 
@@ -139,13 +140,15 @@ public class SessionManager {
 
                     onboardingConversation.bankIdAuthComplete(uc);
 
-                } else if (bankIdStatus == BankIdStatusType.ERROR) {
+                } //else if (bankIdStatus == BankIdStatusType.ERROR) {
                     //Handle error
-                    onboardingConversation.bankIdAuthError(uc);
-                }
+//                    onboardingConversation.bankIdAuthError(uc);
+                //}
 
                 collectionStatus.update(bankIdStatus);
-            }
+            }//else{
+            //    onboardingConversation
+            //}
 
             userrepo.saveAndFlush(uc);
 
