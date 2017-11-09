@@ -65,8 +65,8 @@ public class OnboardingConversationDevi extends Conversation {
     public final static String emoji_waving_hand = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8B}, Charset.forName("UTF-8"));
     public final static String emoji_flushed_face = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0xB3}, Charset.forName("UTF-8"));
 
-    @Value("${hedvig.gateway.url:http://gateway.hedvig.com}")
-    public String gatewayUrl;
+    //@Value("${hedvig.gateway.url:http://gateway.hedvig.com}")
+    public String gatewayUrl = "http://gateway.hedvig.com";
     
     @Autowired
     public OnboardingConversationDevi(MemberService memberService, ProductPricingService productPricingClient) {
