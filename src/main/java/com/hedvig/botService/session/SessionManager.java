@@ -235,6 +235,7 @@ public class SessionManager {
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
         MemberChat mc = uc.getMemberChat();
     	mc.reset(); // Clear chat
+    	uc.clearContext(); // Clear context
         OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
         startConversation(onboardingConversation, uc, mc);
 

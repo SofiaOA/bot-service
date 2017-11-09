@@ -53,10 +53,15 @@ public class MemberChat {
      * */
     public void reset(){
 
+    	chatHistory.clear(); // TODO: Make non delete solutions
+    	return;
+    	
+    	/*
     	for(Message m : chatHistory){
     		log.info("Mark deleted:" + m.globalId + " " + m);
     		m.deleted = true;
     	}
+    	*/
     	
     }
     
