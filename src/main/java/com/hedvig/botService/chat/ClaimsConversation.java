@@ -14,6 +14,8 @@ import com.hedvig.botService.enteties.message.MessageBodyText;
 import com.hedvig.botService.enteties.message.SelectItem;
 import com.hedvig.botService.enteties.message.SelectLink;
 import com.hedvig.botService.enteties.message.SelectOption;
+import com.hedvig.botService.serviceIntegration.memberService.MemberService;
+import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.SessionManager;
 
 @Component
@@ -25,8 +27,8 @@ public class ClaimsConversation extends Conversation {
 	private static Logger log = LoggerFactory.getLogger(ClaimsConversation.class);
 
 	@Autowired
-	public ClaimsConversation() {
-		super("claims");
+	public ClaimsConversation(MemberService memberService, ProductPricingService productPricingClient) {
+		super("claims", memberService, productPricingClient);
 		// TODO Auto-generated constructor stub
 
 		createMessage("message.claims.start", new MessageBodyParagraph("Jag förstår, hoppas du mår ok under omständigheterna. Självklart tar jag tag i det här"), "h_symbol",2000);

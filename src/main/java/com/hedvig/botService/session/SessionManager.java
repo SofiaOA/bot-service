@@ -36,14 +36,6 @@ public class SessionManager {
 
     public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
 
-	@Autowired
-	private OnboardingConversationDevi onboardingConversation;
-	@Autowired
-	private MainConversation mainConversation;
-	@Autowired
-	private ClaimsConversation claimsConversation;
-	@Autowired
-	private UpdateInformationConversation infoConversation;
 	
     @Autowired
     public SessionManager(UserContextRepository userrepo, MemberService memberService, ProductPricingService client) {
@@ -61,8 +53,10 @@ public class SessionManager {
 
     public void initClaim(String hid){
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+
         MemberChat mc = uc.getMemberChat();
-		startConversation(claimsConversation, uc, mc);
+	ClaimsConversation claimsConversation = new ClaimsConversation(memberService, productPricingclient);
+	startConversation(claimsConversation, uc, mc);
 
         userrepo.saveAndFlush(uc);
     }
@@ -81,15 +75,19 @@ public class SessionManager {
         	
         	switch(c.getClassName()){
 				case "com.hedvig.botService.chat.MainConversation":
+				    MainConversation mainConversation = new MainConversation(memberService, productPricingclient);
 		        	mainConversation.recieveEvent(type, value, uc, mc);
 					break;
 				case "com.hedvig.botService.chat.ClaimsConversation":
+				    ClaimsConversation claimsConversation = new ClaimsConversation(memberService, productPricingclient);
 		            claimsConversation.recieveEvent(type, value, uc, mc);
 					break;
 				case "com.hedvig.botService.chat.OnboardingConversationDevi":
+				    OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, productPricingclient);
 		        	onboardingConversation.recieveEvent(type, value, uc, mc);
 					break;
 				case "com.hedvig.botService.chat.UpdateInformationConversation":
+				    UpdateInformationConversation infoConversation = new UpdateInformationConversation(memberService, productPricingclient);
 		            infoConversation.recieveEvent(type, value, uc, mc);                    
 					break;
 			}
@@ -174,7 +172,7 @@ public class SessionManager {
 		/*
 		 * Kick off onboarding conversation
 		 * */
-        //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
+        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
         startConversation(onboardingConversation, uc, mc);
 
         userrepo.saveAndFlush(uc);
@@ -228,7 +226,7 @@ public class SessionManager {
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
         MemberChat mc = uc.getMemberChat();
     	mc.reset(); // Clear chat
-        //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
+        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
         startConversation(onboardingConversation, uc, mc);
 
     	userrepo.saveAndFlush(uc);
@@ -283,6 +281,11 @@ public class SessionManager {
     	}else{
     		log.info("No messages in chat....");
     	}
+
+
+        repo.saveAndFlush(chat);
+        userrepo.saveAndFlush(uc);
+
         return returnList;
     }
     
@@ -302,8 +305,8 @@ public class SessionManager {
     	//if(
     			//!uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString()) && 
     	//		!uc.hasOngoingConversation(conversationTypes.MainConversation.toString())){
-    		//MainConversation mainConversation = new MainConversation();
-        startConversation(mainConversation,uc, mc);
+    		MainConversation mainConversation = new MainConversation(memberService, productPricingclient);
+    		startConversation(mainConversation,uc, mc);
     	//}
         /*
          * User is chatting in the main chat:
@@ -339,8 +342,8 @@ public class SessionManager {
     	
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
         MemberChat mc = uc.getMemberChat();
+        UpdateInformationConversation infoConversation = new UpdateInformationConversation(memberService, productPricingclient);
 
-        //UpdateInformationConversation conversation = new UpdateInformationConversation();
         //conversation.setStartingMessage(startingMessage);
         startConversation(infoConversation, uc, mc, startingMessage);
         /*uc.putUserData("{"+conversation.getConversationName()+"}", Conversation.conversationStatus.ONGOING.toString());
@@ -382,7 +385,7 @@ public class SessionManager {
         MemberChat mc = uc.getMemberChat();
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.memberSigned(payload.getReferenceId(), uc, mc);
         }
 
@@ -396,7 +399,7 @@ public class SessionManager {
         MemberChat mc = uc.getMemberChat();
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.bankAccountRetrieveFailed(uc, mc);
         }
 
@@ -421,7 +424,7 @@ public class SessionManager {
         MemberChat mc = uc.getMemberChat();
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.bankAccountRetrieved(uc, mc);
         }
 
@@ -433,7 +436,7 @@ public class SessionManager {
         MemberChat mc = uc.getMemberChat();
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.quoteAccepted(uc, mc);
         }
 
@@ -457,15 +460,19 @@ public class SessionManager {
         	
         	switch(c.getClassName()){
 				case "com.hedvig.botService.chat.MainConversation":
+				    MainConversation mainConversation = new MainConversation(memberService, productPricingclient);
 		        	mainConversation.recieveMessage(uc, mc, m);
 					break;
 				case "com.hedvig.botService.chat.ClaimsConversation":
+				    ClaimsConversation claimsConversation = new ClaimsConversation(memberService, productPricingclient);
 		            claimsConversation.recieveMessage(uc, mc, m);
 					break;
 				case "com.hedvig.botService.chat.OnboardingConversationDevi":
+				    OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, productPricingclient);
 		        	onboardingConversation.recieveMessage(uc, mc, m);
 					break;
 				case "com.hedvig.botService.chat.UpdateInformationConversation":
+				    UpdateInformationConversation infoConversation = new UpdateInformationConversation(memberService, productPricingclient);
 		            infoConversation.recieveMessage(uc, mc, m);                     
 					break;
 			}
