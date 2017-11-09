@@ -77,12 +77,12 @@ public class OnboardingConversationDevi extends Conversation {
         createChatMessage("message.onboardingstart",
                 new MessageBodySingleSelect("Hej, jag heter Hedvig!" + emoji_waving_hand +"\fFint att ha dig här\fJag är en försäkringsbot som hjälper dig när jobbiga saker händer\fSka jag berätta hur det funkar?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Berätta!", "message.cad"));
+                            //add(new SelectOption("Berätta!", "message.cad"));
                             add(new SelectOption("Ge mig ett försäkringsförslag istället", "message.forslagstart"));
                             add(new SelectOption("Jag är redan medlem", "message.bankid.start"));
-                            add(new SelectOption("[Debug:mock my data]", "message.mockme"));
-                            add(new SelectOption("[Debug:audio test]", "message.audiotest"));
-                            add(new SelectOption("[Debug:photo test]", "message.phototest"));
+                            //add(new SelectOption("[Debug:mock my data]", "message.mockme"));
+                            //add(new SelectOption("[Debug:audio test]", "message.audiotest"));
+                            //add(new SelectOption("[Debug:photo test]", "message.phototest"));
                         }}
                 ));
         

@@ -12,7 +12,7 @@ public class LivingSpaceSquareMeters extends HedvigDataType {
 			if(m<5){ this.errorMessage = input + "kvm låter väldigt litet. Prova att ange igen tack"; return false;}
 			if(m>400){ this.errorMessage = input + "kvm?! Kan man bo så stort? Hmm... Prova att ange igen tack"; return false; }
 		}catch(NumberFormatException e){
-			this.errorMessage = input + " verkar vara ett kontigt antal. Prova igen tack";
+			this.errorMessage = input + " verkar vara ett konstigt antal kvadratmeter. Prova igen tack";
 			return false;
 		}
 		return true;
