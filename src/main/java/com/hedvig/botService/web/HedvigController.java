@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
+
 @RestController
 @RequestMapping("/hedvig")
 public class HedvigController {
@@ -50,14 +51,24 @@ public class HedvigController {
     }
 
     @PostMapping("collect")
-    ResponseEntity<?> collect(@RequestParam  String referenceToken, @RequestHeader(value="hedvig.token", required = false) String hid) {
+    ResponseEntity<?> collect(@RequestParam  String referenceToken,
+                              @RequestHeader(value="hedvig.token", required = false) String hid) {
 
         Optional<BankIdAuthResponse> response = this.sessionManager.collect(hid, referenceToken);
 
 
         if(response.isPresent()) {
-            return ResponseEntity.ok(response.get());
+            ResponseEntity.BodyBuilder responseEntity = ResponseEntity.ok();
+            BankIdAuthResponse r = response.get();
+            String newMemberId = r.getNewMemberId();
+
+            if(newMemberId != null && !newMemberId.equals(hid)) {
+                 responseEntity = responseEntity.header("Hedvig.Id", newMemberId);
+            }
+
+            return responseEntity.body(response.get());
         }
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("");
     }
 

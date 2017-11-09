@@ -100,8 +100,12 @@ public class SessionManager {
 
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
+        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, productPricingclient);
         try {
             BankIdAuthResponse collect = memberService.collect(referenceToken, hid);
+            if(collect.getNewMemberId() != null && !collect.getNewMemberId().equals(hid)){
+                uc = userrepo.findByMemberId(collect.getNewMemberId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+            }
 
             CollectionStatus collectionStatus = uc.getBankIdCollectStatus(referenceToken);
             if(collectionStatus == null) {
@@ -117,7 +121,7 @@ public class SessionManager {
                 if (bankIdStatus == BankIdStatusType.COMPLETE) {
                     //Fetch member data from member service.
                     //Try three times
-                    Member member = memberService.getProfile(hid);
+                    Member member = memberService.getProfile(collect.getNewMemberId());
 
                     UserData obd = uc.getOnBoardingData();
                     obd.setBirthDate(member.getBirthDate());
@@ -132,6 +136,8 @@ public class SessionManager {
                     obd.setAddressZipCode(member.getZipCode());
 
                     uc.getOnBoardingData().setUserHasAuthWithBankId(referenceToken);
+
+                    onboardingConversation.bankIdAuthComplete(uc);
 
                 } else if (bankIdStatus == BankIdStatusType.ERROR) {
                     //Handle error
@@ -282,8 +288,6 @@ public class SessionManager {
     		log.info("No messages in chat....");
     	}
 
-
-        repo.saveAndFlush(chat);
         userrepo.saveAndFlush(uc);
 
         return returnList;
@@ -384,10 +388,10 @@ public class SessionManager {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
         MemberChat mc = uc.getMemberChat();
 
-        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
+        //if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
             OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.memberSigned(payload.getReferenceId(), uc, mc);
-        }
+        //}
 
         userrepo.saveAndFlush(uc);
     }
@@ -398,10 +402,10 @@ public class SessionManager {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
         MemberChat mc = uc.getMemberChat();
 
-        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
+        //if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
             OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.bankAccountRetrieveFailed(uc, mc);
-        }
+        //}
 
         userrepo.saveAndFlush(uc);
     }
@@ -423,10 +427,10 @@ public class SessionManager {
 
         MemberChat mc = uc.getMemberChat();
 
-        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
+//        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
             OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.bankAccountRetrieved(uc, mc);
-        }
+//        }
 
         userrepo.saveAndFlush(uc);
     }
@@ -435,10 +439,10 @@ public class SessionManager {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
         MemberChat mc = uc.getMemberChat();
 
-        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
+//        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
             OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.quoteAccepted(uc, mc);
-        }
+//        }
 
         userrepo.save(uc);
 

@@ -1,31 +1,21 @@
 package com.hedvig.botService.chat;
 
+import com.hedvig.botService.dataTypes.HedvigDataType;
+import com.hedvig.botService.enteties.MemberChat;
+import com.hedvig.botService.enteties.UserContext;
+import com.hedvig.botService.enteties.message.*;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
+import com.hedvig.botService.serviceIntegration.memberService.MemberService;
+import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.hedvig.botService.dataTypes.HedvigDataType;
-import com.hedvig.botService.enteties.*;
-import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.enteties.message.MessageBody;
-import com.hedvig.botService.enteties.message.MessageBodyBankIdCollect;
-import com.hedvig.botService.enteties.message.MessageBodyMultipleSelect;
-import com.hedvig.botService.enteties.message.MessageBodyNumber;
-import com.hedvig.botService.enteties.message.MessageBodyParagraph;
-import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
-import com.hedvig.botService.enteties.message.MessageHeader;
-import com.hedvig.botService.enteties.message.SelectItem;
-import com.hedvig.botService.enteties.message.SelectLink;
-import com.hedvig.botService.enteties.message.SelectOption;
-import com.hedvig.botService.serviceIntegration.memberService.BankIdAuthResponse;
-import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class Conversation {
 
@@ -86,6 +76,7 @@ public abstract class Conversation {
 		this.addToChat(m, uc, uc.getMemberChat());
         }
 
+	/*
 	private String handleBankIdAuthRespose(String nxtMsg, Optional<BankIdAuthResponse> authResponse, UserContext userContext) {
 		if(!authResponse.isPresent()) {
 			log.error("Could not start bankIdAuthentication!");
@@ -95,7 +86,7 @@ public abstract class Conversation {
 			userContext.putUserData("{REFERENCE_TOKEN}", authResponse.get().referenceToken);
 		}
 		return nxtMsg;
-	}
+	}*/
 	
 	void addToChat(Message m, UserContext userContext, MemberChat memberChat) {
 		log.info("Putting message:" + m.id + " content:" + m.body.text);
@@ -113,8 +104,8 @@ public abstract class Conversation {
 							log.error("Could not start bankIdAuthentication!");
 							m = getMessage("message.bankid.error");
 						}else{
-							userContext.putUserData("{AUTOSTART_TOKEN}", authResponse.get().autoStartToken);
-							userContext.putUserData("{REFERENCE_TOKEN}", authResponse.get().referenceToken);
+							BankIdAuthResponse bankIdAuthResponse = authResponse.get();
+							userContext.startBankIdAuth(bankIdAuthResponse);
 						}
 						//nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse, userContext);
 					}
@@ -316,7 +307,7 @@ public abstract class Conversation {
 			String s = paragraphs[i];
 			String s1 = i==0?id:(id + "." + (pId++).toString());
 			String s2 = id + "." + (pId++).toString();
-			log.info("Create message of size "+(s.length())+" with load time:" + (s.length()*delayFactor));
+			//log.info("Create message of size "+(s.length())+" with load time:" + (s.length()*delayFactor));
 			//createMessage(s1, new MessageBodyParagraph(""), "h_symbol",(s.length()*delayFactor));
 			//createMessage(s1, new MessageBodyParagraph(""),(s.length()*delayFactor));
 			createMessage(s2, new MessageBodyParagraph(s));

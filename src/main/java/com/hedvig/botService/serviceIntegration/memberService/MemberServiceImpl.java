@@ -136,7 +136,7 @@ public class MemberServiceImpl implements MemberService {
             put("memberId", memberId);
         }});
 
-        ResponseEntity<BankIdAuthResponse> response = template.postForEntity(expandedUri, createHeaders(), BankIdAuthResponse.class);
+        ResponseEntity<BankIdAuthResponse> response = template.postForEntity(expandedUri, createHeaders(memberId), BankIdAuthResponse.class);
 
         return response.getBody();
     }

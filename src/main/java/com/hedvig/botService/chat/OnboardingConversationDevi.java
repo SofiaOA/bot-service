@@ -740,8 +740,13 @@ public class OnboardingConversationDevi extends Conversation {
                 
                 // New way of handeling relay messages
                 String relay = getRelay(value);
-                if(relay!=null)completeRequest(relay, userContext, memberChat);
-
+                if(relay!=null){
+                    completeRequest(relay, userContext, memberChat);
+                }
+                if(value.equals("message.forslag")) {
+                    String productId = this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
+                    userContext.getOnBoardingData().setProductId(productId);
+                }
                 break;
             case ANIMATION_COMPLETE:
                 switch(value){
@@ -943,6 +948,7 @@ public class OnboardingConversationDevi extends Conversation {
             case "message.bytesinfo2":
             case "message.forsakringidag":
             case "message.missingvalue":
+            case "message.forslag2":
 
                 SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
 
@@ -961,7 +967,7 @@ public class OnboardingConversationDevi extends Conversation {
                     addToChat(getMessage("message.missingvalue"), userContext, memberChat);
                     break;
                 }
-                else if(m.id.equals("message.missingvalue") || item.value.equals("message.forslag")) {
+                else if(m.id.equals("message.missingvalue") || item.value.equals("message.forslag2")) {
                     String productId = this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
                     onBoardingData.setProductId(productId);
                 }
@@ -978,7 +984,9 @@ public class OnboardingConversationDevi extends Conversation {
             case "message.forslagstart3":
                 String selectedValue = getValue((MessageBodySingleSelect)m.body);
 
+                /*
                 if(selectedValue.equals("message.lagenhet")) {
+
 
                 	try{
 	                    Optional<BankIdAuthResponse> authResponse = memberService.auth();
@@ -992,7 +1000,7 @@ public class OnboardingConversationDevi extends Conversation {
                 		log.error(e.getMessage());
                 		nxtMsg = "message.manuellnamn";
                 	}
-                }
+                }*/
 
                 addToChat(m, userContext, memberChat);
                 break;
@@ -1001,6 +1009,7 @@ public class OnboardingConversationDevi extends Conversation {
                 String ssn =  m.body.text;
 
                 Optional<BankIdAuthResponse> ssnResponse = memberService.auth(ssn);
+
 
                 nxtMsg = handleBankIdAuthRespose(nxtMsg, ssnResponse, userContext);
 

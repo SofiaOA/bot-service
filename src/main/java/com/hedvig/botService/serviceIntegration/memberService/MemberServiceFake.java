@@ -22,7 +22,7 @@ public class MemberServiceFake implements MemberService {
     @Override
     public Optional<BankIdAuthResponse> auth() {
 
-        return Optional.of(new BankIdAuthResponse(BankIdStatusType.STARTED, "autostartToken", "referenceToken"));
+        return Optional.of(new BankIdAuthResponse(BankIdStatusType.STARTED, "autostartToken", "referenceToken", null));
     }
 
     @Override
@@ -59,7 +59,7 @@ public class MemberServiceFake implements MemberService {
 
 //        throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
 
-        return new BankIdAuthResponse(factory.get(), "autostartToken", referenceToken);
+        return new BankIdAuthResponse(factory.get(), "autostartToken", referenceToken, memberId);
     }
 
     @Override

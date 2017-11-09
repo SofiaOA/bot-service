@@ -66,7 +66,7 @@ public class UserContext implements Serializable {
 
 	@Getter
 	@Setter
-	@OneToMany(mappedBy = "userContext")
+	@OneToMany(mappedBy = "userContext", cascade = CascadeType.ALL)
 	@MapKey(name="referenceToken")
 	private Map<String, CollectionStatus> bankIdStatus;
     
@@ -179,7 +179,12 @@ public class UserContext implements Serializable {
 		String referenceToken = bankIdAuthResponse.getReferenceToken();
 		collectionStatus.setReferenceToken(referenceToken);
 		collectionStatus.setAutoStartToken(bankIdAuthResponse.getAutoStartToken());
+
+		collectionStatus.setUserContext(this);
 		this.bankIdStatus.put(referenceToken, collectionStatus);
+
+		this.putUserData("{AUTOSTART_TOKEN}", bankIdAuthResponse.getAutoStartToken());
+		this.putUserData("{REFERENCE_TOKEN}", bankIdAuthResponse.getReferenceToken());
 	}
 }
 
