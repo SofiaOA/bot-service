@@ -128,6 +128,7 @@ public class UserContext implements Serializable {
     }
     public void clearContext(){
     	this.userData.clear();
+    	this.conversationManager.conversations.clear();
     }
 
     public void mockMe(){
