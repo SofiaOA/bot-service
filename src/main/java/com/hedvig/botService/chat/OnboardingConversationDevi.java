@@ -72,8 +72,11 @@ public class OnboardingConversationDevi extends Conversation {
     public OnboardingConversationDevi(MemberService memberService, ProductPricingService productPricingClient) {
         super("onboarding", memberService, productPricingClient);
 
-        Image testImage = new Image("http://www.apa.org/Images/insurance-title-image_tcm7-198694.jpg",730,330);
+        Image hImage = new Image("https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/Hedvig_Icon-60%402x.png",120,120);
 
+        createMessage("message.intro", new MessageBodyParagraph(""), hImage, 2000);
+        addRelay("message.intro","message.onboardingstart");
+        
         createChatMessage("message.onboardingstart",
                 new MessageBodySingleSelect("Hej, jag heter Hedvig!" + emoji_waving_hand +"\fFint att ha dig här\fJag är en försäkringsbot som hjälper dig när jobbiga saker händer\fSka jag berätta hur det funkar?",
                         new ArrayList<SelectItem>() {{
@@ -699,7 +702,8 @@ public class OnboardingConversationDevi extends Conversation {
         log.info("Starting onboarding conversation");
         //startConversation(userContext, memberChat, "message.onboardingstart"); // Id of first message
         //startConversation(userContext, memberChat, "message.intro"); // Id of first message
-        startConversation(userContext, memberChat,"message.onboardingstart");
+        //startConversation(userContext, memberChat,"message.onboardingstart");
+        startConversation(userContext, memberChat,"message.intro");
         //startConversation("message.start.account.retrieval"); // Id of first message
     }
 

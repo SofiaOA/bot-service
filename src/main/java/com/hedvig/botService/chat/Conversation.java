@@ -316,11 +316,11 @@ public abstract class Conversation {
 			//createMessage(s1, new MessageBodyParagraph(""),(s.length()*delayFactor));
 			createMessage(s2, new MessageBodyParagraph(s));
 
-			if(i==0){
-				createMessage(s1, new MessageBodyParagraph(""),"h_symbol",(s.length()*delayFactor));
-			}else{
+			//if(i==0){
+			//	createMessage(s1, new MessageBodyParagraph(""),"h_symbol",(s.length()*delayFactor));
+			//}else{
 				createMessage(s1, new MessageBodyParagraph(""),(s.length()*delayFactor));
-			}
+			//}
 			msgs.add(s1); msgs.add(s2);
 		}
 
@@ -334,7 +334,7 @@ public abstract class Conversation {
 		if(avatar!=null){
 			createMessage(sFinal, body, avatar);
 		}else{
-			createMessage(sFinal, body, "h_symbol");
+			createMessage(sFinal, body);
 		}
 		msgs.add(sWrite); msgs.add(sFinal);
 
