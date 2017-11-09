@@ -238,7 +238,6 @@ public class SessionManager {
     	uc.clearContext(); // Clear context
         OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
         startConversation(onboardingConversation, uc, mc);
-
     	userrepo.saveAndFlush(uc);
     }
     

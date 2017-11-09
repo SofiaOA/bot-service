@@ -12,7 +12,7 @@ public class HouseholdMemberNumber extends HedvigDataType {
 			if(m<1){ this.errorMessage = input + " låter som väldigt få personer. Prova att ange igen tack"; return false;}
 			if(m>20){ this.errorMessage = input + "? I ett och samma hushåll?. Hmm... Prova att ange igen tack"; return false; }
 		}catch(NumberFormatException e){
-			this.errorMessage = input + " verkar vara ett kontigt antal. Prova igen tack";
+			this.errorMessage = input + " verkar vara ett kontigt antal personer. Prova igen tack";
 			return false;
 		}
 		return true;
