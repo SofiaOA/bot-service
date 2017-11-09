@@ -33,7 +33,7 @@ public class ConversationManager {
     @Getter
     private String memberId;
 
-    @OneToMany(mappedBy="conversationManager", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="conversationManager", cascade = CascadeType.ALL, orphanRemoval=true)
     public List<ConversationEntity> conversations;
 
     public String toString(){	
