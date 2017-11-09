@@ -30,7 +30,6 @@ import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.UserContextRepository;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.chat.Conversation.EventTypes;
-import org.springframework.beans.factory.annotation.Value;
 
 public class SessionManager {
 
@@ -42,14 +41,6 @@ public class SessionManager {
 
     public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
 
-	@Autowired
-	private OnboardingConversationDevi onboardingConversation;
-	@Autowired
-	private MainConversation mainConversation;
-	@Autowired
-	private ClaimsConversation claimsConversation;
-	@Autowired
-	private UpdateInformationConversation infoConversation;
 	
     @Autowired
     public SessionManager(MemberChatRepository repo, UserContextRepository userrepo, MemberService memberService, ProductPricingService client) {
@@ -71,7 +62,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
-		//ClaimsConversation claimsConversation = new ClaimsConversation();
+		ClaimsConversation claimsConversation = new ClaimsConversation(memberService, productPricingclient);
 		startConversation(claimsConversation, uc, mc);
 		
     	//uc.initClaim();
@@ -91,15 +82,19 @@ public class SessionManager {
         	
         	switch(c.getClassName()){
 				case "com.hedvig.botService.chat.MainConversation":
+				    MainConversation mainConversation = new MainConversation(memberService, productPricingclient);
 		        	mainConversation.recieveEvent(type, value, uc, mc);
 					break;
 				case "com.hedvig.botService.chat.ClaimsConversation":
+				    ClaimsConversation claimsConversation = new ClaimsConversation(memberService, productPricingclient);
 		            claimsConversation.recieveEvent(type, value, uc, mc);
 					break;
 				case "com.hedvig.botService.chat.OnboardingConversationDevi":
+				    OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, productPricingclient);
 		        	onboardingConversation.recieveEvent(type, value, uc, mc);
 					break;
 				case "com.hedvig.botService.chat.UpdateInformationConversation":
+				    UpdateInformationConversation infoConversation = new UpdateInformationConversation(memberService, productPricingclient);
 		            infoConversation.recieveEvent(type, value, uc, mc);                    
 					break;
 			}
@@ -150,7 +145,7 @@ public class SessionManager {
 		/*
 		 * Kick off onboarding conversation
 		 * */
-        //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
+        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
         startConversation(onboardingConversation, uc, mc);
         
         repo.saveAndFlush(mc);
@@ -207,7 +202,7 @@ public class SessionManager {
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
     	
     	mc.reset(); // Clear chat
-        //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
+        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
         startConversation(onboardingConversation, uc, mc);
         
     	repo.saveAndFlush(mc);
@@ -235,9 +230,7 @@ public class SessionManager {
         	userrepo.save(newUserContext);
             return newUserContext;
         });
-        
-        repo.saveAndFlush(chat);
-        userrepo.saveAndFlush(uc);
+
         
         log.info(chat.toString());
         
@@ -270,6 +263,11 @@ public class SessionManager {
     	}else{
     		log.info("No messages in chat....");
     	}
+
+
+        repo.saveAndFlush(chat);
+        userrepo.saveAndFlush(uc);
+
         return returnList;
     }
     
@@ -289,7 +287,7 @@ public class SessionManager {
     	//if(
     			//!uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString()) && 
     	//		!uc.hasOngoingConversation(conversationTypes.MainConversation.toString())){
-    		//MainConversation mainConversation = new MainConversation();
+    		MainConversation mainConversation = new MainConversation(memberService, productPricingclient);
     		startConversation(mainConversation,uc, mc);
     	//}
         /*
@@ -328,7 +326,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
         
-        //UpdateInformationConversation conversation = new UpdateInformationConversation();
+        UpdateInformationConversation infoConversation = new UpdateInformationConversation(memberService, productPricingclient);
         //conversation.setStartingMessage(startingMessage);
         startConversation(infoConversation, uc, mc, startingMessage);
         /*uc.putUserData("{"+conversation.getConversationName()+"}", Conversation.conversationStatus.ONGOING.toString());
@@ -346,7 +344,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             //onboardingConversation.bankIdAuthComplete(e);
             onboardingConversation.bankIdAuthComplete(e, uc, mc);
         }
@@ -375,7 +373,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.memberSigned(payload.getReferenceId(), uc, mc);
         }
 
@@ -390,7 +388,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.bankAccountRetrieveFailed(uc, mc);
         }
 
@@ -416,7 +414,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.bankAccountRetrieved(uc, mc);
         }
 
@@ -429,7 +427,7 @@ public class SessionManager {
         MemberChat mc = repo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find memberchat."));
 
         if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
             onboardingConversation.quoteAccepted(uc, mc);
         }
 
@@ -454,15 +452,19 @@ public class SessionManager {
         	
         	switch(c.getClassName()){
 				case "com.hedvig.botService.chat.MainConversation":
+				    MainConversation mainConversation = new MainConversation(memberService, productPricingclient);
 		        	mainConversation.recieveMessage(uc, mc, m);
 					break;
 				case "com.hedvig.botService.chat.ClaimsConversation":
+				    ClaimsConversation claimsConversation = new ClaimsConversation(memberService, productPricingclient);
 		            claimsConversation.recieveMessage(uc, mc, m);
 					break;
 				case "com.hedvig.botService.chat.OnboardingConversationDevi":
+				    OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, productPricingclient);
 		        	onboardingConversation.recieveMessage(uc, mc, m);
 					break;
 				case "com.hedvig.botService.chat.UpdateInformationConversation":
+				    UpdateInformationConversation infoConversation = new UpdateInformationConversation(memberService, productPricingclient);
 		            infoConversation.recieveMessage(uc, mc, m);                     
 					break;
 			}
