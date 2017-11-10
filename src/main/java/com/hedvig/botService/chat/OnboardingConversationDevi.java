@@ -611,7 +611,7 @@ public class OnboardingConversationDevi extends Conversation {
                 new MessageBodySingleSelect("Då är du snart Hedvig-medlem! Nu behöver du bara signera de allmänna villkoren och en fullmakt som ger Hedvig lov att hantera dina försäkringar!",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectOption("Jag vill skriva på och bli Hedvig-medlem", "message.kontraktpop.startBankId"));
-                        	add(new SelectLink("Läs igenom", "message.kontraktpopread", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));                            
+                        	add(new SelectLink("Läs igenom", "message.kontraktpop", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));
                         }}
                 ),
                 (userContext, i) -> {
@@ -646,10 +646,10 @@ public class OnboardingConversationDevi extends Conversation {
         //createMessage("message.kontraktklar2", new MessageBodyParagraph("Välkommen, bästa nya medlem"), "h_symbol",2000);
         //createMessage("message.kontraktklar3", new MessageBodyText("Jag skickar en bekräftelse till din mejl! Vad har du för mejladress?"), "h_symbol", 2000);
 
-        createChatMessage("message.kontraktklar", 
-        		new MessageBodyText(emoji_tada + " Hurra! "+ emoji_tada +"\f"
-        				+ "Välkommen, bästa nya medlem\f"
-        				+ "Jag skickar en bekräftelse till din mejl! Vad har du för mejladress?"));
+        createMessage("message.kontraktklar",
+        		new MessageBodyText(//emoji_tada + " Hurra! "+ emoji_tada +"\f"
+        				//+ "Välkommen, bästa nya medlem\f"
+        				"Jag skickar en bekräftelse till din mejl! Vad har du för mejladress?"));
         
         setExpectedReturnType("message.kontraktklar", new EmailAdress());
 
