@@ -167,10 +167,8 @@ public class OnboardingConversationDevi extends Conversation {
                         }}
                 ));
 
-        createChatMessage("message.forslagstart",
+        createMessage("message.forslagstart",
                 new MessageBodySingleSelect(
-                		//emoji_hand_ok + "\f" +
-                		//"Då sätter vi igång\f" +
                 		"Bor du i lägenhet eller i eget hus?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Lägenhet", "message.lagenhet"));
@@ -414,7 +412,7 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Trygg-Hansa", "Trygg-Hansa"));
                             add(new SelectOption("If", "if"));
                             add(new SelectOption("Moderna", "Moderna"));
-                            add(new SelectOption("Annat bolag", "message.annatbolag"));
+                            //add(new SelectOption("Annat bolag", "message.annatbolag"));
                             add(new SelectOption("Ingen aning", "vetej"));
 
                         }}
