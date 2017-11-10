@@ -368,6 +368,7 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Säkerhetsdörr", "safety.door"));
                             add(new SelectOption("Gallergrind", "safety.gate"));
                             add(new SelectOption("Inbrottslarm", "safety.burglaralarm"));
+                            add(new SelectOption("Ingen av dessa", "safety.none"));
                         }}
                 ));
         //(FUNKTION: FYLL I SÄKERHETSGREJER) = SCROLL MED DE OLIKA GREJERNA KANSKE? ELLER FLERVALSALTERNATIVBOXAR?
@@ -609,8 +610,8 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.kontraktpop",
                 new MessageBodySingleSelect("Då är du snart Hedvig-medlem! Nu behöver du bara signera de allmänna villkoren och en fullmakt som ger Hedvig lov att hantera dina försäkringar!",
                         new ArrayList<SelectItem>() {{
-                        	add(new SelectLink("Läs igenom", "message.kontraktpopread", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));
-                            add(new SelectOption("Jag vill skriva på och bli Hedvig-medlem", "message.kontraktpop.startBankId"));
+                        	add(new SelectOption("Jag vill skriva på och bli Hedvig-medlem", "message.kontraktpop.startBankId"));
+                        	add(new SelectLink("Läs igenom", "message.kontraktpopread", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));                            
                         }}
                 ),
                 (userContext, i) -> {
@@ -649,6 +650,7 @@ public class OnboardingConversationDevi extends Conversation {
         		new MessageBodyText(emoji_tada + " Hurra! "+ emoji_tada +"\f"
         				+ "Välkommen, bästa nya medlem\f"
         				+ "Jag skickar en bekräftelse till din mejl! Vad har du för mejladress?"));
+        
         setExpectedReturnType("message.kontraktklar", new EmailAdress());
 
         createMessage("message.kontraktklar4",
@@ -915,6 +917,11 @@ public class OnboardingConversationDevi extends Conversation {
                 onBoardingData.setAddressStreet(m.body.text);
                 addToChat(m, userContext, memberChat);
                 nxtMsg = "message.kvadrat";
+                break;
+            case "message.kontraktklar":
+                onBoardingData.setEmail(m.body.text);
+                addToChat(m, userContext, memberChat);
+                nxtMsg = "message.kontraktklar4";
                 break;
             case "message.mail":
                 onBoardingData.setEmail(m.body.text);

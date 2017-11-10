@@ -14,7 +14,7 @@ import com.hedvig.botService.web.dto.Member;
 import com.hedvig.botService.web.dto.MemberAuthedEvent;
 import com.hedvig.botService.web.dto.UpdateTypes;
 import com.hedvig.botService.web.dto.events.memberService.*;
-import org.apache.zookeeper.Op;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,10 +53,8 @@ public class SessionManager {
 
     public void initClaim(String hid){
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-
-        MemberChat mc = uc.getMemberChat();
-	ClaimsConversation claimsConversation = new ClaimsConversation(memberService, productPricingclient);
-	startConversation(claimsConversation, uc, mc);
+        ClaimsConversation claimsConversation = new ClaimsConversation(memberService, productPricingclient);
+        uc.startConversation(claimsConversation);
 
         userrepo.saveAndFlush(uc);
     }
@@ -176,13 +174,11 @@ public class SessionManager {
             return newUserContext;
         });
 
-        MemberChat mc = uc.getMemberChat();
-
 		/*
 		 * Kick off onboarding conversation
 		 * */
         OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
-        startConversation(onboardingConversation, uc, mc);
+        uc.startConversation(onboardingConversation);
 
         userrepo.saveAndFlush(uc);
         
@@ -200,7 +196,7 @@ public class SessionManager {
     
     /*
      * Start a conversation for a user
-     * */
+     * 
     private void startConversation(Conversation c, UserContext uc, MemberChat mc){
     	log.info("Starting conversation of type:" + c.getClass().getName() + " for user:" + uc.getMemberId());
     	
@@ -219,14 +215,14 @@ public class SessionManager {
     	ConversationEntity conv = new ConversationEntity();
     	conv.setClassName(c.getClass().getName());
     	conv.setMemberId(uc.getMemberId());
-    	conv.setConversationStatus(Conversation.conversationStatus.INITIATED);
+    	conv.setConversationStatus(Conversation.conversationStatus.ONGOING);
     	conv.setStartMessage(startMessage);
     	c.init(uc, mc);
     	uc.addConversation(conv);
     	
     	//uc.putUserData("{"+ c.getClass().getName() +"}", Conversation.conversationStatus.ONGOING.toString());
     	//c.init(uc, mc);
-    }
+    }*/
     
     /*
      * Mark all messages (incl) last input from user deleted
@@ -237,7 +233,7 @@ public class SessionManager {
     	mc.reset(); // Clear chat
     	uc.clearContext(); // Clear context
         OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient);
-        startConversation(onboardingConversation, uc, mc);
+        uc.startConversation(onboardingConversation);
     	userrepo.saveAndFlush(uc);
     }
     
@@ -304,7 +300,6 @@ public class SessionManager {
         log.info("Main menu from user:" + hid);
  
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-        MemberChat mc = uc.getMemberChat();
 
     	/*
     	 * No ongoing main conversation and onboarding complete -> show menu
@@ -312,8 +307,9 @@ public class SessionManager {
     	//if(
     			//!uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString()) && 
     	//		!uc.hasOngoingConversation(conversationTypes.MainConversation.toString())){
+        
     		MainConversation mainConversation = new MainConversation(memberService, productPricingclient);
-    		startConversation(mainConversation,uc, mc);
+    		uc.startConversation(mainConversation);
     	//}
         /*
          * User is chatting in the main chat:
@@ -348,11 +344,10 @@ public class SessionManager {
     	}
     	
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-        MemberChat mc = uc.getMemberChat();
         UpdateInformationConversation infoConversation = new UpdateInformationConversation(memberService, productPricingclient);
 
         //conversation.setStartingMessage(startingMessage);
-        startConversation(infoConversation, uc, mc, startingMessage);
+        uc.startConversation(infoConversation, startingMessage);
         /*uc.putUserData("{"+conversation.getConversationName()+"}", Conversation.conversationStatus.ONGOING.toString());
     	conversation.init();*/
 

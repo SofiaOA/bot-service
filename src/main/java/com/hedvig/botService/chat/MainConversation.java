@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.hedvig.botService.enteties.*;
 import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodyNumber;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
 import com.hedvig.botService.enteties.message.MessageBodyText;
 import com.hedvig.botService.enteties.message.SelectItem;
@@ -65,7 +66,7 @@ public class MainConversation extends Conversation {
                         }}
                 ), "h_symbol");
         
-		createMessage("message.main.callme", new MessageBodyText("Ok, ta det lugnt! Vad når jag dig på för nummer?"));
+		createMessage("message.main.callme", new MessageBodyNumber("Ok, ta det lugnt! Vad når jag dig på för nummer?"));
 		
 		createMessage("main.question", new MessageBodyText("Vad har du för fråga?"));
 		
@@ -91,22 +92,26 @@ public class MainConversation extends Conversation {
 				break;
 			}
 		case "message.main.callme": 
+			userContext.putUserData("{PHONE}", m.body.text);
 			nxtMsg = "message.main.end";
 			addToChat(m, userContext, memberChat); // Response parsed to nice format
+			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
 			break;
 		case "message.question": 
-			userContext.putUserData("{QUESTION_"+LocalDate.now()+"}", m.body.text);
+			userContext.putUserData("{QUESTION}", m.body.text);
 			addToChat(m, userContext, memberChat); // Response parsed to nice format
 			nxtMsg = "message.question.recieved";
+			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
 			break;
 		case "message.main.refer": 
-			userContext.putUserData("{REFERAL_"+LocalDate.now()+"}", m.body.text);
+			userContext.putUserData("{REFERAL}", m.body.text);
 			addToChat(m, userContext, memberChat); // Response parsed to nice format
 			nxtMsg = "message.main.refer.recieved";
+			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
 			break;
 		}
 		
-        /*
+      /*
 	  * In a Single select, there is only one trigger event. Set default here to be a link to a new message
 	  */
        if (nxtMsg.equals("") && m.body.getClass().equals(MessageBodySingleSelect.class)) {
@@ -135,8 +140,8 @@ public class MainConversation extends Conversation {
             case "conversation.done":
                 log.info("conversation complete");
                 userContext.completeConversation(this.getClass().getName());
-                new ClaimsConversation(memberService, productPricingClient).init(userContext, memberChat);
-				userContext.startOngoingConversation(ClaimsConversation.class.getName());
+                //new ClaimsConversation(memberService, productPricingClient).init(userContext, memberChat);
+				userContext.startConversation(new ClaimsConversation(memberService, productPricingClient));
                 //userContext.onboardingComplete(true);
                 return;
             case "":

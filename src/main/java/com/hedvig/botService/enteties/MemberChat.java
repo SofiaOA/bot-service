@@ -29,7 +29,7 @@ public class MemberChat {
     @Getter
     private String memberId;
 
-    @OneToMany(mappedBy="chat", cascade = CascadeType.ALL) // TODO kolla att detta funkar
+    @OneToMany(mappedBy="chat", cascade = CascadeType.ALL, orphanRemoval=true) // TODO kolla att detta funkar
     @MapKey(name="timestamp")
     public List<Message> chatHistory;
 

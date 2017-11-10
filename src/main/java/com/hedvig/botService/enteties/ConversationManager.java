@@ -54,7 +54,7 @@ public class ConversationManager {
     public void add(ConversationEntity c) {
     	conversations.add(c);
     }
-    
+
     /*
      * Check if there is a conversation that needs to be initiated
      * */
@@ -63,6 +63,16 @@ public class ConversationManager {
     	return false;
     }
 
+    /*
+     * Check if there is an existing conversation of a certain type with status ONGOING
+     * */
+    public boolean containsOngoingConversationOfType(String type){
+    	for(ConversationEntity c : conversations){
+    		if(c.getClassName().equals(type) && c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING))return true;
+    	}
+    	return false;
+    }
+    
 	public List<ConversationEntity> getConversations() {
 		return conversations;
 	}

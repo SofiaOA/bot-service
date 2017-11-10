@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hedvig.botService.chat.Conversation;
+import com.hedvig.botService.chat.Conversation.conversationStatus;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
 
 import lombok.Getter;
@@ -90,9 +91,45 @@ public class UserContext implements Serializable {
     	return this.conversationManager.getConversations();
     }
     
+    
+    // ------------ Conversation functions ------------------------------- //
+    
+    /*
+     * Start a conversation for a user
+     * */
+    public void startConversation(Conversation c){
+    	log.info("Starting conversation of type:" + c.getClass().getName() + " for user:" + getMemberId());
+    	
+    	ConversationEntity conv = new ConversationEntity();
+    	conv.setClassName(c.getClass().getName());
+    	conv.setMemberId(getMemberId());
+    	conv.setConversationStatus(Conversation.conversationStatus.ONGOING);
+    	c.init(this, this.memberChat);
+    	addConversation(conv);
+
+    }
+    
+    public void startConversation(Conversation c, String startMessage){
+    	log.info("Starting conversation of type:" + c.getClass().getName() + " for user:" + getMemberId());
+    	
+    	ConversationEntity conv = new ConversationEntity();
+    	conv.setClassName(c.getClass().getName());
+    	conv.setMemberId(getMemberId());
+    	conv.setConversationStatus(Conversation.conversationStatus.ONGOING);
+    	conv.setStartMessage(startMessage);
+    	c.init(this, this.memberChat);
+    	addConversation(conv);
+
+    }
+    
+    
     public void addConversation(ConversationEntity c){
-    	c.setConversationManager(this.conversationManager);
-    	this.conversationManager.add(c);
+    	
+    	// TODO: For now a member can only have one conversation of each type
+    	if(!hasOngoingConversation(c.getClassName())){
+    		c.setConversationManager(this.conversationManager);
+    		this.conversationManager.add(c);
+    	}
     }
     
     /*
@@ -100,22 +137,37 @@ public class UserContext implements Serializable {
      * */
     public boolean hasOngoingConversation(String conversationClassName){
     	if(conversationClassName.indexOf(".")==-1)conversationClassName = ("com.hedvig.botService.chat." + conversationClassName); // TODO: Refactor/remove hack
-    	String c =  getDataEntry("{" +conversationClassName+ "}") ;
-    	return(c!=null && c.equals(Conversation.conversationStatus.ONGOING.toString()));
+    	
+    	return conversationManager.containsOngoingConversationOfType(conversationClassName);
+    	//String c =  getDataEntry("{" +conversationClassName+ "}") ;
+    	//return(c!=null && c.equals(Conversation.conversationStatus.ONGOING.toString()));
     }
 
-    public void startOngoingConversation(String conversationClassName){
-        if(conversationClassName.indexOf(".")==-1)conversationClassName = ("com.hedvig.botService.chat." + conversationClassName); // TODO: Refactor/remove hack
+   /* public void startOngoingConversation(String conversationClassName){
+    	if(conversationClassName.indexOf(".")==-1)conversationClassName = ("com.hedvig.botService.chat." + conversationClassName); // TODO: Refactor/remove hack
+    	
+    	// Only one conversation per type TODO: change so a member can have multiple ongoing conversations
+    	if(!conversationManager.containsOngoingConversationOfType(conversationClassName)){
+    		add(c);
+    	}
+    	
         this.putUserData("{" +conversationClassName+ "}", Conversation.conversationStatus.ONGOING.toString());
-    }
+    }*/
     
     /*
      * Set conversation to COMPLETE
      * */
     public void completeConversation(String conversationClassName){
     	if(conversationClassName.indexOf(".")==-1)conversationClassName = ("com.hedvig.botService.chat." + conversationClassName); // TODO: Refactor/remove hack
-    	putUserData("{" +conversationClassName+ "}", Conversation.conversationStatus.COMPLETE.toString());
+    	
+    	for(ConversationEntity c : this.conversationManager.conversations){
+    		if(c.getClassName().equals(conversationClassName))c.conversationStatus=conversationStatus.COMPLETE;
+    	}
+    	
+    	//putUserData("{" +conversationClassName+ "}", Conversation.conversationStatus.COMPLETE.toString());
     }
+    
+    // ------------------------------------------------------ //
     
     public UserContext(String memberId) {
     	log.info("Instantiating UserContext for member:" + memberId + " :" + this );
@@ -129,6 +181,7 @@ public class UserContext implements Serializable {
     public void clearContext(){
     	this.userData.clear();
     	this.conversationManager.conversations.clear();
+    	this.memberChat.chatHistory.clear();
     }
 
     public void mockMe(){
