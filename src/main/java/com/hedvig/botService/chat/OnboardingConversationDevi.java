@@ -598,7 +598,7 @@ public class OnboardingConversationDevi extends Conversation {
         //(FUNKTION: FYLL I MAILADRESS) = FÄLT
         setExpectedReturnType("message.mail", new EmailAdress());
         
-        createMessage("message.kontrakt",
+        createMessage("message.kontraktbbbbbb",
                 new MessageBodySingleSelect("Tack igen! Och nu till det stora ögonblicket. Här har du allt som vi sagt samlat. Läs igenom och skriv på med ditt BankID för att godkänna din nya försäkring",
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Visa kontraktet", "message.kontraktpop", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));
@@ -606,11 +606,11 @@ public class OnboardingConversationDevi extends Conversation {
                         }}
                 ));
 
-        createMessage("message.kontraktpop",
-                new MessageBodySingleSelect("Då är du snart Hedvig-medlem! Nu behöver du bara signera de allmänna villkoren och en fullmakt som ger Hedvig lov att hantera dina försäkringar!",
+        createMessage("message.kontrakt",
+                new MessageBodySingleSelect("Toppen! Här är dina villkor och några andra viktiga dokument!",
                         new ArrayList<SelectItem>() {{
-                        	add(new SelectOption("Jag vill skriva på och bli Hedvig-medlem", "message.kontraktpop.startBankId"));
-                        	add(new SelectLink("Läs igenom", "message.kontraktpop", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));
+                        	add(new SelectOption("Ser bra ut!", "message.kontraktpop.startBankId"));
+                        	add(new SelectLink("Läs igenom", "message.kontrakt", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));
                         }}
                 ),
                 (userContext, i) -> {
@@ -635,7 +635,7 @@ public class OnboardingConversationDevi extends Conversation {
         );
 
         createMessage("message.kontraktpop.startBankId",
-                new MessageBodySingleSelect("Hoppas allt kändes bra! Då återstår bara signeringen",
+                new MessageBodySingleSelect("Då återstår bara signeringen",
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Signera", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://", null, false));
                         }}
@@ -648,7 +648,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.kontraktklar",
         		new MessageBodyText(//emoji_tada + " Hurra! "+ emoji_tada +"\f"
         				//+ "Välkommen, bästa nya medlem\f"
-        				"Jag skickar en bekräftelse till din mejl! Vad har du för mejladress?"));
+                        "Hurra! "+ emoji_tada + " Nu behöver jag bara din mailadress så jag kan skicka en bekräftelse."));
         
         setExpectedReturnType("message.kontraktklar", new EmailAdress());
 
