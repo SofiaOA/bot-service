@@ -78,10 +78,10 @@ public class OnboardingConversationDevi extends Conversation {
         //addRelay("message.intro","message.onboardingstart");
         
         createChatMessage("message.onboardingstart",
-                new MessageBodySingleSelect("Hej, jag heter Hedvig!" + emoji_waving_hand +"\fFint att ha dig här\fJag är en försäkringsbot som hjälper dig när jobbiga saker händer\fSka jag berätta hur det funkar?",
+                new MessageBodySingleSelect("Hej, jag heter Hedvig! " + emoji_waving_hand +"\fJag tar fram ett försäkringsförslag till dig på nolltid",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Berätta!", "message.cad"));
-                            add(new SelectOption("Ge mig ett försäkringsförslag istället", "message.forslagstart"));
+                            //add(new SelectOption("Berätta!", "message.cad"));
+                            add(new SelectOption("Låter bra!", "message.forslagstart"));
                             add(new SelectOption("Jag är redan medlem", "message.bankid.start"));
                             //add(new SelectOption("[Debug:mock my data]", "message.mockme"));
                             //add(new SelectOption("[Debug:audio test]", "message.audiotest"));
@@ -168,9 +168,10 @@ public class OnboardingConversationDevi extends Conversation {
                 ));
 
         createChatMessage("message.forslagstart",
-                new MessageBodySingleSelect(emoji_hand_ok + "\f"
-                		+ "Då sätter vi igång\f"
-                		+ "Bor du i lägenhet eller i hus?",
+                new MessageBodySingleSelect(
+                		//emoji_hand_ok + "\f" +
+                		//"Då sätter vi igång\f" +
+                		"Bor du i lägenhet eller i eget hus?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Lägenhet", "message.lagenhet"));
                             add(new SelectOption("Hus", "message.hus"));
@@ -288,7 +289,7 @@ public class OnboardingConversationDevi extends Conversation {
         // ----------------------------------------------- //
 
         createMessage("message.bankidja",
-                new MessageBodySingleSelect("Tack {NAME}! Stämmer det att du bor i en lägenhet på {ADDRESS}?",
+                new MessageBodySingleSelect("Tack {NAME}! Stämmer det att du bor på {ADDRESS}?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ja", "message.kvadrat"));
                             add(new SelectOption("Nej", "message.varbordufeladress"));
@@ -408,11 +409,11 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.forsakringidagja",
                 new MessageBodySingleSelect("Klokt av dig att redan ha försäkring! Vilket försäkringsbolag har du?",
                         new ArrayList<SelectItem>(){{
-                            add(new SelectOption("Folksam", "folksam"));
-                            add(new SelectOption("Länsförsäkringar", "länsförsäkringar"));
-                            add(new SelectOption("Trygg-Hansa", "trygg-hansa"));
+                            add(new SelectOption("Folksam", "Folksam"));
+                            add(new SelectOption("Länsförsäkringar", "Länsförsäkringar"));
+                            add(new SelectOption("Trygg-Hansa", "Trygg-Hansa"));
                             add(new SelectOption("If", "if"));
-                            add(new SelectOption("Moderna", "moderna"));
+                            add(new SelectOption("Moderna", "Moderna"));
                             add(new SelectOption("Annat bolag", "message.annatbolag"));
                             add(new SelectOption("Ingen aning", "vetej"));
 
@@ -421,7 +422,7 @@ public class OnboardingConversationDevi extends Conversation {
 
         //(FUNKTION: FYLL I FÖRSÄKRINGSBOLAGNAMN) = SCROLL MED DE VANLIGASTE BOLAGEN SAMT "ANNAT FÖRSÄKRINGSBOLAG"
 
-        createMessage("message.annatbolag", new MessageBodyParagraph("Ok! Kan du skriva vad bolaget heter?"), "h_symbol",2000);
+        createMessage("message.annatbolag", new MessageBodyText("Ok! Vad heter ditt försäkringsbolag?"),2000);
 
         createChatMessage("message.bytesinfo",
                 new MessageBodySingleSelect("Ja, ibland är det dags att prova något nytt. De kommer nog förstå\f"
@@ -467,7 +468,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.forslag2",
                 new MessageBodySingleSelect("Sådärja!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Visa förslag", "message.forslag.dashboard", "Offer", null, null, false  ));
+                            add(new SelectLink("Visa mig förslaget", "message.forslag.dashboard", "Offer", null, null, false  ));
 
                         }}
                 ));
@@ -682,7 +683,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.avslutok",
                 new MessageBodySingleSelect("Okej! Trevligt att chattas, ha det fint och hoppas vi hörs igen!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill starta om chatten (FUNKTION: OMSTART)", "message.onboardingstart"));
+                            add(new SelectOption("Jag vill starta om chatten", "message.onboardingstart"));
 
                         }}
                 ));
@@ -873,7 +874,7 @@ public class OnboardingConversationDevi extends Conversation {
             case "message.kvadrat":
                 String kvm = m.body.text;
                 onBoardingData.setLivingSpace(Float.parseFloat(kvm));
-                m.body.text = kvm + "kvm";
+                m.body.text = kvm + " kvm";
                 addToChat(m, userContext, memberChat);
                 if(onBoardingData.getAge() > 0 && onBoardingData.getAge() < 27) {
                     nxtMsg = "message.student";
@@ -983,7 +984,7 @@ public class OnboardingConversationDevi extends Conversation {
                     onBoardingData.setProductId(productId);
                 }
                 break;
-
+            case "message.annatbolag":
             case "message.forsakringidagja":
                 String comp = getValue((MessageBodySingleSelect)m.body);
                 if(comp.equals("message.mockme"));
