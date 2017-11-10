@@ -1,19 +1,13 @@
 package com.hedvig.botService.chat;
 
 import java.util.ArrayList;
+
+import com.hedvig.botService.enteties.message.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.hedvig.botService.enteties.*;
-import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.enteties.message.MessageBodyAudio;
-import com.hedvig.botService.enteties.message.MessageBodyParagraph;
-import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
-import com.hedvig.botService.enteties.message.MessageBodyText;
-import com.hedvig.botService.enteties.message.SelectItem;
-import com.hedvig.botService.enteties.message.SelectLink;
-import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.SessionManager;
@@ -41,8 +35,13 @@ public class ClaimsConversation extends Conversation {
                         }}
                 ), "h_symbol");
         
-		createMessage("message.claim.callme", new MessageBodyText("Vilket telefonnummer nås du på?"));
-		createMessage("message.claims.callme.end", new MessageBodyParagraph("Tack! En kollega ringer dig så snart som möjligt"), "h_symbol",2000);
+		createMessage("message.claim.callme", new MessageBodyNumber("Vilket telefonnummer nås du på?"));
+        createMessage("message.claims.callme.end",
+                new MessageBodySingleSelect("Tack! En kollega ringer dig så snart som möjligt",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
+                        }}
+                ), "h_symbol");
 
 		createMessage("message.claims.chat", new MessageBodyParagraph("Ok! Då kommer du strax få berätta vad som hänt genom att spela in ett röstmeddelande"), "h_symbol",2000);
 		createMessage("message.claims.chat2", new MessageBodyParagraph("Först vill jag bara be dig skriva under detta"), "h_symbol",2000);
@@ -80,9 +79,9 @@ public class ClaimsConversation extends Conversation {
 	public void init(UserContext userContext, MemberChat memberChat){
 		log.info("Starting claims conversation for user:" + userContext.getMemberId());
 		Message m = getMessage("message.claims.start");
-		m.header.fromId = new Long(userContext.getMemberId());
+		m.header.fromId = HEDVIG_USER_ID;//new Long(userContext.getMemberId());
 		addToChat(m, userContext, memberChat);
-		startConversation(userContext, memberChat, "message.claims.whathappened"); // Id of first message
+		startConversation(userContext, memberChat, "message.claims.start"); // Id of first message
 	}
 
 	@Override
@@ -100,6 +99,12 @@ public class ClaimsConversation extends Conversation {
 			nxtMsg = "message.claims.record.ok";
 			
 			break;
+            case "message.claim.callme":
+                userContext.putUserData("{PHONE}", m.body.text);
+                addToChat(m, userContext, memberChat); // Response parsed to nice format
+                userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
+                nxtMsg = "message.claims.callme.end";
+                break;
 
 		}
 		

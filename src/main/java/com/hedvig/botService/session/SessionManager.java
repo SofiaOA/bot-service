@@ -455,7 +455,8 @@ public class SessionManager {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
         MemberChat mc = uc.getMemberChat();
 
-        for(ConversationEntity c : uc.getConversations()){
+        List<ConversationEntity> conversations = new ArrayList<>(uc.getConversations()); //We will add a new element to uc.conversationManager
+        for(ConversationEntity c : conversations){
         	
         	// Only deliver messages to ongoing conversations
         	if(!c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING))continue;
