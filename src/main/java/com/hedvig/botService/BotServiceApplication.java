@@ -44,9 +44,4 @@ public class BotServiceApplication {
 //    public MemberService createMemberService() {
 //        return new MemberServiceFake();
 //    }
-
-    @Bean
-    public SessionManager createSessionManager(UserContextRepository userrepo, MemberService memberService, ProductPricingService ppservice){
-    	return new SessionManager(userrepo, memberService, ppservice);
-    }
 }

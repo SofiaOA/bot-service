@@ -14,10 +14,10 @@ import com.hedvig.botService.web.dto.Member;
 import com.hedvig.botService.web.dto.MemberAuthedEvent;
 import com.hedvig.botService.web.dto.UpdateTypes;
 import com.hedvig.botService.web.dto.events.memberService.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.*;
@@ -27,6 +27,7 @@ import java.util.*;
  * It is a singleton accessed through the request controller
  * */
 
+@Component
 public class SessionManager {
 
     private static Logger log = LoggerFactory.getLogger(SessionManager.class);
