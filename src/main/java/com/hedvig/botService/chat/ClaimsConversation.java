@@ -25,7 +25,7 @@ public class ClaimsConversation extends Conversation {
 		super("claims", memberService, productPricingClient);
 		// TODO Auto-generated constructor stub
 
-		createMessage("message.claims.start", new MessageBodyParagraph("Jag förstår, hoppas du mår ok under omständigheterna. Självklart tar jag tag i det här"), "h_symbol",2000);
+		createMessage("message.claims.start", new MessageBodyParagraph("Jag förstår, hoppas du mår ok under omständigheterna. Självklart tar jag tag i det här"),2000);
 		
         createMessage("message.claim.menu",
                 new MessageBodySingleSelect("Är du i en krissituation just nu? Om det är akut så ser jag till att en kollega ringer upp dig",
@@ -33,7 +33,7 @@ public class ClaimsConversation extends Conversation {
                             add(new SelectOption("Det är kris, ring mig!", "message.claim.callme"));
                             add(new SelectOption("Jag vill chatta", "message.claims.chat"));
                         }}
-                ), "h_symbol");
+                ));
         
 		createMessage("message.claim.callme", new MessageBodyNumber("Vilket telefonnummer nås du på?"));
         createMessage("message.claims.callme.end",
@@ -41,37 +41,37 @@ public class ClaimsConversation extends Conversation {
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
                         }}
-                ), "h_symbol");
+                ));
 
-		createMessage("message.claims.chat", new MessageBodyParagraph("Ok! Då kommer du strax få berätta vad som hänt genom att spela in ett röstmeddelande"), "h_symbol",2000);
-		createMessage("message.claims.chat2", new MessageBodyParagraph("Först vill jag bara be dig skriva under detta"), "h_symbol",2000);
+		createMessage("message.claims.chat", new MessageBodyParagraph("Ok! Då kommer du strax få berätta vad som hänt genom att spela in ett röstmeddelande"),2000);
+		createMessage("message.claims.chat2", new MessageBodyParagraph("Först vill jag bara be dig skriva under detta"),2000);
 
         createMessage("message.claim.promise",
                 new MessageBodySingleSelect("HEDVIGS HEDERSLÖFTE\nJag vet att Hedvig bygger på tillit medlemmar emellan.\nJag lovar att berätta om händelsen precis som den var, och bara ta ut den ersättning jag har rätt till ur vår gemensamma medlemspott.",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Jag lovar!", "message.claims.ok"));
                         }}
-                ), "h_symbol");
+                ));
         
-        createMessage("message.claims.ok", new MessageBodyParagraph("Tusen tack!"), "h_symbol",2000);
-        createMessage("message.claims.record", new MessageBodyParagraph("Berätta vad som har hänt genom att spela in ett röstmeddelande"), "h_symbol",2000);
-        createMessage("message.claims.record2", new MessageBodyParagraph("Ju mer detaljer du ger, desto snabbare hjälp kan jag ge. Så om du svarar på dessa frågor är vi en god bit på väg: "), "h_symbol",2000);
-        createMessage("message.claims.record3", new MessageBodyParagraph("Vad har hänt?"), "h_symbol",2000);
-        createMessage("message.claims.record4", new MessageBodyParagraph("Var och när hände det?"), "h_symbol",2000);
-        createMessage("message.claims.record5", new MessageBodyParagraph("Vad eller vem drabbades?"), "h_symbol",2000);
+        createMessage("message.claims.ok", new MessageBodyParagraph("Tusen tack!"),2000);
+        createMessage("message.claims.record", new MessageBodyParagraph("Berätta vad som har hänt genom att spela in ett röstmeddelande"),2000);
+        createMessage("message.claims.record2", new MessageBodyParagraph("Ju mer detaljer du ger, desto snabbare hjälp kan jag ge. Så om du svarar på dessa frågor är vi en god bit på väg: "),2000);
+        createMessage("message.claims.record3", new MessageBodyParagraph("Vad har hänt?"),2000);
+        createMessage("message.claims.record4", new MessageBodyParagraph("Var och när hände det?"),2000);
+        createMessage("message.claims.record5", new MessageBodyParagraph("Vad eller vem drabbades?"),2000);
         
-        createMessage("message.claims.audio", new MessageBodyAudio("Starta inspelning", "/claims/fileupload"), "h_symbol",2000);
+        createMessage("message.claims.audio", new MessageBodyAudio("Starta inspelning", "/claims/fileupload"),2000);
         
-        createMessage("message.claims.record.ok", new MessageBodyParagraph("Tack! Det är allt jag behöver just nu"), "h_symbol",2000);
-        createMessage("message.claims.record.ok2", new MessageBodyParagraph("Jag återkommer till dig här i chatten om jag behöver något mer, eller för att meddela att jag kan betala ut ersättning direkt"), "h_symbol",2000);
-        createMessage("message.claims.record.ok3", new MessageBodyParagraph("Tack för att du delat med dig om det som hänt. Ta hand om dig så länge, så hörs vi snart!"), "h_symbol",2000);
+        createMessage("message.claims.record.ok", new MessageBodyParagraph("Tack! Det är allt jag behöver just nu"),2000);
+        createMessage("message.claims.record.ok2", new MessageBodyParagraph("Jag återkommer till dig här i chatten om jag behöver något mer, eller för att meddela att jag kan betala ut ersättning direkt"),2000);
+        createMessage("message.claims.record.ok3", new MessageBodyParagraph("Tack för att du delat med dig om det som hänt. Ta hand om dig så länge, så hörs vi snart!"),2000);
 
         createMessage("message.claims.record.ok3",
                 new MessageBodySingleSelect("Tack för att du delat med dig om det som hänt. Ta hand om dig så länge, så hörs vi snart!",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
                         }}
-                ), "h_symbol");
+                ));
         
 		createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 	}
