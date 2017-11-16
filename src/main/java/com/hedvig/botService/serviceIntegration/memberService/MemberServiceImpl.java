@@ -142,6 +142,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public Member convertToFakeUser(String memberId) {
+        throw new RuntimeException("Cannot create fake user in live environment!");
+    }
+
+    @Override
     public Member getProfile(String memberId) {
         UriTemplate url = new UriTemplate("http://" + memberServiceLocation + "/member/{memberId}");
 

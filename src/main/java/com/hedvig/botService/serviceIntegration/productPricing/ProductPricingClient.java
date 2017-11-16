@@ -1,6 +1,7 @@
 package com.hedvig.botService.serviceIntegration.productPricing;
 
 import com.hedvig.botService.serviceIntegration.productPricing.dto.CalculateQuoteRequest;
+import com.hedvig.botService.serviceIntegration.productPricing.dto.ContractSignedRequest;
 import com.hedvig.botService.serviceIntegration.productPricing.dto.Created;
 import feign.Headers;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -28,5 +29,8 @@ public interface ProductPricingClient {
 
     @RequestMapping(value = "/insurance/{userId}/quoteAccepted", method = RequestMethod.POST)
     ResponseEntity<String> quoteAccepted(@PathVariable("userId") String userId);
+
+    @RequestMapping(value = "/i/insurance/contractSigned")
+    ResponseEntity<String> contractSigned(@RequestBody ContractSignedRequest req);
 
 }

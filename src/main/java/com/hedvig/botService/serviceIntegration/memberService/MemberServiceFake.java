@@ -5,16 +5,10 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResp
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdStatusType;
 import com.hedvig.botService.web.dto.Member;
-import java.time.LocalDate;
-
-import org.apache.commons.collections.Factory;
-import org.springframework.http.HttpStatus;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -42,7 +36,7 @@ public class MemberServiceFake implements MemberService {
 
     @Override
     public void finalizeOnBoarding(String memberId, UserData data) {
-        throw new NotImplementedException();
+        return;
     }
 
     @Retryable(RestClientException.class)
@@ -60,6 +54,11 @@ public class MemberServiceFake implements MemberService {
 //        throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
 
         return new BankIdAuthResponse(factory.get(), "autostartToken", referenceToken, memberId);
+    }
+
+    @Override
+    public Member convertToFakeUser(String memberId) {
+        return new Member(Long.parseLong(memberId), "fakessn", "Mr test", "Skenson", "Gatan", "Storstan", "11123", "email@a.com", "070123244", "SE", LocalDate.parse("1980-01-01"));
     }
 
     @Override

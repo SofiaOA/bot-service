@@ -1,10 +1,7 @@
 package com.hedvig.botService.serviceIntegration.productPricing;
 
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
-import com.hedvig.botService.serviceIntegration.productPricing.dto.Address;
-import com.hedvig.botService.serviceIntegration.productPricing.dto.CalculateQuoteRequest;
-import com.hedvig.botService.serviceIntegration.productPricing.dto.Created;
-import com.hedvig.botService.serviceIntegration.productPricing.dto.SafetyIncreaserType;
+import com.hedvig.botService.serviceIntegration.productPricing.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -79,6 +76,10 @@ public class ProductPricingService {
 
     public void quoteAccepted(String hid) {
         this.client.quoteAccepted(hid);
+    }
+
+    public void contractSigned(String memberId, String referenceToken) {
+        this.client.contractSigned(new ContractSignedRequest(memberId, referenceToken));
     }
 
     public void setInsuranceStatus(String hid, String status) {

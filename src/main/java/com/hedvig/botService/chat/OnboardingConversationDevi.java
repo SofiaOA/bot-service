@@ -1,44 +1,29 @@
 package com.hedvig.botService.chat;
 
+import com.hedvig.botService.dataTypes.*;
+import com.hedvig.botService.enteties.MemberChat;
+import com.hedvig.botService.enteties.UserContext;
+import com.hedvig.botService.enteties.message.*;
+import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
+import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
+import com.hedvig.botService.enteties.userContextHelpers.UserData;
+import com.hedvig.botService.serviceIntegration.FakeMemberCreator;
+import com.hedvig.botService.serviceIntegration.memberService.BankIdChatStrategy;
+import com.hedvig.botService.serviceIntegration.memberService.MemberService;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
+import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+
 import java.nio.charset.Charset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
-
-import com.hedvig.botService.dataTypes.*;
-import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
-import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
-import com.hedvig.botService.enteties.userContextHelpers.UserData;
-import com.hedvig.botService.serviceIntegration.memberService.BankIdChatStrategy;
-import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
-import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
-import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.session.SessionManager;
-import com.hedvig.botService.web.dto.Member;
-import com.hedvig.botService.web.dto.MemberAuthedEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import com.hedvig.botService.enteties.*;
-import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.enteties.message.MessageBodyAudio;
-import com.hedvig.botService.enteties.message.MessageBodyBankIdCollect;
-import com.hedvig.botService.enteties.message.MessageBodyMultipleSelect;
-import com.hedvig.botService.enteties.message.MessageBodyNumber;
-import com.hedvig.botService.enteties.message.MessageBodyParagraph;
-import com.hedvig.botService.enteties.message.MessageBodyPhotoUpload;
-import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
-import com.hedvig.botService.enteties.message.MessageBodyText;
-import com.hedvig.botService.enteties.message.MessageHeader;
-import com.hedvig.botService.enteties.message.SelectItem;
-import com.hedvig.botService.enteties.message.SelectLink;
-import com.hedvig.botService.enteties.message.SelectOption;
-import org.springframework.web.client.HttpClientErrorException;
 
 @Component
 public class OnboardingConversationDevi extends Conversation {
@@ -64,13 +49,15 @@ public class OnboardingConversationDevi extends Conversation {
     public final static String emoji_hug = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0xA4, (byte)0x97}, Charset.forName("UTF-8"));
     public final static String emoji_waving_hand = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8B}, Charset.forName("UTF-8"));
     public final static String emoji_flushed_face = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0xB3}, Charset.forName("UTF-8"));
+    private final FakeMemberCreator fakeMemberCreator;
 
     //@Value("${hedvig.gateway.url:http://gateway.hedvig.com}")
     public String gatewayUrl = "http://gateway.hedvig.com";
     
     @Autowired
-    public OnboardingConversationDevi(MemberService memberService, ProductPricingService productPricingClient) {
+    public OnboardingConversationDevi(MemberService memberService, ProductPricingService productPricingClient, FakeMemberCreator fakeMemberCreator) {
         super("onboarding", memberService, productPricingClient);
+        this.fakeMemberCreator = fakeMemberCreator;
 
         Image hImage = new Image("https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/Hedvig_Icon-60%402x.png",120,120);
 
@@ -83,7 +70,7 @@ public class OnboardingConversationDevi extends Conversation {
                             //add(new SelectOption("Berätta!", "message.cad"));
                             add(new SelectOption("Låter bra!", "message.forslagstart"));
                             add(new SelectOption("Jag är redan medlem", "message.bankid.start"));
-                            //add(new SelectOption("[Debug:mock my data]", "message.mockme"));
+                            //add(new SelectOption("Skapa en medlem åt mig", "message.kontraktklar4"));
                             //add(new SelectOption("[Debug:audio test]", "message.audiotest"));
                             //add(new SelectOption("[Debug:photo test]", "message.phototest"));
                         }}
@@ -832,16 +819,19 @@ public class OnboardingConversationDevi extends Conversation {
 		        m.body.text = s.text;
 		        nxtMsg = "message.start.account.retrieval";
 		        break;
-            /*case "message.onboardingstart":
+            case "message.onboardingstart.2":
 
-                if(opt.equals("message.mockme")){
-                	log.info("message.onboardingstart redirect to " + opt);
-                    m.body.text = "Mocka mina uppgifter tack!";
+                SelectItem si = ((MessageBodySingleSelect)m.body).getSelectedItem();
+                if (si.value.equals("message.kontraktklar4")) {
+                    log.info("message.onboardingstart redirect to " + si.value);
+                    //m.body.text = "Mocka mina uppgifter tack!";
                     userContext.clearContext();
-                    userContext.mockMe();
+                    fakeMemberCreator.doCreate(userContext);
+                    //userContext.mockMe();
                 }
-                addToChat(m, userContext, memberChat);
-                break;*/
+                //addToChat(m, userContext, memberChat);
+                break;
+
             case "message.audiotest":
             case "message.phototest":
             	nxtMsg = "message.fileupload.result";

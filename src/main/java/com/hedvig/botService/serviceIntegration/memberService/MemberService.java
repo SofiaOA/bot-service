@@ -20,5 +20,7 @@ public interface MemberService {
 
     BankIdAuthResponse collect(String referenceToken, String memberId);
 
+    Member convertToFakeUser(String memberId);
+
     Member getProfile(String hid);
 }

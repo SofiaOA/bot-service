@@ -1,27 +1,22 @@
 package com.hedvig.botService.enteties;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.persistence.*;
-
+import com.hedvig.botService.chat.Conversation;
+import com.hedvig.botService.chat.Conversation.conversationStatus;
+import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
-import com.hedvig.botService.session.SessionManager;
-
+import com.hedvig.botService.web.dto.Member;
+import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hedvig.botService.chat.Conversation;
-import com.hedvig.botService.chat.Conversation.conversationStatus;
-import com.hedvig.botService.chat.OnboardingConversationDevi;
-
-import lombok.Getter;
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /*
  * Contains all state information related to a member
@@ -240,6 +235,20 @@ public class UserContext implements Serializable {
 		this.putUserData("{AUTOSTART_TOKEN}", bankIdAuthResponse.getAutoStartToken());
 		this.putUserData("{REFERENCE_TOKEN}", bankIdAuthResponse.getReferenceToken());
 	}
+
+    public void fillMemberData(Member member) {
+        UserData obd = getOnBoardingData();
+        obd.setBirthDate(member.getBirthDate());
+        obd.setSSN(member.getSsn());
+        obd.setFirstName(member.getFirstName());
+        obd.setFamilyName(member.getLastName());
+
+        //obd.setEmail(member.getEmail()); I don't think we will ever get his from bisnode
+
+        obd.setAddressStreet(member.getStreet());
+        obd.setAddressCity(member.getCity());
+        obd.setAddressZipCode(member.getZipCode());
+    }
 }
 
 
