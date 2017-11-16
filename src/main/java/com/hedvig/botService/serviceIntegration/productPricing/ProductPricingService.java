@@ -54,6 +54,9 @@ public class ProductPricingService {
                 case "safety.burglaralarm":
                     increaser = SafetyIncreaserType.BURGLAR_ALARM;
                     break;
+                case "safety.none":
+                    increaser = SafetyIncreaserType.NONE;
+                    break;
                 default:
                     throw new RuntimeException(String.format("Unknown safety increaser: %s", s));
             }

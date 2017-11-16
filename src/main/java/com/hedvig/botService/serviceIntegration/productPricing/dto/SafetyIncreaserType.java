@@ -5,5 +5,6 @@ public enum SafetyIncreaserType {
     FIRE_EXTINGUISHER,
     SAFETY_DOOR,
     GATE,
-    BURGLAR_ALARM
+    BURGLAR_ALARM,
+    NONE
 }
