@@ -67,6 +67,10 @@ public class ConversationManager {
      * Check if there is an existing conversation of a certain type with status ONGOING
      * */
     public boolean containsOngoingConversationOfType(String type){
+        if(!type.contains(".")) {
+            type = ("com.hedvig.botService.chat." + type); // TODO: Refactor/remove hack
+        }
+
     	for(ConversationEntity c : conversations){
     		if(c.getClassName().equals(type) && c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING))return true;
     	}

@@ -182,4 +182,11 @@ public class MessagesController {
 
     	return ResponseEntity.noContent().build();
     }
+
+    @PostMapping(path = "/claim/asset/{assetId}")
+	public ResponseEntity<?> startClaim(@RequestHeader(value="hedvig.token", required = true) String hid, @PathVariable String assetId) {
+    	sessionManager.initClaim(hid, assetId);
+
+    	return ResponseEntity.noContent().build();
+	}
 }

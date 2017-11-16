@@ -112,7 +112,7 @@ public class UserContext implements Serializable {
     	conv.setMemberId(getMemberId());
     	conv.setConversationStatus(Conversation.conversationStatus.ONGOING);
     	conv.setStartMessage(startMessage);
-    	c.init(this, this.memberChat);
+    	c.init(this, this.memberChat, startMessage);
     	addConversation(conv);
 
     }
@@ -121,7 +121,7 @@ public class UserContext implements Serializable {
     public void addConversation(ConversationEntity c){
     	
     	// TODO: For now a member can only have one conversation of each type
-    	if(!hasOngoingConversation(c.getClassName())){
+    	if(!conversationManager.containsOngoingConversationOfType(c.getClassName())){
     		c.setConversationManager(this.conversationManager);
     		this.conversationManager.add(c);
     	}
@@ -130,13 +130,14 @@ public class UserContext implements Serializable {
     /*
      * Check if user has an ongoing conversation of type conversationClassName
      * */
+    /*
     public boolean hasOngoingConversation(String conversationClassName){
-    	if(conversationClassName.indexOf(".")==-1)conversationClassName = ("com.hedvig.botService.chat." + conversationClassName); // TODO: Refactor/remove hack
-    	
+
+
     	return conversationManager.containsOngoingConversationOfType(conversationClassName);
     	//String c =  getDataEntry("{" +conversationClassName+ "}") ;
     	//return(c!=null && c.equals(Conversation.conversationStatus.ONGOING.toString()));
-    }
+    }*/
 
    /* public void startOngoingConversation(String conversationClassName){
     	if(conversationClassName.indexOf(".")==-1)conversationClassName = ("com.hedvig.botService.chat." + conversationClassName); // TODO: Refactor/remove hack

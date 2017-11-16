@@ -90,5 +90,10 @@ public class UpdateInformationConversation extends Conversation {
         startConversation(userContext, memberChat, startMessage); // Id of first message
 	}
 
+	public void init(UserContext userContext, MemberChat memberChat) {
+		log.info("Starting main conversation with: message.info.update");
+		startConversation(userContext, memberChat, "message.info.update"); // Id of first message
+	}
+
 
 }

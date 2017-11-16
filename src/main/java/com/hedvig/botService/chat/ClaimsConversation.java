@@ -1,16 +1,16 @@
 package com.hedvig.botService.chat;
 
-import java.util.ArrayList;
-
+import com.hedvig.botService.enteties.MemberChat;
+import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
+import com.hedvig.botService.serviceIntegration.memberService.MemberService;
+import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import com.hedvig.botService.enteties.*;
-import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.session.SessionManager;
+
+import java.util.ArrayList;
 
 @Component
 public class ClaimsConversation extends Conversation {
@@ -25,7 +25,16 @@ public class ClaimsConversation extends Conversation {
 		super("claims", memberService, productPricingClient);
 		// TODO Auto-generated constructor stub
 
-		createMessage("message.claims.start", new MessageBodyParagraph("Jag förstår, hoppas du mår ok under omständigheterna. Självklart tar jag tag i det här"),2000);
+        createMessage("init.asset.claim",
+                new MessageBodySingleSelect("Oj vad tråkigt att någon har hänt med din pryl. Självklart tar jag tag i det här",
+                    new ArrayList<SelectItem>() {{
+                        add(new SelectOption("Det är kris, ring mig!", "message.claim.callme"));
+                        add(new SelectOption("Jag vill chatta", "message.claims.chat"));
+                    }}
+                ));
+
+
+        createMessage("message.claims.start", new MessageBodyParagraph("Jag förstår, hoppas du mår ok under omständigheterna. Självklart tar jag tag i det här"),2000);
 		
         createMessage("message.claim.menu",
                 new MessageBodySingleSelect("Är du i en krissituation just nu? Om det är akut så ser jag till att en kollega ringer upp dig",
@@ -76,13 +85,17 @@ public class ClaimsConversation extends Conversation {
 		createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 	}
 
-	public void init(UserContext userContext, MemberChat memberChat){
+	public void init(UserContext userContext, MemberChat memberChat, String startMessage){
 		log.info("Starting claims conversation for user:" + userContext.getMemberId());
-		Message m = getMessage("message.claims.start");
+		Message m = getMessage(startMessage);
 		m.header.fromId = HEDVIG_USER_ID;//new Long(userContext.getMemberId());
 		addToChat(m, userContext, memberChat);
-		startConversation(userContext, memberChat, "message.claims.start"); // Id of first message
+		startConversation(userContext, memberChat, startMessage); // Id of first message
 	}
+
+	public void init(UserContext userContext, MemberChat memberChat) {
+	    init(userContext, memberChat, "message.claims.start");
+    }
 
 	@Override
 	public void recieveMessage(UserContext userContext, MemberChat memberChat, Message m) {

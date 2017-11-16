@@ -287,9 +287,10 @@ public abstract class Conversation {
 
 	public void recieveEvent(EventTypes e, String value, UserContext userContext, MemberChat memberChat) {}
 
-	public void init(UserContext userContext, MemberChat memberChat) {
-		// TODO Auto-generated method stub
+	public abstract void init(UserContext userContext, MemberChat memberChat);
 
+	public void init(UserContext userContext, MemberChat memberChat, String startMessage) {
+		// TODO Auto-generated method stub
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------- //

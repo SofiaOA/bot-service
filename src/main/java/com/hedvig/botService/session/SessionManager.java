@@ -36,6 +36,8 @@ public class SessionManager {
     private final ProductPricingService productPricingclient;
     private final FakeMemberCreator fakeMemberCreator;
 
+
+
     public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
 
 	
@@ -58,6 +60,14 @@ public class SessionManager {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
         ClaimsConversation claimsConversation = new ClaimsConversation(memberService, productPricingclient);
         uc.startConversation(claimsConversation);
+
+        userrepo.saveAndFlush(uc);
+    }
+
+    public void initClaim(String hid, String assetId) {
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        ClaimsConversation claimsConversation = new ClaimsConversation(memberService, productPricingclient);
+        uc.startConversation(claimsConversation, "init.asset.claim");
 
         userrepo.saveAndFlush(uc);
     }
@@ -476,4 +486,6 @@ public class SessionManager {
 
         userrepo.saveAndFlush(uc);
     }
+
+
 }
