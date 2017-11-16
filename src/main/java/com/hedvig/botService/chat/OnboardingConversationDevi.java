@@ -8,7 +8,6 @@ import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
 import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.FakeMemberCreator;
-import com.hedvig.botService.serviceIntegration.memberService.BankIdChatStrategy;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
@@ -17,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.nio.charset.Charset;
 import java.time.format.DateTimeFormatter;
@@ -1149,51 +1147,4 @@ public class OnboardingConversationDevi extends Conversation {
 
     }
 
-    public BankIdChatStrategy bankIdChatStrategy(UserContext userContext) {
-        return new BankIdChatStrategy() {
-            @Override
-            public void onError() {
-                log.info("BankIdCollectStatus: {}, memberId: {}", "Error", userContext.getMemberId());
-                addToChat(getMessage("message.bankid.error"), userContext);
-            }
-
-            @Override
-            public void onComplete() {
-                log.info("BankIdCollectStatus: {}, memberId: {}", "Complete", userContext.getMemberId());
-                addToChat(getMessage("message.bankIdComplete"), userContext);
-            }
-
-            @Override
-            public void onNoClient() {
-                log.info("BankIdCollectStatus: {}, memberId: {}", "onNoClient", userContext.getMemberId());
-                addToChat(getMessage("message.bankIdError"), userContext);
-            }
-
-            @Override
-            public void onOutstandingTransaction() {
-                log.info("BankIdCollectStatus: {}, memberId: {}", "OutstandingTransaction", userContext.getMemberId());
-
-            }
-
-            @Override
-            public void onStarted() {
-                log.info("BankIdCollectStatus: {}, memberId: {}", "Started", userContext.getMemberId());
-            }
-
-            @Override
-            public void onUserReq() {
-                log.info("BankIdCollectStatus: {}, memberId: {}", "UserReq", userContext.getMemberId());
-            }
-
-            @Override
-            public void onUserSign() {
-                log.info("BankIdCollectStatus: {}, memberId: {}", "UserSign", userContext.getMemberId());
-            }
-
-            @Override
-            public void onException(HttpClientErrorException ex) {
-                addToChat(getMessage("message.bankIdError"), userContext);
-            }
-        };
-    }
 }
