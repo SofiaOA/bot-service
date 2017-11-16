@@ -1,20 +1,12 @@
 package com.hedvig.botService.enteties;
 
+import com.hedvig.botService.chat.Conversation;
 import lombok.Getter;
-
-import javax.persistence.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.hedvig.botService.chat.Conversation;
-import com.hedvig.botService.enteties.message.Message;
-
-import java.time.Instant;
+import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /*
@@ -22,6 +14,9 @@ import java.util.List;
  * */
 
 @Entity
+//@Table(indexes = {
+//        @Index(columnList = "id", name = "conversation_manager_id_idx")
+//})
 public class ConversationManager {
 
 	private static Logger log = LoggerFactory.getLogger(ConversationManager.class);
@@ -51,8 +46,9 @@ public class ConversationManager {
         this.conversations = new ArrayList<ConversationEntity>();
     }
 
-    public void add(ConversationEntity c) {
-    	conversations.add(c);
+    private void addConversation(ConversationEntity c) {
+        c.setConversationManager(this);
+        conversations.add(c);
     }
 
     /*
@@ -85,4 +81,33 @@ public class ConversationManager {
 		this.conversations = conversations;
 	}
 
+    public boolean startConversation(Class<? extends Conversation> conversationClass) {
+
+        return startConversation(conversationClass, null);
+    }
+
+    public boolean startConversation(Class<? extends Conversation> conversationClass, String startMessage) {
+
+        for(ConversationEntity c : conversations){
+            if(c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING)) {
+                if (c.getClassName().equals(conversationClass.getName())) {
+                    return false;
+                } else {
+                    c.setConversationStatus(Conversation.conversationStatus.COMPLETE);
+                }
+            }
+        }
+
+        ConversationEntity conv = new ConversationEntity();
+        conv.setClassName(conversationClass.getName());
+        conv.setMemberId(getMemberId());
+        conv.setConversationStatus(Conversation.conversationStatus.ONGOING);
+        if(startMessage != null) {
+            conv.setStartMessage(startMessage);
+        }
+
+        addConversation(conv);
+
+        return true;
+    }
 }

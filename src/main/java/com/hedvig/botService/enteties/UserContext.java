@@ -94,38 +94,22 @@ public class UserContext implements Serializable {
      * */
     public void startConversation(Conversation c){
     	log.info("Starting conversation of type:" + c.getClass().getName() + " for user:" + getMemberId());
-    	
-    	ConversationEntity conv = new ConversationEntity();
-    	conv.setClassName(c.getClass().getName());
-    	conv.setMemberId(getMemberId());
-    	conv.setConversationStatus(Conversation.conversationStatus.ONGOING);
-    	c.init(this, this.memberChat);
-    	addConversation(conv);
+
+		if(conversationManager.startConversation(c.getClass())){
+			c.init(this, this.memberChat);
+		}
 
     }
     
     public void startConversation(Conversation c, String startMessage){
     	log.info("Starting conversation of type:" + c.getClass().getName() + " for user:" + getMemberId());
-    	
-    	ConversationEntity conv = new ConversationEntity();
-    	conv.setClassName(c.getClass().getName());
-    	conv.setMemberId(getMemberId());
-    	conv.setConversationStatus(Conversation.conversationStatus.ONGOING);
-    	conv.setStartMessage(startMessage);
-    	c.init(this, this.memberChat, startMessage);
-    	addConversation(conv);
+
+		if(conversationManager.startConversation(c.getClass(), startMessage)){
+			c.init(this, this.memberChat, startMessage);
+		}
 
     }
-    
-    
-    public void addConversation(ConversationEntity c){
-    	
-    	// TODO: For now a member can only have one conversation of each type
-    	if(!conversationManager.containsOngoingConversationOfType(c.getClassName())){
-    		c.setConversationManager(this.conversationManager);
-    		this.conversationManager.add(c);
-    	}
-    }
+
     
     /*
      * Check if user has an ongoing conversation of type conversationClassName
@@ -154,10 +138,14 @@ public class UserContext implements Serializable {
      * Set conversation to COMPLETE
      * */
     public void completeConversation(String conversationClassName){
-    	if(conversationClassName.indexOf(".")==-1)conversationClassName = ("com.hedvig.botService.chat." + conversationClassName); // TODO: Refactor/remove hack
-    	
+    	if(!conversationClassName.contains(".")) {
+			conversationClassName = ("com.hedvig.botService.chat." + conversationClassName); // TODO: Refactor/remove hack
+		}
+
     	for(ConversationEntity c : this.conversationManager.conversations){
-    		if(c.getClassName().equals(conversationClassName))c.conversationStatus=conversationStatus.COMPLETE;
+    		if(c.getClassName().equals(conversationClassName) && c.conversationStatus.equals(conversationStatus.ONGOING)){
+    			c.conversationStatus=conversationStatus.COMPLETE;
+			}
     	}
     	
     	//putUserData("{" +conversationClassName+ "}", Conversation.conversationStatus.COMPLETE.toString());

@@ -1,15 +1,9 @@
 package com.hedvig.botService.web;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.session.SessionManager;
+import com.hedvig.botService.web.dto.AvatarDTO;
+import com.hedvig.botService.web.dto.EventDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +13,14 @@ import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.support.ByteArrayMultipartFileEditor;
 
-import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.session.SessionManager;
-import com.hedvig.botService.web.dto.AvatarDTO;
-import com.hedvig.botService.web.dto.EventDTO;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
 public class MessagesController {

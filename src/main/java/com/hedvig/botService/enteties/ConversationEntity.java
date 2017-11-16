@@ -1,23 +1,21 @@
 package com.hedvig.botService.enteties;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapKey;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
 import com.hedvig.botService.chat.Conversation;
 
 import lombok.Getter;
+import org.axonframework.commandhandling.TargetAggregateIdentifier;
 
 /*
  * Stores persistent properties for a Conversation
  * */
 
 @Entity
+@Table(indexes = {
+		@Index(columnList = "id", name = "conversation_entity_id_idx"),
+		@Index(columnList = "conversation_manager_id", name= "conversation_entity_manager_id_idx")
+})
 public class ConversationEntity {
 
     @Id
