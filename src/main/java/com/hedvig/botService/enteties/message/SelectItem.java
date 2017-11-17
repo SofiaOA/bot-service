@@ -25,9 +25,9 @@ public class SelectItem implements Serializable {
 
 	public SelectItem() {}
 
-	public SelectItem(boolean selected, String string, String value) {
+	public SelectItem(boolean selected, String text, String value) {
 		this.selected = selected;
-		this.text = string;
+		this.text = text;
 		this.value = value;
 	}
 }

@@ -178,9 +178,9 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Jag har inte BankID", "message.manuellnamn"));
                         }}
                 ), "h_symbol",
-                (uc2,i) -> {
-                    UserData obd = uc2.getOnBoardingData();
-                    if(i.value.equals("message.bankid.autostart.respond"))
+                (m, uc) -> {
+                    UserData obd = uc.getOnBoardingData();
+                    if(m.getSelectedItem().value.equals("message.bankid.autostart.respond"))
                     {
                         obd.setBankIdOnDecvie(true);
                     } else
@@ -198,9 +198,9 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect=hedvig://",  null, false));
                         }}
                 ), "h_symbol",
-                (uc2,i) -> {
-                    UserData obd = uc2.getOnBoardingData();
-                    if(i.value.equals("message.bankid.autostart.respond"))
+                (m,uc) -> {
+                    UserData obd = uc.getOnBoardingData();
+                    if(m.getSelectedItem().value.equals("message.bankid.autostart.respond"))
                     {
                         obd.setBankIdOnDecvie(true);
                     } else
@@ -547,8 +547,8 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectLink("Logga in med BankId", "message.fetch.accounts", null, "bankid:///?redirect=hedvig://", null, false));
                         }}
                 ),
-                (userContext, item) -> {
-                    if(item.value.equals("message.fetch.accounts")) {
+                (m, userContext) -> {
+                    if(m.getSelectedItem().value.equals("message.fetch.accounts")) {
                         String publicId = memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
                         userContext.putUserData("{REFERENCE_TOKEN}", publicId);
                         return "message.fetch.accounts.hold";
@@ -598,21 +598,27 @@ public class OnboardingConversationDevi extends Conversation {
                         	add(new SelectLink("Läs igenom", "message.kontrakt", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));
                         }}
                 ),
-                (userContext, i) -> {
-                    UserData ud = userContext.getOnBoardingData();
+                (m, userContext) -> {
 
-                    Optional<BankIdSignResponse> signData;
+                    if(m.getSelectedItem().value.equals("message.kontrakt")) {
+                        m.text = m.getSelectedItem().text;
+                        return m.getSelectedItem().value;
+                    }else {
+                        UserData ud = userContext.getOnBoardingData();
 
-                    signData = memberService.sign(ud.getSSN(), "Jag godkänner att jag har tagit del av Hedvigs förköpsinformation och försäkringsvillkor.");
+                        Optional<BankIdSignResponse> signData;
 
-                    if(signData.isPresent()) {
-                    	userContext.putUserData("{AUTOSTART_TOKEN}", signData.get().getAutoStartToken());
-                    	userContext.putUserData("{REFERENCE_TOKEN}", signData.get().getReferenceToken());
-                    }else{
-                        log.error("Could not start signing process.");
-                        return "message.kontraktpop.error";
+                        signData = memberService.sign(ud.getSSN(), "Jag godkänner att jag har tagit del av Hedvigs förköpsinformation och försäkringsvillkor.");
+
+                        if (signData.isPresent()) {
+                            userContext.putUserData("{AUTOSTART_TOKEN}", signData.get().getAutoStartToken());
+                            userContext.putUserData("{REFERENCE_TOKEN}", signData.get().getReferenceToken());
+                        } else {
+                            log.error("Could not start signing process.");
+                            return "message.kontraktpop.error";
+                        }
+                        return "";
                     }
-                    return "";
                 });
 
         createMessage("message.kontraktpop.bankid.collect",
@@ -765,8 +771,8 @@ public class OnboardingConversationDevi extends Conversation {
         
         // Lambda
         if(this.hasSelectItemCallback(m.id) && m.body.getClass().equals(MessageBodySingleSelect.class)) {
-            MessageBodySingleSelect body = (MessageBodySingleSelect) m.body;
-            nxtMsg = this.execSelectItemCallback(m.id, userContext, body.getSelectedItem());
+            //MessageBodySingleSelect body = (MessageBodySingleSelect) m.body;
+            nxtMsg = this.execSelectItemCallback(m.id, (MessageBodySingleSelect) m.body, userContext);
             addToChat(m, userContext, memberChat);
         }
 

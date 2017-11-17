@@ -172,8 +172,8 @@ public abstract class Conversation {
 		return this.callbacks.containsKey(messageId);
 	}
 
-	String execSelectItemCallback(String messageId, UserContext uc, SelectItem item) {
-		return this.callbacks.get(messageId).operation(uc, item);
+	String execSelectItemCallback(String messageId, MessageBodySingleSelect message, UserContext uc) {
+		return this.callbacks.get(messageId).operation(message, uc);
 	}
 
 	// -------------------------
