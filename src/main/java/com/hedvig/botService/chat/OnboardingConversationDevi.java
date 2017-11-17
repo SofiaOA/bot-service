@@ -891,6 +891,7 @@ public class OnboardingConversationDevi extends Conversation {
                 addToChat(m, userContext, memberChat);
                 nxtMsg = "message.varborduadress";
                 break;
+            case "message.varbordufeladress":
             case "message.varborduadress":
                 onBoardingData.setAddressStreet(m.body.text);
                 addToChat(m, userContext, memberChat);
