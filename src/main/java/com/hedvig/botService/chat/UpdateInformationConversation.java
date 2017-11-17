@@ -25,7 +25,7 @@ public class UpdateInformationConversation extends Conversation {
 
 		createMessage("message.info.update.email", new MessageBodyText("Ok, vad har du för mailadress?"));
 		createMessage("message.info.update", new MessageBodyText("Ok, vad är det för information du vill uppdatera?\f Beskriv vad det gäller så ändrar jag"));
-		createMessage("message.info.complete", new MessageBodyParagraph("Toppen, tack! Jag säger till när informationen är uppdaterad"));
+		createMessage("message.info.complete", new MessageBodyText("Toppen, tack! Jag säger till när informationen är uppdaterad"));
 
 		createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 
@@ -56,12 +56,13 @@ public class UpdateInformationConversation extends Conversation {
            for (SelectItem o : body1.choices) {
                if(o.selected) {
                    m.body.text = o.text;
-                   addToChat(m, userContext, memberChat);
+
                    nxtMsg = o.value;
                }
            }
        }
-       
+
+       addToChat(m, userContext, memberChat);
        completeRequest(nxtMsg, userContext, memberChat);
 		
 	}

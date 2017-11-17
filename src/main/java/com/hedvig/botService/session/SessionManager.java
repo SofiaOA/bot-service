@@ -334,15 +334,15 @@ public class SessionManager {
         String startingMessage = "";
         
     	switch(what){
-    	case APARTMENT_INFORMATION: startingMessage = "";
+    	case APARTMENT_INFORMATION: startingMessage = "message.info.update";
     		break;
-    	case BANK_ACCOUNT: startingMessage = "";
+    	case BANK_ACCOUNT: startingMessage = "message.info.update";
     		break;
-    	case FAMILY_MEMBERS: startingMessage = "";
+    	case FAMILY_MEMBERS: startingMessage = "message.info.update";
     		break;
-    	case PERSONAL_INFORMATOIN: startingMessage = "";
+    	case PERSONAL_INFORMATOIN: startingMessage = "message.info.update";
     		break;
-    	case SAFETY_INCREASERS: startingMessage = "";
+    	case SAFETY_INCREASERS: startingMessage = "message.info.update";
 			break;
     	}
     	
