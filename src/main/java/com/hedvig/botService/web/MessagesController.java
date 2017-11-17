@@ -4,6 +4,7 @@ import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.AvatarDTO;
 import com.hedvig.botService.web.dto.EventDTO;
+import com.hedvig.botService.web.dto.ExpoDeviceInfoDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,11 +104,15 @@ public class MessagesController {
     }
 
     @RequestMapping(path = "/init", method = RequestMethod.POST)
-    public ResponseEntity<?> create(@RequestHeader(value="hedvig.token", required = false) String hid) {
+    public ResponseEntity<?> create(@RequestHeader(value="hedvig.token", required = false) String hid, @RequestBody(required = false) ExpoDeviceInfoDTO json) {
 
      	log.info("Init recieved from user:" + hid);
-
-        sessionManager.init(hid);
+     	log.info(json.toString());
+     	String linkUri = "hedvig://+";
+		if(json != null && json.getDeviceInfo() != null) {
+			linkUri = json.getDeviceInfo().getLinkingUri();
+		}
+        sessionManager.init(hid, linkUri);
 
     	return ResponseEntity.noContent().build();
     }

@@ -165,7 +165,7 @@ public class SessionManager {
     /*
      * Create a new users chat and context
      * */
-    public void init(String hid){
+    public void init(String hid, String linkUri){
 
         UserContext uc = userrepo.findByMemberId(hid).orElseGet(() -> {
             UserContext newUserContext = new UserContext(hid);
@@ -176,6 +176,8 @@ public class SessionManager {
 
             return newUserContext;
         });
+
+        uc.putUserData("{LINK_URI}", linkUri);
 
 		/*
 		 * Kick off onboarding conversation
