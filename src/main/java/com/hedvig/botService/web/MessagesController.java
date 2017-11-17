@@ -107,9 +107,10 @@ public class MessagesController {
     public ResponseEntity<?> create(@RequestHeader(value="hedvig.token", required = false) String hid, @RequestBody(required = false) ExpoDeviceInfoDTO json) {
 
      	log.info("Init recieved from user:" + hid);
-     	log.info(json.toString());
+
      	String linkUri = "hedvig://+";
 		if(json != null && json.getDeviceInfo() != null) {
+			log.info(json.toString());
 			linkUri = json.getDeviceInfo().getLinkingUri();
 		}
         sessionManager.init(hid, linkUri);
