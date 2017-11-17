@@ -48,14 +48,16 @@ public class MainConversation extends Conversation {
 		createMessage("message.question.recieved",
 				new MessageBodySingleSelect("Tack för din fråga {NAME}, jag åtekommer så snart jag kan?",
 						new ArrayList<SelectItem>(){{
-							add(new SelectOption("Ok tack!","hedvig.com", false));
+							add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
+							//add(new SelectOption("Ok tack!","hedvig.com", false));
 						}}
 				));
 		
 		createMessage("message.main.refer.recieved",
 				new MessageBodySingleSelect("Då mailar din vän och tipsar om Hedvig." + emoji_hand_ok,
 						new ArrayList<SelectItem>(){{
-							add(new SelectOption("Bra, gör det","hedvig.com", false));
+							add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
+							//add(new SelectOption("Bra, gör det","hedvig.com", false));
 						}}
 				));
 		
@@ -84,6 +86,7 @@ public class MainConversation extends Conversation {
 		switch(m.id){
 			case "hedvig.com": {
 				SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
+				m.body.text = item.text;
 				if(item.value.equals("message.main.report")) {
 					nxtMsg = "conversation.done";
 					//sessionManager.initClaim(userContext.getMemberId()); // Start claim here
@@ -97,7 +100,7 @@ public class MainConversation extends Conversation {
 			addToChat(m, userContext, memberChat); // Response parsed to nice format
 			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
 			break;
-		case "message.question": 
+		case "main.question":
 			userContext.putUserData("{QUESTION}", m.body.text);
 			addToChat(m, userContext, memberChat); // Response parsed to nice format
 			nxtMsg = "message.question.recieved";
