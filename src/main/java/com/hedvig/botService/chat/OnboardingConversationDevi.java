@@ -235,7 +235,7 @@ public class OnboardingConversationDevi extends Conversation {
                 		+ "Jag skickar ingen spam. Lovar!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Skicka mig nyhetsbrev", "message.nyhetsbrev"));
-                            add(new SelectOption("Tack, men nej tack", "message.avslutforstar"));
+                            add(new SelectOption("Tack, men nej tack", "message.avslutok"));
 
                         }}
                 ));
@@ -667,7 +667,6 @@ public class OnboardingConversationDevi extends Conversation {
                 ));
 
         //(FUNKTION: OMSTART) = VORE TOPPEN MED EN FUNKTION SOM GÖR ATT FOLK KAN BÖRJA CHATTA FRÅN BÖRJAN IGEN, SÅ CHATTEN KAN BLI EN LOOP OCH GÖRAS OM IGEN OCH VISAS FÖR ANDRA PERSONER ÄN MEDLEMMEN
-
 
         createMessage("message.avslutok",
                 new MessageBodySingleSelect("Okej! Trevligt att chattas, ha det fint och hoppas vi hörs igen!",
