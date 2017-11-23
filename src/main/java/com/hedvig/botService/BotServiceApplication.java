@@ -39,9 +39,10 @@ public class BotServiceApplication {
 	    return new RestTemplate();
     }
 
+    /*
     @Primary
     @Bean
     public MemberService createMemberService() {
         return new MemberServiceFake();
-   }
+   }*/
 }
