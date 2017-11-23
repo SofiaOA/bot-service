@@ -13,7 +13,7 @@ public class EmailAdress extends HedvigDataType {
 		+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
 	public EmailAdress() {
-		this.errorMessage = "{INPUT} låter inte som en korrekt email adress... Prova igen tack!";
+		this.errorMessage = "{INPUT} låter inte som en korrekt emailadress... Prova igen tack!";
 		pattern = Pattern.compile(EMAIL_PATTERN);
 	}
 	

@@ -155,6 +155,16 @@ public class UserContext implements Serializable {
     	//putUserData("{" +conversationClassName+ "}", Conversation.conversationStatus.COMPLETE.toString());
     }
     
+    // Check if there is at least one conversation containing name 'Onboarding' with state COMPLETE
+    public boolean hasCompletedOnboarding(){
+    	for(ConversationEntity c : this.conversationManager.conversations){
+    		if(c.getClassName().contains("Onboarding") && c.conversationStatus.equals(conversationStatus.COMPLETE)){
+    			return true;
+			}
+    	}
+    	return false;
+    }
+    
     // ------------------------------------------------------ //
     
     public UserContext(String memberId) {

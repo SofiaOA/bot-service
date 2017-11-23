@@ -317,7 +317,7 @@ public class OnboardingConversationDevi extends Conversation {
         createMessage("message.lghtyp",
                 new MessageBodySingleSelect("Då fortsätter vi! Hur bor du?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Äger bostadsrätt", "ägerbostdsrätt"));
+                            add(new SelectOption("Äger bostadsrätt", "BRF"));
                             add(new SelectOption("Hyr hyresrätt", "hyresrätt"));
                             add(new SelectOption("Hyr bostadsrätt", "hyrbostadsrätt"));
                             add(new SelectOption("Hyr studentrum", "studentrum"));
@@ -411,7 +411,7 @@ public class OnboardingConversationDevi extends Conversation {
                 new MessageBodySingleSelect("Ja, ibland är det dags att prova något nytt. De kommer nog förstå\f"
                 		+ "Om du blir medlem hos mig sköter jag bytet åt dig. Så när din gamla försäkring går ut, flyttas du automatiskt till din nya hos mig",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Ok jag förstår", "message.forslag")); //Create product
+                            add(new SelectOption("Jag förstår", "message.forslag")); //Create product
                             add(new SelectOption("Förklara mer", "message.bytesinfo3"));
                         }}
                 ));
@@ -427,8 +427,8 @@ public class OnboardingConversationDevi extends Conversation {
 
         createChatMessage("message.bytesinfo3",
                 new MessageBodySingleSelect("Självklart!\f"
-                		+ "Oftast har du ett tag kvar på bindningstiden på din gamla försäkring.\f"
-                		+ "Om du väljer att byta till Hedvig så hör jag av mig till ditt försäkringsbolag och meddelar att du vill byta försäkring så fort bindningstiden går ut.\f"
+                		+ "Oftast har du ett tag kvar på bindningstiden på din gamla försäkring\f"
+                		+ "Om du väljer att byta till Hedvig så hör jag av mig till ditt försäkringsbolag och meddelar att du vill byta försäkring så fort bindningstiden går ut\f"
                 		+ "Till det behöver jag en fullmakt från dig som du kan skriva under med BankID\f"
                 		+ "Sen börjar din nya försäkring gälla direkt när den gamla går ut\f"
                 		+ "Så du behöver aldrig vara orolig att gå utan försäkring efter att du skrivit på med mig",
@@ -979,8 +979,11 @@ public class OnboardingConversationDevi extends Conversation {
             case "message.annatbolag":
             case "message.forsakringidagja":
                 String comp = getValue((MessageBodySingleSelect)m.body);
-                if(comp.equals("message.mockme"));
-                m.body.text = "Idag har jag " + comp;
+                if(comp.equals("vetej")){
+                	m.body.text = "Vet ej";
+                }else{
+                	m.body.text = "Idag har jag " + comp;
+                }
                 addToChat(m, userContext, memberChat);
                 nxtMsg = "message.bytesinfo";
                 break;

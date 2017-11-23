@@ -38,15 +38,15 @@ public class MainConversation extends Conversation {
 		createMessage("hedvig.com",
 				new MessageBodySingleSelect("Hej {NAME}, vad vill du göra idag?",
 						new ArrayList<SelectItem>(){{
-							add(new SelectOption("Det är kris, ring mig!","message.main.callme", false));
 							add(new SelectOption("Rapportera en skada","message.main.report", false));
-							add(new SelectOption("Rekommendera en vän","message.main.refer", false));
+							add(new SelectOption("Det är kris, ring mig!","message.main.callme", false));
 							add(new SelectOption("Ställ en fråga","main.question", false));
+							add(new SelectOption("Rekommendera en vän","message.main.refer", false));							
 						}}
 				));
 		
 		createMessage("message.question.recieved",
-				new MessageBodySingleSelect("Tack för din fråga {NAME}, jag åtekommer så snart jag kan?",
+				new MessageBodySingleSelect("Tack för din fråga {NAME}, jag återkommer så snart jag kan?",
 						new ArrayList<SelectItem>(){{
 							add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
 							//add(new SelectOption("Ok tack!","hedvig.com", false));

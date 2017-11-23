@@ -235,11 +235,15 @@ public class SessionManager {
     public void resetOnboardingChat(String hid){
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
         MemberChat mc = uc.getMemberChat();
-    	mc.reset(); // Clear chat
-    	uc.clearContext(); // Clear context
-        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator);
-        uc.startConversation(onboardingConversation);
-    	userrepo.saveAndFlush(uc);
+        
+        // Conversations can only be reset during onboarding
+        if(!uc.hasCompletedOnboarding()){
+	    	mc.reset(); // Clear chat
+	    	uc.clearContext(); // Clear context
+	        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator);
+	        uc.startConversation(onboardingConversation);
+	    	userrepo.saveAndFlush(uc);
+        }
     }
     
     public void setInsuranceStatus(String hid, String status){
