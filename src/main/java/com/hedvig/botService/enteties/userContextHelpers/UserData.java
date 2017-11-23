@@ -211,4 +211,34 @@ public class UserData {
     public void setUserHasAuthWithBankId(String referenceId) {
         ctx.putUserData(USER_AUTHED_BANKID, referenceId);
     }
+
+    public void clear() {
+        ctx.removeDataEntry(MEMBER_BIRTH_DATE);
+        ctx.removeDataEntry(FIRST_NAME);
+        ctx.removeDataEntry(FAMILY_NAME);
+        ctx.removeDataEntry(EMAIL);
+        ctx.removeDataEntry(ADDRESS);
+        ctx.removeDataEntry(ADDRESS_CITY);
+        ctx.removeDataEntry(ADDRESS_ZIP);
+        ctx.removeDataEntry(HOUSE);
+        ctx.removeDataEntry(EMAIL_NEWS_LETTER);
+        ctx.removeDataEntry(RECOMMEND_FRIEND_EMAIL);
+        ctx.removeDataEntry(NR_PERSONS);
+        ctx.removeDataEntry(KVM);
+        ctx.removeDataEntry(SSN);
+        ctx.removeDataEntry(INSURANCE_COMPANY_TODAY);
+        ctx.removeDataEntry(PRODUCT_ID);
+        ctx.removeDataEntry(BANK_ID_ON_DEVICE);
+        ctx.removeDataEntry(RECOMMEND_FRIEND_EMAIL);
+        ctx.removeDataEntry(USER_HAS_SIGNED);
+        ctx.removeDataEntry(USER_AUTHED_BANKID);
+
+        String nrOfItemsString = ctx.getDataEntry(SECURE_ITEMS_NO);
+        int nrOfItems = nrOfItemsString != null ? Integer.parseInt(nrOfItemsString) : 0;
+        for(int i = 0; i < nrOfItems; i++) {
+            ctx.removeDataEntry(String.format(SECURE_ITEM_, i));
+        }
+
+        ctx.removeDataEntry(SECURE_ITEMS_NO);
+    }
 }

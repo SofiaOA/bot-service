@@ -78,6 +78,10 @@ public class UserContext implements Serializable {
     	userData.put(key, value);
     }
 
+	public void removeDataEntry(String key) {
+    	userData.remove(key);
+	}
+
     public AutogiroData getAutogiroData(){
         return new AutogiroData(this);
     };
@@ -162,9 +166,11 @@ public class UserContext implements Serializable {
     public UserContext() {
     	log.info("Instantiating empty UserContext " + this );
     }
+
     public void clearContext(){
-    	this.userData.clear();
-    	this.conversationManager.conversations.clear();
+    	//this.userData.clear();
+    	this.getOnBoardingData().clear();
+		this.conversationManager.conversations.clear();
     	this.memberChat.chatHistory.clear();
     }
 
