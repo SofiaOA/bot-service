@@ -103,6 +103,8 @@ public class ClaimsConversation extends Conversation {
 		
 		String nxtMsg = "";
 		
+		if(!validateReturnType(m,userContext, memberChat)){return;}
+		
 		switch(m.id){
 		case "message.claims.audio": 
 

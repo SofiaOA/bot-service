@@ -38,6 +38,7 @@ public class UpdateInformationConversation extends Conversation {
 	public void recieveMessage(UserContext userContext, MemberChat memberChat, Message m) {
 		log.info(m.toString());
 		String nxtMsg = "";
+		if(!validateReturnType(m,userContext, memberChat)){return;}
 		
 		switch(m.id){
 		case "message.info.update": 

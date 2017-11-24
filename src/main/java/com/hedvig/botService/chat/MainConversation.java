@@ -85,6 +85,8 @@ public class MainConversation extends Conversation {
 		
 		String nxtMsg = "";
 		
+		if(!validateReturnType(m,userContext, memberChat)){return;}
+		
 		switch(m.id){
 			case "hedvig.com": {
 				SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
