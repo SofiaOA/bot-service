@@ -887,6 +887,7 @@ public class OnboardingConversationDevi extends Conversation {
                 break;
             case "message.manuellpersonnr":
                 onBoardingData.setSSN(m.body.text);
+                memberService.startOnBoardingWithSSN(userContext.getMemberId(), m.body.text);
                 addToChat(m, userContext, memberChat);
                 nxtMsg = "message.varborduadress";
                 break;
@@ -1152,6 +1153,7 @@ public class OnboardingConversationDevi extends Conversation {
         if(!singed.isPresent() || singed.get().equals(false)) {
             addToChat(getMessage("message.kontraktklar"), userContext, memberChat);
             userContext.getOnBoardingData().setUserHasSigned(true);
+            memberService.finalizeOnBoarding(userContext.getMemberId(), userContext.getOnBoardingData());
         }
 
     }

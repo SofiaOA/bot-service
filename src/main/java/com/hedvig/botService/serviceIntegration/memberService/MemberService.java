@@ -23,4 +23,6 @@ public interface MemberService {
     Member convertToFakeUser(String memberId);
 
     Member getProfile(String hid);
+
+    void startOnBoardingWithSSN(String memberId, String ssn);
 }

@@ -65,4 +65,9 @@ public class MemberServiceFake implements MemberService {
     public Member getProfile(String hid) {
         return new Member(1337l, "121212121212", "sven", "svensson", "stt", "cty", "123", "ema@sadf.com", "9994004", "SE", LocalDate.now());
     }
+
+    @Override
+    public void startOnBoardingWithSSN(String memberId, String ssn) {
+        return;
+    }
 }

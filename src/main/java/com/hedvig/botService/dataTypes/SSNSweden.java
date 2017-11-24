@@ -19,10 +19,23 @@ public class SSNSweden extends HedvigDataType {
 	public boolean validate(String input) {
 		if(input==null){
 			this.errorMessage = "Nu blev något fel tror jag... Försök igen";
-		}	
-		matcher = pattern.matcher(input.trim().replace(" ", ""));
+			return false;
+		}
+
+		String trimmedInput = input.trim().replace(" ", "");
+
+		if(trimmedInput.length() != 12) {
+			this.errorMessage = "Personnummret måste skrivas med 12 siffor.";
+			return false;
+		}
+		matcher = pattern.matcher(trimmedInput);
+
 		boolean ok = matcher.matches();
-		if(!ok){ this.errorMessage = input + " ser ut som ett konstigt personnummer. Ange gärna igen tack!"; return false;}
+		if(!ok) {
+			this.errorMessage = input + " ser ut som ett konstigt personnummer. Ange gärna igen tack!";
+			return false;
+		}
+
 		return true;
 
 	}
