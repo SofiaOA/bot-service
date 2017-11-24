@@ -45,7 +45,7 @@ public class UserContext implements Serializable {
     @Getter
     private String memberId;
     
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name="user_data")
     @MapKeyColumn(name="key")
     @Column(name="value", length = 3000)
