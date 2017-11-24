@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.hedvig.botService.dataTypes.EmailAdress;
 import com.hedvig.botService.enteties.*;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodyNumber;
@@ -73,6 +74,7 @@ public class MainConversation extends Conversation {
 		createMessage("main.question", new MessageBodyText("Vad har du för fråga?"));
 		
 		createMessage("message.main.refer", new MessageBodyText("Kul! Vad har din vän för emailadress?"));
+		setExpectedReturnType("message.main.refer", new EmailAdress());
 		
 		createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 	}
