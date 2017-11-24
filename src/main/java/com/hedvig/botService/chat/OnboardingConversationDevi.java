@@ -259,6 +259,8 @@ public class OnboardingConversationDevi extends Conversation {
         setExpectedReturnType("message.tipsa", new EmailAdress());
         createMessage("message.frifraga", new MessageBodyText("Fråga på! Skriv vad du undrar här så hör jag och mina kollegor av oss snart " + emoji_postal_horn));
 
+        
+        
         createMessage("message.nagotmer",
                 new MessageBodySingleSelect("Tack! Vill du hitta på något mer nu när vi har varandra på tråden?",
                         new ArrayList<SelectItem>() {{
@@ -408,6 +410,7 @@ public class OnboardingConversationDevi extends Conversation {
         //(FUNKTION: FYLL I FÖRSÄKRINGSBOLAGNAMN) = SCROLL MED DE VANLIGASTE BOLAGEN SAMT "ANNAT FÖRSÄKRINGSBOLAG"
 
         createMessage("message.annatbolag", new MessageBodyText("Ok! Vad heter ditt försäkringsbolag?"),2000);
+        setExpectedReturnType("message.manuellnamn", new TextInput());
 
         createChatMessage("message.bytesinfo",
                 new MessageBodySingleSelect("Ja, ibland är det dags att prova något nytt. De kommer nog förstå\f"
@@ -474,24 +477,37 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Är Hedvig tryggt?", "message.tryggt"));
                             add(new SelectOption("Ger Hedvig ett bra skydd?", "message.skydd"));
                             add(new SelectOption("Är Hedvig prisvärt?", "message.pris"));
-                            add(new SelectOption("Jag har en annan fråga", "message.frifråga"));
+                            add(new SelectOption("Jag har en annan fråga", "message.frifraga"));
 
                         }}
                 ));
 
-        createMessage("message.tryggt",
+        createChatMessage("message.tryggt",
                 new MessageBodySingleSelect(""
                 		+ "Jag har en trygghetspartner som är en av världens största återförsäkringskoncerner\fDe är där för mig, så jag alltid kan vara där för dig\fJag är självklart också auktoriserad av Finansinspektionen" + emoji_mag,
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Ok! Jag vill bli medlem", "message.mail"));
-                            add(new SelectOption("Jag undrar om skyddet också", "message.skydd"));
-                            add(new SelectOption("Jag vill höra om priset", "message.pris"));
-                            add(new SelectOption("Jag vill fråga om något annat", "message.frifråga"));
+                            add(new SelectOption("Jag vill bli medlem", "message.forslag"));
+                        }}
+                ));
+
+        createChatMessage("message.skydd",
+                new MessageBodySingleSelect(""
+                		+ "Med mig har du samma grundskydd som vanliga försäkringsbolag\fUtöver det ingår alltid drulle, alltså till exempel om du tappar din telefon i golvet och den går sönder, och ett bra reseskydd",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Jag vill bli medlem", "message.forslag"));
+                        }}
+                ));
+        
+        createMessage("message.frifragatack",
+                new MessageBodySingleSelect("Tack! Jag hör av mig inom kort",
+                        new ArrayList<SelectItem>() {{
+                        	add(new SelectOption("Jag vill bli medlem", "message.forslag"));
+                            add(new SelectOption("Jag har fler frågor", "message.frifråga"));
 
                         }}
                 ));
 
-        createMessage("message.skydd",
+        /*createMessage("message.skydd",
                 new MessageBodySingleSelect("Med mig har du samma grundskydd som vanliga försäkringsbolag\n\nUtöver det ingår alltid drulle, alltså till exempel om du tappar din telefon i golvet och den går sönder, och extra reseskydd\n\nSen kan du enkelt anpassa din försäkring som du vill direkt i appen, så att du får precis det skydd du vill ha",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ok! Jag vill bli medlem", "message.mail"));
@@ -500,15 +516,13 @@ public class OnboardingConversationDevi extends Conversation {
                             add(new SelectOption("Jag vill fråga om något annat", "message.frifråga"));
 
                         }}
-                ));
+                ));*/
 
         createMessage("message.pris",
-                new MessageBodySingleSelect("Oftast betalar du mindre till mig än vad du skulle till andra. Och jag fokuserar alltid på att ge dig mer för pengarna\n\nGrundskyddet som jag ger är också bredare än det du oftast får på annat håll till liknande pris\n\nDet jag prioriterar allra mest är att vara där på dina villkor. Jag utvecklas alltid för att vara så snabb, smidig och smart som möjligt\n\nOch sist men inte minst! Merparten av det du betalar till mig öronmärks för dina och andra medlemmars skador. Det som blir över i medlemspotten varje år går till välgörenhet",
+                new MessageBodySingleSelect("Grundskyddet som jag ger är också bredare än det du oftast får på annat håll\fOch det jag prioriterar allra mest är att vara där på dina villkor. Jag utvecklas alltid för att vara så snabb, smidig och smart som möjligt",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Ok! Jag vill bli medlem", "message.mail"));
-                            add(new SelectOption("Berätta om tryggheten", "message.tryggt"));
-                            add(new SelectOption("Jag vill veta mer om skyddet?", "message.skydd"));
-                            add(new SelectOption("Jag vill fråga om något annat", "message.frifråga"));
+                        	add(new SelectOption("Jag vill bli medlem", "message.forslag"));
+                            add(new SelectOption("Jag har fler frågor", "message.frifråga"));
 
                         }}
                 ));
@@ -854,8 +868,9 @@ public class OnboardingConversationDevi extends Conversation {
                 nxtMsg = "message.nagotmer";
                 break;
             case "message.frifraga":
+            	userContext.putUserData("{ONBOARDING_QUESTION}", m.body.text);
                 addToChat(m, userContext, memberChat);
-                nxtMsg = "message.nagotmer";
+                nxtMsg = "message.frifragatack";
                 break;
             case "message.pers":
                 int nr_persons = getValue((MessageBodyNumber)m.body);
@@ -876,8 +891,7 @@ public class OnboardingConversationDevi extends Conversation {
                     nxtMsg = "message.lghtyp";
                 }
 
-                break;                
-                
+                break;                             
             case "message.manuellnamn":
                 onBoardingData.setFirstName(m.body.text);
                 addToChat(m, userContext, memberChat);
