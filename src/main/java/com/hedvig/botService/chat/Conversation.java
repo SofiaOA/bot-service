@@ -283,8 +283,11 @@ public abstract class Conversation {
 				if(!ok)mCorr.body.text = mCorr.expectedType.getErrorMessage();
 			}		
 			if(m.body.text==null){m.body.text = "";}
-			addToChat(m, userContext, memberChat);
-			addToChat(mCorr, userContext, memberChat);
+			
+			if(!ok){
+				addToChat(m, userContext, memberChat);
+				addToChat(mCorr, userContext, memberChat);
+			}
 			return ok;
 			}		
 		return true;
