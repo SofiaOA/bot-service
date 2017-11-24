@@ -1,6 +1,7 @@
 package com.hedvig.botService.chat;
 
 import com.hedvig.botService.dataTypes.HedvigDataType;
+import com.hedvig.botService.dataTypes.TextInput;
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
@@ -267,14 +268,25 @@ public abstract class Conversation {
 	public boolean validateReturnType(Message m, UserContext userContext, MemberChat memberChat){
 
 		Message mCorr = getMessage(m.id);
-
-		if(mCorr != null && mCorr.expectedType!=null){
-			boolean ok = mCorr.expectedType.validate(m.body.text);
-			if(!ok)mCorr.body.text = mCorr.expectedType.getErrorMessage();
+		
+		if(mCorr != null){
+			boolean ok = true;
+			// All text input are validated to prevent null pointer exceptions
+			if(mCorr.body.getClass().equals(MessageBodyText.class)){
+				TextInput t = new TextInput();
+				ok = t.validate(m.body.text);
+				if(!ok)mCorr.body.text = t.getErrorMessage();
+			}
+			// Other input need explicit 
+			else if(mCorr.expectedType!=null){
+				ok = mCorr.expectedType.validate(m.body.text);
+				if(!ok)mCorr.body.text = mCorr.expectedType.getErrorMessage();
+			}		
+			if(m.body.text==null){m.body.text = "";}
 			addToChat(m, userContext, memberChat);
 			addToChat(mCorr, userContext, memberChat);
 			return ok;
-		}
+			}		
 		return true;
 	}
 

@@ -289,6 +289,8 @@ public class OnboardingConversationDevi extends Conversation {
         //(FUNKTION: FYLL I PERSONNR) = SCROLL KANSKE DÄR EN VÄLJER DATUM? BEHÖVS FYRA SISTA SIFFROR?
 
         createMessage("message.manuellnamn", new MessageBodyText("Inga problem! Då ställer jag bara några extra frågor. Vad heter du i förnamn?"));
+        setExpectedReturnType("message.manuellnamn", new TextInput());
+        
         createMessage("message.manuellfamilyname", new MessageBodyText("Kul att ha dig här {NAME}! " + emoji_hug + " Vad heter du i efternamn?"));
         
         createMessage("message.manuellpersonnr", new MessageBodyNumber("Tack! Vad är ditt personnummer?"));
