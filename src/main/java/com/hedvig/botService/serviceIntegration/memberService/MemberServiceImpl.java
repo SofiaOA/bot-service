@@ -104,7 +104,10 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public void finalizeOnBoarding(String memberId, UserData data) {
-        String url = "http://" + memberServiceLocation + "/i/member/finalizeOnboarding";
+        UriTemplate url = new UriTemplate("http://" + memberServiceLocation + "/i/member/{memberId}/finalizeOnboarding");
+        URI expandedUri = url.expand(new HashMap<String, String>(){{
+            put("memberId", memberId);
+        }});
         try {
             FinalizeOnBoardingRequest req = new FinalizeOnBoardingRequest();
             req.setFirstName(data.getFirstName());
@@ -119,7 +122,7 @@ public class MemberServiceImpl implements MemberService {
             address.setZipCode(data.getAddressZipCode());
             req.setAddress(address);
 
-            ResponseEntity<FinalizeOnBoardingResponse> response = template.postForEntity(url, req, FinalizeOnBoardingResponse.class);
+            ResponseEntity<FinalizeOnBoardingResponse> response = template.postForEntity(expandedUri, req, FinalizeOnBoardingResponse.class);
 
         }catch (RestClientResponseException ex) {
             log.error("Could not finalize member {}", memberId, ex);
@@ -156,5 +159,18 @@ public class MemberServiceImpl implements MemberService {
 
         ResponseEntity<Member> response = template.getForEntity(expandedUri, Member.class);
         return response.getBody();
+    }
+
+    @Override
+    public void startOnBoardingWithSSN(String memberId, String ssn) {
+        UriTemplate url = new UriTemplate("http://" + memberServiceLocation + "/i/member/{memberId}/startOnboardingWithSSN");
+
+        URI expandedUri = url.expand(new HashMap<String, String>(){{
+            put("memberId", memberId);
+        }});
+
+        StartOnboardingWithSSNRequest request = new StartOnboardingWithSSNRequest(ssn);
+
+        template.postForEntity(expandedUri,request, Void.class);
     }
 }
