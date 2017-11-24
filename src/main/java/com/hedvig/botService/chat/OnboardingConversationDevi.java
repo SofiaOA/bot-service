@@ -467,18 +467,19 @@ public class OnboardingConversationDevi extends Conversation {
                 ));
 
         createMessage("message.fundera",
-                new MessageBodySingleSelect("Smart att fundera när ett viktigt val ska göras\n\nJag kanske kan ge dig mer stoff till funderande. Undrar du något av det här?",
+                new MessageBodySingleSelect("Är det kanske något av det här du funderar kring?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Hur vet jag att allt är tryggt?", "message.tryggt"));
-                            add(new SelectOption("Vad täcks och skyddas egentligen?", "message.skydd"));
-                            add(new SelectOption("Berätta mer om priset", "message.pris"));
-                            add(new SelectOption("Jag vill fråga om något annat", "message.frifråga"));
+                            add(new SelectOption("Är Hedvig tryggt?", "message.tryggt"));
+                            add(new SelectOption("Ger Hedvig ett bra skydd?", "message.skydd"));
+                            add(new SelectOption("Är Hedvig prisvärt?", "message.pris"));
+                            add(new SelectOption("Jag har en annan fråga", "message.frifråga"));
 
                         }}
                 ));
 
         createMessage("message.tryggt",
-                new MessageBodySingleSelect("Jag har en trygghetspartner som är ett av världens största försäkringsbolag\n\nDe är där för mig så jag kan vara där för dig, oavsett. Till exempel om en storm skulle drabba hela Sverige och alla mina medlemmar skulle behöva stöd samtidigt\n\nJag är självklart också auktoriserad av Finansinspektionen " + emoji_mag,
+                new MessageBodySingleSelect(""
+                		+ "Jag har en trygghetspartner som är en av världens största återförsäkringskoncerner\fDe är där för mig, så jag alltid kan vara där för dig\fJag är självklart också auktoriserad av Finansinspektionen" + emoji_mag,
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ok! Jag vill bli medlem", "message.mail"));
                             add(new SelectOption("Jag undrar om skyddet också", "message.skydd"));
@@ -643,12 +644,12 @@ public class OnboardingConversationDevi extends Conversation {
         
         setExpectedReturnType("message.kontraktklar", new EmailAdress());
 
-        createMessage("message.kontraktklar4",
-            new MessageBodySingleSelect("Välkommen in i appen! Ett tips är att börja med att välja vilken välgörenhetsorganisation du vill att din del av överskottet ska gå till" + emoji_revlolving_hearts,
+        createChatMessage("message.kontraktklar4",
+            new MessageBodySingleSelect("*Välkommen till Hedvig! Nu kan du börja utforska appen. Ett tips är att börja med att välja vilken välgörenhetsorganisation du vill att din del av överskottet ska gå till" + emoji_revlolving_hearts,
                     new ArrayList<SelectItem>() {{
                         add(new SelectLink("Utforska appen", "onboarding.done", "Dashboard", null, null,  false));
                     }}
-            ), "h_symbol", 2000);
+            ));
         
         createMessage("message.kontraktklar_old",
                 new MessageBodySingleSelect(emoji_tada + " Hurra igen! "+ emoji_tada +"\n\nVälkommen, bästa nya medlem!\n\nI din inkorg finns nu en bekräftelse på allt\n\nOm du behöver eller vill något är det bara att chatta med mig i appen när som helst\n\nOch så till sist ett litet tips! Börja utforska appen genom att välja vilken välgörenhetsorganisation du vill stödja " + emoji_revlolving_hearts,
@@ -887,7 +888,6 @@ public class OnboardingConversationDevi extends Conversation {
                 break;
             case "message.manuellpersonnr":
                 onBoardingData.setSSN(m.body.text);
-                memberService.startOnBoardingWithSSN(userContext.getMemberId(), m.body.text);
                 addToChat(m, userContext, memberChat);
                 nxtMsg = "message.varborduadress";
                 break;
@@ -982,11 +982,12 @@ public class OnboardingConversationDevi extends Conversation {
                 String comp = getValue((MessageBodySingleSelect)m.body);
                 if(comp.equals("vetej")){
                 	m.body.text = "Vet ej";
+                	nxtMsg = "message.forslag";
                 }else{
                 	m.body.text = "Idag har jag " + comp;
+                	nxtMsg = "message.bytesinfo";
                 }
-                addToChat(m, userContext, memberChat);
-                nxtMsg = "message.bytesinfo";
+                addToChat(m, userContext, memberChat);                
                 break;
 
             case "message.forslagstart3":
@@ -1153,7 +1154,6 @@ public class OnboardingConversationDevi extends Conversation {
         if(!singed.isPresent() || singed.get().equals(false)) {
             addToChat(getMessage("message.kontraktklar"), userContext, memberChat);
             userContext.getOnBoardingData().setUserHasSigned(true);
-            memberService.finalizeOnBoarding(userContext.getMemberId(), userContext.getOnBoardingData());
         }
 
     }
