@@ -4,6 +4,7 @@ import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.SessionManager;
+import com.hedvig.botService.web.dto.CollectResponse;
 import com.hedvig.botService.web.dto.UpdateTypes;
 
 import org.slf4j.Logger;
@@ -74,7 +75,10 @@ public class HedvigController {
                  responseEntity = responseEntity.header("Hedvig.Id", newMemberId);
             }
 
-            return responseEntity.body(response.get());
+
+            CollectResponse responseBody = new CollectResponse(response.get().getBankIdStatus().name());
+
+            return responseEntity.body(responseBody);
         }
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("");

@@ -14,6 +14,7 @@ import com.hedvig.botService.web.dto.Member;
 import com.hedvig.botService.web.dto.MemberAuthedEvent;
 import com.hedvig.botService.web.dto.UpdateTypes;
 import com.hedvig.botService.web.dto.events.memberService.*;
+import org.hibernate.StaleObjectStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,9 +155,7 @@ public class SessionManager {
                 }
 
                 collectionStatus.update(bankIdStatus);
-            }//else{
-            //    onboardingConversation
-            //}
+            }
 
             userrepo.saveAndFlush(uc);
 
@@ -165,7 +164,11 @@ public class SessionManager {
             log.error("Error collecting result from member-service: ", ex);
             onboardingConversation.bankIdAuthError(uc);
             //Have hedvig respond with error
+        }catch( StaleObjectStateException ex) {
+            log.error("Could not save collection state: ", ex);
+            return Optional.of(new BankIdAuthResponse(BankIdStatusType.ERROR, "", "", ""));
         }
+
         return Optional.empty();
     }
     

@@ -9,12 +9,6 @@ import javax.persistence.*;
 @Data
 public class CollectionStatus {
 
-    public CollectionStatus() {
-    }
-
-    public void update(BankIdStatusType bankIdStatus) {
-        this.lastStatus = bankIdStatus.name();
-    }
 
     public enum CollectionType { AUTH, SIGN };
 
@@ -33,6 +27,16 @@ public class CollectionStatus {
 
     private String lastStatus;
 
+    @Version
+    private Long version;
+
+
+    public CollectionStatus() {
+    }
+
+    public void update(BankIdStatusType bankIdStatus) {
+        this.lastStatus = bankIdStatus.name();
+    }
 
     public boolean done() {
         return lastStatus.equals("COMPLETE") || lastStatus.equals("ERROR");
