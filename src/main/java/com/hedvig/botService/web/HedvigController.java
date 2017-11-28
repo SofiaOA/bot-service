@@ -41,13 +41,15 @@ public class HedvigController {
     
     @PostMapping("initiateUpdate")
     ResponseEntity<String> initiateUpdate(@RequestParam UpdateTypes what, @RequestHeader(value="hedvig.token", required = false) String hid) {
-    	sessionManager.updateInfo(hid, what);
+    	log.info("Member initiated update: ", what.name());
+        sessionManager.updateInfo(hid, what);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("quoteAccepted")
     ResponseEntity<String> quoteAccepted(@RequestHeader(value="hedvig.token") String hid){
 
+        log.info("Quote accepted");
         service.quoteAccepted(hid);
 
         this.sessionManager.quoteAccepted(hid);
@@ -59,7 +61,7 @@ public class HedvigController {
     ResponseEntity<?> collect(@RequestParam  String referenceToken,
                               @RequestHeader(value="hedvig.token", required = false) String hid) {
 
-        log.info("Starting collect with reference token: {}", value("referenceToken", referenceToken));
+        log.info("Post collect with reference token: {}", value("referenceToken", referenceToken));
         Optional<BankIdAuthResponse> response = this.sessionManager.collect(hid, referenceToken);
 
 

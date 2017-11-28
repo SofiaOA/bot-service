@@ -87,7 +87,7 @@ public class MessagesController {
     @RequestMapping(path = "/response", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
     public ResponseEntity<?> create(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Message recieved from member:" + hid);
+     	log.info("Response recieved from messageId: " + msg.globalId);
 
         msg.header.fromId = new Long(hid);
         
@@ -98,15 +98,13 @@ public class MessagesController {
         
         sessionManager.receiveMessage(msg, hid);
 
-        log.info("Of type:" + msg.body.getClass());
-
     	return ResponseEntity.noContent().build();
     }
 
     @RequestMapping(path = "/init", method = RequestMethod.POST)
     public ResponseEntity<?> create(@RequestHeader(value="hedvig.token", required = false) String hid, @RequestBody(required = false) ExpoDeviceInfoDTO json) {
 
-     	log.info("Init recieved from member:" + hid);
+     	log.info("Init recieved from api-gateway: " + hid);
 
      	String linkUri = "hedvig://+";
 		if(json != null && json.getDeviceInfo() != null) {
@@ -122,7 +120,7 @@ public class MessagesController {
     public ResponseEntity<List<AvatarDTO>> getAvatars(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
     	// TODO: Implement 
-     	log.info("Getting avatars member:" + hid);
+     	log.info("Getting avatars member: " + hid);
         
      	ArrayList<AvatarDTO> avatars = new ArrayList<AvatarDTO>();
      	//AvatarDTO avatar1 = new AvatarDTO("loader", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/hedvig_typing_animation.json",78,52,1000);
@@ -147,7 +145,7 @@ public class MessagesController {
     @PostMapping(path = "/initclaim")
     public ResponseEntity<?> initClaim(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Init claims for member:" + hid);
+     	log.info("Init claim for member:" + hid);
         sessionManager.initClaim(hid);
     	return ResponseEntity.noContent().build();
     }
@@ -155,7 +153,7 @@ public class MessagesController {
     @PostMapping(path = "/event")
     public ResponseEntity<?> eventRecieved(@RequestBody EventDTO e, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Event recieved from member:" + hid);
+     	log.info("Event {} received from member:", e.type, hid);
         sessionManager.recieveEvent(e.type, e.value, hid);
     	return ResponseEntity.noContent().build();
     }
@@ -189,6 +187,8 @@ public class MessagesController {
 
     @PostMapping(path = "/claim/asset/{assetId}")
 	public ResponseEntity<?> startClaim(@RequestHeader(value="hedvig.token", required = true) String hid, @PathVariable String assetId) {
+
+    	log.info("Post assetId: {}", assetId);
     	sessionManager.initClaim(hid, assetId);
 
     	return ResponseEntity.noContent().build();
