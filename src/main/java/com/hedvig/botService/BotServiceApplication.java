@@ -15,11 +15,13 @@ import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 @EnableFeignClients
 @EnableRetry
+@EnableTransactionManagement
 public class BotServiceApplication {
 
 	public static void main(String[] args) {

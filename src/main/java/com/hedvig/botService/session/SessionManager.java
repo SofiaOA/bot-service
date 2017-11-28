@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.*;
@@ -30,6 +31,7 @@ import static net.logstash.logback.argument.StructuredArguments.value;
  * */
 
 @Component
+@Transactional
 public class SessionManager {
 
     private static Logger log = LoggerFactory.getLogger(SessionManager.class);
