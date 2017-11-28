@@ -915,7 +915,7 @@ public class OnboardingConversationDevi extends Conversation {
             case "message.kontraktklar":
                 onBoardingData.setEmail(m.body.text);
                 addToChat(m, userContext, memberChat);
-                nxtMsg = "message.kontraktklar4";
+                nxtMsg = "message.kontraktklar4.1";
                 break;
             case "message.mail":
                 onBoardingData.setEmail(m.body.text);

@@ -22,6 +22,8 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.*;
 
+import static net.logstash.logback.argument.StructuredArguments.value;
+
 /*
  * The session manager is the main controller class for the chat service. It contains all user sessions with chat histories, context etc
  * It is a singleton accessed through the request controller
@@ -114,17 +116,18 @@ public class SessionManager {
         OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, productPricingclient, fakeMemberCreator);
         try {
             BankIdAuthResponse collect = memberService.collect(referenceToken, hid);
-            if(collect.getNewMemberId() != null && !collect.getNewMemberId().equals(hid)){
-                uc = userrepo.findByMemberId(collect.getNewMemberId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-            }
-
             CollectionStatus collectionStatus = uc.getBankIdCollectStatus(referenceToken);
             if(collectionStatus == null) {
-                //onboardingConversation.bankIdAuthError(uc);
+                log.error("Could not find referenceToken: {}", value("referenceToken", referenceToken));
+                onboardingConversation.bankIdAuthError(uc);
 
                 return Optional.of(collect);
             }
 
+            if(collect.getNewMemberId() != null && !collect.getNewMemberId().equals(hid)){
+                uc = userrepo.findByMemberId(collect.getNewMemberId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+                collectionStatus.setUserContext(uc);
+            }
 
             BankIdStatusType bankIdStatus = collect.getBankIdStatus();
             log.info("BankIdStatus after collect:{}, memberId:{}, lastCollectionStatus: {}", bankIdStatus.name(), hid, collectionStatus.getLastStatus());
@@ -141,10 +144,12 @@ public class SessionManager {
 
                     onboardingConversation.bankIdAuthComplete(uc);
 
-                } //else if (bankIdStatus == BankIdStatusType.ERROR) {
+                }else if (bankIdStatus == BankIdStatusType.ERROR) {
                     //Handle error
-//                    onboardingConversation.bankIdAuthError(uc);
-                //}
+                    log.error("Got error response from member service with reference token: {}", value("referenceToken", referenceToken));
+                    onboardingConversation.bankIdAuthError(uc);
+                    collect = new BankIdAuthResponse(BankIdStatusType.COMPLETE, collect.getAutoStartToken(), collect.getReferenceToken(), collect.getNewMemberId());
+                }
 
                 collectionStatus.update(bankIdStatus);
             }//else{
@@ -251,7 +256,6 @@ public class SessionManager {
     }
     
     public List<Message> getAllMessages(String hid) {
-        log.info("Getting all messages for user:" + hid);
 
         /*
          * Find users chat and context. First time it is created
@@ -263,12 +267,12 @@ public class SessionManager {
             return newUserContext;
         });
 
-        log.info(uc.getMemberChat().toString());
+        MemberChat chat = uc.getMemberChat();
 
         // Mark last user input with as editAllowed
-        uc.getMemberChat().markLastInput();
+        chat.markLastInput();
 
-        MemberChat chat = uc.getMemberChat();
+
 
         // Check for deleted messages
         ArrayList<Message> returnList = new ArrayList<Message>();
@@ -291,7 +295,9 @@ public class SessionManager {
     	
     	if(returnList.size() > 0){
 	    	Message lastMessage = returnList.get(returnList.size() - 1);
-	    	if(lastMessage!=null)recieveEvent("MESSAGE_FETCHED", lastMessage.id, hid);
+	    	if(lastMessage!=null) {
+                recieveEvent("MESSAGE_FETCHED", lastMessage.id, hid);
+            }
     	}else{
     		log.info("No messages in chat....");
     	}
