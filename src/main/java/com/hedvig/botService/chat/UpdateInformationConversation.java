@@ -24,8 +24,11 @@ public class UpdateInformationConversation extends Conversation {
 		super("info.update", memberService, productPricingClient);
 
 		createMessage("message.info.update.email", new MessageBodyText("Ok, vad har du för mailadress?"));
-		createMessage("message.info.update", new MessageBodyText("Ok, vad är det för information du vill uppdatera?\f Beskriv vad det gäller så ändrar jag"));
-		createMessage("message.info.complete", new MessageBodyText("Toppen, tack! Jag säger till när informationen är uppdaterad"));
+		
+		createMessage("message.info.update.safety", new MessageBodyText("Okej! Har du kanske skaffat en ny trygghetshöjare eller ändrat om något hemma? Skriv bara här vad som har hänt så uppdaterar jag din info"));
+		createMessage("message.info.update.payment", new MessageBodyText("Okej, vill du kanske flytta autogiro till ett annat konto? Ange bank och kontonummer så tar jag hand om det"));
+		createMessage("message.info.update", new MessageBodyText("Okej, skriv bara här vad du vill uppdatera så fixar jag det! Har du kanske flyttat, eller vill lägga till eller ta bort en person ur din försäkring är det bara att ange det"));
+		createMessage("message.info.complete", new MessageBodyText("Toppen tack, jag ändrar"));
 
 		createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 
@@ -35,14 +38,23 @@ public class UpdateInformationConversation extends Conversation {
 	public void recieveMessage(UserContext userContext, MemberChat memberChat, Message m) {
 		log.info(m.toString());
 		String nxtMsg = "";
+		if(!validateReturnType(m,userContext, memberChat)){return;}
 		
 		switch(m.id){
 		case "message.info.update": 
 			userContext.putUserData("{INFO_UPDATE_"+LocalDate.now()+"}", m.body.text);
 			nxtMsg = "message.info.complete";
 			break;
+		case "message.info.update.payment": 
+			userContext.putUserData("{PAYMENT_UPDATE_"+LocalDate.now()+"}", m.body.text);
+			nxtMsg = "message.info.complete";
+			break;
+		case "message.info.update.safety": 
+			userContext.putUserData("{SAFETY_UPDATE_"+LocalDate.now()+"}", m.body.text);
+			nxtMsg = "message.info.complete";
+			break;
 		case "message.info.update.email": 
-			userContext.putUserData("{EMAIL}", m.body.text);
+			userContext.putUserData("{EMAIL_UPDATE_"+LocalDate.now()+"}", m.body.text);
 			nxtMsg = "message.info.complete";
 			break;
 		}

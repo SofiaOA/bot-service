@@ -348,13 +348,13 @@ public class SessionManager {
     	switch(what){
     	case APARTMENT_INFORMATION: startingMessage = "message.info.update";
     		break;
-    	case BANK_ACCOUNT: startingMessage = "message.info.update";
+    	case BANK_ACCOUNT: startingMessage = "message.info.update.payment";
     		break;
     	case FAMILY_MEMBERS: startingMessage = "message.info.update";
     		break;
     	case PERSONAL_INFORMATOIN: startingMessage = "message.info.update";
     		break;
-    	case SAFETY_INCREASERS: startingMessage = "message.info.update";
+    	case SAFETY_INCREASERS: startingMessage = "message.info.update.safety";
 			break;
     	}
     	

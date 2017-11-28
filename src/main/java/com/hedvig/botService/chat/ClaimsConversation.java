@@ -34,7 +34,7 @@ public class ClaimsConversation extends Conversation {
                 ));
 
 
-        createMessage("message.claims.start", new MessageBodyParagraph("Jag förstår, hoppas du mår ok under omständigheterna. Självklart tar jag tag i det här"),2000);
+        createMessage("message.claims.start", new MessageBodyParagraph("Okej, det här löser vi på nolltid!"),2000);
 		
         createMessage("message.claim.menu",
                 new MessageBodySingleSelect("Är du i en krissituation just nu? Om det är akut så ser jag till att en kollega ringer upp dig",
@@ -52,7 +52,7 @@ public class ClaimsConversation extends Conversation {
                         }}
                 ));
 
-		createMessage("message.claims.chat", new MessageBodyParagraph("Ok! Då kommer du strax få berätta vad som hänt genom att spela in ett röstmeddelande"),2000);
+		createMessage("message.claims.chat", new MessageBodyParagraph("Strax få berätta vad som hänt genom att spela in ett röstmeddelande"),2000);
 		createMessage("message.claims.chat2", new MessageBodyParagraph("Först vill jag bara be dig skriva under detta"),2000);
 
         createMessage("message.claim.promise",
@@ -103,6 +103,8 @@ public class ClaimsConversation extends Conversation {
 		
 		String nxtMsg = "";
 		
+		if(!validateReturnType(m,userContext, memberChat)){return;}
+		
 		switch(m.id){
 		case "message.claims.audio": 
 
@@ -148,7 +150,7 @@ public class ClaimsConversation extends Conversation {
             case MESSAGE_FETCHED:
                 log.info("Message fetched:" + value);
                 switch(value){                
-                case "message.claims.start": completeRequest("message.claim.menu", userContext, memberChat); break;
+                case "message.claims.start": completeRequest("message.claims.chat", userContext, memberChat); break;
                 case "message.claims.chat": completeRequest("message.claims.chat2", userContext, memberChat); break;
                 case "message.claims.chat2": completeRequest("message.claim.promise", userContext, memberChat); break;
                 case "message.claims.ok": completeRequest("message.claims.record", userContext, memberChat); break;
