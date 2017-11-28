@@ -74,7 +74,7 @@ public abstract class Conversation {
 
 	void addToChat(Message m, UserContext uc) {
 		this.addToChat(m, uc, uc.getMemberChat());
-        }
+	}
 
 	/*
 	private String handleBankIdAuthRespose(String nxtMsg, Optional<BankIdAuthResponse> authResponse, UserContext userContext) {
@@ -282,7 +282,9 @@ public abstract class Conversation {
 
 	public abstract void recieveMessage(UserContext userContext, MemberChat memberChat, Message m);
 	public void completeRequest(String nxtMsg, UserContext userContext, MemberChat memberChat) {
-		if(getMessage(nxtMsg)!=null)addToChat(getMessage(nxtMsg), userContext, memberChat);	
+		if(getMessage(nxtMsg)!=null) {
+			addToChat(getMessage(nxtMsg), userContext, memberChat);
+		}
 	}
 
 	public void recieveEvent(EventTypes e, String value, UserContext userContext, MemberChat memberChat) {}

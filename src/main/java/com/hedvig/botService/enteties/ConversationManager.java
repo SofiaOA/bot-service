@@ -36,7 +36,6 @@ public class ConversationManager {
     }
     
     public ConversationManager() {
-    	log.info("Instantiating ConversationManager " + this );
     	//new Exception().printStackTrace(System.out);
     }
 

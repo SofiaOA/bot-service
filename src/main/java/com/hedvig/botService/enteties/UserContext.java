@@ -168,13 +168,11 @@ public class UserContext implements Serializable {
     // ------------------------------------------------------ //
     
     public UserContext(String memberId) {
-    	log.info("Instantiating UserContext for member:" + memberId + " :" + this );
         this.memberId = memberId;
         this.conversationManager = new ConversationManager(memberId);
     }
     
     public UserContext() {
-    	log.info("Instantiating empty UserContext " + this );
     }
 
     public void clearContext(){

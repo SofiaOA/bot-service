@@ -44,7 +44,6 @@ public class MemberChat {
     }
     
     public MemberChat() {
-    	log.info("Instantiating MemberChat " + this );
     	//new Exception().printStackTrace(System.out);
     }
 
@@ -85,7 +84,6 @@ public class MemberChat {
     	if(!hasUserInput)return;
     	
     	for(Message m : chatHistory){
-    		log.info(m.globalId + " " + m);
     		m.deleted = true;
     		if(!(m.header.fromId == Conversation.HEDVIG_USER_ID)){break;}
     	}
@@ -111,7 +109,6 @@ public class MemberChat {
     	if(!hasUserInput)return;
     	
     	for(Message m : chatHistory){
-    		log.info(m.globalId + " " + m.header.fromId);
     		if(!(m.header.fromId == Conversation.HEDVIG_USER_ID)){m.header.editAllowed = true; break;}
     	}
     }

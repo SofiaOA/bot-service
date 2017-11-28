@@ -13,6 +13,7 @@
     <springProperty scope="context" name="springAppName" source="spring.application.name"/>
     <!-- <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-logs}/${springAppName}}"/> -->
 
+    <property name="CONSOLE_LOG_PATTERN2" value="${CONSOLE_LOG_PATTERN2:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr([%X{memberId}]) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
     <!-- Appender to log to console in plain text format -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -20,7 +21,7 @@
             <level>DEBUG</level>
         </filter>
         <encoder>
-            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <pattern>${CONSOLE_LOG_PATTERN2}</pattern>
             <charset>utf8</charset>
         </encoder>
     </appender>

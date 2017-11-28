@@ -6,6 +6,8 @@ import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingSer
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.UpdateTypes;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
+import static net.logstash.logback.argument.StructuredArguments.value;
+
 
 @RestController
 @RequestMapping("/hedvig")
 public class HedvigController {
 
+    private final Logger log = LoggerFactory.getLogger(HedvigController.class);
 	private final SessionManager sessionManager;
     private final ProductPricingService service;
     private final MemberService memberService;
@@ -54,6 +59,7 @@ public class HedvigController {
     ResponseEntity<?> collect(@RequestParam  String referenceToken,
                               @RequestHeader(value="hedvig.token", required = false) String hid) {
 
+        log.info("Starting collect with reference token: {}", value("referenceToken", referenceToken));
         Optional<BankIdAuthResponse> response = this.sessionManager.collect(hid, referenceToken);
 
 

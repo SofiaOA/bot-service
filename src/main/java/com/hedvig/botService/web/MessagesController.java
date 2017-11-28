@@ -49,7 +49,7 @@ public class MessagesController {
     @RequestMapping(path="/messages/{messageCount}")
     public Map<Integer, Message> messages(@PathVariable int messageCount, @RequestHeader(value="hedvig.token", required = false) String hid) {
     	
-    	log.info("Getting " + messageCount + " messages for user:" + hid);
+    	log.info("Getting " + messageCount + " messages for member:" + hid);
 
     	try {
 			return sessionManager.getMessages(messageCount, hid).stream().collect(Collectors.toMap( m -> m.getGlobalId(), Function.identity()));
@@ -66,7 +66,7 @@ public class MessagesController {
     @RequestMapping(path="/messages", produces = "application/json; charset=utf-8")
     public Map<Integer, Message> allMessages(@RequestHeader(value="hedvig.token", required = false) String hid) {
     	
-    	log.info("Getting all messages for user:" + hid);
+    	log.info("Getting all messages for member:" + hid);
 
     	try {
 			return sessionManager.getAllMessages(hid).stream()
@@ -87,7 +87,7 @@ public class MessagesController {
     @RequestMapping(path = "/response", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
     public ResponseEntity<?> create(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Message recieved from user:" + hid);
+     	log.info("Message recieved from member:" + hid);
 
         msg.header.fromId = new Long(hid);
         
@@ -106,7 +106,7 @@ public class MessagesController {
     @RequestMapping(path = "/init", method = RequestMethod.POST)
     public ResponseEntity<?> create(@RequestHeader(value="hedvig.token", required = false) String hid, @RequestBody(required = false) ExpoDeviceInfoDTO json) {
 
-     	log.info("Init recieved from user:" + hid);
+     	log.info("Init recieved from member:" + hid);
 
      	String linkUri = "hedvig://+";
 		if(json != null && json.getDeviceInfo() != null) {
@@ -122,7 +122,7 @@ public class MessagesController {
     public ResponseEntity<List<AvatarDTO>> getAvatars(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
     	// TODO: Implement 
-     	log.info("Getting avatars user:" + hid);
+     	log.info("Getting avatars member:" + hid);
         
      	ArrayList<AvatarDTO> avatars = new ArrayList<AvatarDTO>();
      	//AvatarDTO avatar1 = new AvatarDTO("loader", "https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/hedvig_typing_animation.json",78,52,1000);
@@ -147,7 +147,7 @@ public class MessagesController {
     @PostMapping(path = "/initclaim")
     public ResponseEntity<?> initClaim(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Init claims for user:" + hid);
+     	log.info("Init claims for member:" + hid);
         sessionManager.initClaim(hid);
     	return ResponseEntity.noContent().build();
     }
@@ -155,7 +155,7 @@ public class MessagesController {
     @PostMapping(path = "/event")
     public ResponseEntity<?> eventRecieved(@RequestBody EventDTO e, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Event recieved from user:" + hid);
+     	log.info("Event recieved from member:" + hid);
         sessionManager.recieveEvent(e.type, e.value, hid);
     	return ResponseEntity.noContent().build();
     }
@@ -163,7 +163,7 @@ public class MessagesController {
     @PostMapping(path = "/chat/reset")
     public ResponseEntity<?> resetChat(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Reset chat for user:" + hid);
+     	log.info("Reset chat for member:" + hid);
         sessionManager.resetOnboardingChat(hid);
 
     	return ResponseEntity.noContent().build();
@@ -172,7 +172,7 @@ public class MessagesController {
     @PostMapping("/chat/main")
     public ResponseEntity<?> mainMenue(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Putting main message in chat for user:" + hid);
+     	log.info("Putting main message in chat for member:" + hid);
         sessionManager.mainMenu(hid);
 
     	return ResponseEntity.noContent().build();
@@ -181,7 +181,7 @@ public class MessagesController {
     @PostMapping(path = "/chat/edit")
     public ResponseEntity<?> editChat(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Edit chat for user:" + hid);
+     	log.info("Edit chat for member:" + hid);
         sessionManager.editHistory(hid);
 
     	return ResponseEntity.noContent().build();
