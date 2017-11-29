@@ -6,6 +6,8 @@ import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdStatusType;
 import com.hedvig.botService.web.dto.Member;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +44,9 @@ public class UserContext implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Version
+	private Long version;
     
     @Getter
     private String memberId;
@@ -225,21 +231,32 @@ public class UserContext implements Serializable {
 	}
 
 	public void startBankIdAuth(BankIdAuthResponse bankIdAuthResponse) {
-		CollectionStatus collectionStatus = new CollectionStatus();
-		collectionStatus.setCollectionType(CollectionStatus.CollectionType.AUTH);
-		collectionStatus.setLastStatus(bankIdAuthResponse.getBankIdStatus().name());
-		String referenceToken = bankIdAuthResponse.getReferenceToken();
-		collectionStatus.setReferenceToken(referenceToken);
-		collectionStatus.setAutoStartToken(bankIdAuthResponse.getAutoStartToken());
 
-		collectionStatus.setUserContext(this);
-		this.bankIdStatus.put(referenceToken, collectionStatus);
-
-		this.putUserData("{AUTOSTART_TOKEN}", bankIdAuthResponse.getAutoStartToken());
-		this.putUserData("{REFERENCE_TOKEN}", bankIdAuthResponse.getReferenceToken());
+		createCollectType(CollectionStatus.CollectionType.AUTH, bankIdAuthResponse.getBankIdStatus().toString(), bankIdAuthResponse.getReferenceToken(), bankIdAuthResponse.getAutoStartToken());
 	}
 
-    public void fillMemberData(Member member) {
+	public void startBankIdSign(BankIdSignResponse bankIdAuthResponse) {
+
+		createCollectType(CollectionStatus.CollectionType.SIGN, bankIdAuthResponse.getStatus(), bankIdAuthResponse.getReferenceToken(), bankIdAuthResponse.getAutoStartToken());
+	}
+
+	private void createCollectType(CollectionStatus.CollectionType collectionType, String bankIdStatus, String referenceToken1, String autoStartToken) {
+		CollectionStatus collectionStatus = new CollectionStatus();
+		collectionStatus.setLastCallTime(Instant.now());
+		collectionStatus.setUserContext(this);
+		this.bankIdStatus.put(referenceToken1, collectionStatus);
+
+		collectionStatus.setCollectionType(collectionType);
+
+		collectionStatus.setLastStatus(bankIdStatus);
+		collectionStatus.setReferenceToken(referenceToken1);
+		collectionStatus.setAutoStartToken(autoStartToken);
+
+		this.putUserData("{AUTOSTART_TOKEN}", autoStartToken);
+		this.putUserData("{REFERENCE_TOKEN}", referenceToken1);
+	}
+
+	public void fillMemberData(Member member) {
         UserData obd = getOnBoardingData();
         obd.setBirthDate(member.getBirthDate());
         obd.setSSN(member.getSsn());

@@ -628,8 +628,9 @@ public class OnboardingConversationDevi extends Conversation {
                         signData = memberService.sign(ud.getSSN(), "Jag godkänner att jag har tagit del av Hedvigs förköpsinformation och försäkringsvillkor.");
 
                         if (signData.isPresent()) {
-                            userContext.putUserData("{AUTOSTART_TOKEN}", signData.get().getAutoStartToken());
-                            userContext.putUserData("{REFERENCE_TOKEN}", signData.get().getReferenceToken());
+                            userContext.startBankIdSign(signData.get());
+                            //userContext.putUserData("{AUTOSTART_TOKEN}", signData.get().getAutoStartToken());
+                            //userContext.putUserData("{REFERENCE_TOKEN}", signData.get().getReferenceToken());
                         } else {
                             log.error("Could not start signing process.");
                             return "message.kontraktpop.error";

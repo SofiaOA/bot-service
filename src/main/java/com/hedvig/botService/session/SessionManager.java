@@ -18,6 +18,7 @@ import org.hibernate.StaleObjectStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
@@ -118,43 +119,59 @@ public class SessionManager {
 
         OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, productPricingclient, fakeMemberCreator);
         try {
-            BankIdAuthResponse collect = memberService.collect(referenceToken, hid);
+
             CollectionStatus collectionStatus = uc.getBankIdCollectStatus(referenceToken);
             if(collectionStatus == null) {
                 log.error("Could not find referenceToken: {}", value("referenceToken", referenceToken));
                 onboardingConversation.bankIdAuthError(uc);
 
-                return Optional.of(collect);
+                return Optional.of(new BankIdAuthResponse(BankIdStatusType.ERROR, "", "", null));
+            } else if(!collectionStatus.allowedToCall()) {
+                log.error("Not allowed to call bankId yet, less than 1s passed since last call: {}", value("referenceToken", referenceToken));
+                //onboardingConversation.bankIdAuthError(uc);
+                return Optional.of(new BankIdAuthResponse(BankIdStatusType.ERROR, collectionStatus.getAutoStartToken(),collectionStatus.getReferenceToken(), null));
             }
 
-            if(collect.getNewMemberId() != null && !collect.getNewMemberId().equals(hid)){
-                uc = userrepo.findByMemberId(collect.getNewMemberId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-                collectionStatus.setUserContext(uc);
-            }
+            BankIdAuthResponse collect = memberService.collect(referenceToken, hid);
 
-            BankIdStatusType bankIdStatus = collect.getBankIdStatus();
-            log.info("BankIdStatus after collect:{}, memberId:{}, lastCollectionStatus: {}", bankIdStatus.name(), hid, collectionStatus.getLastStatus());
-            if (!collectionStatus.done()) {
 
-                if (bankIdStatus == BankIdStatusType.COMPLETE) {
-                    //Fetch member data from member service.
-                    //Try three times
-                    Member member = memberService.getProfile(collect.getNewMemberId());
 
-                    uc.fillMemberData(member);
-
-                    uc.getOnBoardingData().setUserHasAuthWithBankId(referenceToken);
-
-                    onboardingConversation.bankIdAuthComplete(uc);
-
-                }else if (bankIdStatus == BankIdStatusType.ERROR) {
-                    //Handle error
-                    log.error("Got error response from member service with reference token: {}", value("referenceToken", referenceToken));
-                    onboardingConversation.bankIdAuthError(uc);
-                    collect = new BankIdAuthResponse(BankIdStatusType.COMPLETE, collect.getAutoStartToken(), collect.getReferenceToken(), collect.getNewMemberId());
+            if(collectionStatus.getCollectionType().equals(CollectionStatus.CollectionType.AUTH)) {
+                if(collect.getNewMemberId() != null && !collect.getNewMemberId().equals(hid)){
+                    uc = userrepo.findByMemberId(collect.getNewMemberId()).orElseThrow(() -> new RuntimeException("Could not find usercontext fo new memberId."));
+                    collectionStatus.setUserContext(uc);
                 }
 
-                collectionStatus.update(bankIdStatus);
+                BankIdStatusType bankIdStatus = collect.getBankIdStatus();
+                log.info("BankIdStatus after collect:{}, memberId:{}, lastCollectionStatus: {}", bankIdStatus.name(), hid, collectionStatus.getLastStatus());
+                if (!collectionStatus.done()) {
+
+                    if (bankIdStatus == BankIdStatusType.COMPLETE) {
+                        //Fetch member data from member service.
+                        //Try three times
+                        Member member = memberService.getProfile(collect.getNewMemberId());
+
+                        uc.fillMemberData(member);
+
+                        uc.getOnBoardingData().setUserHasAuthWithBankId(referenceToken);
+
+                        onboardingConversation.bankIdAuthComplete(uc);
+
+                    }else if (bankIdStatus == BankIdStatusType.ERROR) {
+                        //Handle error
+                        log.error("Got error response from member service with reference token: {}", value("referenceToken", referenceToken));
+                        collectionStatus.addError();
+                        if(collectionStatus.shouldAbort()) {
+                            onboardingConversation.bankIdAuthError(uc);
+                            collect = new BankIdAuthResponse(BankIdStatusType.COMPLETE, collect.getAutoStartToken(), collect.getReferenceToken(), collect.getNewMemberId());
+                        }
+                    }
+
+                    collectionStatus.update(bankIdStatus);
+                }
+
+            }else if(collectionStatus.getCollectionType().equals(CollectionStatus.CollectionType.SIGN)) {
+                //Do nothing
             }
 
             userrepo.saveAndFlush(uc);
@@ -164,8 +181,8 @@ public class SessionManager {
             log.error("Error collecting result from member-service: ", ex);
             onboardingConversation.bankIdAuthError(uc);
             //Have hedvig respond with error
-        }catch( StaleObjectStateException ex) {
-            log.error("Could not save collection state: ", ex);
+        }catch( ObjectOptimisticLockingFailureException ex) {
+            log.error("Could not save user context: ", ex);
             return Optional.of(new BankIdAuthResponse(BankIdStatusType.ERROR, "", "", ""));
         }
 
@@ -214,7 +231,8 @@ public class SessionManager {
      * 
     private void startConversation(Conversation c, UserContext uc, MemberChat mc){
     	log.info("Starting conversation of type:" + c.getClass().getName() + " for user:" + uc.getMemberId());
-    	
+    	2017-11-29 10:58:17.711  INFO [member-service,208644c8d0851c67,c4fcc4a7080d557f,false] 5679 --- [nio-4084-exec-8] c.h.e.billectaAPI.BillectaApiImpl        : Collect response from billecta with referenceId: 81afb2c2-514b-4622-91c9-a5a242542f16, httpStatusCode:200, body: ERROR
+
     	ConversationEntity conv = new ConversationEntity();
     	conv.setClassName(c.getClass().getName());
     	conv.setMemberId(uc.getMemberId());

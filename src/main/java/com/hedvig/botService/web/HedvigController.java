@@ -63,6 +63,7 @@ public class HedvigController {
                               @RequestHeader(value="hedvig.token", required = false) String hid) {
 
         log.info("Post collect with reference token: {}", value("referenceToken", referenceToken));
+        try{
         Optional<BankIdAuthResponse> response = this.sessionManager.collect(hid, referenceToken);
 
 
@@ -79,6 +80,9 @@ public class HedvigController {
             CollectResponse responseBody = new CollectResponse(response.get().getBankIdStatus().name());
 
             return responseEntity.body(responseBody);
+        }
+        }catch (Exception e) {
+            return ResponseEntity.ok(new CollectResponse("ERROR"));
         }
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("");
