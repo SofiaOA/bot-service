@@ -134,10 +134,9 @@ public class SessionManager {
 
             BankIdAuthResponse collect = memberService.collect(referenceToken, hid);
 
-
-
             if(collectionStatus.getCollectionType().equals(CollectionStatus.CollectionType.AUTH)) {
                 if(collect.getNewMemberId() != null && !collect.getNewMemberId().equals(hid)){
+                    log.info("Found in memberId in response from memberService. Loading other userContext.");
                     uc = userrepo.findByMemberId(collect.getNewMemberId()).orElseThrow(() -> new RuntimeException("Could not find usercontext fo new memberId."));
                     collectionStatus.setUserContext(uc);
                 }
