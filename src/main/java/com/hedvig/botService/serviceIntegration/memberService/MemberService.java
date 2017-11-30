@@ -8,13 +8,13 @@ import com.hedvig.botService.web.dto.Member;
 import java.util.Optional;
 
 public interface MemberService {
-    Optional<BankIdAuthResponse> auth();
+    Optional<BankIdAuthResponse> auth(String memberId);
 
-    Optional<BankIdAuthResponse> auth(String ssn);
+    Optional<BankIdAuthResponse> auth(String ssn, String memberId);
 
     String  startBankAccountRetrieval(String memberId, String bankShortId);
 
-    Optional<BankIdSignResponse> sign(String ssn, String userMessage);
+    Optional<BankIdSignResponse> sign(String ssn, String userMessage, String memberId);
 
     void finalizeOnBoarding(String memberId, UserData data);
 

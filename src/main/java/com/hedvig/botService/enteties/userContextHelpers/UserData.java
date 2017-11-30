@@ -174,6 +174,10 @@ public class UserData {
         return ctx.getDataEntry(ADDRESS_ZIP);
     }
 
+    public String getProductId() {
+        return ctx.getDataEntry(PRODUCT_ID);
+    }
+
     public void setProductId(String productId) {
         ctx.putUserData(PRODUCT_ID, productId);
     }

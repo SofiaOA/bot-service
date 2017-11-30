@@ -14,13 +14,13 @@ import java.util.function.Supplier;
 
 public class MemberServiceFake implements MemberService {
     @Override
-    public Optional<BankIdAuthResponse> auth() {
+    public Optional<BankIdAuthResponse> auth(String memberId) {
 
         return Optional.of(new BankIdAuthResponse(BankIdStatusType.STARTED, "autostartToken", "referenceToken", null));
     }
 
     @Override
-    public Optional<BankIdAuthResponse> auth(String ssn) {
+    public Optional<BankIdAuthResponse> auth(String ssn, String memberId) {
         return Optional.empty();
     }
 
@@ -30,7 +30,7 @@ public class MemberServiceFake implements MemberService {
     }
 
     @Override
-    public Optional<BankIdSignResponse> sign(String ssn, String userMessage) {
+    public Optional<BankIdSignResponse> sign(String ssn, String userMessage, String memberId) {
         return Optional.empty();
     }
 

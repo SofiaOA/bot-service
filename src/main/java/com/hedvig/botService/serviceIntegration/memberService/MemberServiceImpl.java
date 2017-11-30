@@ -38,15 +38,15 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Optional<BankIdAuthResponse> auth() {
-        return auth(null);
+    public Optional<BankIdAuthResponse> auth(String memberId) {
+        return auth(null, memberId);
     }
 
     @Override
-    public Optional<BankIdAuthResponse> auth(String ssn) {
+    public Optional<BankIdAuthResponse> auth(String ssn, String memberId) {
          String url = "http://" + memberServiceLocation + "/member/bankid/auth";
         try {
-            BankIdAuthRequest req = new BankIdAuthRequest(ssn);
+            BankIdAuthRequest req = new BankIdAuthRequest(ssn, memberId);
 
             ResponseEntity<BankIdAuthResponse> response = template.postForEntity(url, req, BankIdAuthResponse.class);
             if(response.getStatusCode() == HttpStatus.OK) {
@@ -83,11 +83,11 @@ public class MemberServiceImpl implements MemberService {
 
 
     @Override
-    public Optional<BankIdSignResponse> sign(String ssn, String userMessage) {
+    public Optional<BankIdSignResponse> sign(String ssn, String userMessage, String memberId) {
 
         String url = "http://" + memberServiceLocation + "/member/bankid/sign";
         try {
-            BankIdSignRequest req = new BankIdSignRequest(ssn, userMessage);
+            BankIdSignRequest req = new BankIdSignRequest(ssn, userMessage, memberId);
 
             ResponseEntity<BankIdSignResponse> response = template.postForEntity(url, req, BankIdSignResponse.class);
             if(response.getStatusCode().is2xxSuccessful()) {

@@ -625,7 +625,7 @@ public class OnboardingConversationDevi extends Conversation {
 
                         Optional<BankIdSignResponse> signData;
 
-                        signData = memberService.sign(ud.getSSN(), "Jag godkänner att jag har tagit del av Hedvigs förköpsinformation och försäkringsvillkor.");
+                        signData = memberService.sign(ud.getSSN(), "Jag godkänner att jag har tagit del av Hedvigs förköpsinformation och försäkringsvillkor.", userContext.getMemberId());
 
                         if (signData.isPresent()) {
                             userContext.startBankIdSign(signData.get());
@@ -1113,8 +1113,14 @@ public class OnboardingConversationDevi extends Conversation {
 
     public void bankIdAuthComplete(UserContext userContext) {
 
-        addToChat(getMessage("message.bankidja"), userContext);
-
+        if(userContext.getOnBoardingData().getUserHasSigned().orElse(false)) {
+            userContext.completeConversation(this.getClass().getName());
+            MainConversation mc = new MainConversation(memberService, productPricingClient);
+            userContext.startConversation(mc);
+        }
+        else {
+            addToChat(getMessage("message.bankidja"), userContext);
+        }
     }
 
     public void bankIdAuthError(UserContext userContext) {

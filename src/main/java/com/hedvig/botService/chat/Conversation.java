@@ -101,7 +101,7 @@ public abstract class Conversation {
 					if(link.appUrl!=null && link.appUrl.contains("{AUTOSTART_TOKEN}")){ // A bankid link
 
 						if(!link.value.equals("message.kontraktpop.bankid.collect")) {
-							Optional<BankIdAuthResponse> authResponse = memberService.auth();//authResponse = memberService.sign()
+							Optional<BankIdAuthResponse> authResponse = memberService.auth(userContext.getMemberId());
 
 							if(!authResponse.isPresent()) {
 								log.error("Could not start bankIdAuthentication!");
