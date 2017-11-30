@@ -7,7 +7,6 @@ import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
-import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdStatusType;
 import com.hedvig.botService.web.dto.Member;
 import lombok.Getter;
 import lombok.Setter;
@@ -119,30 +118,6 @@ public class UserContext implements Serializable {
 		}
 
     }
-
-    
-    /*
-     * Check if user has an ongoing conversation of type conversationClassName
-     * */
-    /*
-    public boolean hasOngoingConversation(String conversationClassName){
-
-
-    	return conversationManager.containsOngoingConversationOfType(conversationClassName);
-    	//String c =  getDataEntry("{" +conversationClassName+ "}") ;
-    	//return(c!=null && c.equals(Conversation.conversationStatus.ONGOING.toString()));
-    }*/
-
-   /* public void startOngoingConversation(String conversationClassName){
-    	if(conversationClassName.indexOf(".")==-1)conversationClassName = ("com.hedvig.botService.chat." + conversationClassName); // TODO: Refactor/remove hack
-    	
-    	// Only one conversation per type TODO: change so a member can have multiple ongoing conversations
-    	if(!conversationManager.containsOngoingConversationOfType(conversationClassName)){
-    		add(c);
-    	}
-    	
-        this.putUserData("{" +conversationClassName+ "}", Conversation.conversationStatus.ONGOING.toString());
-    }*/
     
     /*
      * Set conversation to COMPLETE
