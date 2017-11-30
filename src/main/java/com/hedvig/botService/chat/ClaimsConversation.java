@@ -52,7 +52,7 @@ public class ClaimsConversation extends Conversation {
                         }}
                 ));
 
-		createMessage("message.claims.chat", new MessageBodyParagraph("Strax få berätta vad som hänt genom att spela in ett röstmeddelande"),2000);
+		createMessage("message.claims.chat", new MessageBodyParagraph("Du ska strax få berätta vad som hänt genom att spela in ett röstmeddelande"),2000);
 		createMessage("message.claims.chat2", new MessageBodyParagraph("Först vill jag bara be dig skriva under detta"),2000);
 
         createMessage("message.claim.promise",
