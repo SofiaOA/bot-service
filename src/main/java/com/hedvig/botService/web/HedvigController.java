@@ -82,6 +82,7 @@ public class HedvigController {
             return responseEntity.body(responseBody);
         }
         }catch (Exception e) {
+            log.error("Error collecting: ", e);
             return ResponseEntity.ok(new CollectResponse("ERROR"));
         }
 
