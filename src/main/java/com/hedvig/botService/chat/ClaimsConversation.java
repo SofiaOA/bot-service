@@ -107,7 +107,7 @@ public class ClaimsConversation extends Conversation {
 		
 		switch(m.id){
 		case "message.claims.audio": 
-
+			log.info("Audio recieved with m.body.text:" + m.body.text + " and URL:" + ((MessageBodyAudio)m.body).URL);
 			// TODO: Send to claims service!
 			m.body.text = "Inspelning klar";
 			addToChat(m,userContext, memberChat); // Response parsed to nice format
