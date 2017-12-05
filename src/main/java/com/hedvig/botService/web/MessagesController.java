@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static net.logstash.logback.argument.StructuredArguments.value;
+
 @RestController
 public class MessagesController {
 
@@ -80,6 +82,14 @@ public class MessagesController {
 		}
     	return null;
     }
+
+	@PostMapping("/push-token")
+	ResponseEntity<Void> pushToken(@RequestBody String tokenJson, @RequestHeader(value="hedvig.token") String hid) {
+		log.info("Push toke for memberId:{}, is: {}", value("memberId", ""), tokenJson);
+		return ResponseEntity.noContent().build();
+	}
+
+
     
     /*
      * TODO: Change hedvig.token from optional to required
