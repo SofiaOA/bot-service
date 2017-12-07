@@ -232,23 +232,8 @@ public class SessionManager {
  
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
-    	/*
-    	 * No ongoing main conversation and onboarding complete -> show menu
-    	 * */
-    	//if(
-    			//!uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString()) && 
-    	//		!uc.hasOngoingConversation(conversationTypes.MainConversation.toString())){
-        
-    		MainConversation mainConversation = new MainConversation(memberService, productPricingclient);
-    		uc.startConversation(mainConversation);
-    	//}
-        /*
-         * User is chatting in the main chat:
-         * 
-        if(!uc.ongoingMainConversation()) {
-        	uc.startMainConversation();
-            mainConversation.init();
-        }*/
+        MainConversation mainConversation = new MainConversation(memberService, productPricingclient);
+        uc.startConversation(mainConversation);
 
         userrepo.saveAndFlush(uc);    	
     }
@@ -277,11 +262,7 @@ public class SessionManager {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
         UpdateInformationConversation infoConversation = new UpdateInformationConversation(memberService, productPricingclient);
 
-        //conversation.setStartingMessage(startingMessage);
         uc.startConversation(infoConversation, startingMessage);
-        /*uc.putUserData("{"+conversation.getConversationName()+"}", Conversation.conversationStatus.ONGOING.toString());
-    	conversation.init();*/
-
         userrepo.saveAndFlush(uc);
     }
     
