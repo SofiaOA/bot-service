@@ -24,7 +24,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Component
-public class OnboardingConversationDevi extends Conversation {
+public class OnboardingConversationDevi extends Conversation implements BankIdChat {
 
 	/*
 	 * Need to be stateless. I.e no data beyond response scope
@@ -1111,6 +1111,7 @@ public class OnboardingConversationDevi extends Conversation {
         super.completeRequest(nxtMsg, userContext, memberChat);
     }
 
+    @Override
     public void bankIdAuthComplete(UserContext userContext) {
 
         if(userContext.getOnBoardingData().getUserHasSigned().orElse(false)) {
@@ -1123,6 +1124,7 @@ public class OnboardingConversationDevi extends Conversation {
         }
     }
 
+    @Override
     public void bankIdAuthError(UserContext userContext) {
         addToChat(getMessage("message.bankid.error"), userContext);
     }
@@ -1171,14 +1173,20 @@ public class OnboardingConversationDevi extends Conversation {
         addToChat(getMessage("message.kontrakt"), userContext);
     }
 
-    public void memberSigned(String referenceId, UserContext userContext, MemberChat memberChat) {
+    @Override
+    public void memberSigned(String referenceId, UserContext userContext) {
         Optional<Boolean> singed = userContext.getOnBoardingData().getUserHasSigned();
 
         if(!singed.isPresent() || singed.get().equals(false)) {
-            addToChat(getMessage("message.kontraktklar"), userContext, memberChat);
+            addToChat(getMessage("message.kontraktklar"), userContext, userContext.getMemberChat());
             userContext.getOnBoardingData().setUserHasSigned(true);
         }
 
+    }
+
+    @Override
+    public void bankIdSignError(UserContext uc) {
+        addToChat(getMessage("message.kontrakt"), uc, uc.getMemberChat());
     }
 
 }

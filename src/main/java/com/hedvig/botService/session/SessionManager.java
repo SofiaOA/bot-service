@@ -8,24 +8,17 @@ import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
 import com.hedvig.botService.serviceIntegration.FakeMemberCreator;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
-import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdStatusType;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.web.dto.Member;
 import com.hedvig.botService.web.dto.MemberAuthedEvent;
 import com.hedvig.botService.web.dto.UpdateTypes;
 import com.hedvig.botService.web.dto.events.memberService.*;
-import org.hibernate.StaleObjectStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.*;
-
-import static net.logstash.logback.argument.StructuredArguments.value;
 
 /*
  * The session manager is the main controller class for the chat service. It contains all user sessions with chat histories, context etc
@@ -115,77 +108,9 @@ public class SessionManager {
 
     public Optional<BankIdAuthResponse> collect(String hid, String referenceToken) {
 
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+        CollectService service = new CollectService(userrepo, memberService);
 
-        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, productPricingclient, fakeMemberCreator);
-        try {
-
-            CollectionStatus collectionStatus = uc.getBankIdCollectStatus(referenceToken);
-            if(collectionStatus == null) {
-                log.error("Could not find referenceToken: {}", value("referenceToken", referenceToken));
-                onboardingConversation.bankIdAuthError(uc);
-
-                return Optional.of(new BankIdAuthResponse(BankIdStatusType.ERROR, "", "", null));
-            } else if(!collectionStatus.allowedToCall()) {
-                log.error("Not allowed to call bankId yet, less than 1s passed since last call: {}", value("referenceToken", referenceToken));
-                //onboardingConversation.bankIdAuthError(uc);
-                return Optional.of(new BankIdAuthResponse(BankIdStatusType.ERROR, collectionStatus.getAutoStartToken(),collectionStatus.getReferenceToken(), null));
-            }
-
-            BankIdAuthResponse collect = memberService.collect(referenceToken, hid);
-
-            if(collectionStatus.getCollectionType().equals(CollectionStatus.CollectionType.AUTH)) {
-                if(collect.getNewMemberId() != null && !collect.getNewMemberId().equals(hid)){
-                    log.info("Found in memberId in response from memberService. Loading other userContext.");
-                    uc = userrepo.findByMemberId(collect.getNewMemberId()).orElseThrow(() -> new RuntimeException("Could not find usercontext fo new memberId."));
-                    collectionStatus.setUserContext(uc);
-                }
-
-                BankIdStatusType bankIdStatus = collect.getBankIdStatus();
-                log.info("BankIdStatus after collect:{}, memberId:{}, lastCollectionStatus: {}", bankIdStatus.name(), hid, collectionStatus.getLastStatus());
-                if (!collectionStatus.done()) {
-
-                    if (bankIdStatus == BankIdStatusType.COMPLETE) {
-                        //Fetch member data from member service.
-                        //Try three times
-                        Member member = memberService.getProfile(collect.getNewMemberId());
-
-                        uc.fillMemberData(member);
-
-                        uc.getOnBoardingData().setUserHasAuthWithBankId(referenceToken);
-
-                        onboardingConversation.bankIdAuthComplete(uc);
-
-                    }else if (bankIdStatus == BankIdStatusType.ERROR) {
-                        //Handle error
-                        log.error("Got error response from member service with reference token: {}", value("referenceToken", referenceToken));
-                        collectionStatus.addError();
-                        if(collectionStatus.shouldAbort()) {
-                            onboardingConversation.bankIdAuthError(uc);
-                            collect = new BankIdAuthResponse(BankIdStatusType.COMPLETE, collect.getAutoStartToken(), collect.getReferenceToken(), collect.getNewMemberId());
-                        }
-                    }
-
-                    collectionStatus.update(bankIdStatus);
-                }
-
-            }else if(collectionStatus.getCollectionType().equals(CollectionStatus.CollectionType.SIGN)) {
-                //Do nothing
-            }
-
-            userrepo.saveAndFlush(uc);
-
-            return Optional.of(collect);
-        }catch( HttpClientErrorException ex) {
-            log.error("Error collecting result from member-service: ", ex);
-            onboardingConversation.bankIdAuthError(uc);
-            //Have hedvig respond with error
-        }catch( ObjectOptimisticLockingFailureException ex) {
-            log.error("Could not save user context: ", ex);
-            return Optional.of(new BankIdAuthResponse(BankIdStatusType.ERROR, "", "", ""));
-        }
-
-        return Optional.empty();
+        return service.collect(hid, referenceToken, new OnboardingConversationDevi(memberService, productPricingclient, fakeMemberCreator));
     }
     
     /*
@@ -224,37 +149,6 @@ public class SessionManager {
     	mc.revertLastInput();
     	userrepo.saveAndFlush(uc);
     }
-    
-    /*
-     * Start a conversation for a user
-     * 
-    private void startConversation(Conversation c, UserContext uc, MemberChat mc){
-    	log.info("Starting conversation of type:" + c.getClass().getName() + " for user:" + uc.getMemberId());
-    	2017-11-29 10:58:17.711  INFO [member-service,208644c8d0851c67,c4fcc4a7080d557f,false] 5679 --- [nio-4084-exec-8] c.h.e.billectaAPI.BillectaApiImpl        : Collect response from billecta with referenceId: 81afb2c2-514b-4622-91c9-a5a242542f16, httpStatusCode:200, body: ERROR
-
-    	ConversationEntity conv = new ConversationEntity();
-    	conv.setClassName(c.getClass().getName());
-    	conv.setMemberId(uc.getMemberId());
-    	conv.setConversationStatus(Conversation.conversationStatus.ONGOING);
-    	c.init(uc, mc);
-    	uc.addConversation(conv);
-
-    }
-    
-    private void startConversation(Conversation c, UserContext uc, MemberChat mc, String startMessage){
-    	log.info("Starting conversation of type:" + c.getClass().getName() + " for user:" + uc.getMemberId());
-    	
-    	ConversationEntity conv = new ConversationEntity();
-    	conv.setClassName(c.getClass().getName());
-    	conv.setMemberId(uc.getMemberId());
-    	conv.setConversationStatus(Conversation.conversationStatus.ONGOING);
-    	conv.setStartMessage(startMessage);
-    	c.init(uc, mc);
-    	uc.addConversation(conv);
-    	
-    	//uc.putUserData("{"+ c.getClass().getName() +"}", Conversation.conversationStatus.ONGOING.toString());
-    	//c.init(uc, mc);
-    }*/
     
     /*
      * Mark all messages (incl) last input from user deleted
@@ -392,16 +286,7 @@ public class SessionManager {
     }
     
     public void receiveEvent(MemberAuthedEvent e){
-    	log.info("Received MemberAuthedEvent {}", e.toString());
-        //String hid = e.getMemberId().toString();
-    	//UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
-        //MemberChat mc = uc.getMemberChat();
-
-        //if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            //onboardingConversation.bankIdAuthComplete(e, uc, mc);
-        //}
-
-        //userrepo.saveAndFlush(uc);
+    	log.warn("Received unwanted MemberAuthedEvent {}", e.toString());
     }
 
     public void receiveEvent(MemberServiceEvent e){
@@ -412,23 +297,10 @@ public class SessionManager {
             this.handleBankAccountRetrievalSuccess(e, (BankAccountRetrievalSuccess)payload);
         }else if(payload.getClass() == BankAccountRetrievalFailed.class) {
             this.handleBankAccountRetrievalFailed(e, (BankAccountRetrievalFailed)payload);
-        }else if(payload.getClass() == MemberSigned.class) {
-            this.handleMemberSingedEvent(e, (MemberSigned)payload);
+        }else {
+            log.warn("Recieved unhandled event e:{}", e);
         }
 
-    }
-
-    private void handleMemberSingedEvent(MemberServiceEvent e, MemberSigned payload) {
-        String hid = e.getMemberId().toString();
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
-        MemberChat mc = uc.getMemberChat();
-
-        //if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator);
-            onboardingConversation.memberSigned(payload.getReferenceId(), uc, mc);
-        //}
-
-        userrepo.saveAndFlush(uc);
     }
 
     private void handleBankAccountRetrievalFailed(MemberServiceEvent e, BankAccountRetrievalFailed payload) {

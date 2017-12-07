@@ -14,6 +14,7 @@ import java.time.Instant;
 public class CollectionStatus {
 
     private static Logger log = LoggerFactory.getLogger(CollectionStatus.class);
+    private Boolean done;
 
     public boolean shouldAbort() {
         if(errorCount == null) {
@@ -22,6 +23,13 @@ public class CollectionStatus {
         return errorCount > 3;
     }
 
+    public void setDone() {
+        this.done = true;
+    }
+
+    public boolean isDone() {
+        return this.done == null ? false : this.done;
+    }
 
     public enum CollectionType { AUTH, SIGN };
 
@@ -62,13 +70,4 @@ public class CollectionStatus {
         this.lastStatus = bankIdStatus.name();
     }
 
-    public boolean done() {
-        return lastStatus.equals("COMPLETE") || lastStatus.equals("ERROR");
-    }
-
-    public boolean allowedToCall() {
-        Instant now = Instant.now();
-        log.debug("Last call time: {}, currentTime: {}", lastCallTime, now);
-        return Duration.between(lastCallTime, now).toMillis() > 1000;
-    }
 }
