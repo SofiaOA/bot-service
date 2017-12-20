@@ -192,6 +192,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 }
         );
 
+        createMessage("message.missing.bisnode.data",
+                new MessageBodyParagraph("Jag hittade tyvärr inte dina uppgifter. Men...")
+        );
+        addRelay("message.missing.bisnode.data","message.manuellnamn");
+        
         createMessage("message.bankid.start",
                 new MessageBodySingleSelect("Välkommen tillbaka! Bara att logga in så ser du din försäkring",
                         new ArrayList<SelectItem>() {{
@@ -772,6 +777,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 switch(value){
                     case "quote":
                         completeRequest("message.quote.close", userContext, memberChat);
+                        break;
+                }
+                break;
+            case MISSING_DATA:
+                switch(value){
+                    case "bisnode":
+                        completeRequest("message.missing.bisnode.data", userContext, memberChat);
                         break;
                 }
                 break;
