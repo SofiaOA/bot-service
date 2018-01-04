@@ -1,5 +1,6 @@
 package com.hedvig.botService.web;
 
+import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.AvatarDTO;
@@ -111,6 +112,26 @@ public class MessagesController {
     	return ResponseEntity.noContent().build();
     }
 
+    /*
+     * This endpoint is used internally to send messages from back-office personnel to end users
+     * */
+    @RequestMapping(path = "/addmessage", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+    public ResponseEntity<?> addMessage(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
+
+     	log.info("Message from Hedvig to hid:"+ hid +" with messageId: " + msg.globalId);
+
+        msg.header.fromId = Conversation.HEDVIG_USER_ID; //new Long(hid);
+        
+        // Clear all key information to generate a new entry
+        msg.globalId = null;
+        msg.header.messageId = null;
+        msg.body.id = null;
+        
+        sessionManager.addMessageFromHedvig(msg, hid);
+
+    	return ResponseEntity.noContent().build();
+    }
+    
     @RequestMapping(path = "/init", method = RequestMethod.POST)
     public ResponseEntity<?> create(@RequestHeader(value="hedvig.token", required = false) String hid, @RequestBody(required = false) ExpoDeviceInfoDTO json) {
 

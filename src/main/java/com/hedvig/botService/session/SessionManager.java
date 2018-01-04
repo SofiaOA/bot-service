@@ -150,6 +150,14 @@ public class SessionManager {
     	userrepo.saveAndFlush(uc);
     }
     
+    public void addMessageFromHedvig(Message m, String hid){
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    	MemberChat mc = uc.getMemberChat();
+    	mc.addToHistory(m);
+    	userrepo.saveAndFlush(uc);
+    	
+    }
+    
     /*
      * Mark all messages (incl) last input from user deleted
      * */
