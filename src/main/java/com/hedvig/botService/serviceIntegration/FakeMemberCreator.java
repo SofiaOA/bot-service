@@ -24,7 +24,7 @@ public class FakeMemberCreator {
         Member member = memberService.convertToFakeUser(memberId);
         uc.fillMemberData(member);
         UserData data = uc.getOnBoardingData();
-        data.setUserHasAuthWithBankId("afdsaf");
+        data.setUserHasAuthedWithBankId("afdsaf");
         data.setHouseType("ägerbostdsrätt");
         data.setCurrentInsurer("trygg-hansa");
         data.setPersonInHouseHold(3);

@@ -69,7 +69,7 @@ public class UserContext implements Serializable {
 	@Setter
 	@OneToMany(mappedBy = "userContext", cascade = CascadeType.ALL)
 	@MapKey(name="referenceToken")
-	private Map<String, CollectionStatus> bankIdStatus;
+	private Map<String, BankIdSessionImpl> bankIdStatus;
     
     /*
      * Lookup if there is a value for the key in the user context
@@ -200,32 +200,31 @@ public class UserContext implements Serializable {
         return new UserData(this);
     }
 
-	public CollectionStatus getBankIdCollectStatus(String referenceToken) {
-		CollectionStatus collectionStatus = bankIdStatus.get(referenceToken);
-		return collectionStatus;
+	public BankIdSessionImpl getBankIdCollectStatus(String referenceToken) {
+		return bankIdStatus.get(referenceToken);
 	}
 
 	public void startBankIdAuth(BankIdAuthResponse bankIdAuthResponse) {
 
-		createCollectType(CollectionStatus.CollectionType.AUTH, bankIdAuthResponse.getBankIdStatus().toString(), bankIdAuthResponse.getReferenceToken(), bankIdAuthResponse.getAutoStartToken());
+		createCollectType(BankIdSessionImpl.CollectionType.AUTH, bankIdAuthResponse.getReferenceToken(), bankIdAuthResponse.getAutoStartToken());
 	}
 
-	public void startBankIdSign(BankIdSignResponse bankIdAuthResponse) {
+	public void startBankIdSign(BankIdSignResponse bankIdSignResponse) {
 
-		createCollectType(CollectionStatus.CollectionType.SIGN, bankIdAuthResponse.getStatus(), bankIdAuthResponse.getReferenceToken(), bankIdAuthResponse.getAutoStartToken());
+		createCollectType(BankIdSessionImpl.CollectionType.SIGN, bankIdSignResponse.getReferenceToken(), bankIdSignResponse.getAutoStartToken());
 	}
 
-	private void createCollectType(CollectionStatus.CollectionType collectionType, String bankIdStatus, String referenceToken1, String autoStartToken) {
-		CollectionStatus collectionStatus = new CollectionStatus();
-		collectionStatus.setLastCallTime(Instant.now());
-		collectionStatus.setUserContext(this);
-		this.bankIdStatus.put(referenceToken1, collectionStatus);
+	private void createCollectType(BankIdSessionImpl.CollectionType collectionType, String referenceToken1, String autoStartToken) {
+		BankIdSessionImpl bankIdSessionImpl = new BankIdSessionImpl();
+		bankIdSessionImpl.setLastCallTime(Instant.now());
+		bankIdSessionImpl.setUserContext(this);
+		this.bankIdStatus.put(referenceToken1, bankIdSessionImpl);
 
-		collectionStatus.setCollectionType(collectionType);
+		bankIdSessionImpl.setCollectionType(collectionType);
 
-		collectionStatus.setLastStatus(bankIdStatus);
-		collectionStatus.setReferenceToken(referenceToken1);
-		collectionStatus.setAutoStartToken(autoStartToken);
+		bankIdSessionImpl.setLastStatus("STARTED");
+		bankIdSessionImpl.setReferenceToken(referenceToken1);
+		bankIdSessionImpl.setAutoStartToken(autoStartToken);
 
 		this.putUserData("{AUTOSTART_TOKEN}", autoStartToken);
 		this.putUserData("{REFERENCE_TOKEN}", referenceToken1);

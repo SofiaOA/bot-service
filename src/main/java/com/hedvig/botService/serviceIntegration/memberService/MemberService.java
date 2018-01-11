@@ -2,6 +2,7 @@ package com.hedvig.botService.serviceIntegration.memberService;
 
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
 import com.hedvig.botService.web.dto.Member;
 
@@ -18,7 +19,7 @@ public interface MemberService {
 
     void finalizeOnBoarding(String memberId, UserData data);
 
-    BankIdAuthResponse collect(String referenceToken, String memberId);
+    BankIdCollectResponse collect(String referenceToken, String memberId);
 
     Member convertToFakeUser(String memberId);
 
