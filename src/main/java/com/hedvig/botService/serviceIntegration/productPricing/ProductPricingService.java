@@ -31,6 +31,7 @@ public class ProductPricingService {
         request.setHouseType(data.getHouseType());
         request.setLivingSpace(data.getLivingSpace());
         request.setPersonsInHouseHold(data.getPersonsInHouseHold());
+        request.setStudent(data.isStudent());
 
         List<SafetyIncreaserType> increasers = new ArrayList<>();
         for(String s :data.getSecurityItems()) {

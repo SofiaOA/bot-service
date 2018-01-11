@@ -833,6 +833,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 	            nxtMsg = "message.pers";
 	            break;
 	        }
+            case "message.student":
+                SelectItem sitem2 = ((MessageBodySingleSelect)m.body).getSelectedItem();
+                if (sitem2.value.equals("message.studentja")) {
+                    log.info("Student detected...");
+                	userContext.putUserData("{STUDENT}", "1");
+                }
+                break;
 	        case "message.start.account.retrieval":
 	        	SelectItem sitem = ((MessageBodySingleSelect)m.body).getSelectedItem();
 

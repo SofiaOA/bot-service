@@ -14,6 +14,8 @@ public class CalculateQuoteRequest {
     private String lastName;
     private LocalDate birthDate;
 
+    private Boolean student;
+    
     private Address address;
 
     private Float livingSpace;
