@@ -3,6 +3,7 @@ package com.hedvig.botService.serviceIntegration.memberService;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.dto.*;
 import com.hedvig.botService.web.dto.Member;
+import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +31,13 @@ public class MemberServiceFeign implements MemberService {
     @Override
     public Optional<BankIdAuthResponse> auth(String ssn, String memberId) {
         BankIdAuthRequest authRequest = new BankIdAuthRequest(null, memberId);
-        ResponseEntity<BankIdAuthResponse> auth = this.client.auth(authRequest);
-        return Optional.of(auth.getBody());
+        try {
+            ResponseEntity<BankIdAuthResponse> auth = this.client.auth(authRequest);
+            return Optional.of(auth.getBody());
+        }catch (Throwable ex) {
+            log.error("Got error response when calling memberService.auth", ex);
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -42,8 +48,13 @@ public class MemberServiceFeign implements MemberService {
     @Override
     public Optional<BankIdSignResponse> sign(String ssn, String userMessage, String memberId) {
         BankIdSignRequest request = new BankIdSignRequest(ssn, userMessage, memberId);
-        ResponseEntity<BankIdSignResponse> response = this.client.sign(request);
-        return Optional.of(response.getBody());
+        try {
+            ResponseEntity<BankIdSignResponse> response = this.client.sign(request);
+            return Optional.of(response.getBody());
+        }catch (Throwable ex) {
+            log.error("Got error response when calling memberService.sign", ex);
+            return Optional.empty();
+        }
     }
 
     @Override

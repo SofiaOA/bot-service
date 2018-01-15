@@ -19,7 +19,7 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 
 public class CollectService {
 
-    private final Logger log = LoggerFactory.getLogger(BankIdSessionImpl.class);
+    private final Logger log = LoggerFactory.getLogger(CollectService.class);
 
     private final UserContextRepository userContextRepository;
     private final MemberService memberService;
@@ -64,7 +64,7 @@ public class CollectService {
                                 bankIdSession.getReferenceToken(),
                                 null);
             }
-            BankIdCollectResponse collect = new BankIdCollectResponse(BankIdProgressStatus.OUTSTANDING_TRANSACTION, "", "");
+            BankIdCollectResponse collect = new BankIdCollectResponse(BankIdProgressStatus.OUTSTANDING_TRANSACTION, "", null);
             try{
                 collect = memberService.collect(referenceToken, hid);
                 BankIdProgressStatus bankIdStatus = collect.getBankIdStatus();
@@ -126,7 +126,7 @@ public class CollectService {
 
                 return createCOMPLETEResponse();
             }catch( FeignException ex) {
-                log.error("Error collecting result from member-service: ", ex);
+                log.error("Error collecting result from member-service ", ex);
                 bankIdSession.addError();
 
                 if(bankIdSession.shouldAbort()) {

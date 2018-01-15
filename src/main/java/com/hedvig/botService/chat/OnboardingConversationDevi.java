@@ -625,8 +625,18 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         }}
                 ));
 
+        createMessage("message.kontrakt.great", new MessageBodyParagraph("Toppen!"), 1000);
+        addRelay("message.kontrakt.great","message.kontrakt");
+
+
+        createMessage("message.kontrakt.signError", new MessageBodyParagraph("Hmm nu blev något fel! Vi försöker igen " + emoji_flushed_face), 1000);
+        addRelay("message.kontrakt.signError","message.kontrakt");
+
+        createMessage("message.kontrakt.signProcessError", new MessageBodyParagraph("Vi försöker igen " + emoji_flushed_face), 1000);
+        addRelay("message.kontrakt.signProcessError","message.kontrakt");
+
         createMessage("message.kontrakt",
-                new MessageBodySingleSelect("Toppen! Här är dina villkor och några andra viktiga dokument!",
+                new MessageBodySingleSelect("Här är dina villkor och några andra viktiga dokument!",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectOption("Ser bra ut!", "message.kontraktpop.startBankId"));
                         	add(new SelectLink("Läs igenom", "message.kontrakt", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));
@@ -650,7 +660,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                             //userContext.putUserData("{REFERENCE_TOKEN}", signData.get().getReferenceToken());
                         } else {
                             log.error("Could not start signing process.");
-                            return "message.kontraktpop.error";
+                            return "message.kontrakt.signError";
                         }
                         return "";
                     }
@@ -1194,7 +1204,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     public void quoteAccepted(UserContext userContext, MemberChat memberChat) {
         //addToChat(getMessage("message.medlemjabank"), userContext, memberChat);
-        addToChat(getMessage("message.kontrakt"), userContext);
+        addToChat(getMessage("message.kontrakt.great"), userContext);
     }
 
     @Override
@@ -1210,7 +1220,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     @Override
     public void bankIdSignError(UserContext uc) {
-        addToChat(getMessage("message.kontrakt"), uc, uc.getMemberChat());
+        addToChat(getMessage("message.kontrakt.signError"), uc, uc.getMemberChat());
     }
 
     @Override
@@ -1265,11 +1275,17 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     @Override
     public void signalSignFailure(ErrorType errorType, String detail, UserContext uc) {
-
+        addBankIdErrorMessage(errorType, uc);
+        addToChat(getMessage("message.kontrakt.signProcessError"), uc);
     }
 
     @Override
     public void signalAuthFailiure(ErrorType errorType, String detail, UserContext uc) {
+        addBankIdErrorMessage(errorType, uc);
+        addToChat(getMessage("message.bankid.error"), uc);
+    }
+
+    private void addBankIdErrorMessage(ErrorType errorType, UserContext uc) {
         Message message;
         switch (errorType) {
             case EXPIRED_TRANSACTION:
@@ -1293,7 +1309,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         if(message != null) {
             addToChat(message, uc);
         }
-        addToChat(getMessage("message.bankid.error"), uc);
     }
 
 }
