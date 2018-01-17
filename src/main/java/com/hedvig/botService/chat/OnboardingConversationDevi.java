@@ -327,10 +327,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodySingleSelect("Då fortsätter vi! Hur bor du?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Äger bostadsrätt", "BRF"));
-                            add(new SelectOption("Hyr hyresrätt", "hyresrätt"));
-                            add(new SelectOption("Hyr bostadsrätt", "hyrbostadsrätt"));
-                            add(new SelectOption("Hyr studentrum", "studentrum"));
-                            add(new SelectOption("Är inneboende", "inneboende"));
+                            add(new SelectOption("Hyr hyresrätt", "BRF"));
+                            add(new SelectOption("Hyr bostadsrätt", "BRF"));
+                            add(new SelectOption("Hyr studentrum", "BRF"));
+                            add(new SelectOption("Är inneboende", "BRF"));
 
                         }}
                 ));
