@@ -29,6 +29,7 @@ public class UserData {
     public static final String BANK_ID_ON_DEVICE = "{BANK_ID_ON_DEVICE}";
     public static final String USER_HAS_SIGNED = "{USER_HAS_SIGNED}";
     public static final String USER_AUTHED_BANKID = "USER_AUTHED_BANKID";
+    public static final String IS_STUDENT = "{STUDENT}";
     private final UserContext ctx;
     private String address;
 
@@ -62,6 +63,14 @@ public class UserData {
         return ctx.getDataEntry(FIRST_NAME);
     }
 
+    public void setStudent(String student) {
+        ctx.putUserData(IS_STUDENT,student);
+    }
+
+    public Boolean isStudent() {
+        return (ctx.getDataEntry(IS_STUDENT)!=null && ctx.getDataEntry(IS_STUDENT)=="1");
+    }
+    
     public void setEmail(String email) {
         ctx.putUserData(EMAIL,email);
     }
