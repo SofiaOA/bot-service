@@ -1,11 +1,12 @@
 package com.hedvig.botService.enteties.userContextHelpers;
 
 import com.hedvig.botService.enteties.UserContext;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import org.apache.zookeeper.Op;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class UserData {
 
@@ -221,7 +222,7 @@ public class UserData {
         return b != null && b.equals(referenceId);
     }
 
-    public void setUserHasAuthWithBankId(String referenceId) {
+    public void setUserHasAuthedWithBankId(String referenceId) {
         ctx.putUserData(USER_AUTHED_BANKID, referenceId);
     }
 

@@ -3,8 +3,8 @@ package com.hedvig.botService.serviceIntegration.memberService.dto;
 import lombok.Value;
 
 @Value
-public class BankIdAuthResponse {
-    private BankIdStatusType bankIdStatus;
-    private String autoStartToken;
+public class BankIdCollectResponse {
+    private BankIdProgressStatus bankIdStatus;
     private String referenceToken;
+    private String newMemberId;
 }

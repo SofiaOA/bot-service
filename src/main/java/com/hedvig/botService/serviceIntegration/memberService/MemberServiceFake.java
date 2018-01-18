@@ -1,9 +1,7 @@
 package com.hedvig.botService.serviceIntegration.memberService;
 
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
-import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
-import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
-import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdStatusType;
+import com.hedvig.botService.serviceIntegration.memberService.dto.*;
 import com.hedvig.botService.web.dto.Member;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.client.RestClientException;
@@ -16,7 +14,7 @@ public class MemberServiceFake implements MemberService {
     @Override
     public Optional<BankIdAuthResponse> auth(String memberId) {
 
-        return Optional.of(new BankIdAuthResponse(BankIdStatusType.STARTED, "autostartToken", "referenceToken", null));
+        return Optional.of(new BankIdAuthResponse(BankIdStatusType.STARTED, "autostartToken", "referenceToken"));
     }
 
     @Override
@@ -41,19 +39,19 @@ public class MemberServiceFake implements MemberService {
 
     @Retryable(RestClientException.class)
     @Override
-    public BankIdAuthResponse collect(String referenceToken, String memberId) {
+    public BankIdCollectResponse collect(String referenceToken, String memberId) {
 
-        Supplier<BankIdStatusType> factory = () -> {
+        Supplier<BankIdProgressStatus> factory = () -> {
             try {
-                return BankIdStatusType.valueOf(referenceToken);
+                return BankIdProgressStatus.valueOf(referenceToken);
             } catch (IllegalArgumentException ex) {
-                return BankIdStatusType.ERROR;
+                return BankIdProgressStatus.OUTSTANDING_TRANSACTION;
             }
         };
 
 //        throw new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
 
-        return new BankIdAuthResponse(factory.get(), "autostartToken", referenceToken, memberId);
+        return new BankIdCollectResponse(factory.get(),  referenceToken, memberId);
     }
 
     @Override

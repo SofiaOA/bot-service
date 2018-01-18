@@ -12,7 +12,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriTemplate;
@@ -21,7 +20,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Optional;
 
-@Component
+
 public class MemberServiceImpl implements MemberService {
 
     Logger log = LoggerFactory.getLogger(MemberServiceImpl.class);
@@ -33,8 +32,11 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     MemberServiceImpl(RestTemplate restTemplate) {
-
         this.template = restTemplate;
+    }
+
+    public void setMemberServiceLocation(String location) {
+        memberServiceLocation = location;
     }
 
     @Override
@@ -131,7 +133,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Retryable
     @Override
-    public BankIdAuthResponse collect(String referenceToken, String memberId) {
+    public BankIdCollectResponse collect(String referenceToken, String memberId) {
         UriTemplate url = new UriTemplate("http://" + memberServiceLocation + "/member/bankid/collect?referenceToken={referenceToken}&memberId={memberId}");
 
         URI expandedUri = url.expand(new HashMap<String, String>(){{
@@ -139,7 +141,7 @@ public class MemberServiceImpl implements MemberService {
             put("memberId", memberId);
         }});
 
-        ResponseEntity<BankIdAuthResponse> response = template.postForEntity(expandedUri, createHeaders(memberId), BankIdAuthResponse.class);
+        ResponseEntity<BankIdCollectResponse> response = template.postForEntity(expandedUri, createHeaders(memberId), BankIdCollectResponse.class);
 
         return response.getBody();
     }

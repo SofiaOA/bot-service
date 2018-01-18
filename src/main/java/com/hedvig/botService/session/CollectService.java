@@ -1,28 +1,25 @@
 package com.hedvig.botService.session;
 
 import com.hedvig.botService.chat.BankIdChat;
-import com.hedvig.botService.enteties.CollectionStatus;
-import com.hedvig.botService.enteties.ResourceNotFoundException;
-import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.UserContextRepository;
+import com.hedvig.botService.enteties.*;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
-import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdStatusType;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdProgressStatus;
+import com.hedvig.botService.serviceIntegration.memberService.exceptions.BankIdError;
 import com.hedvig.botService.web.dto.Member;
+import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Optional;
 
 import static net.logstash.logback.argument.StructuredArguments.value;
 
 public class CollectService {
 
-    private final Logger log = LoggerFactory.getLogger(CollectionStatus.class);
+    private final Logger log = LoggerFactory.getLogger(CollectService.class);
 
     private final UserContextRepository userContextRepository;
     private final MemberService memberService;
@@ -34,135 +31,134 @@ public class CollectService {
         this.memberService = memberService;
     }
 
-    public Optional<BankIdAuthResponse> collect(String hid, String referenceToken, BankIdChat chat) {
+    public BankIdCollectResponse collect(String hid, String referenceToken, BankIdChat chat) {
         UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
 
         try {
 
-            CollectionStatus collectionStatus = uc.getBankIdCollectStatus(referenceToken);
-            if(collectionStatus == null) {
+            BankIdSessionImpl bankIdSession = uc.getBankIdCollectStatus(referenceToken);
+            if(bankIdSession == null) {
                 log.error("Could not find referenceToken: {}", value("referenceToken", referenceToken));
-                chat.bankIdAuthError(uc);
+                chat.bankIdAuthGeneralError(uc);
 
-                return Optional.of(
-                        new BankIdAuthResponse(
-                                BankIdStatusType.COMPLETE,
+                return
+                        new BankIdCollectResponse(
+                                BankIdProgressStatus.COMPLETE,
                                 "",
-                                "",
-                                null));
+                                null);
 
-            } else if(!allowedToCall(collectionStatus)) {
+            } else if(bankIdSession.isDone()) {
+                log.info("This referenceToken has allready been handled!");
+                return
+                        new BankIdCollectResponse(
+                                BankIdProgressStatus.COMPLETE,
+                                referenceToken,
+                                null);
+            } else if(!allowedToCall(bankIdSession)) {
                 log.error("Not allowed to call bankId yet, less than 1s passed since last call: {}", value("referenceToken", referenceToken));
 
-                return Optional.of(
-                        new BankIdAuthResponse(
-                                BankIdStatusType.ERROR,
-                                "",
-                                collectionStatus.getReferenceToken(),
-                                null));
-            } else if(collectionStatus.isDone()) {
-                log.info("This referenceToken has allready been handled!");
-                return Optional.of(
-                        new BankIdAuthResponse(
-                                BankIdStatusType.COMPLETE,
-                                "",
-                                referenceToken,
-                                null));
+                return
+                        new BankIdCollectResponse(
+                                BankIdProgressStatus.OUTSTANDING_TRANSACTION,
+                                bankIdSession.getReferenceToken(),
+                                null);
             }
+            BankIdCollectResponse collect = new BankIdCollectResponse(BankIdProgressStatus.OUTSTANDING_TRANSACTION, "", null);
+            try{
+                collect = memberService.collect(referenceToken, hid);
+                BankIdProgressStatus bankIdStatus = collect.getBankIdStatus();
+                log.info(
+                        "BankIdStatus after collect:{}, memberId:{}, lastCollectionStatus: {}",
+                        bankIdStatus.name(),
+                        hid,
+                        bankIdSession.getLastStatus());
 
-            BankIdAuthResponse collect = memberService.collect(referenceToken, hid);
-            BankIdStatusType bankIdStatus = collect.getBankIdStatus();
-            log.info(
-                    "BankIdStatus after collect:{}, memberId:{}, lastCollectionStatus: {}",
-                    bankIdStatus.name(),
-                    hid,
-                    collectionStatus.getLastStatus());
+                if (bankIdStatus == BankIdProgressStatus.COMPLETE) {
+                    if(bankIdSession.getCollectionType().equals(BankIdSessionImpl.CollectionType.AUTH)) {
 
-            if(collectionStatus.getCollectionType().equals(CollectionStatus.CollectionType.AUTH)) {
+                        if (collect.getNewMemberId() != null && !collect.getNewMemberId().equals(hid)) {
+                            log.info("Found in memberId in response from memberService. Loading other userContext.");
+                            uc = userContextRepository.findByMemberId(collect.getNewMemberId()).
+                                    orElseThrow(() -> new RuntimeException("Could not find usercontext fo new memberId."));
 
-                if(collect.getNewMemberId() != null && !collect.getNewMemberId().equals(hid)){
-                    log.info("Found in memberId in response from memberService. Loading other userContext.");
-                    uc = userContextRepository.findByMemberId(collect.getNewMemberId()).
-                            orElseThrow(() -> new RuntimeException("Could not find usercontext fo new memberId."));
+                            bankIdSession.setUserContext(uc);
+                        }
+                        try {
+                            Member member = memberService.getProfile(collect.getNewMemberId());
 
-                    collectionStatus.setUserContext(uc);
-                }
+                            uc.fillMemberData(member);
+                            chat.bankIdAuthComplete(uc);
+                        }catch (Exception ex) {
+                            log.error("Error loading memberProfile from memberService", ex);
+                            chat.couldNotLoadMemberProfile(uc);
+                        }
+                        uc.getOnBoardingData().setUserHasAuthedWithBankId(referenceToken);
 
-
-
-                if (bankIdStatus == BankIdStatusType.COMPLETE) {
-                    //Fetch member data from member service.
-                    //Try three times
-
-                    Member member = memberService.getProfile(collect.getNewMemberId());
-
-                    uc.fillMemberData(member);
-
-                    uc.getOnBoardingData().setUserHasAuthWithBankId(referenceToken);
-
-                    chat.bankIdAuthComplete(uc);
-                    collectionStatus.setDone();
-
-                }else if (bankIdStatus == BankIdStatusType.ERROR) {
-                    //Handle error
-                    log.error("Got error response from member service with reference token: {}", value("referenceToken", referenceToken));
-                    collectionStatus.addError();
-
-                    if(collectionStatus.shouldAbort()) {
-                        chat.bankIdAuthError(uc);
-                        collect = createCOMPLETEResponse(collect);
-                        collectionStatus.setDone();
+                    }else if(bankIdSession.getCollectionType().equals(BankIdSessionImpl.CollectionType.SIGN)) {
+                        chat.memberSigned(referenceToken, uc);
                     }
+
+                    bankIdSession.setDone();
+
+                }else if(bankIdStatus == BankIdProgressStatus.STARTED){
+                    chat.started(uc);
+                }else if(bankIdStatus == BankIdProgressStatus.NO_CLIENT){
+                    chat.noClient(uc);
+                }else if(bankIdStatus == BankIdProgressStatus.USER_SIGN){
+                    chat.userSign(uc);
+                }
+                else if (bankIdStatus == BankIdProgressStatus.OUTSTANDING_TRANSACTION) {
+                    chat.oustandingTransaction(uc);
+                }
+                bankIdSession.update(bankIdStatus);
+                return collect;
+            }
+            catch(BankIdError e) {//Handle error
+                log.error("Got bankIderror {} response from member service with reference token: {}",
+                        value("referenceToken", referenceToken), e.getErrorType());
+
+                if(bankIdSession.getCollectionType() == BankIdSession.CollectionType.SIGN) {
+                    chat.signalSignFailure(e.getErrorType(), e.getMessage(), uc);
+                }else if(bankIdSession.getCollectionType() == BankIdSession.CollectionType.AUTH) {
+                    chat.signalAuthFailiure(e.getErrorType(), e.getMessage(), uc);
                 }
 
+                return createCOMPLETEResponse();
+            }catch( FeignException ex) {
+                log.error("Error collecting result from member-service ", ex);
+                bankIdSession.addError();
 
-
-
-            }else if(collectionStatus.getCollectionType().equals(CollectionStatus.CollectionType.SIGN)) {
-                //Do nothing
-                if(bankIdStatus == BankIdStatusType.COMPLETE) {
-                    chat.memberSigned(referenceToken, uc);
-                    collectionStatus.setDone();
-                }
-                else if(bankIdStatus == BankIdStatusType.ERROR) {
-                    log.error("Got error response from member service with reference token: {}", value("referenceToken", referenceToken));
-                    collectionStatus.addError();
-                    if(collectionStatus.shouldAbort()) {
+                if(bankIdSession.shouldAbort()) {
+                    if(bankIdSession.getCollectionType() == BankIdSession.CollectionType.SIGN) {
                         chat.bankIdSignError(uc);
-                        collect = createCOMPLETEResponse(collect);
-                        collectionStatus.setDone();
+                    }else {
+                        chat.bankIdAuthGeneralError(uc);
                     }
+                    collect = createCOMPLETEResponse();
+                    bankIdSession.setDone();
                 }
+                //Have hedvig respond with error
+                return collect;
+            }finally {
+                userContextRepository.saveAndFlush(uc);
             }
-
-            collectionStatus.update(bankIdStatus);
-            userContextRepository.saveAndFlush(uc);
-
-            return Optional.of(collect);
-        }catch( HttpClientErrorException ex) {
-            log.error("Error collecting result from member-service: ", ex);
-            chat.bankIdAuthError(uc);
-            //Have hedvig respond with error
         }catch( ObjectOptimisticLockingFailureException ex) {
             log.error("Could not save user context: ", ex);
-            return Optional.of(new BankIdAuthResponse(BankIdStatusType.ERROR, "", "", ""));
+            return new BankIdCollectResponse(BankIdProgressStatus.OUTSTANDING_TRANSACTION, "", "");
         }
-
-        return Optional.empty();
     }
 
-    private BankIdAuthResponse createCOMPLETEResponse(BankIdAuthResponse collect) {
-        return new BankIdAuthResponse(
-                BankIdStatusType.COMPLETE,
+    private BankIdCollectResponse createCOMPLETEResponse() {
+        return new BankIdCollectResponse(
+                BankIdProgressStatus.COMPLETE,
                 "",
-                collect.getReferenceToken(),
-                collect.getNewMemberId());
+                null);
     }
 
-    private boolean allowedToCall(CollectionStatus collectionStatus) {
+    private boolean allowedToCall(BankIdSessionImpl bankIdSessionImpl) {
         Instant now = Instant.now();
         //log.debug("Last call time: {}, currentTime: {}", getLastCallTime(), now);
-        return Duration.between(collectionStatus.getLastCallTime(), now).toMillis() > 1000;
+        return Duration.between(bankIdSessionImpl.getLastCallTime(), now).toMillis() > 1000;
     }
 }

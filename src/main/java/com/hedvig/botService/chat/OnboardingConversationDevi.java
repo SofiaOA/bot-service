@@ -11,6 +11,7 @@ import com.hedvig.botService.serviceIntegration.FakeMemberCreator;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
+import com.hedvig.botService.serviceIntegration.memberService.exceptions.ErrorType;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -604,7 +605,18 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         //(FUNKTION: FYLL I MAILADRESS) = FÄLT
         setExpectedReturnType("message.mail", new EmailAdress());
-        
+
+
+        createMessage("message.bankid.error.expiredTransaction", new MessageBodyParagraph("bankID säger \"BankID-appen svarar inte. Kontrollera att den är startad och att du har internetanslutning. Om du inte har något giltigt BankID kan du hämta ett hos din Bank. Försök sedan igen..\"" + emoji_mag),10);
+
+        createMessage("message.bankid.error.certificateError", new MessageBodyParagraph("bankID säger \"Det BankID du försöker använda är för gammalt eller spärrat. Använd ett annat BankID eller hämta ett nytt hos din internetbank.\""));
+
+        createMessage("message.bankid.error.userCancel", new MessageBodyParagraph("bankID säger \"Åtgärden avbruten.\""));
+
+        createMessage("message.bankid.error.cancelled", new MessageBodyParagraph("bankID säger \"Åtgärden avbruten. Försök igen.\""));
+
+        createMessage("message.bankid.error.startFailed", new MessageBodyParagraph("bankID säger \"BankID-appen verkar inte finnas i din dator eller telefon. Installera den och hämta ett BankID hos din internetbank. Installera appen från install.bankid.com.\""));
+
         createMessage("message.kontraktbbbbbb",
                 new MessageBodySingleSelect("Tack igen! Och nu till det stora ögonblicket. Här har du allt som vi sagt samlat. Läs igenom och skriv på med ditt BankID för att godkänna din nya försäkring",
                         new ArrayList<SelectItem>() {{
@@ -613,8 +625,18 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         }}
                 ));
 
+        createMessage("message.kontrakt.great", new MessageBodyParagraph("Toppen!"), 1000);
+        addRelay("message.kontrakt.great","message.kontrakt");
+
+
+        createMessage("message.kontrakt.signError", new MessageBodyParagraph("Hmm nu blev något fel! Vi försöker igen " + emoji_flushed_face), 1000);
+        addRelay("message.kontrakt.signError","message.kontrakt");
+
+        createMessage("message.kontrakt.signProcessError", new MessageBodyParagraph("Vi försöker igen " + emoji_flushed_face), 1000);
+        addRelay("message.kontrakt.signProcessError","message.kontrakt");
+
         createMessage("message.kontrakt",
-                new MessageBodySingleSelect("Toppen! Här är dina villkor och några andra viktiga dokument!",
+                new MessageBodySingleSelect("Här är dina villkor och några andra viktiga dokument!",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectOption("Ser bra ut!", "message.kontraktpop.startBankId"));
                         	add(new SelectLink("Läs igenom", "message.kontrakt", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));
@@ -638,7 +660,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                             //userContext.putUserData("{REFERENCE_TOKEN}", signData.get().getReferenceToken());
                         } else {
                             log.error("Could not start signing process.");
-                            return "message.kontraktpop.error";
+                            return "message.kontrakt.signError";
                         }
                         return "";
                     }
@@ -1144,7 +1166,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     }
 
     @Override
-    public void bankIdAuthError(UserContext userContext) {
+    public void bankIdAuthGeneralError(UserContext userContext) {
         addToChat(getMessage("message.bankid.error"), userContext);
     }
 
@@ -1189,7 +1211,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     public void quoteAccepted(UserContext userContext, MemberChat memberChat) {
         //addToChat(getMessage("message.medlemjabank"), userContext, memberChat);
-        addToChat(getMessage("message.kontrakt"), userContext);
+        addToChat(getMessage("message.kontrakt.great"), userContext);
     }
 
     @Override
@@ -1205,7 +1227,95 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     @Override
     public void bankIdSignError(UserContext uc) {
-        addToChat(getMessage("message.kontrakt"), uc, uc.getMemberChat());
+        addToChat(getMessage("message.kontrakt.signError"), uc, uc.getMemberChat());
+    }
+
+    @Override
+    public void oustandingTransaction(UserContext uc) {
+
+    }
+
+    @Override
+    public void noClient(UserContext uc) {
+
+    }
+
+    @Override
+    public void started(UserContext uc) {
+
+    }
+
+    @Override
+    public void userSign(UserContext uc) {
+
+    }
+
+    @Override
+    public void expiredTransaction(UserContext uc) {
+
+    }
+
+    @Override
+    public void certificateError(UserContext uc) {
+
+    }
+
+    @Override
+    public void userCancel(UserContext uc) {
+
+    }
+
+    @Override
+    public void cancelled(UserContext uc) {
+
+    }
+
+    @Override
+    public void startFailed(UserContext uc) {
+
+    }
+
+    @Override
+    public void couldNotLoadMemberProfile(UserContext uc) {
+
+    }
+
+    @Override
+    public void signalSignFailure(ErrorType errorType, String detail, UserContext uc) {
+        addBankIdErrorMessage(errorType, uc);
+        addToChat(getMessage("message.kontrakt.signProcessError"), uc);
+    }
+
+    @Override
+    public void signalAuthFailiure(ErrorType errorType, String detail, UserContext uc) {
+        addBankIdErrorMessage(errorType, uc);
+        addToChat(getMessage("message.bankid.error"), uc);
+    }
+
+    private void addBankIdErrorMessage(ErrorType errorType, UserContext uc) {
+        Message message;
+        switch (errorType) {
+            case EXPIRED_TRANSACTION:
+                 message = getMessage("message.bankid.error.expiredTransaction");
+                break;
+            case CERTIFICATE_ERR:
+                message = getMessage("message.bankid.error.certificateError");
+                break;
+            case USER_CANCEL:
+                message = getMessage("message.bankid.error.userCancel");
+                break;
+            case CANCELLED:
+                message = getMessage("message.bankid.error.cancelled");
+                break;
+            case START_FAILED:
+                message = getMessage("message.bankid.error.startFailed");
+                break;
+            default:
+                message = null;
+        }
+        if(message != null) {
+            addToChat(message, uc);
+        }
     }
 
 }

@@ -7,7 +7,7 @@ import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
 import com.hedvig.botService.serviceIntegration.FakeMemberCreator;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.web.dto.MemberAuthedEvent;
 import com.hedvig.botService.web.dto.UpdateTypes;
@@ -18,7 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /*
  * The session manager is the main controller class for the chat service. It contains all user sessions with chat histories, context etc
@@ -106,7 +109,7 @@ public class SessionManager {
         userrepo.saveAndFlush(uc);
     }
 
-    public Optional<BankIdAuthResponse> collect(String hid, String referenceToken) {
+    public BankIdCollectResponse collect(String hid, String referenceToken) {
 
         CollectService service = new CollectService(userrepo, memberService);
 

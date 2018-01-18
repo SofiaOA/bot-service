@@ -1,21 +1,21 @@
 package com.hedvig.botService.enteties;
 
-import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdStatusType;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdProgressStatus;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
-import java.time.Duration;
 import java.time.Instant;
 
 @Entity
 @Data
-public class CollectionStatus {
+public class BankIdSessionImpl implements BankIdSession {
 
-    private static Logger log = LoggerFactory.getLogger(CollectionStatus.class);
+    private static Logger log = LoggerFactory.getLogger(BankIdSessionImpl.class);
     private Boolean done;
 
+    @Override
     public boolean shouldAbort() {
         if(errorCount == null) {
             errorCount = 0;
@@ -23,15 +23,17 @@ public class CollectionStatus {
         return errorCount > 3;
     }
 
+    @Override
     public void setDone() {
         this.done = true;
     }
 
+    @Override
     public boolean isDone() {
         return this.done == null ? false : this.done;
     }
 
-    public enum CollectionType { AUTH, SIGN };
+    ;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,9 +58,10 @@ public class CollectionStatus {
     private Integer errorCount = 0;
 
 
-    public CollectionStatus() {
+    public BankIdSessionImpl() {
     }
 
+    @Override
     public void addError() {
         if(errorCount == null) {
             errorCount = 0;
@@ -66,7 +69,8 @@ public class CollectionStatus {
         errorCount++;
     }
 
-    public void update(BankIdStatusType bankIdStatus) {
+    @Override
+    public void update(BankIdProgressStatus bankIdStatus) {
         this.lastStatus = bankIdStatus.name();
     }
 
