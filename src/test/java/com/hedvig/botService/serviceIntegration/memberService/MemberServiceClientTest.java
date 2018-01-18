@@ -89,23 +89,10 @@ public class MemberServiceClientTest {
                         withStatus(500)
                         .withBody(objectMapper.writeValueAsString(response))));
 
-        thrown.expect(BankIdError.class);
-        ResponseEntity<BankIdAuthResponse> adadad = feignClient.auth(new BankIdAuthRequest("", ""));
-    }
-
-    @Test()
-    public void bankIdError2() throws Exception {
-
-        stubFor(post(urlEqualTo("/member/bankid/auth")).
-                willReturn(aResponse().
-                        withHeader("Content-Type", "application/json").
-                        withStatus(500)
-                        .withBody("")));
-
         thrown.expect(FeignException.class);
         ResponseEntity<BankIdAuthResponse> adadad = feignClient.auth(new BankIdAuthRequest("", ""));
     }
-
+    
     @Test()
     public void bankIdError404() throws Exception {
 
