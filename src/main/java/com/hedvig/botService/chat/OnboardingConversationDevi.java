@@ -798,8 +798,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     completeRequest(relay, userContext, memberChat);
                 }
                 if(value.equals("message.forslag")) {
-                    String productId = this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
-                    userContext.getOnBoardingData().setProductId(productId);
+                    completeOnboarding(userContext);
                 }
                 break;
             case ANIMATION_COMPLETE:
@@ -824,6 +823,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 }
                 break;
         }
+    }
+
+    private void completeOnboarding(UserContext userContext) {
+        String productId = this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
+        userContext.getOnBoardingData().setProductId(productId);
+        this.memberService.finalizeOnBoarding(userContext.getMemberId(), userContext.getOnBoardingData());
     }
 
     @Override
@@ -1063,8 +1068,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     break;
                 }
                 else if(m.id.equals("message.missingvalue") || item.value.equals("message.forslag2")) {
-                    String productId = this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
-                    onBoardingData.setProductId(productId);
+                    completeOnboarding(userContext);
                 }
                 break;
             case "message.annatbolag":
@@ -1126,8 +1130,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 break;
 
             case "message.kontrakt":
-                String product_id = this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
-                onBoardingData.setProductId(product_id);
+                completeOnboarding(userContext);
             default:
                 break;
         }
