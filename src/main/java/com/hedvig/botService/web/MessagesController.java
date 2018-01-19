@@ -90,7 +90,15 @@ public class MessagesController {
 		return ResponseEntity.noContent().build();
 	}
 
+	   /*
+     * TODO: Change hedvig.token from optional to required
+     * */
+	@RequestMapping(path="/signupcode")
+    public ResponseEntity<?> generateSignupCode(@RequestBody String email, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
+        sessionManager.createSignupCode(email);
+    	return ResponseEntity.noContent().build();
+    }
     
     /*
      * TODO: Change hedvig.token from optional to required
