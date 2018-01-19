@@ -32,6 +32,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 	 * */
     private static Logger log = LoggerFactory.getLogger(OnboardingConversationDevi.class);
     private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    public static enum ProductTypes {BRF, RENT, RENT_BRF, SUBLET_RENTAL, SUBLET_BRF, STUDENT, LODGER};
     //private final MemberService memberService;
     //private final ProductPricingService productPricingClient;
 
@@ -327,15 +328,24 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage("message.lghtyp",
                 new MessageBodySingleSelect("Då fortsätter vi! Hur bor du?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Äger bostadsrätt", "BRF"));
-                            add(new SelectOption("Hyr hyresrätt", "BRF"));
-                            add(new SelectOption("Hyr bostadsrätt", "BRF"));
-                            add(new SelectOption("Hyr studentrum", "BRF"));
-                            add(new SelectOption("Är inneboende", "BRF"));
+                            add(new SelectOption("Äger bostadsrätt", ProductTypes.BRF.toString()));
+                            add(new SelectOption("Hyr hyresrätt", ProductTypes.RENT.toString()));
+                            //add(new SelectOption("Hyr bostadsrätt", ProductTypes.SUBLET.toString()));
+                            add(new SelectOption("Hyr i andra hand", "message.lghtyp.sublet"));
+                            add(new SelectOption("Hyr studentrum", ProductTypes.STUDENT.toString()));
+                            //add(new SelectOption("Är inneboende", ProductTypes.LODGER.toString()));
 
                         }}
                 ));
 
+        createMessage("message.lghtyp.sublet",
+                new MessageBodySingleSelect("Okej! Är lägenheten du hyr i andra hand en hyresrätt eller bostadsrätt?",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Hyresrätt", ProductTypes.SUBLET_RENTAL.toString()));
+                            add(new SelectOption("Bostadsrätt", ProductTypes.SUBLET_BRF.toString()));
+                        }}
+                ));
+        
         // ALTERNATIVT KAN DESSA SVARSALTERNATIV GÖRAS TILL SCROLL ELLER SÅ?
 
         createMessage("message.pers", new MessageBodyNumber("Hoppas du trivs! Bor du själv eller med andra? Fyll i hur många som bor i lägenheten"));
@@ -848,6 +858,23 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         // ... and then the incomming message id
         switch (m.id) {
 	        case "message.lghtyp": {
+	        	SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
+	        	
+	        	// Additional question for sublet contracts
+	        	if(item.value.equals("message.lghtyp.sublet")){
+	        		m.body.text = item.text;
+	        		nxtMsg = "message.lghtyp.sublet";
+	        		break;
+	        	}	        	
+	        	else{
+	        		UserData obd = userContext.getOnBoardingData();
+		            obd.setHouseType(item.value);
+		            m.body.text = item.text;
+		            nxtMsg = "message.pers";
+	        	}
+	            break;
+	        }
+	        case "message.lghtyp.sublet": {
 	        	SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
 	            UserData obd = userContext.getOnBoardingData();
 	            obd.setHouseType(item.value);

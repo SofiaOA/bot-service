@@ -37,18 +37,18 @@ public class SessionManager {
     private final MemberService memberService;
     private final ProductPricingService productPricingclient;
     private final FakeMemberCreator fakeMemberCreator;
-
-
+    private final SignupCodeRepository signupRepo;
 
     public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
 
 	
     @Autowired
-    public SessionManager(UserContextRepository userrepo, MemberService memberService, ProductPricingService client, FakeMemberCreator fakeMemberCreator) {
+    public SessionManager(UserContextRepository userrepo, MemberService memberService, ProductPricingService client, FakeMemberCreator fakeMemberCreator, SignupCodeRepository signupRepo) {
         this.userrepo = userrepo;
         this.memberService = memberService;
         this.productPricingclient = client;
         this.fakeMemberCreator = fakeMemberCreator;
+        this.signupRepo = signupRepo;
     }
 
     public List<Message> getMessages(int i, String hid) {
@@ -234,10 +234,18 @@ public class SessionManager {
         return returnList;
     }
     
+    public void createSignupCode(String email){
+        SignupCode sc = signupRepo.findByEmail(email).orElseGet(() -> {
+        	SignupCode newCode = new SignupCode(email);
+            signupRepo.save(newCode);
+            return newCode;
+        });
+        
+    }
+    
     /*
      * Add the "what do you want to do today" message to the chat
      * */
-    
     public void mainMenu(String hid){
         log.info("Main menu from user:" + hid);
  
