@@ -2,6 +2,7 @@ package com.hedvig.botService.serviceIntegration;
 
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
+import com.hedvig.botService.serviceIntegration.memberService.MemberProfile;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.web.dto.Member;
@@ -21,7 +22,7 @@ public class FakeMemberCreator {
 
     public void doCreate(UserContext uc){
         String memberId = uc.getMemberId();
-        Member member = memberService.convertToFakeUser(memberId);
+        MemberProfile member = memberService.convertToFakeUser(memberId);
         uc.fillMemberData(member);
         UserData data = uc.getOnBoardingData();
         data.setUserHasAuthedWithBankId("afdsaf");

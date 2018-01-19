@@ -21,9 +21,9 @@ public interface MemberService {
 
     BankIdCollectResponse collect(String referenceToken, String memberId);
 
-    Member convertToFakeUser(String memberId);
+    MemberProfile convertToFakeUser(String memberId);
 
-    Member getProfile(String hid);
+    MemberProfile getProfile(String hid);
 
     void startOnBoardingWithSSN(String memberId, String ssn);
 }

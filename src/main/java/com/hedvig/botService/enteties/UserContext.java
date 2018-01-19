@@ -5,6 +5,7 @@ import com.hedvig.botService.chat.Conversation.conversationStatus;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
+import com.hedvig.botService.serviceIntegration.memberService.MemberProfile;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
 import com.hedvig.botService.web.dto.Member;
@@ -230,7 +231,7 @@ public class UserContext implements Serializable {
 		this.putUserData("{REFERENCE_TOKEN}", referenceToken1);
 	}
 
-	public void fillMemberData(Member member) {
+	public void fillMemberData(MemberProfile member) {
         UserData obd = getOnBoardingData();
         obd.setBirthDate(member.getBirthDate());
         obd.setSSN(member.getSsn());
@@ -239,9 +240,11 @@ public class UserContext implements Serializable {
 
         //obd.setEmail(member.getEmail()); I don't think we will ever get his from bisnode
 
-        obd.setAddressStreet(member.getStreet());
-        obd.setAddressCity(member.getCity());
-        obd.setAddressZipCode(member.getZipCode());
+		member.getAddress().ifPresent((address) -> {
+			obd.setAddressStreet(address.getStreet());
+			obd.setAddressCity(address.getCity());
+			obd.setAddressZipCode(address.getZipCode());
+		});
     }
 }
 

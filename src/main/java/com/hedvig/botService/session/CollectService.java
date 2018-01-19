@@ -2,6 +2,7 @@ package com.hedvig.botService.session;
 
 import com.hedvig.botService.chat.BankIdChat;
 import com.hedvig.botService.enteties.*;
+import com.hedvig.botService.serviceIntegration.memberService.MemberProfile;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdProgressStatus;
@@ -85,10 +86,15 @@ public class CollectService {
                             bankIdSession.setUserContext(uc);
                         }
                         try {
-                            Member member = memberService.getProfile(collect.getNewMemberId());
+                            MemberProfile member = memberService.getProfile(collect.getNewMemberId());
 
                             uc.fillMemberData(member);
-                            chat.bankIdAuthComplete(uc);
+                            if(member.getAddress().isPresent()) {
+                                chat.bankIdAuthComplete(uc);
+                            }
+                            else {
+                                chat.bankIdAuthCompleteNoAddress(uc);
+                            }
                         }catch (Exception ex) {
                             log.error("Error loading memberProfile from memberService", ex);
                             chat.couldNotLoadMemberProfile(uc);

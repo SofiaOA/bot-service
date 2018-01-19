@@ -4,6 +4,8 @@ import com.hedvig.botService.chat.BankIdChat;
 import com.hedvig.botService.enteties.BankIdSessionImpl;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.UserContextRepository;
+import com.hedvig.botService.serviceIntegration.memberService.MemberAddress;
+import com.hedvig.botService.serviceIntegration.memberService.MemberProfile;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
@@ -217,16 +219,18 @@ public class CollectServiceTests {
         userContext.getBankIdCollectStatus(referenceToken).setLastCallTime(Instant.now().minusSeconds(3));
     }
 
-    private Member newFakeMember(String memberId) {
+    private MemberProfile newFakeMember(String memberId) {
 
-        return new Member(
-            Long.parseLong(memberId),
+        MemberAddress address = new MemberAddress("Street",
+                "City",
+                "13345");
+
+        return new MemberProfile(
+            memberId,
             "",
             "FirstName",
             "LastName",
-            "Street",
-            "City",
-            "13345",
+            Optional.of(address),
             "seomtji@gmail.com",
             "0070334251",
             "se",

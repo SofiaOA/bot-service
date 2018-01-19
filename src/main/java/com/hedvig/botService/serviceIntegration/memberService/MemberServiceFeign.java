@@ -3,7 +3,6 @@ package com.hedvig.botService.serviceIntegration.memberService;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.dto.*;
 import com.hedvig.botService.web.dto.Member;
-import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -87,13 +86,21 @@ public class MemberServiceFeign implements MemberService {
     }
 
     @Override
-    public Member convertToFakeUser(String memberId) {
+    public MemberProfile convertToFakeUser(String memberId) {
         throw new RuntimeException("Cannot create fake user in live environment!");
     }
 
     @Override
-    public Member getProfile(String hid) {
-        return this.client.profile(hid).getBody();
+    public MemberProfile getProfile(String memberId) {
+
+        final Member profile = this.client.profile(memberId).getBody();
+        MemberAddress address = null;
+        if(profile.getStreet() != null && profile.getZipCode() != null && profile.getCity() != null) {
+            address = new MemberAddress(profile.getStreet(), profile.getZipCode(), profile.getCity());
+        }
+
+        return new MemberProfile(memberId, profile.getSsn(), profile.getFirstName(), profile.getLastName(), Optional.ofNullable(address), "", profile.getPhoneNumber(), profile.getCountry(), profile.getBirthDate());
+
     }
 
     @Override

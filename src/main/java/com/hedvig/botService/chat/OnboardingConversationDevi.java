@@ -287,6 +287,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         }}
                 ));
 
+        createMessage("message.bankidja.noaddress",
+                new MessageBodyText("Tack {NAME}! Nu skulle jag behöva veta vilken gatuadress bor du på?")
+                );
+
         createMessage("message.varbordufeladress", new MessageBodyText("Inga problem! Vilken gatuadress bor du på?"));
         createMessage("message.varbordufelpostnr", new MessageBodyNumber("Och vad har du för postnummer?"));
         setExpectedReturnType("message.varbordufelpostnr", new ZipCodeSweden());
@@ -949,6 +953,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 addToChat(m, userContext, memberChat);
                 nxtMsg = "message.varborduadress";
                 break;
+            case "message.bankidja.noaddress":
             case "message.varbordufeladress":
             case "message.varborduadress":
                 onBoardingData.setAddressStreet(m.body.text);
@@ -1155,7 +1160,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     @Override
     public void bankIdAuthComplete(UserContext userContext) {
 
-        if(userContext.getOnBoardingData().getUserHasSigned().orElse(false)) {
+        if(userContext.getOnBoardingData().getUserHasSigned()) {
             userContext.completeConversation(this.getClass().getName());
             MainConversation mc = new MainConversation(memberService, productPricingClient);
             userContext.startConversation(mc);
@@ -1163,6 +1168,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         else {
             addToChat(getMessage("message.bankidja"), userContext);
         }
+    }
+
+    @Override
+    public void bankIdAuthCompleteNoAddress(UserContext uc) {
+        addToChat(getMessage("message.bankidja.noaddress"), uc);
     }
 
     @Override
@@ -1216,9 +1226,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     @Override
     public void memberSigned(String referenceId, UserContext userContext) {
-        Optional<Boolean> singed = userContext.getOnBoardingData().getUserHasSigned();
+        Boolean singed = userContext.getOnBoardingData().getUserHasSigned();
 
-        if(!singed.isPresent() || singed.get().equals(false)) {
+        if(!singed) {
             addToChat(getMessage("message.kontraktklar"), userContext, userContext.getMemberChat());
             userContext.getOnBoardingData().setUserHasSigned(true);
         }

@@ -6,7 +6,7 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name="memberServiceClient", url = "${hedvig.member-service.url}", configuration = FeignConfiguration.class)
+@FeignClient(name="memberServiceClient", url = "${hedvig.member-service.url:member-service}", configuration = FeignConfiguration.class)
 public interface MemberServiceClient {
 
     @RequestMapping(value = "/member/bankid/auth", method = RequestMethod.POST)

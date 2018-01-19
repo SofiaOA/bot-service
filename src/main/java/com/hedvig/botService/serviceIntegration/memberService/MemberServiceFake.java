@@ -3,6 +3,7 @@ package com.hedvig.botService.serviceIntegration.memberService;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.dto.*;
 import com.hedvig.botService.web.dto.Member;
+import org.apache.zookeeper.Op;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.client.RestClientException;
 
@@ -55,13 +56,14 @@ public class MemberServiceFake implements MemberService {
     }
 
     @Override
-    public Member convertToFakeUser(String memberId) {
-        return new Member(Long.parseLong(memberId), "fakessn", "Mr test", "Skenson", "Gatan", "Storstan", "11123", "email@a.com", "070123244", "SE", LocalDate.parse("1980-01-01"));
+    public MemberProfile convertToFakeUser(String memberId) {
+        MemberAddress address = new MemberAddress("Gatan", "Storstan", "11123");
+        return new MemberProfile(memberId, "fakessn", "Mr test", "Skenson", Optional.of(address), "email@a.com", "070123244", "SE", LocalDate.parse("1980-01-01"));
     }
 
     @Override
-    public Member getProfile(String hid) {
-        return new Member(1337l, "121212121212", "sven", "svensson", "stt", "cty", "123", "ema@sadf.com", "9994004", "SE", LocalDate.now());
+    public MemberProfile getProfile(String hid) {
+        return new MemberProfile("1337", "121212121212", "sven", "svensson", Optional.empty(),"ema@sadf.com", "9994004", "SE", LocalDate.now());
     }
 
     @Override

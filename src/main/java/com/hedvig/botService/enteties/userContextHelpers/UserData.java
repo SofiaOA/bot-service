@@ -205,12 +205,12 @@ public class UserData {
         return Optional.of(Boolean.parseBoolean(yes));
     }
 
-    public Optional<Boolean> getUserHasSigned() {
-        String yes = ctx.getDataEntry(USER_HAS_SIGNED);
-        if(yes == null) {
-            return Optional.empty();
+    public Boolean getUserHasSigned() {
+        String value = ctx.getDataEntry(USER_HAS_SIGNED);
+        if(value == null) {
+            return false;
         }
-        return Optional.of(Boolean.parseBoolean(yes));
+        return Boolean.parseBoolean(value);
     }
 
     public void setUserHasSigned(boolean b) {

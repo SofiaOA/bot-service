@@ -32,4 +32,6 @@ public interface BankIdChat {
     void signalSignFailure(ErrorType errorType, String detail, UserContext uc);
 
     void signalAuthFailiure(ErrorType errorType, String detail, UserContext uc);
+
+    void bankIdAuthCompleteNoAddress(UserContext uc);
 }
