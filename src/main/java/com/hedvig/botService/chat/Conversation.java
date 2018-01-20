@@ -106,6 +106,7 @@ public abstract class Conversation {
 							if(!authResponse.isPresent()) {
 								log.error("Could not start bankIdAuthentication!");
 								m = getMessage("message.bankid.error");
+								//m = getMessage("message.manuellnamn");
 							}else{
 								BankIdAuthResponse bankIdAuthResponse = authResponse.get();
 								userContext.startBankIdAuth(bankIdAuthResponse);
@@ -277,8 +278,8 @@ public abstract class Conversation {
 				ok = t.validate(m.body.text);
 				if(!ok)mCorr.body.text = t.getErrorMessage();
 			}
-			// Other input need explicit 
-			else if(mCorr.expectedType!=null){
+			// Input with explicit validation
+			if(mCorr.expectedType!=null){
 				ok = mCorr.expectedType.validate(m.body.text);
 				if(!ok)mCorr.body.text = mCorr.expectedType.getErrorMessage();
 			}		

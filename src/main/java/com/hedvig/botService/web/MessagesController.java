@@ -1,6 +1,7 @@
 package com.hedvig.botService.web;
 
 import com.hedvig.botService.chat.Conversation;
+import com.hedvig.botService.enteties.SignupCode;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.AvatarDTO;
@@ -94,12 +95,18 @@ public class MessagesController {
      * TODO: Change hedvig.token from optional to required
      * */
 	@RequestMapping(path="/signupcode")
-    public ResponseEntity<?> generateSignupCode(@RequestBody String email, @RequestHeader(value="hedvig.token", required = false) String hid) {
+    public ResponseEntity<?> getSignupCodeQueuePosition(@RequestParam("code") String code) {
 
-        sessionManager.createSignupCode(email);
-    	return ResponseEntity.noContent().build();
+        int pos = sessionManager.getSignupQueuePosition(code);
+        String returnMessage = "";
+        if(pos < 0){
+        	returnMessage = "Vi hittade inte din kod i kösystemet tyvärr... :(";
+        }else{
+        	returnMessage = "Din plats i kön är " + pos;
+        }
+        return new ResponseEntity<String>(returnMessage,HttpStatus.OK);
     }
-    
+
     /*
      * TODO: Change hedvig.token from optional to required
      * */

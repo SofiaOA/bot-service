@@ -2,6 +2,8 @@ package com.hedvig.botService.chat;
 
 import com.hedvig.botService.dataTypes.*;
 import com.hedvig.botService.enteties.MemberChat;
+import com.hedvig.botService.enteties.SignupCode;
+import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
@@ -49,15 +51,23 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public final static String emoji_hug = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0xA4, (byte)0x97}, Charset.forName("UTF-8"));
     public final static String emoji_waving_hand = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8B}, Charset.forName("UTF-8"));
     public final static String emoji_flushed_face = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0xB3}, Charset.forName("UTF-8"));
+    public final static String emoji_thinking = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0xA4, (byte)0x94}, Charset.forName("UTF-8"));
+    
     private final FakeMemberCreator fakeMemberCreator;
+    private final SignupCodeRepository signupRepo;
 
     //@Value("${hedvig.gateway.url:http://gateway.hedvig.com}")
     public String gatewayUrl = "http://gateway.hedvig.com";
     
     @Autowired
-    public OnboardingConversationDevi(MemberService memberService, ProductPricingService productPricingClient, FakeMemberCreator fakeMemberCreator) {
+    public OnboardingConversationDevi(
+    		MemberService memberService, 
+    		ProductPricingService productPricingClient, 
+    		FakeMemberCreator fakeMemberCreator,
+    		SignupCodeRepository signupRepo) {
         super("onboarding", memberService, productPricingClient);
         this.fakeMemberCreator = fakeMemberCreator;
+        this.signupRepo = signupRepo;
 
         Image hImage = new Image("https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/Hedvig_Icon-60%402x.png",120,120);
 
@@ -65,6 +75,54 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         //addRelay("message.intro","message.onboardingstart");
         
         createChatMessage("message.onboardingstart",
+                new MessageBodySingleSelect("Hej! Det är jag som är Hedvig " + emoji_waving_hand 
+                		+"\fSuperkul att ha dig här!"
+                		+"\fIngenting är viktigare för mig än att du ska få fantastisk service"
+                		+"\fMen eftersom många vill bli medlemmar just nu, så måste jag ta in ett begränsat antal i taget",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Jag har fått en aktiveringskod", "message.activate"));
+                            add(new SelectOption("Jag vill ställa mig på väntelistan", "message.waitlist"));
+                        }}
+                ));
+        
+        createMessage("message.waitlist", new MessageBodyText("Det ordnar jag! Vad är din mailadress? "));
+        setExpectedReturnType("message.waitlist", new EmailAdress());
+        
+        createChatMessage("message.waitlist.tack",
+                new MessageBodySingleSelect("Tack! Din kod är {SIGNUP_CODE}. Du står på plats {SIGNUP_POSITION} på väntelistan"
+                		+"\fJag ska göra mitt bästa för att du ska kunna bli medlem så snart som möjligt!"
+                		+"\fJag skickar en länk till din mail där du kan se status"
+                		+"\fHa det fint så länge " + emoji_hug,
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Jag vill starta om chatten", "message.onboardingstart"));
+
+                        }}
+                ));
+        
+        createChatMessage("message.activate.notactive",
+                new MessageBodySingleSelect("Tack! Du står på plats {SIGNUP_POSITION} på väntelistan"
+                		+"\fJag ska göra mitt bästa för att du ska kunna bli medlem så snart som möjligt!"
+                		+"\fJag skickar en länk till din mail där du kan se status"
+                		+"\fHa det fint så länge " + emoji_hug,
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Jag vill starta om chatten", "message.onboardingstart"));
+
+                        }}
+                ));
+        
+        createMessage("message.activate.nocode", new MessageBodyParagraph("Hmm... hittar tyvärr inte den koden " + emoji_thinking),2000);
+        createMessage("message.activate.nocode.tryagain", new MessageBodyText("Pröva att ange koden igen"));
+        addRelay("message.activate.nocode","message.activate.nocode.tryagain");
+
+        
+        createMessage("message.activate", new MessageBodyText("Kul! Skriv in din kod här"));
+        createMessage("message.activate.ok.1", new MessageBodyParagraph("Välkommen!"),1000);
+        addRelay("message.activate.ok.1","message.activate.ok.2");
+        createMessage("message.activate.ok.2", new MessageBodyParagraph("Nu ska jag ta fram ett försäkringsförslag åt dig"),2000);
+        addRelay("message.activate.ok.2","message.forslagstart");
+        
+        // --------------- OLD --------------------------- //
+        /*createChatMessage("message.onboardingstart",
                 new MessageBodySingleSelect("Hej, jag heter Hedvig! " + emoji_waving_hand +"\fJag tar fram ett försäkringsförslag till dig på nolltid",
                         new ArrayList<SelectItem>() {{
                             //add(new SelectOption("Berätta!", "message.cad"));
@@ -74,7 +132,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                             //add(new SelectOption("[Debug:audio test]", "message.audiotest"));
                             //add(new SelectOption("[Debug:photo test]", "message.phototest"));
                         }}
-                ));
+                ));*/
         
         createMessage("message.audiotest", new MessageBodyAudio("Här kan du testa audio", "/claims/fileupload"), "h_symbol",2000);
         createMessage("message.phototest", new MessageBodyPhotoUpload("Här kan du testa fotouppladdaren", "/asset/fileupload"), "h_symbol",2000);
@@ -941,6 +999,26 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 onBoardingData.setNewsLetterEmail(m.body.text);
                 nxtMsg = "message.nagotmer";
                 break;
+            case "message.waitlist":
+            	// Logic goes here
+            	String userEmail = m.body.text.toLowerCase();
+            	SignupCode sc = createSignupCode(userEmail);
+            	m.body.text = userEmail;
+            	userContext.putUserData("{SIGNUP_CODE}", sc.code);
+            	// TODO: Remove constant when list is up
+            	userContext.putUserData("{SIGNUP_POSITION}", new Integer(90 + getSignupQueuePosition(userEmail)).toString());
+            	addToChat(m, userContext, memberChat);
+                nxtMsg = "message.waitlist.tack";
+                break;
+            case "message.activate.nocode.tryagain":
+            case "message.activate":
+            	// Logic goes here
+            	String userCode = m.body.text.toUpperCase();
+            	m.body.text = userCode;
+            	addToChat(m, userContext, memberChat);
+            	nxtMsg = validateSignupCode(userCode, userContext);
+                //nxtMsg = "message.activate.ok.1";
+                break;
             case "message.tipsa":
                 onBoardingData.setRecommendFriendEmail(m.body.text);
                 nxtMsg = "message.nagotmer";
@@ -1356,6 +1434,50 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         if(message != null) {
             addToChat(message, uc);
         }
+    }
+    
+    // ---------- Signup code logic ------------- //
+    
+    public String validateSignupCode(String code, UserContext uc){
+    	log.debug("Validating signup code:" + code);
+        Optional<SignupCode> sc = signupRepo.findByCode(code);
+
+        if(sc.isPresent()){
+        	if(sc.get().getActive()){
+            	sc.get().setUsed(true);
+            	signupRepo.saveAndFlush(sc.get());
+            	return "message.activate.ok.1";       		
+        	}
+        	uc.putUserData("{SIGNUP_POSITION}", new Integer(90 + getSignupQueuePosition(sc.get().email)).toString());
+        	return "message.activate.notactive";
+        }
+        return "message.activate.nocode";
+    }
+    
+    public SignupCode createSignupCode(String email){
+    	log.debug("Generate signup code for email:" + email);
+        SignupCode sc = signupRepo.findByEmail(email).orElseGet(() -> {
+        	SignupCode newCode = new SignupCode(email);
+            signupRepo.save(newCode);
+            return newCode;
+        });
+        signupRepo.saveAndFlush(sc);
+        return sc;
+    }
+    
+    public int getSignupQueuePosition(String email){
+        ArrayList<SignupCode> scList = (ArrayList<SignupCode>) signupRepo.findAllByOrderByDateAsc();
+        int pos = 1;
+        for(SignupCode sc : scList){
+        	if(!sc.used){
+        		log.debug(sc.code + "|" + sc.email + "(" + sc.date+"):" + (pos));
+        		if(sc.email.equals(email)){
+        			return pos;
+        		}
+        		pos++;
+        	}
+        }
+        return -1;
     }
 
 }

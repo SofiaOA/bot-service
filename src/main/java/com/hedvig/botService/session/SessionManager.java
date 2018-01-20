@@ -58,6 +58,21 @@ public class SessionManager {
         return messages.subList(Math.max(messages.size() - i, 0), messages.size());
     }
 
+    public int getSignupQueuePosition(String code){
+        ArrayList<SignupCode> scList = (ArrayList<SignupCode>) signupRepo.findAllByOrderByDateAsc();
+        int pos = 1;
+        for(SignupCode sc : scList){
+        	if(!sc.used){
+        		log.debug(sc.code + "|" + sc.email + "(" + sc.date+"):" + (pos));
+        		if(sc.code.equals(code)){
+        			return pos;
+        		}
+        		pos++;
+        	}
+        }
+        return -1;
+    }
+    
     public void initClaim(String hid){
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
         ClaimsConversation claimsConversation = new ClaimsConversation(memberService, productPricingclient);
@@ -96,7 +111,7 @@ public class SessionManager {
 		            claimsConversation.recieveEvent(type, value, uc, mc);
 					break;
 				case "com.hedvig.botService.chat.OnboardingConversationDevi":
-				    OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, productPricingclient, fakeMemberCreator);
+				    OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, productPricingclient, fakeMemberCreator, signupRepo);
 		        	onboardingConversation.recieveEvent(type, value, uc, mc);
 					break;
 				case "com.hedvig.botService.chat.UpdateInformationConversation":
@@ -113,7 +128,7 @@ public class SessionManager {
 
         CollectService service = new CollectService(userrepo, memberService);
 
-        return service.collect(hid, referenceToken, new OnboardingConversationDevi(memberService, productPricingclient, fakeMemberCreator));
+        return service.collect(hid, referenceToken, new OnboardingConversationDevi(memberService, productPricingclient, fakeMemberCreator, signupRepo));
     }
     
     /*
@@ -136,7 +151,7 @@ public class SessionManager {
 		/*
 		 * Kick off onboarding conversation
 		 * */
-        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator);
+        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator, signupRepo);
         uc.startConversation(onboardingConversation);
 
         userrepo.saveAndFlush(uc);
@@ -172,7 +187,7 @@ public class SessionManager {
         if(!uc.hasCompletedOnboarding()){
 	    	mc.reset(); // Clear chat
 	    	uc.clearContext(); // Clear context
-	        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator);
+	        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator, signupRepo);
 	        uc.startConversation(onboardingConversation);
 	    	userrepo.saveAndFlush(uc);
         }
@@ -232,15 +247,6 @@ public class SessionManager {
         userrepo.saveAndFlush(uc);
 
         return returnList;
-    }
-    
-    public void createSignupCode(String email){
-        SignupCode sc = signupRepo.findByEmail(email).orElseGet(() -> {
-        	SignupCode newCode = new SignupCode(email);
-            signupRepo.save(newCode);
-            return newCode;
-        });
-        
     }
     
     /*
@@ -310,7 +316,7 @@ public class SessionManager {
         MemberChat mc = uc.getMemberChat();
 
         //if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator, signupRepo);
             onboardingConversation.bankAccountRetrieveFailed(uc, mc);
         //}
 
@@ -335,7 +341,7 @@ public class SessionManager {
         MemberChat mc = uc.getMemberChat();
 
 //        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator, signupRepo);
             onboardingConversation.bankAccountRetrieved(uc, mc);
 //        }
 
@@ -347,7 +353,7 @@ public class SessionManager {
         MemberChat mc = uc.getMemberChat();
 
 //        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator);
+            OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator, signupRepo);
             onboardingConversation.quoteAccepted(uc, mc);
 //        }
 
@@ -380,7 +386,7 @@ public class SessionManager {
 		            claimsConversation.recieveMessage(uc, mc, m);
 					break;
 				case "com.hedvig.botService.chat.OnboardingConversationDevi":
-				    OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, productPricingclient, fakeMemberCreator);
+				    OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, productPricingclient, fakeMemberCreator, signupRepo);
 		        	onboardingConversation.recieveMessage(uc, mc, m);
 					break;
 				case "com.hedvig.botService.chat.UpdateInformationConversation":
