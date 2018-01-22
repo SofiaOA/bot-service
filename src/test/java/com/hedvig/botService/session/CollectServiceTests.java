@@ -11,7 +11,6 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResp
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdProgressStatus;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdStatusType;
-import com.hedvig.botService.web.dto.Member;
 import feign.FeignException;
 import org.junit.After;
 import org.junit.Test;
@@ -94,7 +93,7 @@ public class CollectServiceTests {
         CollectService sut = new CollectService(userContextRepository, memberService);
         BankIdCollectResponse actual = sut.collect(memberId, referenceToken, chat);
 
-        verify(chat, times(1)).bankIdAuthGeneralError(userContext);
+        verify(chat, times(1)).bankIdAuthGeneralCollectError(userContext);
         assertThat(actual.getBankIdStatus()).isEqualTo(BankIdProgressStatus.COMPLETE);
     }
 
@@ -277,7 +276,7 @@ public class CollectServiceTests {
 
         //VERIFY
 
-        verify(chat, times(1)).bankIdAuthGeneralError(userContext);
+        verify(chat, times(1)).bankIdAuthGeneralCollectError(userContext);
 
     }
 

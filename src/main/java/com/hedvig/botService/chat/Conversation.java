@@ -91,34 +91,6 @@ public abstract class Conversation {
 	
 	void addToChat(Message m, UserContext userContext, MemberChat memberChat) {
 		log.info("Putting message:" + m.id + " content:" + m.body.text);
-
-		// Look for bankid start links and get new token TODO: Move this to external function
-		if(m.body.getClass() == MessageBodySingleSelect.class) {
-			MessageBodySingleSelect mbody = (MessageBodySingleSelect) m.body;
-			for(SelectItem x : mbody.choices){
-				if(x.getClass() == SelectLink.class) {
-					SelectLink link = (SelectLink) x;
-					if(link.appUrl!=null && link.appUrl.contains("{AUTOSTART_TOKEN}")){ // A bankid link
-
-						if(!link.value.equals("message.kontraktpop.bankid.collect")) {
-							Optional<BankIdAuthResponse> authResponse = memberService.auth(userContext.getMemberId());
-
-							if(!authResponse.isPresent()) {
-								log.error("Could not start bankIdAuthentication!");
-								m = getMessage("message.bankid.error");
-								//m = getMessage("message.manuellnamn");
-							}else{
-								BankIdAuthResponse bankIdAuthResponse = authResponse.get();
-								userContext.startBankIdAuth(bankIdAuthResponse);
-							}
-
-						}
-						//nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse, userContext);
-					}
-				}         
-			}
-		}
-
 		// -------------------------------------
 
 		m.body.text = replaceWithContext(userContext, m.body.text);

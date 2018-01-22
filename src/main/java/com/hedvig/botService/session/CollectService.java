@@ -7,7 +7,6 @@ import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdProgressStatus;
 import com.hedvig.botService.serviceIntegration.memberService.exceptions.BankIdError;
-import com.hedvig.botService.web.dto.Member;
 import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +40,7 @@ public class CollectService {
             BankIdSessionImpl bankIdSession = uc.getBankIdCollectStatus(referenceToken);
             if(bankIdSession == null) {
                 log.error("Could not find referenceToken: {}", value("referenceToken", referenceToken));
-                chat.bankIdAuthGeneralError(uc);
+                chat.bankIdAuthGeneralCollectError(uc);
 
                 return
                         new BankIdCollectResponse(
@@ -139,7 +138,7 @@ public class CollectService {
                     if(bankIdSession.getCollectionType() == BankIdSession.CollectionType.SIGN) {
                         chat.bankIdSignError(uc);
                     }else {
-                        chat.bankIdAuthGeneralError(uc);
+                        chat.bankIdAuthGeneralCollectError(uc);
                     }
                     collect = createCOMPLETEResponse();
                     bankIdSession.setDone();

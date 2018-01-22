@@ -215,20 +215,23 @@ public class UserContext implements Serializable {
 		createCollectType(BankIdSessionImpl.CollectionType.SIGN, bankIdSignResponse.getReferenceToken(), bankIdSignResponse.getAutoStartToken());
 	}
 
-	private void createCollectType(BankIdSessionImpl.CollectionType collectionType, String referenceToken1, String autoStartToken) {
+	private void createCollectType(BankIdSessionImpl.CollectionType collectionType,
+
+								   String referenceToken,
+								   String autoStartToken) {
 		BankIdSessionImpl bankIdSessionImpl = new BankIdSessionImpl();
 		bankIdSessionImpl.setLastCallTime(Instant.now());
 		bankIdSessionImpl.setUserContext(this);
-		this.bankIdStatus.put(referenceToken1, bankIdSessionImpl);
+		this.bankIdStatus.put(referenceToken, bankIdSessionImpl);
 
 		bankIdSessionImpl.setCollectionType(collectionType);
 
 		bankIdSessionImpl.setLastStatus("STARTED");
-		bankIdSessionImpl.setReferenceToken(referenceToken1);
+		bankIdSessionImpl.setReferenceToken(referenceToken);
 		bankIdSessionImpl.setAutoStartToken(autoStartToken);
 
 		this.putUserData("{AUTOSTART_TOKEN}", autoStartToken);
-		this.putUserData("{REFERENCE_TOKEN}", referenceToken1);
+		this.putUserData("{REFERENCE_TOKEN}", referenceToken);
 	}
 
 	public void fillMemberData(MemberProfile member) {

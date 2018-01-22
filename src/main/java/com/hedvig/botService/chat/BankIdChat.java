@@ -6,7 +6,7 @@ import com.hedvig.botService.serviceIntegration.memberService.exceptions.ErrorTy
 public interface BankIdChat {
     void bankIdAuthComplete(UserContext userContext);
 
-    void bankIdAuthGeneralError(UserContext userContext);
+    void bankIdAuthGeneralCollectError(UserContext userContext);
 
     void memberSigned(String referenceId, UserContext userContext);
 
@@ -19,13 +19,6 @@ public interface BankIdChat {
     void started(UserContext uc);
 
     void userSign(UserContext uc);
-
-    void expiredTransaction(UserContext uc);
-
-    void certificateError(UserContext uc);
-    void userCancel(UserContext uc);
-    void cancelled(UserContext uc);
-    void startFailed(UserContext uc);
 
     void couldNotLoadMemberProfile(UserContext uc);
 

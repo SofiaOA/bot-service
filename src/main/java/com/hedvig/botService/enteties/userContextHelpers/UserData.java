@@ -27,10 +27,10 @@ public class UserData {
     public static final String SSN = "{SSN}";
     public static final String INSURANCE_COMPANY_TODAY = "{INSURANCE_COMPANY_TODAY}";
     public static final String PRODUCT_ID = "{PRODUCT_ID}";
-    public static final String BANK_ID_ON_DEVICE = "{BANK_ID_ON_DEVICE}";
     public static final String USER_HAS_SIGNED = "{USER_HAS_SIGNED}";
     public static final String USER_AUTHED_BANKID = "USER_AUTHED_BANKID";
     public static final String IS_STUDENT = "{STUDENT}";
+    public static final String BANK_ID_MESSAGE = "{BANK_ID_MESSAGE}";
     private final UserContext ctx;
     private String address;
 
@@ -192,19 +192,6 @@ public class UserData {
         ctx.putUserData(PRODUCT_ID, productId);
     }
 
-    public void setBankIdOnDecvie(boolean yes) {
-        ctx.putUserData(BANK_ID_ON_DEVICE, Objects.toString(yes));
-    }
-
-    public Optional<Boolean> getBankIdOnDevice() {
-        String yes = ctx.getDataEntry(BANK_ID_ON_DEVICE);
-        if(yes == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of(Boolean.parseBoolean(yes));
-    }
-
     public Boolean getUserHasSigned() {
         String value = ctx.getDataEntry(USER_HAS_SIGNED);
         if(value == null) {
@@ -220,6 +207,14 @@ public class UserData {
     public boolean userHasAuthedWithBankId(String referenceId) {
         String b = ctx.getDataEntry(USER_AUTHED_BANKID);
         return b != null && b.equals(referenceId);
+    }
+
+    public void setBankIdMessage(String bankIdMessage) {
+        ctx.putUserData(BANK_ID_MESSAGE, bankIdMessage);
+    }
+
+    public String getBankIdMessage() {
+        return ctx.getDataEntry(BANK_ID_MESSAGE);
     }
 
     public void setUserHasAuthedWithBankId(String referenceId) {
@@ -242,7 +237,6 @@ public class UserData {
         ctx.removeDataEntry(SSN);
         ctx.removeDataEntry(INSURANCE_COMPANY_TODAY);
         ctx.removeDataEntry(PRODUCT_ID);
-        ctx.removeDataEntry(BANK_ID_ON_DEVICE);
         ctx.removeDataEntry(RECOMMEND_FRIEND_EMAIL);
         ctx.removeDataEntry(USER_HAS_SIGNED);
         ctx.removeDataEntry(USER_AUTHED_BANKID);
@@ -255,4 +249,6 @@ public class UserData {
 
         ctx.removeDataEntry(SECURE_ITEMS_NO);
     }
+
+
 }

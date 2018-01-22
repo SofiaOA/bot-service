@@ -27,7 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Component
-public class OnboardingConversationDevi extends Conversation implements BankIdChat {
+public class    OnboardingConversationDevi extends Conversation implements BankIdChat {
 
 	/*
 	 * Need to be stateless. I.e no data beyond response scope
@@ -242,15 +242,15 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     UserData obd = uc.getOnBoardingData();
                     if(m.getSelectedItem().value.equals("message.bankid.autostart.respond"))
                     {
-                        obd.setBankIdOnDecvie(true);
-                    } else
-                    {
-                        obd.setBankIdOnDecvie(false);
+                        obd.setBankIdMessage("message.lagenhet");
                     }
 
                     return "";
                 }
         );
+
+
+        setupBankidErrorHandlers("message.lagenhet");
 
         createMessage("message.missing.bisnode.data",
                 new MessageBodyParagraph("Jag hittade tyvärr inte dina uppgifter. Men...")
@@ -263,19 +263,18 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                             add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}",  null, false));
                         }}
                 ), "h_symbol",
-                (m,uc) -> {
+                (m, uc) -> {
                     UserData obd = uc.getOnBoardingData();
                     if(m.getSelectedItem().value.equals("message.bankid.autostart.respond"))
                     {
-                        obd.setBankIdOnDecvie(true);
-                    } else
-                    {
-                        obd.setBankIdOnDecvie(false);
+                        obd.setBankIdMessage("message.bankid.start");
                     }
 
                     return "";
                 }
         );
+
+        setupBankidErrorHandlers("message.bankid.start");
         
         createMessage("message.bankid.start.manual",
                 new MessageBodyNumber("Om du anger ditt personnumer så får du använda bankId på din andra enhet" + emoji_smile
@@ -283,12 +282,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
 
         createMessage("message.bankid.error",
-                new MessageBodySingleSelect("Något gick fel när jag försökte kontakta BankId",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Försök igen", "message.bankid.start"));
-                            //add(new SelectOption("Hoppa över", "message.bankidja"));
-                        }}
-                ));
+                new MessageBodyParagraph("Hmm, något blev fel vi försöker igen" + emoji_flushed_face), 1500);
+
+        createMessage("message.bankid.start.manual.error",
+                new MessageBodyParagraph("Hmm nu blev något fel! Vi försöker igen \"" + emoji_flushed_face));
+        addRelay("message.bankid.start.manual.error", "message.bankid.start.manual");
 
         createMessage("message.bankid.autostart.respond",
                 new MessageBodyBankIdCollect( "{REFERENCE_TOKEN}")
@@ -679,15 +677,18 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         setExpectedReturnType("message.mail", new EmailAdress());
 
 
-        createMessage("message.bankid.error.expiredTransaction", new MessageBodyParagraph("bankID säger \"BankID-appen svarar inte. Kontrollera att den är startad och att du har internetanslutning. Om du inte har något giltigt BankID kan du hämta ett hos din Bank. Försök sedan igen..\"" + emoji_mag),10);
+        createMessage("message.bankid.error.expiredTransaction", new MessageBodyParagraph(BankIDStrings.expiredTransactionError),1500);
 
-        createMessage("message.bankid.error.certificateError", new MessageBodyParagraph("bankID säger \"Det BankID du försöker använda är för gammalt eller spärrat. Använd ett annat BankID eller hämta ett nytt hos din internetbank.\""));
+        createMessage("message.bankid.error.certificateError", new MessageBodyParagraph(BankIDStrings.certificateError),1500);
 
-        createMessage("message.bankid.error.userCancel", new MessageBodyParagraph("bankID säger \"Åtgärden avbruten.\""));
 
-        createMessage("message.bankid.error.cancelled", new MessageBodyParagraph("bankID säger \"Åtgärden avbruten. Försök igen.\""));
+        createMessage("message.bankid.error.userCancel", new MessageBodyParagraph(BankIDStrings.userCancel),1500);
 
-        createMessage("message.bankid.error.startFailed", new MessageBodyParagraph("bankID säger \"BankID-appen verkar inte finnas i din dator eller telefon. Installera den och hämta ett BankID hos din internetbank. Installera appen från install.bankid.com.\""));
+
+        createMessage("message.bankid.error.cancelled", new MessageBodyParagraph(BankIDStrings.cancelled),1500);
+
+
+        createMessage("message.bankid.error.startFailed", new MessageBodyParagraph(BankIDStrings.startFailed),1500);
 
         createMessage("message.kontraktbbbbbb",
                 new MessageBodySingleSelect("Tack igen! Och nu till det stora ögonblicket. Här har du allt som vi sagt samlat. Läs igenom och skriv på med ditt BankID för att godkänna din nya försäkring",
@@ -728,8 +729,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
                         if (signData.isPresent()) {
                             userContext.startBankIdSign(signData.get());
-                            //userContext.putUserData("{AUTOSTART_TOKEN}", signData.get().getAutoStartToken());
-                            //userContext.putUserData("{REFERENCE_TOKEN}", signData.get().getReferenceToken());
                         } else {
                             log.error("Could not start signing process.");
                             return "message.kontrakt.signError";
@@ -747,7 +746,18 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Signera", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null, false));
                         }}
-                ));
+                ),
+                (m, uc) -> {
+                    UserData obd = uc.getOnBoardingData();
+                    if(m.getSelectedItem().value.equals("message.kontraktpop.bankid.collect"))
+                    {
+                        obd.setBankIdMessage("message.kontraktpop.startBankId");
+                    }
+
+                    return "";
+                });
+
+        setupBankidErrorHandlers("message.kontraktpop.startBankId", "message.kontrakt");
 
         //createMessage("message.kontraktklar", new MessageBodyParagraph(emoji_tada + " Hurra! "+ emoji_tada ), "h_symbol",2000);
         //createMessage("message.kontraktklar2", new MessageBodyParagraph("Välkommen, bästa nya medlem"), "h_symbol",2000);
@@ -805,12 +815,41 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 
     }
-    
+
+    private void setupBankidErrorHandlers(String messageId) {
+        setupBankidErrorHandlers(messageId, null);
+    }
+
+    private void setupBankidErrorHandlers(String messageId, String relayId) {
+
+        if(relayId == null) {
+            relayId = messageId;
+        }
+
+        createMessage(messageId + ".bankid.error.expiredTransaction", new MessageBodyParagraph(BankIDStrings.expiredTransactionError),1500);
+        addRelay(messageId + ".bankid.error.expiredTransaction", relayId);
+
+        createMessage(messageId + ".bankid.error.certificateError", new MessageBodyParagraph(BankIDStrings.certificateError),1500);
+        addRelay(messageId + ".bankid.error.certificateError", relayId);
+
+        createMessage(messageId + ".bankid.error.userCancel", new MessageBodyParagraph(BankIDStrings.userCancel),1500);
+        addRelay(messageId + ".bankid.error.userCancel", relayId);
+
+        createMessage(messageId + ".bankid.error.cancelled", new MessageBodyParagraph(BankIDStrings.cancelled),1500);
+        addRelay(messageId + ".bankid.error.cancelled", relayId);
+
+        createMessage(messageId + ".bankid.error.startFailed", new MessageBodyParagraph(BankIDStrings.startFailed),1500);
+        addRelay(messageId + ".bankid.error.startFailed", relayId);
+
+        createMessage(messageId + ".bankid.error.invalidParameters", new MessageBodyParagraph(BankIDStrings.userCancel),1500);
+        addRelay(messageId + ".bankid.error.invalidParameters", relayId);
+    }
+
     public void init(UserContext userContext, MemberChat memberChat) {
         log.info("Starting onboarding conversation");
         //startConversation(userContext, memberChat, "message.onboardingstart"); // Id of first message
         //startConversation(userContext, memberChat, "message.intro"); // Id of first message
-        startConversation(userContext, memberChat,"message.onboardingstart");
+        startConversation(userContext, memberChat,"message.forslagstart");
         //startConversation(userContext, memberChat,"message.intro");
         //startConversation("message.start.account.retrieval"); // Id of first message
     }
@@ -1153,25 +1192,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
             case "message.forslagstart3":
                 String selectedValue = getValue((MessageBodySingleSelect)m.body);
-
-                /*
-                if(selectedValue.equals("message.lagenhet")) {
-
-
-                	try{
-	                    Optional<BankIdAuthResponse> authResponse = memberService.auth();
-	                    if(!authResponse.isPresent()){
-	                    	nxtMsg = "message.manuellnamn";
-	                    }
-	                    else{
-	                    	nxtMsg = handleBankIdAuthRespose(nxtMsg, authResponse, userContext);
-	                    }
-                	}catch(Exception e){
-                		log.error(e.getMessage());
-                		nxtMsg = "message.manuellnamn";
-                	}
-                }*/
-
                 addToChat(m, userContext, memberChat);
                 break;
                 
@@ -1181,7 +1201,15 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 Optional<BankIdAuthResponse> ssnResponse = memberService.auth(ssn);
 
 
-                nxtMsg = handleBankIdAuthRespose(nxtMsg, ssnResponse, userContext);
+                if(!ssnResponse.isPresent()) {
+                    log.error("Could not start bankIdAuthentication!");
+                    nxtMsg = "message.bankid.start.manual.error";
+                }else{
+                    userContext.startBankIdAuth(ssnResponse.get());
+                    userContext.putUserData("{AUTOSTART_TOKEN}", ssnResponse.get().getAutoStartToken());
+                    userContext.putUserData("{REFERENCE_TOKEN}", ssnResponse.get().getReferenceToken());
+                }
+
 
                 if(nxtMsg.equals("")) {
                     nxtMsg = "message.bankid.autostart.respond";
@@ -1221,18 +1249,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     }
 
-    private String handleBankIdAuthRespose(String nxtMsg, Optional<BankIdAuthResponse> authResponse, UserContext userContext) {
-        if(!authResponse.isPresent()) {
-            log.error("Could not start bankIdAuthentication!");
-            nxtMsg = "message.bankid.error";
-        }else{
-            userContext.startBankIdAuth(authResponse.get());
-            userContext.putUserData("{AUTOSTART_TOKEN}", authResponse.get().getAutoStartToken());
-            userContext.putUserData("{REFERENCE_TOKEN}", authResponse.get().getReferenceToken());
-        }
-        return nxtMsg;
-    }
-
     /*
      * Generate next chat message or ends conversation
      * */
@@ -1240,6 +1256,20 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public void completeRequest(String nxtMsg, UserContext userContext, MemberChat memberChat){
 
         switch(nxtMsg){
+            case "message.bankid.start":
+            case "message.lagenhet":
+                Optional<BankIdAuthResponse> authResponse = memberService.auth(userContext.getMemberId());
+
+                if(!authResponse.isPresent()) {
+                    log.error("Could not start bankIdAuthentication!");
+
+                    nxtMsg = "message.onboardingstart";
+                }else{
+                    BankIdAuthResponse bankIdAuthResponse = authResponse.get();
+                    userContext.startBankIdAuth(bankIdAuthResponse);
+                }
+
+                break;
             case "onboarding.done":
                 log.info("Onboarding complete");
                 userContext.completeConversation(this.getClass().getName());
@@ -1273,8 +1303,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     }
 
     @Override
-    public void bankIdAuthGeneralError(UserContext userContext) {
+    public void bankIdAuthGeneralCollectError(UserContext userContext) {
         addToChat(getMessage("message.bankid.error"), userContext);
+        String bankIdStartMessage = userContext.getOnBoardingData().getBankIdMessage();
+        addToChat(getMessage(bankIdStartMessage), userContext);
     }
 
     public void bankAccountRetrieved(UserContext userContext, MemberChat memberChat) {
@@ -1358,71 +1390,49 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     }
 
     @Override
-    public void expiredTransaction(UserContext uc) {
-
-    }
-
-    @Override
-    public void certificateError(UserContext uc) {
-
-    }
-
-    @Override
-    public void userCancel(UserContext uc) {
-
-    }
-
-    @Override
-    public void cancelled(UserContext uc) {
-
-    }
-
-    @Override
-    public void startFailed(UserContext uc) {
-
-    }
-
-    @Override
     public void couldNotLoadMemberProfile(UserContext uc) {
 
     }
 
     @Override
     public void signalSignFailure(ErrorType errorType, String detail, UserContext uc) {
-        addBankIdErrorMessage(errorType, uc);
-        addToChat(getMessage("message.kontrakt.signProcessError"), uc);
+        //addBankIdErrorMessage(errorType,uc.getOnBoardingData().getBankIdMessage(), uc);
+        addBankIdErrorMessage(errorType, "message.kontraktpop.startBankId", uc);
+        //addToChat(getMessage("message.kontrakt.signProcessError"), uc);
     }
 
     @Override
     public void signalAuthFailiure(ErrorType errorType, String detail, UserContext uc) {
-        addBankIdErrorMessage(errorType, uc);
-        addToChat(getMessage("message.bankid.error"), uc);
+        addBankIdErrorMessage(errorType,uc.getOnBoardingData().getBankIdMessage(), uc);
     }
 
-    private void addBankIdErrorMessage(ErrorType errorType, UserContext uc) {
-        Message message;
+    private void addBankIdErrorMessage(ErrorType errorType, String baseMessage, UserContext uc) {
+        String errorPostfix;
         switch (errorType) {
             case EXPIRED_TRANSACTION:
-                 message = getMessage("message.bankid.error.expiredTransaction");
+                errorPostfix = ".bankid.error.expiredTransaction";
                 break;
             case CERTIFICATE_ERR:
-                message = getMessage("message.bankid.error.certificateError");
+                errorPostfix = ".bankid.error.certificateError";
                 break;
             case USER_CANCEL:
-                message = getMessage("message.bankid.error.userCancel");
+                errorPostfix = ".bankid.error.userCancel";
                 break;
             case CANCELLED:
-                message = getMessage("message.bankid.error.cancelled");
+                errorPostfix = ".bankid.error.cancelled";
                 break;
             case START_FAILED:
-                message = getMessage("message.bankid.error.startFailed");
+                errorPostfix = ".bankid.error.startFailed";
+                break;
+            case INVALID_PARAMETERS:
+                errorPostfix = ".bankid.error.invalidParameters";
                 break;
             default:
-                message = null;
+                errorPostfix = "";
         }
-        if(message != null) {
-            addToChat(message, uc);
-        }
+        final String messageID = baseMessage + errorPostfix;
+        log.info("Adding bankIDerror message: {}", messageID);
+        addToChat(getMessage(messageID), uc);
     }
     
     // ---------- Signup code logic ------------- //
