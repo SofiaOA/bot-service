@@ -1,6 +1,6 @@
 package com.hedvig.botService.enteties;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Random;
 
 import javax.persistence.Entity;
@@ -21,7 +21,17 @@ public class SignupCode {
     private Long id;
 	public String email;
 	public String code;
-	public LocalDate date;
+	public LocalDateTime date;
+	public Boolean used;
+	public Boolean active;
+	
+	public void setUsed(Boolean used) {
+		this.used = used;
+	}
+
+	public Boolean getActive() {
+		return active;
+	}
 
 	public SignupCode(){
 		Random r = new Random();
@@ -36,7 +46,9 @@ public class SignupCode {
 		}
 		log.debug("SingupCode generated: " + code);
 		this.code = code;
-		this.date = LocalDate.now();
+		this.used = false;
+		this.active = false;
+		this.date = LocalDateTime.now();
 	}
 	
 	public SignupCode(String email) {
