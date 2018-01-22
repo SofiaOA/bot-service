@@ -376,7 +376,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                             add(new SelectOption("Säkerhetsdörr", "safety.door"));
                             add(new SelectOption("Gallergrind", "safety.gate"));
                             add(new SelectOption("Inbrottslarm", "safety.burglaralarm"));
-                            add(new SelectOption("Ingen av dessa", "safety.none"));
+                            add(new SelectOption("Inget av dessa", "safety.none"));
                         }}
                 ));
         //(FUNKTION: FYLL I SÄKERHETSGREJER) = SCROLL MED DE OLIKA GREJERNA KANSKE? ELLER FLERVALSALTERNATIVBOXAR?
@@ -1018,27 +1018,16 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 nxtMsg = "message.kontrakt";
                 break;
             case "message.sakerhet":
-                String safetyItems = "";
                 MessageBodyMultipleSelect body = (MessageBodyMultipleSelect)m.body;
-                String separator = "";
-                for(SelectItem o : body.choices){
-                    if(SelectOption.class.isInstance(o)){ // Check non-link items
-                        {
-                            SelectOption option = SelectOption.class.cast(o);
 
-                            if (option.selected) {
-                                safetyItems += (separator + option.text.toLowerCase());
-                                separator = ", ";
-                                onBoardingData.addSecurityItem(option.value);
-                            }
-                        }
-                    }
-                }
-                if(safetyItems.equals("")) {
+                if(body.getNoSelectedOptions() == 0) {
                     m.body.text = "Jag har inga sådana grejer...";
                 }
                 else{
-                    m.body.text = "Jag har " + safetyItems + ".";
+                    m.body.text = String.format("Jag har %s.", body.selectedOptionsAsString());
+                    for(SelectOption o : body.selectedOptions()){
+                        onBoardingData.addSecurityItem(o.value);
+                    }
                 }
                 addToChat(m, userContext, memberChat);
                 nxtMsg = "message.forsakringidag";
