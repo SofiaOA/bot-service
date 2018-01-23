@@ -847,9 +847,9 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
 
     public void init(UserContext userContext, MemberChat memberChat) {
         log.info("Starting onboarding conversation");
-        //startConversation(userContext, memberChat, "message.onboardingstart"); // Id of first message
+        startConversation(userContext, memberChat, "message.onboardingstart"); // Id of first message
         //startConversation(userContext, memberChat, "message.intro"); // Id of first message
-        startConversation(userContext, memberChat,"message.forslagstart");
+        //startConversation(userContext, memberChat,"message.forslagstart");
         //startConversation(userContext, memberChat,"message.intro");
         //startConversation("message.start.account.retrieval"); // Id of first message
     }
