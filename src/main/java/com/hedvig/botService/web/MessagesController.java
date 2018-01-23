@@ -5,6 +5,7 @@ import com.hedvig.botService.enteties.SignupCode;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.AvatarDTO;
+import com.hedvig.botService.web.dto.BackOfficeMessageDTO;
 import com.hedvig.botService.web.dto.EventDTO;
 import com.hedvig.botService.web.dto.ExpoDeviceInfoDTO;
 import org.slf4j.Logger;
@@ -131,8 +132,11 @@ public class MessagesController {
      * This endpoint is used internally to send messages from back-office personnel to end users
      * */
     @RequestMapping(path = "/addmessage", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
-    public ResponseEntity<?> addMessage(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
+    public ResponseEntity<?> addmessage(@RequestBody BackOfficeMessageDTO m) {
 
+    	Message msg = m.msg;
+    	String hid = m.userId;
+    	
      	log.info("Message from Hedvig to hid:"+ hid +" with messageId: " + msg.globalId);
 
         msg.header.fromId = Conversation.HEDVIG_USER_ID; //new Long(hid);
@@ -141,7 +145,7 @@ public class MessagesController {
         msg.globalId = null;
         msg.header.messageId = null;
         msg.body.id = null;
-        
+
         sessionManager.addMessageFromHedvig(msg, hid);
 
     	return ResponseEntity.noContent().build();

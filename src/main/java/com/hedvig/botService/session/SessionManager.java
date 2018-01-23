@@ -169,6 +169,7 @@ public class SessionManager {
     }
     
     public void addMessageFromHedvig(Message m, String hid){
+    	
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
     	MemberChat mc = uc.getMemberChat();
     	mc.addToHistory(m);
