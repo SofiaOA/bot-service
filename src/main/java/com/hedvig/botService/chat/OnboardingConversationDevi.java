@@ -311,8 +311,6 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
                         }}
                 ));
 
-        // ----------------------------------------------- //
-
         createMessage("message.bankidja",
                 new MessageBodySingleSelect("Tack {NAME}! Stämmer det att du bor på {ADDRESS}?",
                         new ArrayList<SelectItem>() {{
@@ -431,15 +429,7 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
                             add(new SelectOption("Förklara mer", "message.bytesinfo3"));
                         }}
                 ));
-        
-        /*createMessage("message.bytesinfo", new MessageBodyParagraph("Ja, ibland är det dags att prova något nytt. De kommer nog förstå"), "h_symbol",2000);
-        createMessage("message.bytesinfo2",
-                new MessageBodySingleSelect("Om du blir medlem hos mig sköter jag bytet åt dig. Så när din gamla försäkring går ut, flyttas du automatiskt till din nya hos mig",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Ok jag förstår", "message.forslag")); //Create product
-                            add(new SelectOption("Förklara mer", "message.bytesinfo3"));
-                        }}
-                ));*/
+
 
         createChatMessage("message.bytesinfo3",
                 new MessageBodySingleSelect("Självklart!\f"
@@ -452,16 +442,6 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
                             add(new SelectOption("Ok", "message.forslag")); //Create product
                         }}
                 ));
-        
-        /*createMessage("message.bytesinfo3", new MessageBodyParagraph("Självklart!"), "h_symbol",2000);
-        createMessage("message.bytesinfo4", new MessageBodyParagraph("Oftast har du ett tag kvar på bindningstiden på din gamla försäkring. Om du väljer att byta till Hedvig så hör jag av mig till ditt försäkringsbolag och meddelar att du vill byta försäkring så fort bindningstiden går ut. Till det behöver jag en fullmakt från dig som du kan skriva under med BankID"), "h_symbol",2000);
-        createMessage("message.bytesinfo5", new MessageBodyParagraph("Sen börjar din nya försäkring gälla direkt när den gamla går ut"), "h_symbol",2000);
-        createMessage("message.bytesinfo6",
-                new MessageBodySingleSelect("Så du behöver aldrig vara orolig att gå utan försäkring efter att du skrivit på med mig",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Ok", "message.forslag")); //Create product
-                        }}
-                ));*/
 
         createMessage("message.forslag", new MessageBodyParagraph("Okej! Nu har jag allt för att ge dig ett förslag. Ska bara räkna lite..."),2000);
         createMessage("message.forslag2",
@@ -518,16 +498,6 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
                         }}
                 ));
 
-        /*createMessage("message.skydd",
-                new MessageBodySingleSelect("Med mig har du samma grundskydd som vanliga försäkringsbolag\n\nUtöver det ingår alltid drulle, alltså till exempel om du tappar din telefon i golvet och den går sönder, och extra reseskydd\n\nSen kan du enkelt anpassa din försäkring som du vill direkt i appen, så att du får precis det skydd du vill ha",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Ok! Jag vill bli medlem", "message.mail"));
-                            add(new SelectOption("Berätta om tryggheten", "message.tryggt"));
-                            add(new SelectOption("Hur är det med priset?", "message.pris"));
-                            add(new SelectOption("Jag vill fråga om något annat", "message.frifråga"));
-
-                        }}
-                ));*/
 
         createMessage("message.pris",
                 new MessageBodySingleSelect("Grundskyddet som jag ger är också bredare än det du oftast får på annat håll\fOch det jag prioriterar allra mest är att vara där på dina villkor. Jag utvecklas alltid för att vara så snabb, smidig och smart som möjligt",
@@ -600,13 +570,6 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
         //(FUNKTION: FYLL I BANKNAMN) = SCROLL MED DE VANLIGASTE BANKERNA SAMT "ANNAN BANK"
 
         createMessage("message.mail", new MessageBodyText("Tackar.\nOch din mailadress så jag kan skicka en bekräftelse när vi skrivit på?"));
-        /*createMessage("message.mail",
-                new MessageBodySingleSelect("Tackar.\nOch din mailadress så jag kan skicka en bekräftelse när vi skrivit på?",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("(FUNKTION: FYLL I MAILADRESS)", "message.kontrakt"));
-
-                        }}
-                ));*/
 
         //(FUNKTION: FYLL I MAILADRESS) = FÄLT
         setExpectedReturnType("message.mail", new EmailAdress());
@@ -694,10 +657,6 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
 
         setupBankidErrorHandlers("message.kontraktpop.startBankId", "message.kontrakt");
 
-        //createMessage("message.kontraktklar", new MessageBodyParagraph(emoji_tada + " Hurra! "+ emoji_tada ), "h_symbol",2000);
-        //createMessage("message.kontraktklar2", new MessageBodyParagraph("Välkommen, bästa nya medlem"), "h_symbol",2000);
-        //createMessage("message.kontraktklar3", new MessageBodyText("Jag skickar en bekräftelse till din mejl! Vad har du för mejladress?"), "h_symbol", 2000);
-
         createMessage("message.kontraktklar",
         		new MessageBodyText(//emoji_tada + " Hurra! "+ emoji_tada +"\f"
         				//+ "Välkommen, bästa nya medlem\f"
@@ -783,10 +742,6 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
     public void init(UserContext userContext, MemberChat memberChat) {
         log.info("Starting onboarding conversation");
         startConversation(userContext, memberChat, "message.onboardingstart"); // Id of first message
-        //startConversation(userContext, memberChat, "message.intro"); // Id of first message
-        //startConversation(userContext, memberChat,"message.forslagstart");
-        //startConversation(userContext, memberChat,"message.intro");
-        //startConversation("message.start.account.retrieval"); // Id of first message
     }
 
     // --------------------------------------------------------------------------- //
@@ -1331,9 +1286,7 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
 
     @Override
     public void signalSignFailure(ErrorType errorType, String detail, UserContext uc) {
-        //addBankIdErrorMessage(errorType,uc.getOnBoardingData().getBankIdMessage(), uc);
         addBankIdErrorMessage(errorType, "message.kontraktpop.startBankId", uc);
-        //addToChat(getMessage("message.kontrakt.signProcessError"), uc);
     }
 
     @Override
