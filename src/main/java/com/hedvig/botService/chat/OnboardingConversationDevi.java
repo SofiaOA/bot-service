@@ -70,9 +70,6 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
         this.signupRepo = signupRepo;
 
         Image hImage = new Image("https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/Hedvig_Icon-60%402x.png",120,120);
-
-        //createMessage("message.intro", new MessageBodyParagraph(""), hImage, 2000);
-        //addRelay("message.intro","message.onboardingstart");
         
         createChatMessage("message.onboardingstart",
                 new MessageBodySingleSelect("Hej! Det är jag som är Hedvig " + emoji_waving_hand 
@@ -220,16 +217,7 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
                             add(new SelectOption("Hus", "message.hus"));
                         }}
                 ), "h_to_house");
-        
-        /*createMessage("message.forslagstart", new MessageBodyParagraph(emoji_hand_ok), "h_symbol",2000);
-        createMessage("message.forslagstart2", new MessageBodyParagraph("Då sätter vi igång"), "h_symbol",2000);
-        createMessage("message.forslagstart3",
-                new MessageBodySingleSelect("Bor du i lägenhet eller i hus?",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Lägenhet", "message.lagenhet"));
-                            add(new SelectOption("Hus", "message.hus"));
-                        }}
-                ), "h_to_house");*/
+
 
         createMessage("message.lagenhet",
                 new MessageBodySingleSelect("Toppen! Har du BankID? I så fall kan vi hoppa över några frågor!",
@@ -302,17 +290,6 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
 
                         }}
                 ));
-        
-        /*createMessage("message.hus", new MessageBodyParagraph("Åh, typiskt! Just nu är det lägenheter jag kan försäkra"), "h_symbol",2000);
-        createMessage("message.hus2", new MessageBodyParagraph("Men jag hör gärna av mig till dig så fort jag har viktiga nyheter"), "h_symbol",2000);
-        createMessage("message.hus3",
-                new MessageBodySingleSelect("Jag skickar ingen spam. Lovar!",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Skicka mig nyhetsbrev", "message.nyhetsbrev"));
-                            add(new SelectOption("Tack, men nej tack", "message.avslutforstar"));
-
-                        }}
-                ));*/
 
 
         // All these goes to message.nagotmer
@@ -355,8 +332,6 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
         createMessage("message.kvadrat", new MessageBodyNumber("Och hur många kvadratmeter är lägenheten?"));
         setExpectedReturnType("message.kvadrat", new LivingSpaceSquareMeters());
 
-        //(FUNKTION: FYLL I PERSONNR) = SCROLL KANSKE DÄR EN VÄLJER DATUM? BEHÖVS FYRA SISTA SIFFROR?
-
         createMessage("message.manuellnamn", new MessageBodyText("Inga problem! Då ställer jag bara några extra frågor. Vad heter du i förnamn?"));
         setExpectedReturnType("message.manuellnamn", new TextInput());
         
@@ -375,8 +350,6 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
                             add(new SelectOption("Nej", "message.lghtyp"));
                         }}
                 ));
-
-        //message.student visas endast för personer upp till 27 år. Om personen är över 27 år går de direkt vidare till message.lghtyp
 
         createMessage("message.studentja",
                 new MessageBodySingleSelect("Se där! Då fixar jag så att du får studentrabatt",
@@ -409,20 +382,7 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
         // ALTERNATIVT KAN DESSA SVARSALTERNATIV GÖRAS TILL SCROLL ELLER SÅ?
 
         createMessage("message.pers", new MessageBodyNumber("Hoppas du trivs! Bor du själv eller med andra? Fyll i hur många som bor i lägenheten"));
-       /* createMessage("message.pers",
-                new MessageBodySingleSelect("Hoppas du trivs! Bor du själv eller med andra? Fyll i hur många som bor i lägenheten",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("1 person", "message.sakerhet", false));
-                            add(new SelectOption("2 personer", "message.sakerhet", false));
-                            add(new SelectOption("3 personer", "message.sakerhet", false));
-                            add(new SelectOption("4 personer", "message.sakerhet", false));
-                            add(new SelectOption("5 personer", "message.sakerhet", false));
-                            add(new SelectOption("Mer än 6 personer", "message.sakerhet", false));
-
-                        }}
-                ));*/
         setExpectedReturnType("message.pers", new HouseholdMemberNumber());
-//(FUNKTION: FYLL I ANTAL PERS) = SCROLL KANSKE? 1-6+ ALT. FLERVALSALTERNATIVBOXAR ELLER DEN DÄR DRA-I-SKALOR-EW-DESIGNLÖSNINGEN
 
         createMessage("message.sakerhet",
                 new MessageBodyMultipleSelect("Tack! Finns någon av de här säkerhetsgrejerna i lägenheten?",
@@ -435,30 +395,6 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
                             add(new SelectOption("Inget av dessa", "safety.none"));
                         }}
                 ));
-        //(FUNKTION: FYLL I SÄKERHETSGREJER) = SCROLL MED DE OLIKA GREJERNA KANSKE? ELLER FLERVALSALTERNATIVBOXAR?
-
-        /*createMessage("message.dyrpryl",
-                new MessageBodySingleSelect("Äger du någon pryl som är värd över 50 000 kr? ",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag har inget så dyrt", "message.dyrprylnej"));
-                            add(new SelectOption("Jag har dyra prylar", "message.dyrprylja"));
-                        }}
-                );
-
-        createMessage("message.dyrprylnej",
-                new MessageBodySingleSelect("Okej!\nOm du skulle skaffa en dyr pryl senare är det bara att lägga till den direkt i appen så täcker jag den åt dig",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Ok", "message.forsakringidag"));
-                        }}
-                );
-
-
-        createMessage("message.dyrprylja",
-                 new MessageBodySingleSelect("Flott! Alla dina prylar värda upp till 50 000 kr täcker jag automatiskt. Allt värt mer än så kan du enkelt lägga till direkt i appen sen. Det kostar en slant extra men oftast mindre än om du har prylen försäkrad idag",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Ok", "message.forsakringidag"));
-                        }}
-                );*/
 
         createMessage("message.forsakringidag",
                 new MessageBodySingleSelect("Då är vi snart klara! Har du någon hemförsäkring idag?",
@@ -483,7 +419,6 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
                         }}
                 ));
 
-        //(FUNKTION: FYLL I FÖRSÄKRINGSBOLAGNAMN) = SCROLL MED DE VANLIGASTE BOLAGEN SAMT "ANNAT FÖRSÄKRINGSBOLAG"
 
         createMessage("message.annatbolag", new MessageBodyText("Ok! Vad heter ditt försäkringsbolag?"),2000);
         setExpectedReturnType("message.manuellnamn", new TextInput());
