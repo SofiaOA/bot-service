@@ -208,6 +208,28 @@ public class MessagesController {
     	return ResponseEntity.noContent().build();
     }
     
+    /*
+     * Already member start
+     * */
+    @RequestMapping(path = "/chat/login")
+    public ResponseEntity<?> chatLogin(@RequestHeader(value="hedvig.token", required = false) String hid) {
+
+     	log.info("Chat login event from user: " + hid);
+     	sessionManager.startOnboardingConversation(hid, "message.start.login");
+    	return ResponseEntity.noContent().build();
+    }
+    
+    /*
+     * Regular start
+     * */
+    @RequestMapping(path = "/chat/start")
+    public ResponseEntity<?> chatStart(@RequestHeader(value="hedvig.token", required = false) String hid) {
+
+     	log.info("Chat start event from user: " + hid);
+        sessionManager.startOnboardingConversation(hid, "message.onboardingstart");
+    	return ResponseEntity.noContent().build();
+    }
+    
     @PostMapping(path = "/chat/reset")
     public ResponseEntity<?> resetChat(@RequestHeader(value="hedvig.token", required = false) String hid) {
 

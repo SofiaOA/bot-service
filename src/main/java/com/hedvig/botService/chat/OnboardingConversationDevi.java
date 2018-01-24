@@ -27,7 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Component
-public class    OnboardingConversationDevi extends Conversation implements BankIdChat {
+public class OnboardingConversationDevi extends Conversation implements BankIdChat {
 
 	/*
 	 * Need to be stateless. I.e no data beyond response scope
@@ -245,12 +245,17 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
         );
         addRelay("message.missing.bisnode.data","message.manuellnamn");
         
+        
+        createMessage("message.start.login",
+                new MessageBodyParagraph("Välkommen tillbaka! " + emoji_hug), 1500);
+        addRelay("message.start.login","message.bankid.start");
+        
         createMessage("message.bankid.start",
-                new MessageBodySingleSelect("Välkommen tillbaka! Bara att logga in så ser du din försäkring",
+                new MessageBodySingleSelect("Bara att logga in så ser du din försäkring",
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}",  null, false));
                         }}
-                ), "h_symbol",
+                ),
                 (m, uc) -> {
                     UserData obd = uc.getOnBoardingData();
                     if(m.getSelectedItem().value.equals("message.bankid.autostart.respond"))
@@ -744,6 +749,11 @@ public class    OnboardingConversationDevi extends Conversation implements BankI
         startConversation(userContext, memberChat, "message.onboardingstart"); // Id of first message
     }
 
+	@Override
+	public void init(UserContext userContext, MemberChat memberChat, String startMessage) {
+        log.info("Starting onboarding conversation with message:" + startMessage);
+        startConversation(userContext, memberChat, startMessage); // Id of first message	
+	}
     // --------------------------------------------------------------------------- //
 
     public int getValue(MessageBodyNumber body){

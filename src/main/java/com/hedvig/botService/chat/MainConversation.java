@@ -164,7 +164,12 @@ public class MainConversation extends Conversation {
 	public void init(UserContext userContext, MemberChat memberChat) {
     	log.info("Starting main conversation");
         startConversation(userContext, memberChat, "hedvig.com"); // Id of first message
-		
+	}
+
+	@Override
+	public void init(UserContext userContext, MemberChat memberChat, String startMessage) {
+    	log.info("Starting main conversation with message:" + startMessage);
+        startConversation(userContext, memberChat, "hedvig.com"); // Id of first message
 	}
 
 }

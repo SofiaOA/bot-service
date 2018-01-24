@@ -112,7 +112,7 @@ public class UserContext implements Serializable {
     }
     
     public void startConversation(Conversation c, String startMessage){
-    	log.info("Starting conversation of type:" + c.getClass().getName() + " for user:" + getMemberId());
+    	log.info("Starting conversation of type:" + c.getClass().getName() + " for user:" + getMemberId() + " with message:" + startMessage);
 
 		if(conversationManager.startConversation(c.getClass(), startMessage)){
 			c.init(this, this.memberChat, startMessage);

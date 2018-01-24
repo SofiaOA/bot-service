@@ -132,6 +132,19 @@ public class SessionManager {
     }
     
     /*
+     * Kicks off onboarding conversation with either direct login or regular signup flow
+     * */
+    public void startOnboardingConversation(String hid, String startMsg){
+    	
+    	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    	
+        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator, signupRepo);
+        uc.startConversation(onboardingConversation, startMsg);
+
+        userrepo.saveAndFlush(uc);
+    }
+    
+    /*
      * Create a new users chat and context
      * */
     public void init(String hid, String linkUri){
@@ -151,8 +164,8 @@ public class SessionManager {
 		/*
 		 * Kick off onboarding conversation
 		 * */
-        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator, signupRepo);
-        uc.startConversation(onboardingConversation);
+        //OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator, signupRepo);
+        //uc.startConversation(onboardingConversation);
 
         userrepo.saveAndFlush(uc);
         

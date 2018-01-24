@@ -279,9 +279,7 @@ public abstract class Conversation {
 
 	public abstract void init(UserContext userContext, MemberChat memberChat);
 
-	public void init(UserContext userContext, MemberChat memberChat, String startMessage) {
-		// TODO Auto-generated method stub
-	}
+	public abstract void init(UserContext userContext, MemberChat memberChat, String startMessage);
 
 	// ----------------------------------------------------------------------------------------------------------------- //
 
