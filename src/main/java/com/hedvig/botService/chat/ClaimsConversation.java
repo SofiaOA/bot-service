@@ -53,7 +53,7 @@ public class ClaimsConversation extends Conversation {
                 ));
 
 		createMessage("message.claims.chat", new MessageBodyParagraph("Du ska strax få berätta vad som hänt genom att spela in ett röstmeddelande"),2000);
-		createMessage("message.claims.chat2", new MessageBodyParagraph("Först vill jag bara be dig skriva under detta"),2000);
+		createMessage("message.claims.chat2", new MessageBodyParagraph("Först behöver du bara bekräfta detta"),2000);
 
         createMessage("message.claim.promise",
                 new MessageBodySingleSelect("HEDVIGS HEDERSLÖFTE\nJag vet att Hedvig bygger på tillit medlemmar emellan.\nJag lovar att berätta om händelsen precis som den var, och bara ta ut den ersättning jag har rätt till ur vår gemensamma medlemspott.",

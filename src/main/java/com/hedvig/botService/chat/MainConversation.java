@@ -41,13 +41,13 @@ public class MainConversation extends Conversation {
 						new ArrayList<SelectItem>(){{
 							add(new SelectOption("Rapportera en skada","message.main.report", false));
 							add(new SelectOption("Det är kris, ring mig!","message.main.callme", false));
-							add(new SelectOption("Ställ en fråga","main.question", false));
+							add(new SelectOption("Jag har en fråga","main.question", false));
 							add(new SelectOption("Rekommendera en vän","message.main.refer", false));							
 						}}
 				));
 		
 		createMessage("message.question.recieved",
-				new MessageBodySingleSelect("Tack för din fråga {NAME}, jag återkommer så snart jag kan?",
+				new MessageBodySingleSelect("Tack {NAME}, jag återkommer så snart jag kan med svar på din fråga",
 						new ArrayList<SelectItem>(){{
 							add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
 							//add(new SelectOption("Ok tack!","hedvig.com", false));
@@ -55,7 +55,7 @@ public class MainConversation extends Conversation {
 				));
 		
 		createMessage("message.main.refer.recieved",
-				new MessageBodySingleSelect("Då mailar din vän och tipsar om Hedvig." + emoji_hand_ok,
+				new MessageBodySingleSelect("Då mailar din vän och tipsar om Hedvig" + emoji_hand_ok,
 						new ArrayList<SelectItem>(){{
 							add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
 							//add(new SelectOption("Bra, gör det","hedvig.com", false));
@@ -63,7 +63,7 @@ public class MainConversation extends Conversation {
 				));
 		
         createMessage("message.main.end",
-                new MessageBodySingleSelect("Tack, jag ringer!",
+                new MessageBodySingleSelect("Tack. Jag ringer upp dig så snart jag kan",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
                         }}
@@ -71,7 +71,7 @@ public class MainConversation extends Conversation {
         
 		createMessage("message.main.callme", new MessageBodyNumber("Ok, ta det lugnt! Vad når jag dig på för nummer?"));
 		
-		createMessage("main.question", new MessageBodyText("Vad har du för fråga?"));
+		createMessage("main.question", new MessageBodyText("Självklart, vad kan jag hjälpa dig med?"));
 		
 		createMessage("message.main.refer", new MessageBodyText("Kul! Vad har din vän för emailadress?"));
 		setExpectedReturnType("message.main.refer", new EmailAdress());
