@@ -96,7 +96,10 @@ public class MemberServiceFeign implements MemberService {
         final Member profile = this.client.profile(memberId).getBody();
         MemberAddress address = null;
         if(profile.getStreet() != null && profile.getZipCode() != null && profile.getCity() != null) {
-            address = new MemberAddress(profile.getStreet(), profile.getZipCode(), profile.getCity());
+            address = new MemberAddress(
+            		profile.getStreet(), 
+            		profile.getCity(),
+            		profile.getZipCode());
         }
 
         return new MemberProfile(memberId, profile.getSsn(), profile.getFirstName(), profile.getLastName(), Optional.ofNullable(address), "", profile.getPhoneNumber(), profile.getCountry(), profile.getBirthDate());
