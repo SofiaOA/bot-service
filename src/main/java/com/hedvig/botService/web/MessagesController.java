@@ -92,16 +92,6 @@ public class MessagesController {
 		return ResponseEntity.noContent().build();
 	}
 
-    @PostMapping(path = "/waitlist")
-    public ResponseEntity<?> waitlistPosition(@RequestBody String email) {
-    	log.info("Fetching waitlist position for email:" + email);
-    	
-        String returnMessage = sessionManager.getSignupQueuePosition(email);
-
-        return new ResponseEntity<String>(returnMessage,HttpStatus.OK);
-    }
-
-    
     /*
      * TODO: Change hedvig.token from optional to required
      * */

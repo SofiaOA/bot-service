@@ -8,6 +8,7 @@ import com.hedvig.botService.web.dto.UpdateTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,15 @@ public class HedvigController {
 	{
 		this.sessionManager = sessions;
         this.service = service;
+    }
+    
+    @PostMapping(path = "/waitlist")
+    public ResponseEntity<?> waitlistPosition(@RequestBody String externalToken) {
+    	log.info("Fetching waitlist position for externalToken:" + externalToken);
+    	
+        String returnMessage = sessionManager.getSignupQueuePosition(externalToken);
+
+        return new ResponseEntity<String>(returnMessage,HttpStatus.OK);
     }
     
     @PostMapping("initiateUpdate")

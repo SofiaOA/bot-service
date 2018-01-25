@@ -58,13 +58,13 @@ public class SessionManager {
         return messages.subList(Math.max(messages.size() - i, 0), messages.size());
     }
 
-    public String getSignupQueuePosition(String email){
+    public String getSignupQueuePosition(String externalToken){
 
         ArrayList<SignupCode> scList = (ArrayList<SignupCode>) signupRepo.findAllByOrderByDateAsc();
         int pos = 1;
         for(SignupCode sc : scList){
-        		log.debug(sc.code + "|" + sc.email + "(" + sc.date+"):" + (pos));
-        		if(sc.email.equals(email)){
+        		log.debug(sc.code + " UUID:" + sc.externalToken + " email:" + sc.email + "(" + sc.date+"):" + (pos));
+        		if(sc.externalToken.equals(externalToken)){
         			if(!sc.used){
         				return "Din plats i kön är " + pos;
         			}else{
