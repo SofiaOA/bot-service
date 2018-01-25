@@ -58,19 +58,22 @@ public class SessionManager {
         return messages.subList(Math.max(messages.size() - i, 0), messages.size());
     }
 
-    public int getSignupQueuePosition(String code){
+    public String getSignupQueuePosition(String email){
+
         ArrayList<SignupCode> scList = (ArrayList<SignupCode>) signupRepo.findAllByOrderByDateAsc();
         int pos = 1;
         for(SignupCode sc : scList){
-        	if(!sc.used){
         		log.debug(sc.code + "|" + sc.email + "(" + sc.date+"):" + (pos));
-        		if(sc.code.equals(code)){
-        			return pos;
+        		if(sc.email.equals(email)){
+        			if(!sc.used){
+        				return "Din plats i kön är " + pos;
+        			}else{
+        				return "Det ser ut som du redan fått en inbjudan. Kika i mailen så hittar du din inloggningskod. Välkommen!";
+        			}
         		}
-        		pos++;
-        	}
+        		if(!sc.used)pos++;
         }
-        return -1;
+        return "Vi hittade inte din kod i kösystemet tyvärr... :(";
     }
     
     public void initClaim(String hid){
@@ -412,6 +415,11 @@ public class SessionManager {
 
         userrepo.saveAndFlush(uc);
     }
+
+	public Integer getWaitlistPosition(String email) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 
 }

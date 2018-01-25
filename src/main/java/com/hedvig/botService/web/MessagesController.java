@@ -47,7 +47,7 @@ public class MessagesController {
 		binder.registerCustomEditor(byte[].class, new ByteArrayMultipartFileEditor());
 	
 	}
-    
+
     /*
      * TODO: Change hedvig.token from optional to required
      * */
@@ -88,26 +88,20 @@ public class MessagesController {
 
 	@PostMapping("/push-token")
 	ResponseEntity<Void> pushToken(@RequestBody String tokenJson, @RequestHeader(value="hedvig.token") String hid) {
-		log.info("Push toke for memberId:{}, is: {}", value("memberId", ""), tokenJson);
+		log.info("Push token for memberId:{}, is: {}", value("memberId", ""), tokenJson);
 		return ResponseEntity.noContent().build();
 	}
 
-	   /*
-     * TODO: Change hedvig.token from optional to required
-     * */
-	@RequestMapping(path="/signupcode")
-    public ResponseEntity<?> getSignupCodeQueuePosition(@RequestParam("code") String code) {
+    @PostMapping(path = "/waitlist")
+    public ResponseEntity<?> waitlistPosition(@RequestBody String email) {
+    	log.info("Fetching waitlist position for email:" + email);
+    	
+        String returnMessage = sessionManager.getSignupQueuePosition(email);
 
-        int pos = sessionManager.getSignupQueuePosition(code);
-        String returnMessage = "";
-        if(pos < 0){
-        	returnMessage = "Vi hittade inte din kod i kösystemet tyvärr... :(";
-        }else{
-        	returnMessage = "Din plats i kön är " + pos;
-        }
         return new ResponseEntity<String>(returnMessage,HttpStatus.OK);
     }
 
+    
     /*
      * TODO: Change hedvig.token from optional to required
      * */
