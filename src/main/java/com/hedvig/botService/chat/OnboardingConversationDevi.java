@@ -86,9 +86,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         setExpectedReturnType("message.waitlist", new EmailAdress());
         
         createChatMessage("message.waitlist.tack",
-                new MessageBodySingleSelect("Tack! Din kod är {SIGNUP_CODE}. Du står på plats {SIGNUP_POSITION} på väntelistan"
+                new MessageBodySingleSelect("Tack! Du står på plats {SIGNUP_POSITION} på väntelistan"
                 		+"\fJag ska göra mitt bästa för att du ska kunna bli medlem så snart som möjligt!"
-                		+"\fJag skickar en länk till din mail där du kan se status"
+                		+"\fJag skickar en länk till din mail där du kan se din köplats"
                 		+"\fHa det fint så länge " + emoji_hug,
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Jag vill starta om chatten", "message.onboardingstart"));
@@ -506,6 +506,14 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         }}
                 ));
 
+        createChatMessage("message.uwlimit.housingsize",
+                new MessageBodyText("Det var stort! För att kunna försäkra så stora lägenheter behöver vi ta några grejer över telefon\fVad är ditt nummer?")
+                );
+        
+        createChatMessage("message.uwlimit.householdsize",
+                new MessageBodyText("Okej! För att kunna försäkra så många i samma lägenhet behöver vi ta några grejer över telefon\fVad är ditt nummer?")
+                );
+        
         createMessage("message.pris",
                 new MessageBodySingleSelect("Grundskyddet som jag ger är också bredare än det du oftast får på annat håll\fOch det jag prioriterar allra mest är att vara där på dina villkor. Jag utvecklas alltid för att vara så snabb, smidig och smart som möjligt",
                         new ArrayList<SelectItem>() {{
@@ -997,6 +1005,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 if(nr_persons==1){ m.body.text = "Jag bor själv"; }
                 else{ m.body.text = "Vi är " + nr_persons + " i hushållet"; }
                 addToChat(m, userContext, memberChat);
+                
+                if(nr_persons > 6){
+                	nxtMsg = "message.uwlimit.householdsize";
+                	break;
+                }
                 nxtMsg = "message.sakerhet";
                 break;
             case "message.kvadrat":
@@ -1004,6 +1017,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 onBoardingData.setLivingSpace(Float.parseFloat(kvm));
                 m.body.text = kvm + " kvm";
                 addToChat(m, userContext, memberChat);
+                if(Integer.parseInt(kvm) > 250){
+                	nxtMsg = "message.uwlimit.housingsize";
+                	break;
+                }
                 if(onBoardingData.getAge() > 0 && onBoardingData.getAge() < 27) {
                     nxtMsg = "message.student";
                 } else {
