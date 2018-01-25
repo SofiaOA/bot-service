@@ -9,6 +9,7 @@ import org.springframework.web.client.RestClientException;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class MemberServiceFake implements MemberService {
@@ -69,5 +70,10 @@ public class MemberServiceFake implements MemberService {
     @Override
     public void startOnBoardingWithSSN(String memberId, String ssn) {
         return;
+    }
+
+    @Override
+    public void sendSignupMail(String email, UUID uuid) {
+
     }
 }

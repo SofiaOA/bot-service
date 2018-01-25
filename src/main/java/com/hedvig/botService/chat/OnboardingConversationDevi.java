@@ -1389,6 +1389,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             return newCode;
         });
         signupRepo.saveAndFlush(sc);
+        try {
+            this.memberService.sendSignupMail(email, sc.externalToken);
+        }catch (Exception ex) {
+            log.error("Could not send emailrequest to memberService: ", ex);
+        }
+
         return sc;
     }
     

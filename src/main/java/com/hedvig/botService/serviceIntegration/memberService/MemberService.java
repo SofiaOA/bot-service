@@ -7,6 +7,7 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResp
 import com.hedvig.botService.web.dto.Member;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface MemberService {
     Optional<BankIdAuthResponse> auth(String memberId);
@@ -26,4 +27,6 @@ public interface MemberService {
     MemberProfile getProfile(String hid);
 
     void startOnBoardingWithSSN(String memberId, String ssn);
+
+    void sendSignupMail(String email, UUID uuid);
 }

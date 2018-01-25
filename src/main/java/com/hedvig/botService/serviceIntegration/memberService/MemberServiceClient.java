@@ -26,4 +26,7 @@ public interface MemberServiceClient {
 
     @RequestMapping(value = "/i/member/{memberId}/finalizeOnboarding")
     ResponseEntity<FinalizeOnBoardingResponse> finalizeOnBoarding(@PathVariable("memberId") String memberId, @RequestBody FinalizeOnBoardingRequest req);
+
+    @RequestMapping(value = "/_/mail/sendSignup")
+    ResponseEntity<String> sendSignup(@RequestBody SendSignupRequest request);
 }

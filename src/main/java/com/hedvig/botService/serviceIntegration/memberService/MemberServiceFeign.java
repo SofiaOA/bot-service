@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class MemberServiceFeign implements MemberService {
@@ -109,5 +110,12 @@ public class MemberServiceFeign implements MemberService {
     @Override
     public void startOnBoardingWithSSN(String memberId, String ssn) {
         this.client.startOnBoardingWithSSN(memberId, new StartOnboardingWithSSNRequest(ssn));
+    }
+
+    @Override
+    public void sendSignupMail(String email, UUID uuid) {
+        final Long requestId = Math.round(Math.random() * 1000);
+        final SendSignupRequest sendSignupRequest = new SendSignupRequest(uuid, email, requestId.toString());
+        this.client.sendSignup(sendSignupRequest);
     }
 }
