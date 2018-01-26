@@ -96,6 +96,15 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         }}
                 ));
         
+        
+        createChatMessage("message.uwlimit.tack",
+                new MessageBodySingleSelect("Tack! Jag hör av mig så fort jag kan",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Jag vill starta om chatten", "message.onboardingstart"));
+
+                        }}
+                ));
+        
         createChatMessage("message.activate.notactive",
                 new MessageBodySingleSelect("Tack! Du står på plats {SIGNUP_POSITION} på väntelistan"
                 		+"\fJag ska göra mitt bästa för att du ska kunna bli medlem så snart som möjligt!"
@@ -990,6 +999,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             	addToChat(m, userContext, memberChat);
             	nxtMsg = validateSignupCode(userCode, userContext);
                 //nxtMsg = "message.activate.ok.1";
+                break;
+            case "message.uwlimit.housingsize":
+            case "message.uwlimit.householdsize":
+            	userContext.putUserData("{UWLIMIT_PHONENUMBER}", m.body.text);
+                addToChat(m, userContext, memberChat);
+                nxtMsg = "message.uwlimit.tack";
                 break;
             case "message.tipsa":
                 onBoardingData.setRecommendFriendEmail(m.body.text);
