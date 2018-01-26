@@ -344,12 +344,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage("message.kvadrat", new MessageBodyNumber("Hur många kvadratmeter är lägenheten?"));
         setExpectedReturnType("message.kvadrat", new LivingSpaceSquareMeters());
 
-        createMessage("message.manuellnamn", new MessageBodyText("Inga problem! Då ställer jag bara några extra frågor. Vad heter du i förnamn?"));
-        setExpectedReturnType("message.manuellnamn", new TextInput());
+        createChatMessage("message.manuellnamn", new MessageBodyText("Inga problem! Då ställer jag bara några extra frågor nu\fMen om du vill bli medlem sen så måste du signera med BankID, bara så du vet!\fVad heter du i förnamn?"));
         
         createMessage("message.manuellfamilyname", new MessageBodyText("Kul att ha dig här {NAME}! " + emoji_hug + " Vad heter du i efternamn?"));
         
-        createMessage("message.manuellpersonnr", new MessageBodyNumber("Tack! Vad är ditt personnummer?"));
+        createMessage("message.manuellpersonnr", new MessageBodyNumber("Tack! Vad är ditt personnummer? (12 siffror)"));
         setExpectedReturnType("message.manuellpersonnr", new SSNSweden());
         createMessage("message.varborduadress", new MessageBodyText("Tack! Och vilken gatuadress bor du på?"));
         createMessage("message.varbordupostnr", new MessageBodyNumber("Vad är ditt postnummer?"));
