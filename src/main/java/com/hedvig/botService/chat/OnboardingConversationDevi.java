@@ -482,10 +482,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodySingleSelect(""
                 		+ "Jag har en trygghetspartner som är en av världens största återförsäkringskoncerner\fDe är där för mig, så jag alltid kan vara där för dig\fJag är självklart också auktoriserad av Finansinspektionen" + emoji_mag,
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill bli medlem", "message.forslag"));
+                        	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
+                            add(new SelectOption("Jag har en annan fråga", "message.frifraga"));
                         }}
                 ));
-
+        
         createChatMessage("message.skydd",
                 new MessageBodySingleSelect(""
                 		+ "Med mig har du samma grundskydd som vanliga försäkringsbolag\fUtöver det ingår alltid drulle, alltså till exempel om du tappar din telefon i golvet och den går sönder, och ett bra reseskydd",
@@ -501,7 +502,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
                         	//add(new SelectOption("Jag vill bli medlem", "message.forslag"));
-                            add(new SelectOption("Jag har fler frågor", "message.frifråga"));
+                            add(new SelectOption("Jag har fler frågor", "message.frifraga"));
 
                         }}
                 ));
@@ -514,12 +515,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodyText("Okej! För att kunna försäkra så många i samma lägenhet behöver vi ta några grejer över telefon\fVad är ditt nummer?")
                 );
         
-        createMessage("message.pris",
+        createChatMessage("message.pris",
                 new MessageBodySingleSelect("Grundskyddet som jag ger är också bredare än det du oftast får på annat håll\fOch det jag prioriterar allra mest är att vara där på dina villkor. Jag utvecklas alltid för att vara så snabb, smidig och smart som möjligt",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
                         	//add(new SelectOption("Jag vill bli medlem", "message.forslag"));
-                            add(new SelectOption("Jag har fler frågor", "message.frifråga"));
+                            add(new SelectOption("Jag har fler frågor", "message.frifraga"));
 
                         }}
                 ));
