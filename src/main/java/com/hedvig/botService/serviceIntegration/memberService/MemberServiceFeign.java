@@ -71,6 +71,7 @@ public class MemberServiceFeign implements MemberService {
         address.setStreet(data.getAddressStreet());
         address.setCity(data.getAddressCity());
         address.setZipCode(data.getAddressZipCode());
+        address.setFloor(data.getFloor());
         req.setAddress(address);
         try {
             ResponseEntity<FinalizeOnBoardingResponse> response = this.client.finalizeOnBoarding(memberId, req);
@@ -100,7 +101,9 @@ public class MemberServiceFeign implements MemberService {
             address = new MemberAddress(
             		profile.getStreet(), 
             		profile.getCity(),
-            		profile.getZipCode());
+            		profile.getZipCode(),
+                    profile.getApartment(),
+                    profile.getFloor() == null ? 0 : profile.getFloor());
         }
 
         return new MemberProfile(memberId, profile.getSsn(), profile.getFirstName(), profile.getLastName(), Optional.ofNullable(address), "", profile.getPhoneNumber(), profile.getCountry(), profile.getBirthDate());

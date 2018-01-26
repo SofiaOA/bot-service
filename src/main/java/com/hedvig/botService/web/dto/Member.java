@@ -19,12 +19,13 @@ public class Member {
     private final String street;
     private final String city;
     private final String zipCode;
-
+    private final Integer floor;
 
     private final String email;
     private final String phoneNumber;
     private final String country;
 
     private final LocalDate birthDate;
+    private final String apartment;
 
 }

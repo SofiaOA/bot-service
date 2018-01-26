@@ -7,4 +7,6 @@ public class MemberAddress {
     private final String street;
     private final String city;
     private final String zipCode;
+    private final String apartment;
+    private final int floor;
 }

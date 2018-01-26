@@ -69,6 +69,7 @@ public class ProductPricingService {
         address.setStreet(data.getAddressStreet());
         address.setCity(data.getAddressCity());
         address.setZipCode(data.getAddressZipCode());
+        address.setFloor(data.getFloor());
         request.setAddress(address);
 
         Created result = this.client.createQuote(request).getBody();

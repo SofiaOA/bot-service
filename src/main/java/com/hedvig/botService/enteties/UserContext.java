@@ -247,6 +247,7 @@ public class UserContext implements Serializable {
 			obd.setAddressStreet(address.getStreet());
 			obd.setAddressCity(address.getCity());
 			obd.setAddressZipCode(address.getZipCode());
+			obd.setFloor(address.getFloor());
 		});
     }
 }

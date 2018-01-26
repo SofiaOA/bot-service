@@ -31,6 +31,7 @@ public class UserData {
     public static final String USER_AUTHED_BANKID = "USER_AUTHED_BANKID";
     public static final String IS_STUDENT = "{STUDENT}";
     public static final String BANK_ID_MESSAGE = "{BANK_ID_MESSAGE}";
+    public static final String FLOOR = "{FLOOR}";
     private final UserContext ctx;
     private String address;
 
@@ -251,4 +252,15 @@ public class UserData {
     }
 
 
+    public void setFloor(int floor) {
+        ctx.putUserData(FLOOR, Integer.toString(floor));
+    }
+
+    public Integer getFloor(){
+        try {
+            return Integer.parseInt(ctx.getDataEntry(FLOOR));
+        }catch (Exception ex){
+            return 0;
+        }
+    }
 }
