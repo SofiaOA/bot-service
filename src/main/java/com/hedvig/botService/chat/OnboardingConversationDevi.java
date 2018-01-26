@@ -96,6 +96,15 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         }}
                 ));
         
+        
+        createChatMessage("message.uwlimit.tack",
+                new MessageBodySingleSelect("Tack! Jag hör av mig så fort jag kan",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Jag vill starta om chatten", "message.onboardingstart"));
+
+                        }}
+                ));
+        
         createChatMessage("message.activate.notactive",
                 new MessageBodySingleSelect("Tack! Du står på plats {SIGNUP_POSITION} på väntelistan"
                 		+"\fJag ska göra mitt bästa för att du ska kunna bli medlem så snart som möjligt!"
@@ -335,12 +344,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage("message.kvadrat", new MessageBodyNumber("Hur många kvadratmeter är lägenheten?"));
         setExpectedReturnType("message.kvadrat", new LivingSpaceSquareMeters());
 
-        createMessage("message.manuellnamn", new MessageBodyText("Inga problem! Då ställer jag bara några extra frågor. Vad heter du i förnamn?"));
-        setExpectedReturnType("message.manuellnamn", new TextInput());
+        createChatMessage("message.manuellnamn", new MessageBodyText("Inga problem! Då ställer jag bara några extra frågor nu\fMen om du vill bli medlem sen så måste du signera med BankID, bara så du vet!\fVad heter du i förnamn?"));
         
         createMessage("message.manuellfamilyname", new MessageBodyText("Kul att ha dig här {NAME}! " + emoji_hug + " Vad heter du i efternamn?"));
         
-        createMessage("message.manuellpersonnr", new MessageBodyNumber("Tack! Vad är ditt personnummer?"));
+        createMessage("message.manuellpersonnr", new MessageBodyNumber("Tack! Vad är ditt personnummer? (12 siffror)"));
         setExpectedReturnType("message.manuellpersonnr", new SSNSweden());
         createMessage("message.varborduadress", new MessageBodyText("Tack! Och vilken gatuadress bor du på?"));
         createMessage("message.varbordupostnr", new MessageBodyNumber("Vad är ditt postnummer?"));
@@ -482,10 +490,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodySingleSelect(""
                 		+ "Jag har en trygghetspartner som är en av världens största återförsäkringskoncerner\fDe är där för mig, så jag alltid kan vara där för dig\fJag är självklart också auktoriserad av Finansinspektionen" + emoji_mag,
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill bli medlem", "message.forslag"));
+                        	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
+                            add(new SelectOption("Jag har en annan fråga", "message.frifraga"));
                         }}
                 ));
-
+        
         createChatMessage("message.skydd",
                 new MessageBodySingleSelect(""
                 		+ "Med mig har du samma grundskydd som vanliga försäkringsbolag\fUtöver det ingår alltid drulle, alltså till exempel om du tappar din telefon i golvet och den går sönder, och ett bra reseskydd",
@@ -501,7 +510,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
                         	//add(new SelectOption("Jag vill bli medlem", "message.forslag"));
-                            add(new SelectOption("Jag har fler frågor", "message.frifråga"));
+                            add(new SelectOption("Jag har fler frågor", "message.frifraga"));
 
                         }}
                 ));
@@ -514,12 +523,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodyText("Okej! För att kunna försäkra så många i samma lägenhet behöver vi ta några grejer över telefon\fVad är ditt nummer?")
                 );
         
-        createMessage("message.pris",
+        createChatMessage("message.pris",
                 new MessageBodySingleSelect("Grundskyddet som jag ger är också bredare än det du oftast får på annat håll\fOch det jag prioriterar allra mest är att vara där på dina villkor. Jag utvecklas alltid för att vara så snabb, smidig och smart som möjligt",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
                         	//add(new SelectOption("Jag vill bli medlem", "message.forslag"));
-                            add(new SelectOption("Jag har fler frågor", "message.frifråga"));
+                            add(new SelectOption("Jag har fler frågor", "message.frifraga"));
 
                         }}
                 ));
@@ -989,6 +998,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             	addToChat(m, userContext, memberChat);
             	nxtMsg = validateSignupCode(userCode, userContext);
                 //nxtMsg = "message.activate.ok.1";
+                break;
+            case "message.uwlimit.housingsize":
+            case "message.uwlimit.householdsize":
+            	userContext.putUserData("{UWLIMIT_PHONENUMBER}", m.body.text);
+                addToChat(m, userContext, memberChat);
+                nxtMsg = "message.uwlimit.tack";
                 break;
             case "message.tipsa":
                 onBoardingData.setRecommendFriendEmail(m.body.text);
