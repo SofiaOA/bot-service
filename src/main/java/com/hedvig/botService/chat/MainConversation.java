@@ -42,7 +42,7 @@ public class MainConversation extends Conversation {
 							add(new SelectOption("Rapportera en skada","message.main.report", false));
 							add(new SelectOption("Det är kris, ring mig!","message.main.callme", false));
 							add(new SelectOption("Jag har en fråga","main.question", false));
-							add(new SelectOption("Rekommendera en vän","message.main.refer", false));							
+							//add(new SelectOption("Rekommendera en vän","message.main.refer", false));
 						}}
 				));
 		
