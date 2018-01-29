@@ -222,7 +222,7 @@ public class CollectServiceTests {
 
         MemberAddress address = new MemberAddress("Street",
                 "City",
-                "13345");
+                "13345", "1111", 1);
 
         return new MemberProfile(
             memberId,

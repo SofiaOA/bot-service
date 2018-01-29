@@ -58,7 +58,7 @@ public class MemberServiceFake implements MemberService {
 
     @Override
     public MemberProfile convertToFakeUser(String memberId) {
-        MemberAddress address = new MemberAddress("Gatan", "Storstan", "11123");
+        MemberAddress address = new MemberAddress("Gatan", "Storstan", "11123", "1001", 0);
         return new MemberProfile(memberId, "fakessn", "Mr test", "Skenson", Optional.of(address), "email@a.com", "070123244", "SE", LocalDate.parse("1980-01-01"));
     }
 
