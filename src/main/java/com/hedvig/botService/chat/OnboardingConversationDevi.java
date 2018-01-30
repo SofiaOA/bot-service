@@ -268,13 +268,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         
         
         createMessage("message.start.login",
-                new MessageBodyParagraph("Välkommen tillbaka! " + emoji_hug), 1500,
-                (m, uc) -> {
-                    UserData obd = uc.getOnBoardingData();
-                    uc.putUserData(LOGIN, "true");
-                    return "";
-                }
-        );
+                new MessageBodyParagraph("Välkommen tillbaka! " + emoji_hug), 1500);
         addRelay("message.start.login","message.bankid.start");
         
         createMessage("message.bankid.start",
@@ -812,6 +806,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 	@Override
 	public void init(UserContext userContext, MemberChat memberChat, String startMessage) {
         log.info("Starting onboarding conversation with message:" + startMessage);
+        if(startMessage.equals("message.start.login")) {
+            userContext.putUserData(LOGIN, "true");
+        }
         startConversation(userContext, memberChat, startMessage); // Id of first message	
 	}
     // --------------------------------------------------------------------------- //
