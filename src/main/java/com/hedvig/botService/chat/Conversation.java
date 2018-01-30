@@ -133,10 +133,7 @@ public abstract class Conversation {
 	}
 
 
-	void createMessage(String id, MessageBody body, SelectItemMessageCallback callback) {
-		this.createMessage(id, body);
-		this.setMessageCallback(id, callback);
-	}
+
 
 	protected void setMessageCallback(String id, SelectItemMessageCallback callback) {
 		this.callbacks.put(id, callback);
@@ -152,9 +149,20 @@ public abstract class Conversation {
 
 	// -------------------------
 
+	void createMessage(String id, MessageBody body, SelectItemMessageCallback callback) {
+		this.createMessage(id, body);
+		this.setMessageCallback(id, callback);
+	}
+
 	void createMessage(String id, MessageBody body, Integer delay){
 		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
 		createMessage(id,header,body,delay);    	
+	}
+
+	void createMessage(String id, MessageBody body, Integer delay, SelectItemMessageCallback callback){
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		createMessage(id,header,body,delay);
+		this.setMessageCallback(id, callback);
 	}
 
 	void createMessage(String id, MessageBody body, String avatarName, Integer delay){
