@@ -54,7 +54,7 @@ public class InternalMessagesController {
     	return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(path = "/{since}", method = RequestMethod.GET)
+    @RequestMapping(path = "/{from}", method = RequestMethod.GET)
     public List<BackOfficeMessageDTO> messages(@PathVariable Long from) {
         Instant timestamp = Instant.ofEpochMilli(from);
         List<Message> messages = messageRepository.findFromTimestamp(timestamp);
