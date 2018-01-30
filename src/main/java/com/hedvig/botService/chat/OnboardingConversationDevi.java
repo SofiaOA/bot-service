@@ -29,9 +29,10 @@ import java.util.Optional;
 @Component
 public class OnboardingConversationDevi extends Conversation implements BankIdChat {
 
-	/*
-	 * Need to be stateless. I.e no data beyond response scope
-	 * */
+    public static final String LOGIN = "{LOGIN}";
+    /*
+             * Need to be stateless. I.e no data beyond response scope
+             * */
     private static Logger log = LoggerFactory.getLogger(OnboardingConversationDevi.class);
     private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     public static enum ProductTypes {BRF, RENT, RENT_BRF, SUBLET_RENTAL, SUBLET_BRF, STUDENT, LODGER};
@@ -81,6 +82,17 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                             add(new SelectOption("Jag vill ställa mig på väntelistan", "message.waitlist"));
                         }}
                 ));
+
+        createChatMessage("message.membernotfound",
+                new MessageBodySingleSelect("Hmm, det verkar som att du inte är medlem här hos mig ännu." +
+                        +"\fJag vill gärna ha dig som medlem och ingenting är viktigare för mig än att du ska få fantastisk service" +
+                        +"\fMen eftersom att det är många som vill bli medlemmar just nu, så måste jag ta in ett begränsat antal i taget",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Jag har fått en aktiveringskod", "message.activate"));
+                            add(new SelectOption("Jag vill ställa mig på väntelistan", "message.waitlist"));
+                        }}
+                ));
+
         
         createMessage("message.waitlist", new MessageBodyText("Det ordnar jag! Vad är din mailadress? "));
         setExpectedReturnType("message.waitlist", new EmailAdress());
@@ -256,7 +268,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         
         
         createMessage("message.start.login",
-                new MessageBodyParagraph("Välkommen tillbaka! " + emoji_hug), 1500);
+                new MessageBodyParagraph("Välkommen tillbaka! " + emoji_hug), 1500,
+                (m, uc) -> {
+                    UserData obd = uc.getOnBoardingData();
+                    uc.putUserData(LOGIN, "true");
+                    return "";
+                }
+        );
         addRelay("message.start.login","message.bankid.start");
         
         createMessage("message.bankid.start",
@@ -1252,6 +1270,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             userContext.completeConversation(this.getClass().getName());
             MainConversation mc = new MainConversation(memberService, productPricingClient);
             userContext.startConversation(mc);
+        }
+        else if(userContext.getDataEntry(LOGIN).equals("true")) {
+            userContext.removeDataEntry(LOGIN);
+            addToChat(getMessage("message.membernotfound"), userContext);
         }
         else {
             addToChat(getMessage("message.bankidja"), userContext);
