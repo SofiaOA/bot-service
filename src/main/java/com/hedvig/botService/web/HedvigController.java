@@ -4,6 +4,7 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectR
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.CollectResponse;
+import com.hedvig.botService.web.dto.SignupStatus;
 import com.hedvig.botService.web.dto.UpdateTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +32,12 @@ public class HedvigController {
     }
     
     @PostMapping(path = "/waitlist")
-    public ResponseEntity<?> waitlistPosition(@RequestBody String externalToken) {
+    public ResponseEntity<SignupStatus> waitlistPosition(@RequestBody String externalToken) {
     	log.info("Fetching waitlist position for externalToken:" + externalToken);
     	
-        String returnMessage = sessionManager.getSignupQueuePosition(externalToken);
+        SignupStatus ss = sessionManager.getSignupQueuePosition(externalToken);
 
-        return new ResponseEntity<String>(returnMessage,HttpStatus.OK);
+        return new ResponseEntity<>(ss,HttpStatus.OK);
     }
     
     @PostMapping("initiateUpdate")

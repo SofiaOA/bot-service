@@ -10,6 +10,7 @@ import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.web.dto.MemberAuthedEvent;
+import com.hedvig.botService.web.dto.SignupStatus;
 import com.hedvig.botService.web.dto.UpdateTypes;
 import com.hedvig.botService.web.dto.events.memberService.*;
 import org.slf4j.Logger;
@@ -58,22 +59,28 @@ public class SessionManager {
         return messages.subList(Math.max(messages.size() - i, 0), messages.size());
     }
 
-    public String getSignupQueuePosition(String externalToken){
+    public SignupStatus getSignupQueuePosition(String externalToken){
 
         ArrayList<SignupCode> scList = (ArrayList<SignupCode>) signupRepo.findAllByOrderByDateAsc();
         int pos = 1;
+        SignupStatus ss = new SignupStatus();
+        
         for(SignupCode sc : scList){
         		log.debug(sc.code + " UUID:" + sc.externalToken + " email:" + sc.email + "(" + sc.date+"):" + (pos));
-        		if(sc.externalToken.equals(externalToken)){
+        		if(sc.externalToken.toString().equals(externalToken)){
         			if(!sc.used){
-        				return "Din plats i kön är " + pos;
+        				ss.position = pos;
+        				ss.status = SignupStatus.states.WAITLIST.toString();
+        				return ss;
         			}else{
-        				return "Det ser ut som du redan fått en inbjudan. Kika i mailen så hittar du din inloggningskod. Välkommen!";
+        				ss.status = SignupStatus.states.ACCESS.toString();
+        				return ss;
         			}
         		}
         		if(!sc.used)pos++;
         }
-        return "Vi hittade inte din kod i kösystemet tyvärr... :(";
+        ss.status = SignupStatus.states.NOT_FOUND.toString();
+        return ss;
     }
     
     public void initClaim(String hid){
