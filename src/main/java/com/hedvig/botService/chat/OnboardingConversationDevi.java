@@ -1271,7 +1271,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             MainConversation mc = new MainConversation(memberService, productPricingClient);
             userContext.startConversation(mc);
         }
-        else if(userContext.getDataEntry(LOGIN).equals("true")) {
+        else if(userContext.getDataEntry(LOGIN) != null) {
             userContext.removeDataEntry(LOGIN);
             addToChat(getMessage("message.membernotfound"), userContext);
         }
