@@ -86,12 +86,6 @@ public class MessagesController {
     	return null;
     }
 
-	@PostMapping("/push-token")
-	ResponseEntity<Void> pushToken(@RequestBody String tokenJson, @RequestHeader(value="hedvig.token") String hid) {
-		log.info("Push token for memberId:{}, is: {}", value("memberId", ""), tokenJson);
-		return ResponseEntity.noContent().build();
-	}
-
     /*
      * TODO: Change hedvig.token from optional to required
      * */
