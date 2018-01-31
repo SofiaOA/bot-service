@@ -57,6 +57,33 @@ public class MessageBodyMultipleSelectTest {
         assertThat(sut.selectedOptionsAsString(), equalTo("text1 och text2"));
     }
 
+    @Test
+    public void selectedOptionsAsStringReturnsTextAsLowerCaseWithClearable(){
+        MessageBodyMultipleSelect sut = new MessageBodyMultipleSelect();
+        sut.choices.add(new SelectOption("Text1", "value1", true));
+        sut.choices.add(new SelectOption("Text2", "value2", true, true));
+
+        assertThat(sut.selectedOptionsAsString(), equalTo("text1"));
+    }
+
+    @Test
+    public void selectedOptionsAsString_With_OneClearable(){
+        MessageBodyMultipleSelect sut = new MessageBodyMultipleSelect();
+        sut.choices.add(new SelectOption("Text2", "value2", true, true));
+
+        assertThat(sut.selectedOptionsAsString(), equalTo("text2"));
+    }
+
+    @Test
+    public void selectedOptionsAsString_With_ClearableInMiddle(){
+        MessageBodyMultipleSelect sut = new MessageBodyMultipleSelect();
+        sut.choices.add(new SelectOption("Text1", "value1", true));
+        sut.choices.add(new SelectOption("Text2", "value2", true, true));
+        sut.choices.add(new SelectOption("Text3", "value1", true));
+
+        assertThat(sut.selectedOptionsAsString(), equalTo("text1 och text3"));
+    }
+
 
     @Test public void getSelectedOptions(){
         MessageBodyMultipleSelect sut = new MessageBodyMultipleSelect();

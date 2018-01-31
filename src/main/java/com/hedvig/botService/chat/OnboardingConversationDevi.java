@@ -466,7 +466,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                             add(new SelectOption("Säkerhetsdörr", "safety.door"));
                             add(new SelectOption("Gallergrind", "safety.gate"));
                             add(new SelectOption("Inbrottslarm", "safety.burglaralarm"));
-                            add(new SelectOption("Inget av dessa", "safety.none"));
+                            add(new SelectOption("Inget av dessa", "safety.none", false, true));
                         }}
                 ));
 
