@@ -28,14 +28,27 @@ public class MessageBodyMultipleSelect extends MessageBody {
     	StringBuilder accumulator = new StringBuilder();
 		final List<SelectItem> selectedOptions = this.choices.stream().filter(x -> x.selected).collect(Collectors.toList());
 
-		for(int i = 0; i < selectedOptions.size(); i++) {
-    		accumulator.append(selectedOptions.get(i).text.toLowerCase());
-    		int optionsLeft = (selectedOptions.size() - (i+1));
-    		if(optionsLeft > 1) {
-    			accumulator.append(", ");
-			}else if(optionsLeft > 0) {
-    			accumulator.append(" och ");
+
+		final int nrSelectedOptions = selectedOptions.size();
+		if(nrSelectedOptions == 1) {
+			return selectedOptions.get(0).text.toLowerCase();
+		}
+
+		for(int i = 0; i < nrSelectedOptions; i++) {
+			final SelectItem selectItem = selectedOptions.get(i);
+			if(selectItem instanceof  SelectOption && ((SelectOption)selectItem).clearable) {
+				continue;
 			}
+
+			int optionsLeft = (nrSelectedOptions - (i+1));
+			if( accumulator.length() > 0 && optionsLeft > 0){
+				accumulator.append(", ");
+			}else if ( accumulator.length() > 0 && optionsLeft == 0) {
+				accumulator.append(" och ");
+			}
+
+			accumulator.append(selectItem.text.toLowerCase());
+
 		}
 		return accumulator.toString();
 	}

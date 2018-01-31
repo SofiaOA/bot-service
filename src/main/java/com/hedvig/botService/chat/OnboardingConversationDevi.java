@@ -487,7 +487,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                             add(new SelectOption("Säkerhetsdörr", "safety.door"));
                             add(new SelectOption("Gallergrind", "safety.gate"));
                             add(new SelectOption("Inbrottslarm", "safety.burglaralarm"));
-                            add(new SelectOption("Inget av dessa", "safety.none"));
+                            add(new SelectOption("Inget av dessa", "safety.none", false, true));
                         }}
                 ));
 
@@ -809,29 +809,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                             add(new SelectLink("Börja utforska appen", "onboarding.done", "Dashboard", null, null,  false));
                         }}
                 ));
-        
-        createMessage("message.kontraktklar.old",
-        		new MessageBodyText(//emoji_tada + " Hurra! "+ emoji_tada +"\f"
-        				//+ "Välkommen, bästa nya medlem\f"
-                        "Hurra! "+ emoji_tada + " Nu behöver jag bara din mailadress så jag kan skicka en bekräftelse."));
-        
-        //setExpectedReturnType("message.kontraktklar", new EmailAdress());
-
-        createChatMessage("message.kontraktklar4",
-            new MessageBodySingleSelect("*Välkommen till Hedvig! Nu kan du börja utforska appen. Ett tips är att börja med att välja vilken välgörenhetsorganisation du vill att din del av överskottet ska gå till" + emoji_revlolving_hearts,
-                    new ArrayList<SelectItem>() {{
-                        add(new SelectLink("Börja utforska", "onboarding.done", "Dashboard", null, null,  false));
-                    }}
-            ));
-        
-        createMessage("message.kontraktklar_old",
-                new MessageBodySingleSelect(emoji_tada + " Hurra igen! "+ emoji_tada +"\n\nVälkommen, bästa nya medlem!\n\nI din inkorg finns nu en bekräftelse på allt\n\nOm du behöver eller vill något är det bara att chatta med mig i appen när som helst\n\nOch så till sist ett litet tips! Börja utforska appen genom att välja vilken välgörenhetsorganisation du vill stödja " + emoji_revlolving_hearts,
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Jag vill utforska", "onboarding.done", "Dashboard", null, null,  false));
-                            add(new SelectOption("Vi hörs, Hedvig!", "message.avslutvalkommen"));
-
-                        }}
-                ));
 
         createMessage("message.avslutvalkommen",
                 new MessageBodySingleSelect("Hej så länge och ännu en gång, varmt välkommen!",
@@ -1100,18 +1077,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 		        m.body.text = s.text;
 		        nxtMsg = "message.start.account.retrieval";
 		        break;
-            case "message.onboardingstart.b":
-
-                SelectItem si = ((MessageBodySingleSelect)m.body).getSelectedItem();
-                if (si.value.equals("message.kontraktklar4")) {
-                    log.info("message.onboardingstart redirect to " + si.value);
-                    //m.body.text = "Mocka mina uppgifter tack!";
-                    userContext.clearContext();
-                    fakeMemberCreator.doCreate(userContext);
-                    //userContext.mockMe();
-                }
-                //addToChat(m, userContext, memberChat);
-                break;
 
             case "message.audiotest":
             case "message.phototest":
@@ -1264,11 +1229,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 addToChat(m, userContext, memberChat);
                 nxtMsg = "message.kvadrat";
                 break;
-            case "message.kontraktklar.old":
-                onBoardingData.setEmail(m.body.text);
-                addToChat(m, userContext, memberChat);
-                nxtMsg = "message.kontraktklar4";
-                break;
             case "message.mail":
                 onBoardingData.setEmail(m.body.text);
                 addToChat(m, userContext, memberChat);
@@ -1281,7 +1241,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     m.body.text = "Jag har inga säkerhetsgrejer";
                 }
                 else{
-                    m.body.text = String.format("Jag har %s.", body.selectedOptionsAsString());
+                    m.body.text = String.format("Jag har %s", body.selectedOptionsAsString());
                     for(SelectOption o : body.selectedOptions()){
                         onBoardingData.addSecurityItem(o.value);
                     }
@@ -1415,8 +1375,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
                 break;
             case "onboarding.done":
-                log.info("Onboarding complete");
-                userContext.completeConversation(this.getClass().getName());
                 //userContext.onboardingComplete(true);
                 break;
             case "":
@@ -1506,6 +1464,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         Boolean singed = userContext.getOnBoardingData().getUserHasSigned();
 
         if(!singed) {
+            log.info("Onboarding complete");
+            userContext.completeConversation(this.getClass().getName());
             addToChat(getMessage("message.kontraktklar"), userContext, userContext.getMemberChat());
             userContext.getOnBoardingData().setUserHasSigned(true);
         }
