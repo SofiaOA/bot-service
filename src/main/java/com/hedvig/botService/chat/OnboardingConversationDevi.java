@@ -1500,7 +1500,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     @Override
     public void couldNotLoadMemberProfile(UserContext uc) {
-
+        addToChat(getMessage("message.missing.bisnode.data"), uc);
     }
 
     @Override
