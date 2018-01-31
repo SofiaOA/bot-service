@@ -88,9 +88,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         +"\fJag vill gärna ha dig som medlem och ingenting är viktigare för mig än att du ska få fantastisk service"
                         +"\fMen eftersom att det är många som vill bli medlemmar just nu, så måste jag ta in ett begränsat antal i taget",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Sätt upp mig på väntelistan", "message.waitlist"))
+                            add(new SelectOption("Sätt upp mig på väntelistan", "message.waitlist"));
                             add(new SelectOption("Jag har en aktiveringskod", "message.activate"));
-                            ;
                         }}
                 ));
 
