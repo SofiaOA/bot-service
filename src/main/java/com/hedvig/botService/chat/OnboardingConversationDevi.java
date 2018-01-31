@@ -912,6 +912,16 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         return "";
     }
 
+    public String getText(MessageBodySingleSelect body){
+
+        for(SelectItem o : body.choices){
+            if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
+                return SelectOption.class.cast(o).text;
+            }
+        }
+        return "";
+    }
+    
     public ArrayList<String> getValue(MessageBodyMultipleSelect body){
         ArrayList<String> selectedOptions = new ArrayList<String>();
         for(SelectItem o : body.choices){
@@ -989,6 +999,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         
         String selectedOption = (m.body.getClass().equals(MessageBodySingleSelect.class))?
         		getValue((MessageBodySingleSelect)m.body):null;
+        		
+		String selectedText = (m.body.getClass().equals(MessageBodySingleSelect.class))?
+        		getText((MessageBodySingleSelect)m.body):null;
         		
         if(selectedOption != null){ // TODO: Think this over
 	        // Check the selected option first...
@@ -1093,7 +1106,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             case "message.kontrakt.charity.tellmemore":
             case "message.kontrakt.charity":
             	if(selectedOption.startsWith("charity")){
-	                m.body.text = "Jag vill att mitt överskott ska gå till " + m.body.text;
+	                m.body.text = "Jag vill att mitt överskott ska gå till " + selectedText;
 	                addToChat(m, userContext, memberChat);
 	                userContext.putUserData("{CHARITY}", selectedOption);
 	                nxtMsg = "message.kontrakt.charity.tack";
@@ -1553,13 +1566,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         Optional<SignupCode> sc = signupRepo.findByCode(code);
 
         if(sc.isPresent()){
+        	uc.putUserData("{EMAIL}", sc.get().email);
         	if(sc.get().getActive()){
             	sc.get().setUsed(true);
             	signupRepo.saveAndFlush(sc.get());
             	return "message.activate.ok.a";       		
         	}
         	uc.putUserData("{SIGNUP_POSITION}", new Integer(90 + getSignupQueuePosition(sc.get().email)).toString());
-        	uc.putUserData("{EMAIL}", sc.get().email);
         	return "message.activate.notactive";
         }
         return "message.activate.nocode";
