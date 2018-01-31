@@ -133,7 +133,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         }}
                 ));*/   
         
-        createChatMessage("message.waitlist.user.alreadyactive",
+        createMessage("message.waitlist.user.alreadyactive",
                 new MessageBodyText("Du borde redan ha fått en aktiveringskod. Kolla din mailkorg och skriv sedan in koden här"
                 ));
         
@@ -146,7 +146,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         }}
                 ));        
 
-        createChatMessage("message.activate.notactive",
+        createMessage("message.activate.notactive",
     	        new MessageBodySingleSelect("Du verkar redan stå på väntelistan. Din plats är {SIGNUP_POSITION}!",
     	                        new ArrayList<SelectItem>() {{
     	                            add(new SelectOption("Kolla min plats på väntelistan", "message.signup.checkposition"));
@@ -158,7 +158,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 ));
         addRelay("message.activate.notactive", "message.signup.flerval");   */     
         
-        createChatMessage("message.activate.nocode",
+        // TODO: chatMessages have a bug: they need to be multiline... pls fix
+        createMessage("message.activate.nocode",
     	        new MessageBodySingleSelect("Jag känner inte igen den koden tyvärr " + emoji_thinking,
     	                        new ArrayList<SelectItem>() {{
     	                            add(new SelectOption("Kolla min plats på väntelistan", "message.signup.checkposition"));
@@ -180,7 +181,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         addRelay("message.activate.ok.b","message.forslagstart");
         
         
-        createChatMessage("message.uwlimit.tack",
+        createMessage("message.uwlimit.tack",
                 new MessageBodySingleSelect("Tack! Jag hör av mig så fort jag kan",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Jag vill starta om chatten", "message.onboardingstart"));
@@ -960,11 +961,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 	        switch(selectedOption){
 		        case "message.signup.checkposition":
 		        	log.info("Checking position...");
-		            m.body.text = "Visa min köplats";        
-		            addToChat(m, userContext, memberChat);
 		            // We do not have the users email
 		            if(!(onBoardingData.getEmail()!=null && !onBoardingData.getEmail().equals(""))){
 		            	nxtMsg = "message.signup.email";
+		            }else{ // Update position if there is a code
+		            	userContext.putUserData("{SIGNUP_POSITION}", new Integer(90 + getSignupQueuePosition(onBoardingData.getEmail())).toString());
 		            }
 		        break;
 		        case "message.mockme":
