@@ -39,6 +39,12 @@ public class HedvigController {
 
         return new ResponseEntity<>(ss,HttpStatus.OK);
     }
+
+    @PostMapping("/push-token")
+    ResponseEntity<Void> pushToken(@RequestBody String tokenJson, @RequestHeader(value="hedvig.token") String hid) {
+        log.info("Push token for memberId:{}, is: {}", value("memberId", ""), tokenJson);
+        return ResponseEntity.noContent().build();
+    }
     
     @PostMapping("initiateUpdate")
     ResponseEntity<String> initiateUpdate(@RequestParam UpdateTypes what, @RequestHeader(value="hedvig.token", required = false) String hid) {
