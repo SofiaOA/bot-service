@@ -82,6 +82,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Sätt upp mig på väntelistan", "message.waitlist"));
                             add(new SelectOption("Jag har fått en aktiveringskod", "message.activate"));
+                            add(new SelectOption("Kolla min plats på väntelistan", "message.signup.checkposition"));
                         }}
                 ));
 
@@ -92,6 +93,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Sätt upp mig på väntelistan", "message.waitlist"));
                             add(new SelectOption("Jag har en aktiveringskod", "message.activate"));
+                            add(new SelectOption("Kolla min plats på väntelistan", "message.signup.checkposition"));
                         }}
                 ));
 
@@ -99,13 +101,26 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage("message.waitlist", new MessageBodyText("Det ordnar jag! Vad är din mailadress? "));
         setExpectedReturnType("message.waitlist", new EmailAdress());
         
-        createChatMessage("message.waitlist.tack",
-                new MessageBodyParagraph("Tack! Du står på plats {SIGNUP_POSITION} på väntelistan"
+        createMessage("message.signup.email", new MessageBodyText("Det ordnar jag! Vad är din mailadress? "));
+        setExpectedReturnType("message.signup.email", new EmailAdress());
+        
+        /*createChatMessage("message.signup.checkposition",
+                new MessageBodyParagraph("Du står på plats {SIGNUP_POSITION} på väntelistan"
                 		+"\fJag ska göra mitt bästa för att du ska kunna bli medlem så snart som möjligt!"
                 		//+"\fJag skickar en länk till din mail där du kan se din köplats"
                 		+"\fHa det fint så länge!"
                 ));
-        addRelay("message.waitlist.tack", "message.signup.flerval");
+        addRelay("message.signup.checkposition", "message.signup.flerval");*/
+        
+        createChatMessage("message.signup.checkposition",
+	        new MessageBodySingleSelect("Du står på plats {SIGNUP_POSITION} på väntelistan"
+	                		+"\fJag ska göra mitt bästa för att du ska kunna bli medlem så snart som möjligt!"
+	                		+"\fHa det fint så länge!",
+	                        new ArrayList<SelectItem>() {{
+	                            add(new SelectOption("Kolla min plats på väntelistan", "message.signup.checkposition"));
+	                            add(new SelectOption("Jag har fått en aktiveringskod", "message.activate"));
+	                        }}
+	        ));
         
         /*createChatMessage("message.waitlist.tack",
                 new MessageBodySingleSelect("Tack! Du står på plats {SIGNUP_POSITION} på väntelistan"
@@ -116,15 +131,54 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                             //add(new SelectOption("Jag vill starta om chatten", "message.onboardingstart"));
                             //add(new SelectLink("Det samma " + emoji_waving_hand,null,null,null,"http://www.hedvig.com/",false)); // TODO: fixa denna för web
                         }}
-                ));*/
+                ));*/   
         
-        createChatMessage("message.signup.flerval",
+        createChatMessage("message.waitlist.user.alreadyactive",
+                new MessageBodyText("Du borde redan ha fått en aktiveringskod. Kolla din mailkorg och skriv sedan in koden här"
+                ));
+        
+        
+        createMessage("message.signup.flerval",
                 new MessageBodySingleSelect("",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Kolla min plats på väntelistan", "message.signup.checkposition"));
                             add(new SelectOption("Jag har fått en aktiveringskod", "message.activate"));
                         }}
                 ));        
+
+        createChatMessage("message.activate.notactive",
+    	        new MessageBodySingleSelect("Du verkar redan stå på väntelistan. Din plats är {SIGNUP_POSITION}!",
+    	                        new ArrayList<SelectItem>() {{
+    	                            add(new SelectOption("Kolla min plats på väntelistan", "message.signup.checkposition"));
+    	                            add(new SelectOption("Jag har fått en aktiveringskod", "message.activate"));
+    	                        }}
+    	        ));
+        /*createChatMessage("message.activate.notactive",
+                new MessageBodyParagraph("Du verkar redan stå på väntelistan. Din plats är {SIGNUP_POSITION}"
+                ));
+        addRelay("message.activate.notactive", "message.signup.flerval");   */     
+        
+        createChatMessage("message.activate.nocode",
+    	        new MessageBodySingleSelect("Jag känner inte igen den koden tyvärr " + emoji_thinking,
+    	                        new ArrayList<SelectItem>() {{
+    	                            add(new SelectOption("Kolla min plats på väntelistan", "message.signup.checkposition"));
+    	                            add(new SelectOption("Jag har fått en aktiveringskod", "message.activate"));
+    	                        }}
+    	        ));
+        
+        /*createMessage("message.activate.nocode", new MessageBodyParagraph("Jag känner inte igen den koden tyvärr " + emoji_thinking),2000);
+        //createMessage("message.activate.nocode.tryagain", new MessageBodyText("Pröva att ange koden igen"));
+        addRelay("message.activate.nocode","message.signup.flerval");*/
+
+        
+        createMessage("message.activate", new MessageBodyText("Kul! Skriv in din kod här"));
+        
+        createMessage("message.activate.ok.a", new MessageBodyParagraph("Välkommen!"),1000);
+        addRelay("message.activate.ok.a","message.activate.ok.b");
+        
+        createMessage("message.activate.ok.b", new MessageBodyParagraph("Nu ska jag ta fram ett försäkringsförslag åt dig"),2000);
+        addRelay("message.activate.ok.b","message.forslagstart");
+        
         
         createChatMessage("message.uwlimit.tack",
                 new MessageBodySingleSelect("Tack! Jag hör av mig så fort jag kan",
@@ -134,28 +188,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         }}
                 ));
         
-        createChatMessage("message.activate.notactive",
-                new MessageBodySingleSelect("Tack! Du står på plats {SIGNUP_POSITION} på väntelistan"
-                		+"\fJag ska göra mitt bästa för att du ska kunna bli medlem så snart som möjligt!"
-                		//+"\fJag skickar en länk till din mail där du kan se status"
-                		+"\fHa det fint så länge!",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill starta om chatten", "message.onboardingstart"));
 
-                        }}
-                ));
-        
-        createMessage("message.activate.nocode", new MessageBodyParagraph("Hmm... hittar tyvärr inte den koden " + emoji_thinking),2000);
-        createMessage("message.activate.nocode.tryagain", new MessageBodyText("Pröva att ange koden igen"));
-        addRelay("message.activate.nocode","message.activate.nocode.tryagain");
-
-        
-        createMessage("message.activate", new MessageBodyText("Kul! Skriv in din kod här"));
-        createMessage("message.activate.ok.a", new MessageBodyParagraph("Välkommen!"),1000);
-        addRelay("message.activate.ok.a","message.activate.ok.b");
-        createMessage("message.activate.ok.b", new MessageBodyParagraph("Nu ska jag ta fram ett försäkringsförslag åt dig"),2000);
-        addRelay("message.activate.ok.b","message.forslagstart");
-        
         // --------------- OLD --------------------------- //
         /*createChatMessage("message.onboardingstart",
                 new MessageBodySingleSelect("Hej, jag heter Hedvig! " + emoji_waving_hand +"\fJag tar fram ett försäkringsförslag till dig på nolltid",
@@ -925,6 +958,15 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         if(selectedOption != null){ // TODO: Think this over
 	        // Check the selected option first...
 	        switch(selectedOption){
+		        case "message.signup.checkposition":
+		        	log.info("Checking position...");
+		            m.body.text = "Visa min köplats";        
+		            addToChat(m, userContext, memberChat);
+		            // We do not have the users email
+		            if(!(onBoardingData.getEmail()!=null && !onBoardingData.getEmail().equals(""))){
+		            	nxtMsg = "message.signup.email";
+		            }
+		        break;
 		        case "message.mockme":
 		        	log.info("Mocking data...");
 		            m.body.text = "Mocka mina uppgifter tack!";
@@ -1011,17 +1053,41 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 onBoardingData.setNewsLetterEmail(m.body.text);
                 nxtMsg = "message.nagotmer";
                 break;
+            case "message.signup.email" :
             case "message.waitlist":
             	// Logic goes here
             	String userEmail = m.body.text.toLowerCase();
-            	SignupCode sc = createSignupCode(userEmail);
+            	onBoardingData.setEmail(userEmail);
             	m.body.text = userEmail;
-            	userContext.putUserData("{SIGNUP_CODE}", sc.code);
-            	// TODO: Remove constant when list is up
-            	userContext.putUserData("{SIGNUP_POSITION}", new Integer(90 + getSignupQueuePosition(userEmail)).toString());
             	addToChat(m, userContext, memberChat);
-                nxtMsg = "message.waitlist.tack";
+            	
+            	
+            	// --------- Logic for user state ------------- //
+            	Optional<SignupCode> existingSignupCode = findSignupCodeByEmail(userEmail);
+            	
+            	// User already has a signup code
+            	if(existingSignupCode.isPresent()){
+            		SignupCode esc = existingSignupCode.get();
+            		if(esc.getActive()){ // User should have got an activation code
+            			nxtMsg = "message.waitlist.user.alreadyactive";
+            		}else{
+            			nxtMsg = "message.signup.checkposition";
+            		}
+            	}else{
+	            	SignupCode sc = createSignupCode(userEmail);
+	            	userContext.putUserData("{SIGNUP_CODE}", sc.code);
+	            	// TODO: Remove constant when list is up
+	            	//userContext.putUserData("{SIGNUP_POSITION}", new Integer(90 + getSignupQueuePosition(userEmail)).toString());
+	            	nxtMsg = "message.signup.checkposition";
+            	}
+            	userContext.putUserData("{SIGNUP_POSITION}", new Integer(90 + getSignupQueuePosition(userEmail)).toString());
+                
                 break;
+            case "message.signup.flerval":
+            	// TODO: Remove constant when list is up
+            	userContext.putUserData("{SIGNUP_POSITION}", new Integer(90 + getSignupQueuePosition(onBoardingData.getEmail())).toString());
+                break;
+            case "message.waitlist.user.alreadyactive":
             case "message.activate.nocode.tryagain":
             case "message.activate":
             	// Logic goes here
@@ -1464,6 +1530,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         }
 
         return sc;
+    }
+    
+    public Optional<SignupCode> findSignupCodeByEmail(String email){
+    	return signupRepo.findByEmail(email);
     }
     
     public int getSignupQueuePosition(String email){
