@@ -83,20 +83,22 @@ public class CollectService {
                                     orElseThrow(() -> new RuntimeException("Could not find usercontext fo new memberId."));
 
                             bankIdSession.setUserContext(uc);
-                        }
-                        try {
-                            MemberProfile member = memberService.getProfile(collect.getNewMemberId());
+                            chat.bankIdAuthComplete(uc);
+                        } else {
+                            try {
+                                MemberProfile member = memberService.getProfile(collect.getNewMemberId());
 
-                            uc.fillMemberData(member);
-                            if(member.getAddress().isPresent()) {
-                                chat.bankIdAuthComplete(uc);
+                                uc.fillMemberData(member);
+                                if(member.getAddress().isPresent()) {
+                                    chat.bankIdAuthComplete(uc);
+                                }
+                                else {
+                                    chat.bankIdAuthCompleteNoAddress(uc);
+                                }
+                            }catch (Exception ex) {
+                                log.error("Error loading memberProfile from memberService", ex);
+                                chat.couldNotLoadMemberProfile(uc);
                             }
-                            else {
-                                chat.bankIdAuthCompleteNoAddress(uc);
-                            }
-                        }catch (Exception ex) {
-                            log.error("Error loading memberProfile from memberService", ex);
-                            chat.couldNotLoadMemberProfile(uc);
                         }
                         uc.getOnBoardingData().setUserHasAuthedWithBankId(referenceToken);
 
