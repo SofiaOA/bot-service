@@ -747,7 +747,41 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         createChatMessage("message.kontraktklar",
                 new MessageBodySingleSelect("Hurra! "+ emoji_tada + " Välkommen som medlem!"+
-        "\fJag har skickat en bekräftelse till din mail, {EMAIL}. Nu är det bara att börja utforska appen!",
+        "\fJag skickar en bekräftelse till din mail. Visst stämmer det att du har {EMAIL}?",
+                        new ArrayList<SelectItem>() {{
+                        	add(new SelectOption("Ja", "message.kontrakt.charity"));
+                        	add(new SelectOption("Nej", "message.kontrakt.email"));
+                            //add(new SelectLink("Börja utforska", "onboarding.done", "Dashboard", null, null,  false));
+                        }}
+                ));
+        
+        createMessage("message.kontrakt.email", new MessageBodyText("Ok, är din mailadress? "));
+        setExpectedReturnType("message.kontrakt.email", new EmailAdress());
+        
+        createChatMessage("message.kontrakt.charity",
+                new MessageBodySingleSelect("En sista grej bara.. \f" 
+                		+"Som Hedvig-medlem får du välja en välgörenhetsorganisation att stödja om det blir pengar över när alla skador har betalats",
+                        new ArrayList<SelectItem>() {{
+                        	add(new SelectOption("SOS Barnbyar", "charity.sosbarnbyar"));
+                        	add(new SelectOption("Cancerfonden", "charity.cancerfonden"));
+                        	add(new SelectOption("Berätta mer", "message.kontrakt.charity.tellmemore"));
+                        }}
+                ));
+        
+        createChatMessage("message.kontrakt.charity.tellmemore",
+                new MessageBodySingleSelect("Så här, jag fungerar inte som ett vanligt försäkringsbolag\f" + 
+					"Jag tar ut en fast avgift för att kunna ge dig bra service\f" + 
+					"Resten av det du betalar öronmärks för att ersätta skador\f" + 
+					"När alla skador har betalats skänks överskottet till organisationer som gör världen bättre\f" + 
+					"Du väljer själv vad ditt hjärta klappar för!",
+                        new ArrayList<SelectItem>() {{
+                        	add(new SelectOption("SOS Barnbyar", "charity.sosbarnbyar"));
+                        	add(new SelectOption("Cancerfonden", "charity.cancerfonden"));
+                        }}
+                ));        
+        
+        createMessage("message.kontrakt.charity.tack",
+                new MessageBodySingleSelect("Toppen tack!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Börja utforska", "onboarding.done", "Dashboard", null, null,  false));
                         }}
@@ -1049,6 +1083,21 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             	break;
             case "message.forslagstart":
                 onBoardingData.setHouseType(((MessageBodySingleSelect)m.body).getSelectedItem().value);
+                break;
+            case "message.kontrakt.email":
+                onBoardingData.setEmail(m.body.text);
+                m.body.text = m.body.text;
+                addToChat(m, userContext, memberChat);
+                nxtMsg = "message.kontrakt.charity";
+                break;
+            case "message.kontrakt.charity.tellmemore":
+            case "message.kontrakt.charity":
+            	if(selectedOption.startsWith("charity")){
+	                m.body.text = "Jag vill att mitt överskott ska gå till " + m.body.text;
+	                addToChat(m, userContext, memberChat);
+	                userContext.putUserData("{CHARITY}", selectedOption);
+	                nxtMsg = "message.kontrakt.charity.tack";
+            	}
                 break;
             case "message.nyhetsbrev":
                 onBoardingData.setNewsLetterEmail(m.body.text);
