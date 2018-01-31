@@ -69,7 +69,7 @@ public class SessionManager {
         		log.debug(sc.code + " UUID:" + sc.externalToken + " email:" + sc.email + "(" + sc.date+"):" + (pos));
         		if(sc.externalToken.toString().equals(externalToken)){
         			if(!sc.used){
-        				ss.position = pos;
+        				ss.position = 90 + pos; // TODO: Remove constant!
         				ss.status = SignupStatus.states.WAITLIST.toString();
         				return ss;
         			}else{
