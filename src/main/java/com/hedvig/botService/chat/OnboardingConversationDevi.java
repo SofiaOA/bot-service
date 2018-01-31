@@ -32,6 +32,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public static final String LOGIN = "{LOGIN}";
     /*
              * Need to be stateless. I.e no data beyond response scope
+             * 
+             * Also, message names cannot end with numbers!! Numbers are used for internal sectioning
              * */
     private static Logger log = LoggerFactory.getLogger(OnboardingConversationDevi.class);
     private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -78,8 +80,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 		+"\fIngenting är viktigare för mig än att du ska få fantastisk service"
                 		+"\fMen eftersom många vill bli medlemmar just nu, så måste jag ta in ett begränsat antal i taget",
                         new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Sätt upp mig på väntelistan", "message.waitlist"));
                             add(new SelectOption("Jag har fått en aktiveringskod", "message.activate"));
-                            add(new SelectOption("Jag vill ställa mig på väntelistan", "message.waitlist"));
                         }}
                 ));
 
@@ -98,16 +100,31 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         setExpectedReturnType("message.waitlist", new EmailAdress());
         
         createChatMessage("message.waitlist.tack",
+                new MessageBodyParagraph("Tack! Du står på plats {SIGNUP_POSITION} på väntelistan"
+                		+"\fJag ska göra mitt bästa för att du ska kunna bli medlem så snart som möjligt!"
+                		//+"\fJag skickar en länk till din mail där du kan se din köplats"
+                		+"\fHa det fint så länge!"
+                ));
+        addRelay("message.waitlist.tack", "message.signup.flerval");
+        
+        /*createChatMessage("message.waitlist.tack",
                 new MessageBodySingleSelect("Tack! Du står på plats {SIGNUP_POSITION} på väntelistan"
                 		+"\fJag ska göra mitt bästa för att du ska kunna bli medlem så snart som möjligt!"
-                		+"\fJag skickar en länk till din mail där du kan se din köplats"
-                		+"\fHa det fint så länge " + emoji_hug,
+                		//+"\fJag skickar en länk till din mail där du kan se din köplats"
+                		+"\fHa det fint så länge!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill starta om chatten", "message.onboardingstart"));
-
+                            //add(new SelectOption("Jag vill starta om chatten", "message.onboardingstart"));
+                            //add(new SelectLink("Det samma " + emoji_waving_hand,null,null,null,"http://www.hedvig.com/",false)); // TODO: fixa denna för web
                         }}
-                ));
+                ));*/
         
+        createChatMessage("message.signup.flerval",
+                new MessageBodySingleSelect("",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Kolla min plats på väntelistan", "message.signup.checkposition"));
+                            add(new SelectOption("Jag har fått en aktiveringskod", "message.activate"));
+                        }}
+                ));        
         
         createChatMessage("message.uwlimit.tack",
                 new MessageBodySingleSelect("Tack! Jag hör av mig så fort jag kan",
@@ -120,8 +137,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createChatMessage("message.activate.notactive",
                 new MessageBodySingleSelect("Tack! Du står på plats {SIGNUP_POSITION} på väntelistan"
                 		+"\fJag ska göra mitt bästa för att du ska kunna bli medlem så snart som möjligt!"
-                		+"\fJag skickar en länk till din mail där du kan se status"
-                		+"\fHa det fint så länge " + emoji_hug,
+                		//+"\fJag skickar en länk till din mail där du kan se status"
+                		+"\fHa det fint så länge!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Jag vill starta om chatten", "message.onboardingstart"));
 
@@ -134,10 +151,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         
         createMessage("message.activate", new MessageBodyText("Kul! Skriv in din kod här"));
-        createMessage("message.activate.ok.1", new MessageBodyParagraph("Välkommen!"),1000);
-        addRelay("message.activate.ok.1","message.activate.ok.2");
-        createMessage("message.activate.ok.2", new MessageBodyParagraph("Nu ska jag ta fram ett försäkringsförslag åt dig"),2000);
-        addRelay("message.activate.ok.2","message.forslagstart");
+        createMessage("message.activate.ok.a", new MessageBodyParagraph("Välkommen!"),1000);
+        addRelay("message.activate.ok.a","message.activate.ok.b");
+        createMessage("message.activate.ok.b", new MessageBodyParagraph("Nu ska jag ta fram ett försäkringsförslag åt dig"),2000);
+        addRelay("message.activate.ok.b","message.forslagstart");
         
         // --------------- OLD --------------------------- //
         /*createChatMessage("message.onboardingstart",
@@ -919,7 +936,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         }
         
         // ... and then the incomming message id
-        switch (m.id) {
+        switch (getMessageId(m.id)) {
 	        case "message.lghtyp": {
 	        	SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
 	        	
@@ -970,7 +987,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 		        m.body.text = s.text;
 		        nxtMsg = "message.start.account.retrieval";
 		        break;
-            case "message.onboardingstart.2":
+            case "message.onboardingstart.b":
 
                 SelectItem si = ((MessageBodySingleSelect)m.body).getSelectedItem();
                 if (si.value.equals("message.kontraktklar4")) {
@@ -1012,7 +1029,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             	m.body.text = userCode;
             	addToChat(m, userContext, memberChat);
             	nxtMsg = validateSignupCode(userCode, userContext);
-                //nxtMsg = "message.activate.ok.1";
+                //nxtMsg = "message.activate.ok.a";
                 break;
             case "message.uwlimit.housingsize":
             case "message.uwlimit.householdsize":
@@ -1098,7 +1115,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             case "message.kontraktklar.old":
                 onBoardingData.setEmail(m.body.text);
                 addToChat(m, userContext, memberChat);
-                nxtMsg = "message.kontraktklar4.1";
+                nxtMsg = "message.kontraktklar4";
                 break;
             case "message.mail":
                 onBoardingData.setEmail(m.body.text);
@@ -1423,7 +1440,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         	if(sc.get().getActive()){
             	sc.get().setUsed(true);
             	signupRepo.saveAndFlush(sc.get());
-            	return "message.activate.ok.1";       		
+            	return "message.activate.ok.a";       		
         	}
         	uc.putUserData("{SIGNUP_POSITION}", new Integer(90 + getSignupQueuePosition(sc.get().email)).toString());
         	uc.putUserData("{EMAIL}", sc.get().email);
