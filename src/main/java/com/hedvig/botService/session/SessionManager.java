@@ -73,6 +73,7 @@ public class SessionManager {
         				ss.status = SignupStatus.states.WAITLIST.toString();
         				return ss;
         			}else{
+        				ss.code = sc.code;
         				ss.status = SignupStatus.states.ACCESS.toString();
         				return ss;
         			}

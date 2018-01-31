@@ -114,10 +114,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         
         createChatMessage("message.signup.checkposition",
 	        new MessageBodySingleSelect("Du står på plats {SIGNUP_POSITION} på väntelistan"
-	                		+"\fJag ska göra mitt bästa för att du ska kunna bli medlem så snart som möjligt!"
-	                		+"\fHa det fint så länge!",
+	                		+"\fSå snart jag har gett alla framför dig en chans att bli medlem så är det din tur!"
+	                		+"\fKom tillbaka hit om du vill kolla din plats, eller för att ange aktiveringskoden när du får den på mailen"
+	                		+"\fHa en fin dag, så hörs vi snart!",
 	                        new ArrayList<SelectItem>() {{
-	                            add(new SelectOption("Kolla min plats på väntelistan", "message.signup.checkposition"));
+	                            add(new SelectOption("Kolla min plats på listan", "message.signup.checkposition"));
 	                            add(new SelectOption("Jag har fått en aktiveringskod", "message.activate"));
 	                        }}
 	        ));
