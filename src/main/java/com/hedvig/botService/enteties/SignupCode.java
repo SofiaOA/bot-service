@@ -25,6 +25,11 @@ public class SignupCode {
 	public LocalDateTime date;
 	public Boolean used;
 	public Boolean active;
+	
+	public Boolean getUsed() {
+		return used;
+	}
+
 	public UUID externalToken;
 	
 	public void setUsed(Boolean used) {

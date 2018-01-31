@@ -67,7 +67,7 @@ public class MainConversation extends Conversation {
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
                         }}
-                ), "h_symbol");
+                ));
         
 		createMessage("message.main.callme", new MessageBodyNumber("Ok, ta det lugnt! Vad når jag dig på för nummer?"));
 		

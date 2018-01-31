@@ -56,7 +56,8 @@ public class ClaimsConversation extends Conversation {
 		createMessage("message.claims.chat2", new MessageBodyParagraph("Först behöver du bara bekräfta detta"),2000);
 
         createMessage("message.claim.promise",
-                new MessageBodySingleSelect("HEDVIGS HEDERSLÖFTE\nJag vet att Hedvig bygger på tillit medlemmar emellan.\nJag lovar att berätta om händelsen precis som den var, och bara ta ut den ersättning jag har rätt till ur vår gemensamma medlemspott.",
+                new MessageBodySingleSelect("HEDVIGS HEDERSLÖFTE\nJag förstår att Hedvig bygger på tillit.\nJag lovar att berätta om händelsen precis som den var, och bara ta ut den ersättning jag har rätt till. Tar jag ut mer än så inser jag att det drabbar en välgörenhetsorganisation",        		
+                //new MessageBodySingleSelect("HEDVIGS HEDERSLÖFTE\nJag vet att Hedvig bygger på tillit medlemmar emellan.\nJag lovar att berätta om händelsen precis som den var, och bara ta ut den ersättning jag har rätt till ur vår gemensamma medlemspott.",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Jag lovar!", "message.claims.ok"));
                         }}
@@ -72,7 +73,7 @@ public class ClaimsConversation extends Conversation {
         createMessage("message.claims.audio", new MessageBodyAudio("Starta inspelning", "/claims/fileupload"),2000);
         
         createMessage("message.claims.record.ok", new MessageBodyParagraph("Tack! Det är allt jag behöver just nu"),2000);
-        createMessage("message.claims.record.ok2", new MessageBodyParagraph("Jag återkommer till dig här i chatten om jag behöver något mer, eller för att meddela att jag kan betala ut ersättning direkt"),2000);
+        createMessage("message.claims.record.ok2", new MessageBodyParagraph("Jag återkommer till dig om jag behöver något mer, eller för att meddela att jag kan betala ut ersättning direkt"),2000);
         createMessage("message.claims.record.ok3", new MessageBodyParagraph("Tack för att du delat med dig om det som hänt. Ta hand om dig så länge, så hörs vi snart!"),2000);
 
         createMessage("message.claims.record.ok3",
