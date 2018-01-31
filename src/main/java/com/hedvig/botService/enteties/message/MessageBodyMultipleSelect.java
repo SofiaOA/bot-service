@@ -22,30 +22,30 @@ public class MessageBodyMultipleSelect extends MessageBody {
     MessageBodyMultipleSelect(){}
 
 	public String selectedOptionsAsString() {
-    	StringBuilder accumulator = new StringBuilder();
+
 		final List<SelectItem> selectedOptions = this.choices.stream().filter(x -> x.selected).collect(Collectors.toList());
 
-
-		final int nrSelectedOptions = selectedOptions.size();
-		if(nrSelectedOptions == 1) {
+		if(selectedOptions.size() == 1) {
 			return selectedOptions.get(0).text.toLowerCase();
 		}
 
+
+		selectedOptions.removeIf( x->x instanceof  SelectOption && ((SelectOption)x).clearable);
+
+		StringBuilder accumulator = new StringBuilder();
+		final int nrSelectedOptions = selectedOptions.size();
+
 		for(int i = 0; i < nrSelectedOptions; i++) {
 			final SelectItem selectItem = selectedOptions.get(i);
-			if(selectItem instanceof  SelectOption && ((SelectOption)selectItem).clearable) {
-				continue;
-			}
 
 			int optionsLeft = (nrSelectedOptions - (i+1));
-			if( accumulator.length() > 0 && optionsLeft > 0){
+			if( accumulator.length() > 0 && optionsLeft > 0 ){
 				accumulator.append(", ");
 			}else if ( accumulator.length() > 0 && optionsLeft == 0) {
 				accumulator.append(" och ");
 			}
 
 			accumulator.append(selectItem.text.toLowerCase());
-
 		}
 		return accumulator.toString();
 	}
