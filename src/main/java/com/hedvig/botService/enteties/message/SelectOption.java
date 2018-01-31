@@ -1,8 +1,7 @@
 package com.hedvig.botService.enteties.message;
 
-import org.springframework.data.annotation.Transient;
-
 public class SelectOption extends SelectItem  {
+	static final long serialVersionUID = 1L;
 
 	public boolean clearable;
 

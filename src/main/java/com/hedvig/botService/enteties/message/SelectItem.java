@@ -19,6 +19,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 	    })
 public class SelectItem implements Serializable {
 
+	static final long serialVersionUID = 1L;
+
 	public boolean selected;
 	public String text;
 	public String value;
