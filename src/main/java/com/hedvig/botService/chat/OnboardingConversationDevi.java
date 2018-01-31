@@ -1218,7 +1218,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     m.body.text = "Jag har inga säkerhetsgrejer";
                 }
                 else{
-                    m.body.text = String.format("Jag har %s.", body.selectedOptionsAsString());
+                    m.body.text = String.format("Jag har %s", body.selectedOptionsAsString());
                     for(SelectOption o : body.selectedOptions()){
                         onBoardingData.addSecurityItem(o.value);
                     }
