@@ -1,21 +1,18 @@
 package com.hedvig.botService.enteties.message;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @DiscriminatorValue("multipleChoice")
 public class MessageBodyMultipleSelect extends MessageBody {
 	private static Logger log = LoggerFactory.getLogger(MessageBodySingleSelect.class);
-	
 	public ArrayList<SelectItem> choices = new ArrayList<SelectItem>();
 	
     public MessageBodyMultipleSelect(String content, ArrayList<SelectItem> items) {

@@ -1099,6 +1099,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 	                addToChat(m, userContext, memberChat);
 	                userContext.putUserData("{CHARITY}", selectedOption);
 	                nxtMsg = "message.kontrakt.charity.tack";
+                    userContext.completeConversation(this.getClass().getName());
             	}
                 break;
             case "message.nyhetsbrev":
@@ -1466,7 +1467,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         if(!singed) {
             log.info("Onboarding complete");
-            userContext.completeConversation(this.getClass().getName());
             addToChat(getMessage("message.kontraktklar"), userContext, userContext.getMemberChat());
             userContext.getOnBoardingData().setUserHasSigned(true);
         }
@@ -1500,7 +1500,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     @Override
     public void couldNotLoadMemberProfile(UserContext uc) {
-
+        addToChat(getMessage("message.missing.bisnode.data"), uc);
     }
 
     @Override

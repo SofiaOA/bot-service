@@ -2,6 +2,8 @@ package com.hedvig.botService.enteties.message;
 
 public class SelectLink extends SelectItem {
 
+	static final long serialVersionUID = 1L;
+
 	public SelectLink(String text, String value, String view, String appUrl, String webUrl, boolean selected) {
 		super(selected, text, value);
 		this.view = view;
