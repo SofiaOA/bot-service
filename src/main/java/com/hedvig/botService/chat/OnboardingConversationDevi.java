@@ -1393,8 +1393,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
                 break;
             case "onboarding.done":
-                log.info("Onboarding complete");
-                userContext.completeConversation(this.getClass().getName());
                 //userContext.onboardingComplete(true);
                 break;
             case "":
@@ -1484,6 +1482,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         Boolean singed = userContext.getOnBoardingData().getUserHasSigned();
 
         if(!singed) {
+            log.info("Onboarding complete");
+            userContext.completeConversation(this.getClass().getName());
             addToChat(getMessage("message.kontraktklar"), userContext, userContext.getMemberChat());
             userContext.getOnBoardingData().setUserHasSigned(true);
         }
