@@ -169,12 +169,16 @@ public class SessionManager {
     public void startOnboardingConversationWeb(String hid, String startMsg){
     	
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-    	uc.putUserData("{WEB_USER}", "TRUE");
     	
-        OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
-        uc.startConversation(onboardingConversation, startMsg);
-
-        userrepo.saveAndFlush(uc);
+    	// TODO: Make sure it is only possible to activate this endpoint ones
+    	if(uc.getDataEntry("{WEB_USER}") == null){
+	    	uc.putUserData("{WEB_USER}", "TRUE");
+	    	
+	        OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
+	        uc.startConversation(onboardingConversation, startMsg);
+	
+	        userrepo.saveAndFlush(uc);
+    	}
     }    
     
     /*
@@ -226,8 +230,13 @@ public class SessionManager {
         
         // Conversations can only be reset during onboarding
         if(!uc.hasCompletedOnboarding()){
+        	
+        	String email = uc.getOnBoardingData().getEmail(); // TODO: remove hack
 	    	mc.reset(); // Clear chat
 	    	uc.clearContext(); // Clear context
+	    	
+	    	uc.getOnBoardingData().setEmail(email); // TODO: remove hack
+	    	
 	        OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
 	        uc.startConversation(onboardingConversation);
 	    	userrepo.saveAndFlush(uc);
