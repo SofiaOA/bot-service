@@ -230,8 +230,13 @@ public class SessionManager {
         
         // Conversations can only be reset during onboarding
         if(!uc.hasCompletedOnboarding()){
+        	
+        	String email = uc.getOnBoardingData().getEmail(); // TODO: remove hack
 	    	mc.reset(); // Clear chat
 	    	uc.clearContext(); // Clear context
+	    	
+	    	uc.getOnBoardingData().setEmail(email); // TODO: remove hack
+	    	
 	        OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
 	        uc.startConversation(onboardingConversation);
 	    	userrepo.saveAndFlush(uc);
