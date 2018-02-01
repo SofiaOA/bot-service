@@ -1587,7 +1587,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     	log.debug("Generate signup code for email:" + email);
         SignupCode sc = signupRepo.findByEmail(email).orElseGet(() -> {
         	SignupCode newCode = new SignupCode(email);
-        	newCode.active = true;
             signupRepo.save(newCode);
             return newCode;
         });
