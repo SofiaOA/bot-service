@@ -140,8 +140,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         }}
                 ));*/   
         
-        createMessage("message.waitlist.user.alreadyactive",
+        /*createMessage("message.waitlist.user.alreadyactive",
                 new MessageBodyText("Du borde redan ha fått en aktiveringskod. Kolla din mailkorg och skriv sedan in koden här"
+                ));*/
+        
+        createChatMessage("message.waitlist.user.alreadyactive",
+                new MessageBodyText("Grattis! " + emoji_tada + " Nu kan du bli medlem hos Hedvig\fKolla din mail, där ska du ha fått en aktiveringkod som du ska ange här\fVi ses snart! " + emoji_smile
                 ));
         
         createChatMessage("message.activate.code.used",

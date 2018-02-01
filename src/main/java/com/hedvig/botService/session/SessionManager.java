@@ -169,12 +169,16 @@ public class SessionManager {
     public void startOnboardingConversationWeb(String hid, String startMsg){
     	
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-    	uc.putUserData("{WEB_USER}", "TRUE");
     	
-        OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
-        uc.startConversation(onboardingConversation, startMsg);
-
-        userrepo.saveAndFlush(uc);
+    	// TODO: Make sure it is only possible to activate this endpoint ones
+    	if(uc.getDataEntry("{WEB_USER}") == null){
+	    	uc.putUserData("{WEB_USER}", "TRUE");
+	    	
+	        OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
+	        uc.startConversation(onboardingConversation, startMsg);
+	
+	        userrepo.saveAndFlush(uc);
+    	}
     }    
     
     /*

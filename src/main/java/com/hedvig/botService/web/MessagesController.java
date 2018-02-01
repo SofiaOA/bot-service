@@ -204,7 +204,7 @@ public class MessagesController {
     public ResponseEntity<?> chatStartWeb(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Chat start web event from user: " + hid);
-        sessionManager.startOnboardingConversation(hid, "message.onboardingstart");
+        sessionManager.startOnboardingConversationWeb(hid, "message.onboardingstart");
     	return ResponseEntity.noContent().build();
     }
     
