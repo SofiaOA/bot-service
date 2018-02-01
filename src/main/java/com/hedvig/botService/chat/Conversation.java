@@ -97,6 +97,7 @@ public abstract class Conversation {
 
 		if(m.body.getClass() == MessageBodySingleSelect.class) {
 			MessageBodySingleSelect mss = (MessageBodySingleSelect) m.body;
+			
 			mss.choices.forEach(x -> {
 				if(x.getClass() == SelectLink.class) {
 					SelectLink link = (SelectLink) x;
@@ -108,6 +109,13 @@ public abstract class Conversation {
 					}
 				}
 			});
+		
+			// TODO: Remove this hack! ----------
+			if(userContext.getDataEntry("{WEB_USER}").equals("TRUE")){
+				mss.choices.removeIf( x->x instanceof  SelectOption && ((SelectOption)x).value.equals("message.activate"));
+			}
+			// ----------------------------------
+
 		}else if(m.body.getClass() == MessageBodyBankIdCollect.class) {
 			MessageBodyBankIdCollect mbc = (MessageBodyBankIdCollect) m.body;
 			mbc.referenceId = replaceWithContext(userContext, mbc.referenceId);

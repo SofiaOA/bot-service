@@ -200,6 +200,17 @@ public class MessagesController {
     /*
      * Regular start
      * */
+    @RequestMapping(path = "/chat/startweb")
+    public ResponseEntity<?> chatStartWeb(@RequestHeader(value="hedvig.token", required = false) String hid) {
+
+     	log.info("Chat start web event from user: " + hid);
+        sessionManager.startOnboardingConversation(hid, "message.onboardingstart");
+    	return ResponseEntity.noContent().build();
+    }
+    
+    /*
+     * Regular start
+     * */
     @RequestMapping(path = "/chat/start")
     public ResponseEntity<?> chatStart(@RequestHeader(value="hedvig.token", required = false) String hid) {
 

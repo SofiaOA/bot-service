@@ -148,12 +148,27 @@ public class SessionManager {
     public void startOnboardingConversation(String hid, String startMsg){
     	
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    	uc.putUserData("{WEB_USER}", "FALSE");
     	
         OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator, signupRepo);
         uc.startConversation(onboardingConversation, startMsg);
 
         userrepo.saveAndFlush(uc);
     }
+    
+    /*
+     * Kicks off onboarding web conversation
+     * */
+    public void startOnboardingConversationWeb(String hid, String startMsg){
+    	
+    	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    	uc.putUserData("{WEB_USER}", "TRUE");
+    	
+        OnboardingConversationDevi onboardingConversation = new OnboardingConversationDevi(memberService, this.productPricingclient, fakeMemberCreator, signupRepo);
+        uc.startConversation(onboardingConversation, startMsg);
+
+        userrepo.saveAndFlush(uc);
+    }    
     
     /*
      * Create a new users chat and context
@@ -228,11 +243,7 @@ public class SessionManager {
          * Find users chat and context. First time it is created
          * */
 
-        UserContext uc = userrepo.findByMemberId(hid).orElseGet(() -> {
-        	UserContext newUserContext = new UserContext(hid);
-        	userrepo.saveAndFlush(newUserContext);
-            return newUserContext;
-        });
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
         MemberChat chat = uc.getMemberChat();
 

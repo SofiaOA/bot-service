@@ -99,13 +99,13 @@ public class MainConversation extends Conversation {
 				break;
 			}
 		case "message.main.callme": 
-			userContext.putUserData("{PHONE}", m.body.text);
+			userContext.putUserData("{PHONE_"+ new LocalDate().toString() + "}", m.body.text);
 			nxtMsg = "message.main.end";
 			addToChat(m, userContext, memberChat); // Response parsed to nice format
 			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
 			break;
 		case "main.question":
-			userContext.putUserData("{QUESTION}", m.body.text);
+			userContext.putUserData("{QUESTION_"+ new LocalDate().toString() + "}", m.body.text);
 			addToChat(m, userContext, memberChat); // Response parsed to nice format
 			nxtMsg = "message.question.recieved";
 			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
