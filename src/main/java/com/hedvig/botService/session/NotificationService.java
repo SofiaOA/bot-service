@@ -4,16 +4,18 @@ import com.amazonaws.services.sns.AmazonSNS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.aws.messaging.core.NotificationMessagingTemplate;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SNSPublisher {
+@Profile("production")
+public class NotificationService {
 
     private final NotificationMessagingTemplate template;
-    private final Logger log = LoggerFactory.getLogger(SNSPublisher.class);
+    private final Logger log = LoggerFactory.getLogger(NotificationService.class);
 
-    public SNSPublisher(AmazonSNS tmp) {
+    public NotificationService(AmazonSNS tmp) {
         this.template = new NotificationMessagingTemplate(tmp);
     }
 
