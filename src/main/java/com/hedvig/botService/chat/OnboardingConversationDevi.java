@@ -735,7 +735,16 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
                         Optional<BankIdSignResponse> signData;
 
-                        signData = memberService.sign(ud.getSSN(), "Jag godkänner att jag har tagit del av Hedvigs förköpsinformation och försäkringsvillkor.", userContext.getMemberId());
+                        String signText = "";
+                        if(ud.getCurrentInsurer() != null) {
+                            signText = "Jag har tagit del av förköpsinformation och villkor och bekräftar genom att signera:\n" +
+                                    "- Att jag blir medlem hos Hedvig\n" +
+                                    "- Att jag ger Hedvig fullmakt att avsluta min gamla försäkring för att byta till Hedvig";
+                        } else {
+                            signText = "Jag har tagit del av förköpsinformation och villkor och bekräftar genom att signera att jag tecknar en försäkring hos Hedvig.";
+                        }
+
+                        signData = memberService.sign(ud.getSSN(), signText, userContext.getMemberId());
 
                         if (signData.isPresent()) {
                             userContext.startBankIdSign(signData.get());
