@@ -3,6 +3,11 @@ hedvig:
     url: localhost:8080
   product-pricing.url: localhost:4085
 
+cloud:
+  aws:
+    region:
+      static: eu-west-1
+
 spring:
   jpa:
     generate-ddl: true
