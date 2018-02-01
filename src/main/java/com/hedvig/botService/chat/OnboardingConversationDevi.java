@@ -15,9 +15,11 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResp
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
 import com.hedvig.botService.serviceIntegration.memberService.exceptions.ErrorType;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.session.SignedOnWaitlistEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.Charset;
@@ -37,6 +39,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
              * */
     private static Logger log = LoggerFactory.getLogger(OnboardingConversationDevi.class);
     private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private final ApplicationEventPublisher publisher;
+
     public static enum ProductTypes {BRF, RENT, RENT_BRF, SUBLET_RENTAL, SUBLET_BRF, STUDENT, LODGER};
     //private final MemberService memberService;
     //private final ProductPricingService productPricingClient;
@@ -67,10 +71,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     		MemberService memberService, 
     		ProductPricingService productPricingClient, 
     		FakeMemberCreator fakeMemberCreator,
-    		SignupCodeRepository signupRepo) {
+    		SignupCodeRepository signupRepo,
+            ApplicationEventPublisher publisher) {
         super("onboarding", memberService, productPricingClient);
         this.fakeMemberCreator = fakeMemberCreator;
         this.signupRepo = signupRepo;
+        this.publisher = publisher;
 
         Image hImage = new Image("https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/Hedvig_Icon-60%402x.png",120,120);
         
@@ -1585,6 +1591,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         }catch (Exception ex) {
             log.error("Could not send emailrequest to memberService: ", ex);
         }
+
+
+        publisher.publishEvent(new SignedOnWaitlistEvent(email));
 
         return sc;
     }

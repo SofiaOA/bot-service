@@ -40,18 +40,23 @@
 			<id>confluent</id>
 			<url>http://packages.confluent.io/maven/</url>
 		</repository>
+		<repository>
+			<id>aws-release</id>
+			<name>AWS Release Repository</name>
+			<url>s3://repo.elasticspring.org/</url>
+		</repository>
 	</repositories>
 
 	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-sleuth</artifactId>
-				<version>1.3.0.RELEASE</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-dependencies</artifactId>
+			<version>Dalston.SR4</version>
+			<type>pom</type>
+			<scope>import</scope>
+		</dependency>
+	</dependencies>
 	</dependencyManagement>
 
 	<dependencies>
@@ -210,8 +215,25 @@
             <artifactId>feign-jaxb</artifactId>
             <version>9.3.1</version>
         </dependency>
-    </dependencies>
-
+		<!-- AWS -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-ses</artifactId>
+			<version>1.11.228</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-aws-context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-aws-autoconfigure</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-aws-messaging</artifactId>
+</dependency>
+	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
