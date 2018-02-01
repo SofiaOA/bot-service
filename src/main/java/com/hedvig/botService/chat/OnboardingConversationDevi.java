@@ -899,7 +899,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     public void init(UserContext userContext, MemberChat memberChat) {
         log.info("Starting onboarding conversation");
-        startConversation(userContext, memberChat, "message.onboardingstart"); // Id of first message
+        if(userContext.getDataEntry("{SIGNED_UP}") != null) {
+            startConversation(userContext, memberChat, "message.onboardingstart"); // Id of first message
+        }else{
+            startConversation(userContext, memberChat, "message.activate.ok.b"); // Id of first message
+        }
+
     }
 
 	@Override
@@ -1569,6 +1574,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         		}
             	sc.get().setUsed(true);
             	signupRepo.saveAndFlush(sc.get());
+            	uc.putUserData("{SIGNED_UP}", "true");
             	return "message.activate.ok.a";       		
         	}
         	uc.putUserData("{SIGNUP_POSITION}", new Integer(90 + getSignupQueuePosition(sc.get().email)).toString());
