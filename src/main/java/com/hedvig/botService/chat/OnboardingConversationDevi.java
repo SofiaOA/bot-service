@@ -899,7 +899,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     public void init(UserContext userContext, MemberChat memberChat) {
         log.info("Starting onboarding conversation");
-        if(userContext.getDataEntry("{SIGNED_UP}") != null) {
+        if(userContext.getDataEntry("{SIGNED_UP}") == null) {
             startConversation(userContext, memberChat, "message.onboardingstart"); // Id of first message
         }else{
             startConversation(userContext, memberChat, "message.activate.ok.b"); // Id of first message
