@@ -39,7 +39,7 @@ public class ClaimsConversation extends Conversation {
         createMessage("message.claim.menu",
                 new MessageBodySingleSelect("Är du i en krissituation just nu? Om det är akut så ser jag till att en kollega ringer upp dig",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Det är kris, ring mig!", "message.claim.callme"));
+                            add(new SelectOption("Ring mig!", "message.claim.callme"));
                             add(new SelectOption("Jag vill chatta", "message.claims.chat"));
                         }}
                 ));
