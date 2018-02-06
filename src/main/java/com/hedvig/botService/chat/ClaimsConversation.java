@@ -28,7 +28,7 @@ public class ClaimsConversation extends Conversation {
         createMessage("init.asset.claim",
                 new MessageBodySingleSelect("Oj vad tråkigt att någon har hänt med din pryl. Självklart tar jag tag i det här",
                     new ArrayList<SelectItem>() {{
-                        add(new SelectOption("Det är kris, ring mig!", "message.claim.callme"));
+                        add(new SelectOption("Ring mig!", "message.claim.callme"));
                         add(new SelectOption("Jag vill chatta", "message.claims.chat"));
                     }}
                 ));
