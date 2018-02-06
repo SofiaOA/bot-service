@@ -34,6 +34,6 @@ public interface ProductPricingClient {
     ResponseEntity<String> contractSigned(@RequestBody ContractSignedRequest req);
     
     @RequestMapping(value = "{memberId}/insurance", method = RequestMethod.GET)
-    ResponseEntity<com.hedvig.botService.web.dto.InsuranceStatusDTO> getInsuranceStatus(@PathVariable String memberId);
+    ResponseEntity<com.hedvig.botService.web.dto.InsuranceStatusDTO> getInsuranceStatus(@PathVariable("memberId") String memberId);
 
 }
