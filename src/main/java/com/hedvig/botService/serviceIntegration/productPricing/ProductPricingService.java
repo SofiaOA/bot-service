@@ -2,7 +2,10 @@ package com.hedvig.botService.serviceIntegration.productPricing;
 
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.productPricing.dto.*;
+import com.hedvig.botService.web.dto.InsuranceStatusDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -86,5 +89,13 @@ public class ProductPricingService {
 
     public void setInsuranceStatus(String hid, String status) {
         this.client.setInsuranceStatus(hid, status);
+    }
+    
+    public String getInsuranceStatus(String hid) {
+    	ResponseEntity<InsuranceStatusDTO> isd = this.client.getInsuranceStatus(hid);
+    	if(isd!=null){
+    		return isd.getBody().getInsuranceStatus();
+    	}
+    	return null;
     }
 }

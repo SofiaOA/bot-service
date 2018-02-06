@@ -111,8 +111,13 @@ public abstract class Conversation {
 			});
 		
 			// TODO: Remove this hack! ----------
+			// Do not show activation option on web
 			if(userContext.getDataEntry("{WEB_USER}").equals("TRUE")){
 				mss.choices.removeIf( x->x instanceof  SelectOption && ((SelectOption)x).value.equals("message.activate"));
+			}
+			// Do not show report claim option when user is not active
+			if(!productPricingClient.getInsuranceStatus(userContext.getMemberId()).equals("ACTIVE")){
+				mss.choices.removeIf( x->x instanceof  SelectOption && ((SelectOption)x).value.equals("message.main.report"));
 			}
 			// ----------------------------------
 
