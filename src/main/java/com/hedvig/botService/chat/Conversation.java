@@ -8,6 +8,7 @@ import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,8 +120,12 @@ public abstract class Conversation {
 			Boolean isActive = false;
 			try{
 				isActive = productPricingClient.getInsuranceStatus(userContext.getMemberId()).equals("ACTIVE");
-			}catch(Exception e){
-				log.error(e.getMessage());
+			}catch(FeignException ex){
+				if(ex.status() != 404) {
+					log.error(ex.getMessage());
+				}
+			}catch (Exception ex) {
+				log.error(ex.getMessage());
 			}
 			
 			if(!isActive){
