@@ -116,7 +116,14 @@ public abstract class Conversation {
 				mss.choices.removeIf( x->x instanceof  SelectOption && ((SelectOption)x).value.equals("message.activate"));
 			}
 			// Do not show report claim option when user is not active
-			if(!productPricingClient.getInsuranceStatus(userContext.getMemberId()).equals("ACTIVE")){
+			Boolean isActive = false;
+			try{
+				isActive = productPricingClient.getInsuranceStatus(userContext.getMemberId()).equals("ACTIVE");
+			}catch(Exception e){
+				log.error(e.getMessage());
+			}
+			
+			if(!isActive){
 				mss.choices.removeIf( x->x instanceof  SelectOption && ((SelectOption)x).value.equals("message.main.report"));
 			}
 			// ----------------------------------
