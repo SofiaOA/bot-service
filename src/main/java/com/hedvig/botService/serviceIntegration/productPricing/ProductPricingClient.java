@@ -30,10 +30,10 @@ public interface ProductPricingClient {
     @RequestMapping(value = "/insurance/{userId}/quoteAccepted", method = RequestMethod.POST)
     ResponseEntity<String> quoteAccepted(@PathVariable("userId") String userId);
 
-    @RequestMapping(value = "/i/insurance/contractSigned")
+    @RequestMapping(value = "/_/insurance/contractSigned")
     ResponseEntity<String> contractSigned(@RequestBody ContractSignedRequest req);
     
-    @RequestMapping(value = "{memberId}/insurance", method = RequestMethod.GET)
+    @RequestMapping(value = "/_/insurance/{memberId}/insurance", method = RequestMethod.GET)
     ResponseEntity<com.hedvig.botService.web.dto.InsuranceStatusDTO> getInsuranceStatus(@PathVariable("memberId") String memberId);
 
 }
