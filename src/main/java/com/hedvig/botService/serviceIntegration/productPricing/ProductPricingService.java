@@ -4,6 +4,8 @@ import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.productPricing.dto.*;
 import com.hedvig.botService.web.dto.InsuranceStatusDTO;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -15,7 +17,8 @@ import java.util.List;
 public class ProductPricingService {
 
     private final ProductPricingClient client;
-
+    private static Logger log = LoggerFactory.getLogger(ProductPricingService.class);
+    
     @Autowired
     ProductPricingService(ProductPricingClient client) {
 
@@ -93,6 +96,7 @@ public class ProductPricingService {
     
     public String getInsuranceStatus(String hid) {
     	ResponseEntity<InsuranceStatusDTO> isd = this.client.getInsuranceStatus(hid);
+    	log.info("Getting insurance status:" + (isd==null?null:isd.getStatusCodeValue()));  	
     	if(isd!=null){
     		return isd.getBody().getInsuranceStatus();
     	}
