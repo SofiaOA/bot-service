@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hedvig.botService.dataTypes.HedvigDataType;
 import com.hedvig.botService.enteties.MemberChat;
 
+import com.hedvig.botService.enteties.UserContext;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -58,6 +59,11 @@ public class Message {
 
 	public String toString(){
 		return "[globalId:" + globalId + " id:" + id + " header:" + header + " body("+body.getClass()+"):" + body + "]";
+	}
+
+
+	public void render(UserContext userContext) {
+		this.body.render(userContext);
 	}
 
 }

@@ -44,6 +44,7 @@ public class MemberChat {
     }
     
     public MemberChat() {
+    	chatHistory = new ArrayList<>();
     	//new Exception().printStackTrace(System.out);
     }
 

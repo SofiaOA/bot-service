@@ -90,7 +90,7 @@ public class ClaimsConversation extends Conversation {
 		log.info("Starting claims conversation for user:" + userContext.getMemberId());
 		Message m = getMessage(startMessage);
 		m.header.fromId = HEDVIG_USER_ID;//new Long(userContext.getMemberId());
-		addToChat(m, userContext, memberChat);
+		addToChat(m, userContext);
 		startConversation(userContext, memberChat, startMessage); // Id of first message
 	}
 
@@ -111,13 +111,13 @@ public class ClaimsConversation extends Conversation {
 			log.info("Audio recieved with m.body.text:" + m.body.text + " and URL:" + ((MessageBodyAudio)m.body).URL);
 			// TODO: Send to claims service!
 			m.body.text = "Inspelning klar";
-			addToChat(m,userContext, memberChat); // Response parsed to nice format
+			addToChat(m,userContext); // Response parsed to nice format
 			nxtMsg = "message.claims.record.ok";
 			
 			break;
             case "message.claim.callme":
                 userContext.putUserData("{PHONE}", m.body.text);
-                addToChat(m, userContext, memberChat); // Response parsed to nice format
+                addToChat(m, userContext); // Response parsed to nice format
                 userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
                 nxtMsg = "message.claims.callme.end";
                 break;
@@ -133,7 +133,7 @@ public class ClaimsConversation extends Conversation {
            for (SelectItem o : body1.choices) {
                if(o.selected) {
                    m.body.text = o.text;
-                   addToChat(m,userContext, memberChat);
+                   addToChat(m,userContext);
                    nxtMsg = o.value;
                }
            }

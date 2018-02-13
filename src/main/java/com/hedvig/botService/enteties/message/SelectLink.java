@@ -1,5 +1,7 @@
 package com.hedvig.botService.enteties.message;
 
+import com.hedvig.botService.enteties.UserContext;
+
 public class SelectLink extends SelectItem {
 
 	static final long serialVersionUID = 1L;
@@ -16,4 +18,14 @@ public class SelectLink extends SelectItem {
 	public String view;
 	public String appUrl;
 	public String webUrl;
+
+	@Override
+	public void render(final UserContext context) {
+		if(this.appUrl != null) {
+			this.appUrl = context.replaceWithContext(this.appUrl);
+		}
+		if(this.webUrl != null) {
+			this.webUrl = context.replaceWithContext(this.webUrl);
+		}
+	}
 }

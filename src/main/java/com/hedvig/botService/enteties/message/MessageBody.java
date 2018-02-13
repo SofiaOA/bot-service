@@ -2,6 +2,7 @@ package com.hedvig.botService.enteties.message;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.hedvig.botService.enteties.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,4 +48,8 @@ public class MessageBody {
 	
 	MessageBody(String text){this.text = text;}
 	MessageBody(){;}
+
+	public void render(UserContext userContext) {
+		this.text = userContext.replaceWithContext(this.text);
+	}
 }
