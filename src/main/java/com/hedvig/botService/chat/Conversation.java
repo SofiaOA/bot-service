@@ -6,18 +6,14 @@ import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import feign.FeignException;
+import org.h2.engine.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public abstract class Conversation {
 
@@ -26,7 +22,6 @@ public abstract class Conversation {
 	public static enum conversationStatus {INITIATED, ONGOING, COMPLETE}
 	public static enum EventTypes {ANIMATION_COMPLETE, MODAL_CLOSED, MESSAGE_FETCHED, MISSING_DATA};
 
-	private static final String regexPattern = "\\{(.*?)\\}";
 	private static Logger log = LoggerFactory.getLogger(Conversation.class);
 	private String conversationName; // Id for the conversation
 
@@ -59,85 +54,15 @@ public abstract class Conversation {
 		return relayList.get(s1);
 	}
 
-	private String replaceWithContext(UserContext userContext, String input){
-		log.info("Contextualizing string:" + input);
-		Pattern pattern = Pattern.compile(regexPattern);
-		Matcher m = pattern.matcher(input);
-		while (m.find()) {
-			String s = m.group();
-			String r = userContext.getDataEntry(s);
-			log.debug(s + ":" + r);
-			if(r!=null){input = input.replace(s, r);}
-		}
-		log.debug("-->" + input);
-		return input;
+
+	void addToChat(String messageId, UserContext userContext) {
+		addToChat(getMessage(messageId), userContext);
 	}
 
-
-	void addToChat(Message m, UserContext uc) {
-		this.addToChat(m, uc, uc.getMemberChat());
-	}
-
-	/*
-	private String handleBankIdAuthRespose(String nxtMsg, Optional<BankIdAuthResponse> authResponse, UserContext userContext) {
-		if(!authResponse.isPresent()) {
-			log.error("Could not start bankIdAuthentication!");
-			nxtMsg = "message.bankid.error";
-		}else{
-			userContext.putUserData("{AUTOSTART_TOKEN}", authResponse.get().autoStartToken);
-			userContext.putUserData("{REFERENCE_TOKEN}", authResponse.get().referenceToken);
-		}
-		return nxtMsg;
-	}*/
-	
-	void addToChat(Message m, UserContext userContext, MemberChat memberChat) {
+	void addToChat(Message m, UserContext userContext) {
+		m.render(userContext);
 		log.info("Putting message:" + m.id + " content:" + m.body.text);
-		// -------------------------------------
-
-		m.body.text = replaceWithContext(userContext, m.body.text);
-
-		if(m.body.getClass() == MessageBodySingleSelect.class) {
-			MessageBodySingleSelect mss = (MessageBodySingleSelect) m.body;
-			
-			mss.choices.forEach(x -> {
-				if(x.getClass() == SelectLink.class) {
-					SelectLink link = (SelectLink) x;
-					if(link.appUrl != null) {
-						link.appUrl = replaceWithContext(userContext, link.appUrl);
-					}
-					if(link.webUrl != null) {
-						link.webUrl = replaceWithContext(userContext, link.webUrl);
-					}
-				}
-			});
-		
-			// TODO: Remove this hack! ----------
-			// Do not show activation option on web
-			if(userContext.getDataEntry("{WEB_USER}").equals("TRUE")){
-				mss.choices.removeIf( x->x instanceof  SelectOption && ((SelectOption)x).value.equals("message.activate"));
-			}
-			// Do not show report claim option when user is not active
-			Boolean isActive = false;
-			try{
-				isActive = productPricingClient.getInsuranceStatus(userContext.getMemberId()).equals("ACTIVE");
-			}catch(FeignException ex){
-				if(ex.status() != 404) {
-					log.error(ex.getMessage());
-				}
-			}catch (Exception ex) {
-				log.error(ex.getMessage());
-			}
-			
-			if(!isActive){
-				mss.choices.removeIf( x->x instanceof  SelectOption && ((SelectOption)x).value.equals("message.main.report"));
-			}
-			// ----------------------------------
-
-		}else if(m.body.getClass() == MessageBodyBankIdCollect.class) {
-			MessageBodyBankIdCollect mbc = (MessageBodyBankIdCollect) m.body;
-			mbc.referenceId = replaceWithContext(userContext, mbc.referenceId);
-		}
-		memberChat.addToHistory(m);
+		userContext.addToHistory(m);
 	}
 
 	private void createMessage(String id, MessageHeader header, MessageBody body){
@@ -234,7 +159,7 @@ public abstract class Conversation {
 
 	void startConversation(UserContext userContext, MemberChat memberChat, String startId){
 		log.info("Starting conversation with message:" + startId);
-		addToChat(messageList.get(startId), userContext, memberChat);
+		addToChat(messageList.get(startId), userContext);
 	}
 
 	public int getValue(MessageBodyNumber body){
@@ -291,8 +216,8 @@ public abstract class Conversation {
 			if(m.body.text==null){m.body.text = "";}
 			
 			if(!ok){
-				addToChat(m, userContext, memberChat);
-				addToChat(mCorr, userContext, memberChat);
+				addToChat(m, userContext);
+				addToChat(mCorr, userContext);
 			}
 			return ok;
 			}		
@@ -304,7 +229,7 @@ public abstract class Conversation {
 	public abstract void recieveMessage(UserContext userContext, MemberChat memberChat, Message m);
 	public void completeRequest(String nxtMsg, UserContext userContext, MemberChat memberChat) {
 		if(getMessage(nxtMsg)!=null) {
-			addToChat(getMessage(nxtMsg), userContext, memberChat);
+			addToChat(getMessage(nxtMsg), userContext);
 		}
 	}
 

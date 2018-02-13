@@ -1015,7 +1015,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         if(this.hasSelectItemCallback(m.id) && m.body.getClass().equals(MessageBodySingleSelect.class)) {
             //MessageBodySingleSelect body = (MessageBodySingleSelect) m.body;
             nxtMsg = this.execSelectItemCallback(m.id, (MessageBodySingleSelect) m.body, userContext);
-            addToChat(m, userContext, memberChat);
+            addToChat(m, userContext);
         }
 
         UserData onBoardingData = userContext.getOnBoardingData();
@@ -1043,7 +1043,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 		            m.body.text = "Mocka mina uppgifter tack!";
 		            userContext.clearContext();
 		            userContext.mockMe();	        
-		            addToChat(m, userContext, memberChat);
+		            addToChat(m, userContext);
 		        break;
 	        }
         }
@@ -1111,14 +1111,14 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             case "message.kontrakt.email":
                 onBoardingData.setEmail(m.body.text);
                 m.body.text = m.body.text;
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 nxtMsg = "message.kontrakt.charity";
                 break;
             case "message.kontrakt.charity.tellmemore":
             case "message.kontrakt.charity":
             	if(selectedOption.startsWith("charity")){
 	                m.body.text = "Jag vill att mitt överskott ska gå till " + selectedText;
-	                addToChat(m, userContext, memberChat);
+	                addToChat(m, userContext);
 	                userContext.putUserData("{CHARITY}", selectedOption);
 	                nxtMsg = "message.kontrakt.charity.tack";
                     userContext.completeConversation(this.getClass().getName());
@@ -1134,7 +1134,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             	String userEmail = m.body.text.toLowerCase();
             	onBoardingData.setEmail(userEmail);
             	m.body.text = userEmail;
-            	addToChat(m, userContext, memberChat);
+            	addToChat(m, userContext);
             	
             	
             	// --------- Logic for user state ------------- //
@@ -1168,14 +1168,14 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             	// Logic goes here
             	String userCode = m.body.text.toUpperCase();
             	m.body.text = userCode;
-            	addToChat(m, userContext, memberChat);
+            	addToChat(m, userContext);
             	nxtMsg = validateSignupCode(userCode, userContext);
                 //nxtMsg = "message.activate.ok.a";
                 break;
             case "message.uwlimit.housingsize":
             case "message.uwlimit.householdsize":
             	userContext.putUserData("{UWLIMIT_PHONENUMBER}", m.body.text);
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 nxtMsg = "message.uwlimit.tack";
                 break;
             case "message.tipsa":
@@ -1184,7 +1184,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 break;
             case "message.frifraga":
             	userContext.putUserData("{ONBOARDING_QUESTION}", m.body.text);
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 nxtMsg = "message.frifragatack";
                 break;
             case "message.pers":
@@ -1192,7 +1192,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 onBoardingData.setPersonInHouseHold(nr_persons);
                 if(nr_persons==1){ m.body.text = "Jag bor själv"; }
                 else{ m.body.text = "Vi är " + nr_persons + " i hushållet"; }
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 
                 if(nr_persons > 6){
                 	nxtMsg = "message.uwlimit.householdsize";
@@ -1204,7 +1204,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 String kvm = m.body.text;
                 onBoardingData.setLivingSpace(Float.parseFloat(kvm));
                 m.body.text = kvm + " kvm";
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 if(Integer.parseInt(kvm) > 250){
                 	nxtMsg = "message.uwlimit.housingsize";
                 	break;
@@ -1218,44 +1218,44 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 break;                             
             case "message.manuellnamn":
                 onBoardingData.setFirstName(m.body.text);
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 nxtMsg = "message.manuellfamilyname";
                 break;
             case "message.manuellfamilyname":
             	onBoardingData.setFamilyName(m.body.text);
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 nxtMsg = "message.manuellpersonnr";
                 break;
             case "message.manuellpersonnr":
                 onBoardingData.setSSN(m.body.text);
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 nxtMsg = "message.varborduadress";
                 break;
             case "message.bankidja.noaddress":
             case "message.varbordufeladress":
             case "message.varborduadress":
                 onBoardingData.setAddressStreet(m.body.text);
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 nxtMsg = "message.varbordupostnr";
                 break;
             case "message.varbordupostnr":
                 onBoardingData.setAddressZipCode(m.body.text);
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 nxtMsg = "message.kvadrat";
                 break;                
             case "message.mockme":
                 nxtMsg = m.body.text.toLowerCase();
                 m.body.text = "Jag vill gå till " + nxtMsg + " tack";
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 break;
             case "message.varbordu":
                 onBoardingData.setAddressStreet(m.body.text);
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 nxtMsg = "message.kvadrat";
                 break;
             case "message.mail":
                 onBoardingData.setEmail(m.body.text);
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 nxtMsg = "message.kontrakt";
                 break;
             case "message.sakerhet":
@@ -1270,7 +1270,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         onBoardingData.addSecurityItem(o.value);
                     }
                 }
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 nxtMsg = "message.forsakringidag";
                 break;
 
@@ -1293,8 +1293,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     
                     m.body.text = item.text;
                     nxtMsg = "message.missingvalue";
-                    addToChat(m, userContext, memberChat);
-                    addToChat(getMessage("message.missingvalue"), userContext, memberChat);
+                    addToChat(m, userContext);
+                    addToChat(getMessage("message.missingvalue"), userContext);
                     break;
                 }
                 else if(m.id.equals("message.missingvalue") || item.value.equals("message.forslag2")) {
@@ -1306,7 +1306,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 userContext.putUserData("{INSURANCE_COMPANY_TODAY}", _comp);
                 m.body.text = "Idag har jag " + _comp;
                 nxtMsg = "message.bytesinfo";
-                addToChat(m, userContext, memberChat); 
+                addToChat(m, userContext);
                 break;
             case "message.forsakringidagja":
                 String comp = getValue((MessageBodySingleSelect)m.body);
@@ -1314,12 +1314,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 	                userContext.putUserData("{INSURANCE_COMPANY_TODAY}", comp);
 	                m.body.text = "Idag har jag " + comp;
 	                nxtMsg = "message.bytesinfo";
-	                addToChat(m, userContext, memberChat);      
+	                addToChat(m, userContext);
                 }
                 break;
             case "message.forslagstart3":
                 String selectedValue = getValue((MessageBodySingleSelect)m.body);
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 break;
                 
             case "message.bankid.start.manual":
@@ -1342,7 +1342,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     nxtMsg = "message.bankid.autostart.respond";
                 }
 
-                addToChat(m, userContext, memberChat);
+                addToChat(m, userContext);
                 break;
 
             case "message.fetch.account.complete":
@@ -1366,7 +1366,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             for (SelectItem o : body1.choices) {
                 if(o.selected) {
                     m.body.text = o.text;
-                    addToChat(m, userContext, memberChat);
+                    addToChat(m, userContext);
                     nxtMsg = o.value;
                 }
             }
@@ -1408,6 +1408,20 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         }
 
         super.completeRequest(nxtMsg, userContext, memberChat);
+    }
+
+    @Override
+    void addToChat(Message m, UserContext userContext) {
+        if(m.body.getClass() == MessageBodySingleSelect.class) {
+            MessageBodySingleSelect mss = (MessageBodySingleSelect) m.body;
+
+            // Do not show activation option on web
+            if(userContext.getDataEntry("{WEB_USER}").equals("TRUE")){
+                mss.removeItemIf( x->x instanceof SelectOption && ((SelectOption)x).value.equals("message.activate"));
+            }
+        }
+
+        super.addToChat(m,userContext);
     }
 
     @Override
@@ -1468,13 +1482,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         message.id = "message.fetch.account.complete";
         message.header = header;
         message.body = new MessageBodySingleSelect(text, options);
-        addToChat(message, userContext, memberChat);
+        addToChat(message, userContext);
     }
 
     public void bankAccountRetrieveFailed(UserContext userContext, MemberChat memberChat) {
         //Add somethingWentWrong message
         //Add lastMessageAgain
-        addToChat(getMessage("message.fetch.accounts.error"), userContext, memberChat);
+        addToChat(getMessage("message.fetch.accounts.error"), userContext);
     }
 
 
@@ -1489,7 +1503,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         if(!singed) {
             log.info("Onboarding complete");
-            addToChat(getMessage("message.kontraktklar"), userContext, userContext.getMemberChat());
+            addToChat(getMessage("message.kontraktklar"), userContext);
             userContext.getOnBoardingData().setUserHasSigned(true);
         }
 
@@ -1497,7 +1511,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     @Override
     public void bankIdSignError(UserContext uc) {
-        addToChat(getMessage("message.kontrakt.signError"), uc, uc.getMemberChat());
+        addToChat(getMessage("message.kontrakt.signError"), uc);
     }
 
     @Override

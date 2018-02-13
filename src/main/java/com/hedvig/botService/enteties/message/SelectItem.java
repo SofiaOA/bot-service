@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.hedvig.botService.enteties.UserContext;
 
 /*
  * A select item is a super type for everything one can put in a list of options
@@ -31,5 +32,9 @@ public class SelectItem implements Serializable {
 		this.selected = selected;
 		this.text = text;
 		this.value = value;
+	}
+
+	public void render(UserContext userContext) {
+		//this.text = userContext.replaceWithContext(this.text);
 	}
 }

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+import feign.FeignException;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,6 @@ import com.hedvig.botService.enteties.message.SelectLink;
 import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.session.SessionManager;
 
 @Component
 public class MainConversation extends Conversation {
@@ -95,24 +95,24 @@ public class MainConversation extends Conversation {
 					nxtMsg = "conversation.done";
 					//sessionManager.initClaim(userContext.getMemberId()); // Start claim here
 				}
-				addToChat(m, userContext, memberChat); // Response parsed to nice format
+				addToChat(m, userContext); // Response parsed to nice format
 				break;
 			}
 		case "message.main.callme": 
 			userContext.putUserData("{PHONE_"+ new LocalDate().toString() + "}", m.body.text);
 			nxtMsg = "message.main.end";
-			addToChat(m, userContext, memberChat); // Response parsed to nice format
+			addToChat(m, userContext); // Response parsed to nice format
 			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
 			break;
 		case "main.question":
 			userContext.putUserData("{QUESTION_"+ new LocalDate().toString() + "}", m.body.text);
-			addToChat(m, userContext, memberChat); // Response parsed to nice format
+			addToChat(m, userContext); // Response parsed to nice format
 			nxtMsg = "message.question.recieved";
 			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
 			break;
 		case "message.main.refer": 
 			userContext.putUserData("{REFERAL}", m.body.text);
-			addToChat(m, userContext, memberChat); // Response parsed to nice format
+			addToChat(m, userContext); // Response parsed to nice format
 			nxtMsg = "message.main.refer.recieved";
 			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
 			break;
@@ -127,7 +127,7 @@ public class MainConversation extends Conversation {
            for (SelectItem o : body1.choices) {
                if(o.selected) {
                    m.body.text = o.text;
-                   addToChat(m, userContext, memberChat);
+                   addToChat(m, userContext);
                    nxtMsg = o.value;
                }
            }
@@ -147,9 +147,9 @@ public class MainConversation extends Conversation {
             case "conversation.done":
                 log.info("conversation complete");
                 userContext.completeConversation(this.getClass().getName());
-                //new ClaimsConversation(memberService, productPricingClient).init(userContext, memberChat);
+
 				userContext.startConversation(new ClaimsConversation(memberService, productPricingClient));
-                //userContext.onboardingComplete(true);
+
                 return;
             case "":
                 log.error("I dont know where to go next...");
@@ -159,6 +159,37 @@ public class MainConversation extends Conversation {
 
         super.completeRequest(nxtMsg, userContext, memberChat);
     }
+
+    @Override
+	void addToChat(Message m, UserContext userContext) {
+		if(m.body.getClass() == MessageBodySingleSelect.class) {
+			MessageBodySingleSelect mss = (MessageBodySingleSelect) m.body;
+
+			// Do not show report claim option when user is not active
+			Boolean isActive = userHasActiveInsurance(userContext);
+
+			if (!isActive) {
+				mss.removeItemIf(x -> x instanceof SelectOption && ((SelectOption) x).value.equals("message.main.report"));
+
+			}
+		}
+
+		super.addToChat(m,userContext);
+	}
+
+	private Boolean userHasActiveInsurance(UserContext userContext) {
+		Boolean isActive = false;
+		try{
+			isActive = productPricingClient.getInsuranceStatus(userContext.getMemberId()).equals("ACTIVE");
+		}catch(FeignException ex){
+			if(ex.status() != 404) {
+				log.error(ex.getMessage());
+			}
+		}catch (Exception ex) {
+			log.error(ex.getMessage());
+		}
+		return isActive;
+	}
     
 	@Override
 	public void init(UserContext userContext, MemberChat memberChat) {

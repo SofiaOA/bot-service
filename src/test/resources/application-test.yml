@@ -14,7 +14,7 @@ spring:
     properties:
       hibernate:
         hbm2ddl:
-       #   auto: update
+          auto: create
       javax:
         persistence:
           schema-generation:
@@ -32,4 +32,3 @@ spring:
   datasource:
     url: jdbc:h2:mem:product-pricing;MODE=PostgreSQL
     driverClassName: org.h2.Driver
-

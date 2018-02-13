@@ -3,6 +3,7 @@ package com.hedvig.botService.enteties;
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.Conversation.conversationStatus;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
+import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.MemberProfile;
@@ -20,6 +21,8 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
  * Contains all state information related to a member
@@ -249,6 +252,24 @@ public class UserContext implements Serializable {
 			obd.setAddressZipCode(address.getZipCode());
 			obd.setFloor(address.getFloor());
 		});
+    }
+
+    public String replaceWithContext(String input){
+        //log.info("Contextualizing string:" + input);
+        Pattern pattern = Pattern.compile("\\{(.*?)\\}");
+        Matcher m = pattern.matcher(input);
+        while (m.find()) {
+            String s = m.group();
+            String r = getDataEntry(s);
+            //log.debug(s + ":" + r);
+            if(r!=null){input = input.replace(s, r);}
+        }
+        //log.debug("-->" + input);
+        return input;
+    }
+
+    public void addToHistory(Message m) {
+        getMemberChat().addToHistory(m);
     }
 }
 

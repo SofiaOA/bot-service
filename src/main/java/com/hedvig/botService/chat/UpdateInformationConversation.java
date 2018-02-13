@@ -74,7 +74,7 @@ public class UpdateInformationConversation extends Conversation {
            }
        }
 
-       addToChat(m, userContext, memberChat);
+       addToChat(m, userContext);
        completeRequest(nxtMsg, userContext, memberChat);
 		
 	}
