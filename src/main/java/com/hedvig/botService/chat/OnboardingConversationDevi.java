@@ -566,7 +566,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage("message.forslagpop",
                 new MessageBodySingleSelect("(FÖRSLAG VISAS I POP-UP. I POP-UP FINNS NEDAN ALTERNATIV SOM TAR EN TILLBAKA TILL CHATTEN NÄR EN VALT)",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill bli medlem", "message.medlemjabank"));
                             add(new SelectOption("Jag vill fundera", "message.fundera"));
 
                         }}
@@ -631,62 +630,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 ));
 
 //DET VORE SNYGGT OM FUNDERASVARSALTERNATIVEN I medlem.fundera-trädet KUNDE FÖRSVINNA/ÄNDRAS BEROENDE PÅ VILKA EN KLICKAT PÅ! =)
-
-
-
-        createMessage("message.medlemjabank",
-                new MessageBodySingleSelect("Hurra! "+ emoji_tada +" Då behöver jag bara veta vilken bank du har så jag kan koppla upp autogiro",
-                        new ArrayList<SelectItem>() {{
-
-                            add(new SelectOption("Swedbank", "FSPA"));
-                            add(new SelectOption("Forex", "FOREX"));
-                            add(new SelectOption("Handelsbanken", "SHB"));
-                            add(new SelectOption("Ica", "ICA"));
-                            add(new SelectOption("Lansforsakringar", "LFB"));
-                            add(new SelectOption("Nordea", "NB"));
-                            add(new SelectOption("SBAB", "SBAB"));
-                            add(new SelectOption("SEB", "SEB"));
-                            add(new SelectOption("Skandia", "SKB"));
-                            add(new SelectOption("Sparbanken Syd ", "SYD"));
-                        }}
-                ));
-
-        createMessage("message.start.account.retrieval",
-                new MessageBodySingleSelect("Då behöver vi välja det konto som pengarna ska dras ifrån. Om du har ditt BankId redo så ska jag fråga mina vänner på {BANK_FULL} om dina konotnummer.",
-                        new ArrayList<SelectItem>(){{
-                            //add(new SelectOption("Jag är redo!", "message.fetch.accounts"));
-                            add(new SelectLink("Öppna BankId", "message.fetch.accounts", null, "bankid:///?redirect={LINK_URI}", null, false));
-                            add(new SelectOption("Varför ska jag göra detta?", "message.fetch.accounts.explain"));
-                        }}));
-
-        
-        createMessage("message.fetch.accounts.explain", new MessageBodyParagraph("Jag använder autogiro för att göra betalningar smidiga. För att kunna aktivera autogiro behöver du välja vilket av dina bankkonton betalningen ska dras ifrån"),2000);;
-        createMessage("message.fetch.accounts.explain2",
-                new MessageBodySingleSelect("Jag vet inte vilka bankkonton du har, men om du loggar in med BankID kan jag hämta informationen från din bank så att du kan välja konto i en lista",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Logga in med BankId", "message.fetch.accounts", null, "bankid:///?redirect={LINK_URI}", null, false));
-                        }}
-                ),
-                (m, userContext) -> {
-                    if(m.getSelectedItem().value.equals("message.fetch.accounts")) {
-                        String publicId = memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
-                        userContext.putUserData("{REFERENCE_TOKEN}", publicId);
-                        return "message.fetch.accounts.hold";
-                    }
-                    return "message.start.account.retrieval";
-                });
-        addRelay("message.fetch.accounts.explain","message.fetch.accounts.explain2");
-
-        
-        
-        createMessage("message.fetch.accounts.hold", new MessageBodyParagraph("Då väntar vi på svar ifrån {BANK_FULL}, det tar normalt 10-30 sekunder." + emoji_mag),1000);
-
-        createMessage("message.fetch.accounts.error",
-                new MessageBodySingleSelect("Nu blev någonting fel, ska vi försöka igen?",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Försök igen", "message.start.account.retrieval"));
-                        }}
-                ));
 
 
         //(FUNKTION: FYLL I BANKNAMN) = SCROLL MED DE VANLIGASTE BANKERNA SAMT "ANNAN BANK"
@@ -1081,25 +1024,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 	userContext.putUserData("{STUDENT}", "1");
                 }
                 break;
-	        case "message.start.account.retrieval":
-	        	SelectItem sitem = ((MessageBodySingleSelect)m.body).getSelectedItem();
-
-                m.body.text = sitem.text;
-                if(sitem.value.equals("message.fetch.accounts")) {
-                    String publicId = memberService.startBankAccountRetrieval(userContext.getMemberId(), userContext.getAutogiroData().getBankShort());
-                    userContext.putUserData("{REFERENCE_TOKEN}", publicId);
-                    nxtMsg = "message.fetch.accounts.hold";
-                }else {
-                    nxtMsg = "message.start.account.retrieval";
-                }
-
-		        break;
-	        case "message.medlemjabank":
-	        	SelectItem s = ((MessageBodySingleSelect)m.body).getSelectedItem();
-		        userContext.getAutogiroData().selectBank(s.value, s.text);
-		        m.body.text = s.text;
-		        nxtMsg = "message.start.account.retrieval";
-		        break;
 
             case "message.audiotest":
             case "message.phototest":
@@ -1453,47 +1377,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         addToChat(getMessage(bankIdStartMessage), userContext);
     }
 
-    public void bankAccountRetrieved(UserContext userContext, MemberChat memberChat) {
-
-
-        AutogiroData bankAccountHelper = userContext.getAutogiroData();
-
-        String text = String.format("Hej du har %s konton hos %s:\n",
-                bankAccountHelper.getAccountCount(),
-                userContext.getAutogiroData().getBankFullName());
-
-        ArrayList<SelectItem> options = new ArrayList<>();
-
-        int nr = 0;
-        for(BankAccount ba: bankAccountHelper.getAccounts()) {
-            text += String.format("* %s %s, %s %s:-\n",
-                    ba.getName(),
-                    ba.getClearingNo(),
-                    ba.getAccountNo(),
-                    ba.getAmonut().toString());
-
-            options.add(new SelectOption(ba.getAccountNo(), Objects.toString(nr)));
-            nr++;
-        }
-
-
-        MessageHeader header = new MessageHeader(HEDVIG_USER_ID, "/response", -1);
-        Message message = new Message();
-        message.id = "message.fetch.account.complete";
-        message.header = header;
-        message.body = new MessageBodySingleSelect(text, options);
-        addToChat(message, userContext);
-    }
-
-    public void bankAccountRetrieveFailed(UserContext userContext, MemberChat memberChat) {
-        //Add somethingWentWrong message
-        //Add lastMessageAgain
-        addToChat(getMessage("message.fetch.accounts.error"), userContext);
-    }
-
 
     public void quoteAccepted(UserContext userContext, MemberChat memberChat) {
-        //addToChat(getMessage("message.medlemjabank"), userContext, memberChat);
         addToChat(getMessage("message.kontrakt.great"), userContext);
     }
 
