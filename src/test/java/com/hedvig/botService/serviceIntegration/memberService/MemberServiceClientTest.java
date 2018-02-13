@@ -2,13 +2,14 @@ package com.hedvig.botService.serviceIntegration.memberService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.http.Fault;
+import com.hedvig.botService.BotServiceApplicationTests;
 import com.hedvig.botService.serviceIntegration.memberService.dto.APIErrorDTO;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthRequest;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdStatusType;
-import com.hedvig.botService.serviceIntegration.memberService.exceptions.BankIdError;
 import feign.FeignException;
 import feign.RetryableException;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -22,30 +23,33 @@ import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.RestTemplate;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 @RunWith(SpringRunner.class)
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(classes=BotServiceApplicationTests.class)
 @AutoConfigureWireMock(port = 4777)
 @TestPropertySource(properties = {
         "hedvig.member-service.url=localhost:4777"
-})
+
+}, locations = "/application-test.yml")
 @EnableFeignClients
 public class MemberServiceClientTest {
 
     @Value("${wiremock.server.port}")
     String port;
 
-    @Autowired
-    RestTemplate template;
+    //@Autowired
+    //RestTemplate template;
 
-    @Autowired
     ObjectMapper objectMapper;
 
     @Autowired
@@ -57,15 +61,16 @@ public class MemberServiceClientTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    /*@Before
+    @Before
     public void setup(){
-         feignClient = Feign.builder().
+         /*feignClient = Feign.builder().
                  contract(new SpringMvcContract()).
                  errorDecoder(new MemberServiceErrorDecoder(objectMapper)).
                  encoder(new SpringEncoder(feignEncoder)).
                  decoder(new SpringDecoder(feignEncoder)).
-                 target(MemberServiceClient.class, "http://localhost:4777");
-    }*/
+                 target(MemberServiceClient.class, "http://localhost:4777"); */
+         objectMapper = new ObjectMapper();
+    }
 
     @Test
     public void auth() throws Exception {

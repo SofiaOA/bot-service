@@ -1,5 +1,6 @@
 package com.hedvig.botService.web;
 
+import com.hedvig.botService.BotServiceApplicationTests;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdProgressStatus;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
@@ -9,6 +10,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -19,6 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = HedvigController.class)
+@ContextConfiguration(classes=BotServiceApplicationTests.class)
+@ActiveProfiles("test")
 public class HedvigControllerTest {
 
     @MockBean
