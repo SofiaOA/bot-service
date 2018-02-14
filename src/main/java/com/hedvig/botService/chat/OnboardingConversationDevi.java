@@ -13,7 +13,7 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResp
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
 import com.hedvig.botService.serviceIntegration.memberService.exceptions.ErrorType;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.session.SignedOnWaitlistEvent;
+import com.hedvig.botService.session.events.SignedOnWaitlistEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

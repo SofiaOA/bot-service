@@ -1,6 +1,7 @@
 package com.hedvig.botService.session;
 
 import com.amazonaws.services.sns.AmazonSNS;
+import com.hedvig.botService.session.events.SignedOnWaitlistEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.aws.messaging.core.NotificationMessagingTemplate;
