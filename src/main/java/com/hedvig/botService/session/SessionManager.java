@@ -341,66 +341,12 @@ public class SessionManager {
     	log.warn("Received unwanted MemberAuthedEvent {}", e.toString());
     }
 
-    public void receiveEvent(MemberServiceEvent e){
-        log.info("Received BankAccountsRetrievedEvent {}", e.toString());
-
-        MemberServiceEventPayload payload = e.getPayload();
-        if(payload.getClass() == BankAccountRetrievalSuccess.class) {
-            this.handleBankAccountRetrievalSuccess(e, (BankAccountRetrievalSuccess)payload);
-        }else if(payload.getClass() == BankAccountRetrievalFailed.class) {
-            this.handleBankAccountRetrievalFailed(e, (BankAccountRetrievalFailed)payload);
-        }else {
-            log.warn("Recieved unhandled event e:{}", e);
-        }
-
-    }
-
-    private void handleBankAccountRetrievalFailed(MemberServiceEvent e, BankAccountRetrievalFailed payload) {
-        log.info("Handle failed event {}, {}", e, payload);
-        String hid = e.getMemberId().toString();
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
-        MemberChat mc = uc.getMemberChat();
-
-        //if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
-            onboardingConversation.bankAccountRetrieveFailed(uc, mc);
-        //}
-
-        userrepo.saveAndFlush(uc);
-    }
-
-    private void handleBankAccountRetrievalSuccess(MemberServiceEvent e, BankAccountRetrievalSuccess payload) {
-
-        String hid = e.getMemberId().toString();
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
-        List<BankAccountDetails> details = payload.getAccounts();
-        List<BankAccount> accounts = new ArrayList<>();
-
-        for(int i=0; i < details.size(); i++) {
-
-            BankAccountDetails bad = details.get(i);
-            BankAccount ba = new BankAccount(bad.getName(), bad.getClearingNumber(), bad.getNumber(), bad.getAmount());
-            accounts.add(ba);
-        }
-        uc.getAutogiroData().setAccounts(accounts);
-
-        MemberChat mc = uc.getMemberChat();
-
-//        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
-            onboardingConversation.bankAccountRetrieved(uc, mc);
-//        }
-
-        userrepo.saveAndFlush(uc);
-    }
-
     public void quoteAccepted(String hid) {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
-        MemberChat mc = uc.getMemberChat();
 
 //        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
             OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
-            onboardingConversation.quoteAccepted(uc, mc);
+            onboardingConversation.quoteAccepted(uc);
 //        }
 
         userrepo.save(uc);

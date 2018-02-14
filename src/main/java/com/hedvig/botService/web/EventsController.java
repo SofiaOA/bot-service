@@ -40,14 +40,4 @@ public class EventsController {
         return ResponseEntity.ok("");
     }
 
-    @PostMapping("/event/memberservice/bankaccountsretreived")
-    public ResponseEntity<String> bankaccountsretrieved(@RequestBody MemberServiceEvent event) {
-        MDC.put("memberId", event.getMemberId().toString());
-
-        log.info("Received MemberServiceEvent");
-        sessionManager.receiveEvent(event);
-
-        return ResponseEntity.ok("");
-    }
-
 }
