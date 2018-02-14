@@ -133,6 +133,10 @@ public class SessionManager {
 				    UpdateInformationConversation infoConversation = new UpdateInformationConversation(memberService, productPricingclient);
 		            infoConversation.recieveEvent(type, value, uc, mc);                    
 					break;
+                case "com.hedvig.botService.chat.CharityConversation":
+                    Conversation conversation = conversationFactory.createConversation(CharityConversation.class);
+                    conversation.recieveEvent(type, value, uc, mc);
+                    break;
 			}
         }
 

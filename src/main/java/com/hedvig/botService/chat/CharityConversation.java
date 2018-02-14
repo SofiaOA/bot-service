@@ -3,16 +3,20 @@ package com.hedvig.botService.chat;
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
 public class CharityConversation extends Conversation {
 
+    private final Logger log = LoggerFactory.getLogger(CharityConversation.class);
+
     public CharityConversation() {
         super("charity");
 
         createChatMessage("message.kontrakt.charity",
-                new MessageBodySingleSelect("En sista grej bara.. "
+                new MessageBodySingleSelect("En sista grej bara.. \f"
                         +"Som Hedvig-medlem får du välja en välgörenhetsorganisation att stödja om det blir pengar över när alla skador har betalats",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("SOS Barnbyar", "charity.sosbarnbyar"));
@@ -46,12 +50,12 @@ public class CharityConversation extends Conversation {
 
         String nxtMsg = "message.kontrakt.charity";
         switch (m.id) {
-            case "message.kontrakt.charity.tellmemore":
-            case "message.kontrakt.charity":
+            case "message.kontrakt.charity.tellmemore.8":
+            case "message.kontrakt.charity.2":
 
                 MessageBodySingleSelect mss = (MessageBodySingleSelect) m.body;
                 final SelectItem selectedItem = mss.getSelectedItem();
-                if(selectedItem.text.startsWith("charity")){
+                if(selectedItem.value.startsWith("charity")){
                     m.body.text = "Jag vill att mitt överskott ska gå till " + selectedItem.text;
                     addToChat(m, userContext);
                     userContext.putUserData("{CHARITY}", selectedItem.value);
@@ -59,13 +63,33 @@ public class CharityConversation extends Conversation {
                     userContext.completeConversation(this.getClass().getName());
                 }
                 else{
+                    m.body.text = selectedItem.text;
                     nxtMsg = selectedItem.value;
+                    addToChat(m, userContext);
                 }
                 break;
         }
 
         completeRequest(nxtMsg, userContext, memberChat);
     }
+
+    @Override
+    public void recieveEvent(EventTypes e, String value, UserContext userContext, MemberChat memberChat){
+
+        switch(e){
+            // This is used to let Hedvig say multiple message after another
+            case MESSAGE_FETCHED:
+                log.info("Message fetched:" + value);
+
+                // New way of handeling relay messages
+                String relay = getRelay(value);
+                if(relay!=null){
+                    completeRequest(relay, userContext, memberChat);
+                }
+                break;
+        }
+    }
+
 
     @Override
     public void init(UserContext userContext) {

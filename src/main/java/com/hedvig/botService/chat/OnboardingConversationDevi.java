@@ -741,7 +741,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         }}
                 ));
         
-        createMessage("message.kontrakt.email", new MessageBodyText("Ok, är din mailadress? "));
+        createMessage("message.kontrakt.email", new MessageBodyText("Ok, vad är din mailadress? "));
         setExpectedReturnType("message.kontrakt.email", new EmailAdress());
         
 
@@ -1250,8 +1250,15 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
                 m.body.text = ((MessageBodySingleSelect)m.body).getSelectedItem().text;
                 addToChat(m, userContext);
-                endConversation(userContext);
-                return;
+                if(((MessageBodySingleSelect)m.body).getSelectedItem().value.equals("message.kontrakt.email")) {
+                    //NOOP
+                    nxtMsg = "message.kontrakt.email";
+                }else{
+                    endConversation(userContext);
+                    return;
+                }
+                break;
+
             default:
                 break;
         }
