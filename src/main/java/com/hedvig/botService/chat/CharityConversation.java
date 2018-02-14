@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class CharityConversation extends Conversation {
 
     public CharityConversation() {
-        super("charity",null,null);
+        super("charity");
 
         createChatMessage("message.kontrakt.charity",
                 new MessageBodySingleSelect("En sista grej bara.. "

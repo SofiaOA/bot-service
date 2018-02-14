@@ -2,10 +2,8 @@ package com.hedvig.botService.chat;
 
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.serviceIntegration.paymentService.PaymentService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.triggerService.TriggerService;
 import org.junit.Before;
@@ -44,7 +42,7 @@ public class TrustlyConversationTest {
         userContext = new UserContext(TOLVANSSON_MEMBER_ID);
         userContext.setMemberChat(new MemberChat());
 
-        testConversation = new TrustlyConversation(memberService, productPricingService, triggerService, factory);
+        testConversation = new TrustlyConversation(triggerService, factory);
     }
 
     @Test

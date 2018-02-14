@@ -2,10 +2,11 @@ package com.hedvig.botService.chat;
 
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.*;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
-import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.triggerService.TriggerService;
 
 import java.util.ArrayList;
@@ -17,11 +18,9 @@ public class TrustlyConversation extends Conversation {
     private final TriggerService triggerService;
     private final ConversationFactory factory;
 
-    public TrustlyConversation(MemberService memberService,
-                               ProductPricingService productPricingService,
-                               TriggerService triggerService,
+    public TrustlyConversation(TriggerService triggerService,
                                ConversationFactory factory) {
-        super("conversation.trustly", memberService, productPricingService);
+        super("conversation.trustly");
         this.triggerService = triggerService;
         this.factory = factory;
 

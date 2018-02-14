@@ -1,9 +1,10 @@
 package com.hedvig.botService.chat;
 
-import java.nio.charset.Charset;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-
+import com.hedvig.botService.dataTypes.EmailAdress;
+import com.hedvig.botService.enteties.MemberChat;
+import com.hedvig.botService.enteties.UserContext;
+import com.hedvig.botService.enteties.message.*;
+import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import feign.FeignException;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -11,28 +12,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.hedvig.botService.dataTypes.EmailAdress;
-import com.hedvig.botService.enteties.*;
-import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.enteties.message.MessageBodyNumber;
-import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
-import com.hedvig.botService.enteties.message.MessageBodyText;
-import com.hedvig.botService.enteties.message.SelectItem;
-import com.hedvig.botService.enteties.message.SelectLink;
-import com.hedvig.botService.enteties.message.SelectOption;
-import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import java.nio.charset.Charset;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 @Component
 public class MainConversation extends Conversation {
 
 	private static Logger log = LoggerFactory.getLogger(MainConversation.class);
 	private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    private String emoji_hand_ok = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8C}, Charset.forName("UTF-8"));
+	private final ConversationFactory conversationFactory;
+	private final ProductPricingService productPricingService;
+	private String emoji_hand_ok = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8C}, Charset.forName("UTF-8"));
 
     @Autowired
-	public MainConversation(MemberService memberService, ProductPricingService productPricingClient) {
-		super("main.menue", memberService, productPricingClient);
+	public MainConversation(ProductPricingService productPricingService, ConversationFactory conversationFactory) {
+		super("main.menue");
+		this.productPricingService = productPricingService;
+		this.conversationFactory = conversationFactory;
 		// TODO Auto-generated constructor stub
 
 		createMessage("hedvig.com",
@@ -99,6 +96,7 @@ public class MainConversation extends Conversation {
 			}
 		case "message.main.callme": 
 			userContext.putUserData("{PHONE_"+ new LocalDate().toString() + "}", m.body.text);
+
 			nxtMsg = "message.main.end";
 			addToChat(m, userContext); // Response parsed to nice format
 			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
@@ -147,7 +145,7 @@ public class MainConversation extends Conversation {
                 log.info("conversation complete");
                 userContext.completeConversation(this.getClass().getName());
 
-				userContext.startConversation(new ClaimsConversation(memberService, productPricingClient));
+				userContext.startConversation(conversationFactory.createConversation(ClaimsConversation.class));
 
                 return;
             case "":
@@ -179,7 +177,7 @@ public class MainConversation extends Conversation {
 	private Boolean userHasActiveInsurance(UserContext userContext) {
 		Boolean isActive = false;
 		try{
-			isActive = productPricingClient.getInsuranceStatus(userContext.getMemberId()).equals("ACTIVE");
+			isActive = productPricingService.getInsuranceStatus(userContext.getMemberId()).equals("ACTIVE");
 		}catch(FeignException ex){
 			if(ex.status() != 404) {
 				log.error(ex.getMessage());

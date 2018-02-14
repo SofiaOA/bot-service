@@ -22,7 +22,7 @@ public class ClaimsConversation extends Conversation {
 
 	@Autowired
 	public ClaimsConversation(MemberService memberService, ProductPricingService productPricingClient) {
-		super("claims", memberService, productPricingClient);
+		super("claims");
 		// TODO Auto-generated constructor stub
 
         createMessage("init.asset.claim",

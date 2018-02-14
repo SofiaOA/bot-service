@@ -114,10 +114,11 @@ public class SessionManager {
         	
         	// Only deliver messages to ongoing conversations
         	if(!c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING))continue;
-        	
+
+
         	switch(c.getClassName()){
 				case "com.hedvig.botService.chat.MainConversation":
-				    MainConversation mainConversation = new MainConversation(memberService, productPricingclient);
+				    Conversation mainConversation = conversationFactory.createConversation(MainConversation.class);
 		        	mainConversation.recieveEvent(type, value, uc, mc);
 					break;
 				case "com.hedvig.botService.chat.ClaimsConversation":
@@ -146,7 +147,7 @@ public class SessionManager {
     }
 
     private OnboardingConversationDevi createOnboaringConversation() {
-        return new OnboardingConversationDevi(memberService, productPricingclient, fakeMemberCreator, signupRepo, publisher, conversationFactory);
+        return new OnboardingConversationDevi(memberService, productPricingclient, signupRepo, publisher, conversationFactory);
     }
 
     /*
@@ -303,7 +304,7 @@ public class SessionManager {
  
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
-        MainConversation mainConversation = new MainConversation(memberService, productPricingclient);
+        Conversation mainConversation = conversationFactory.createConversation(MainConversation.class);
         uc.startConversation(mainConversation);
 
         userrepo.saveAndFlush(uc);    	

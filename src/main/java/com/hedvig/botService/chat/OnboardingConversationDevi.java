@@ -7,7 +7,6 @@ import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
-import com.hedvig.botService.serviceIntegration.FakeMemberCreator;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
@@ -38,6 +37,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     private static Logger log = LoggerFactory.getLogger(OnboardingConversationDevi.class);
     private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private final ApplicationEventPublisher publisher;
+    private final MemberService memberService;
+    private final ProductPricingService productPricingService;
 
     public static enum ProductTypes {BRF, RENT, RENT_BRF, SUBLET_RENTAL, SUBLET_BRF, STUDENT, LODGER};
     //private final MemberService memberService;
@@ -57,8 +58,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public final static String emoji_waving_hand = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8B}, Charset.forName("UTF-8"));
     public final static String emoji_flushed_face = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0xB3}, Charset.forName("UTF-8"));
     public final static String emoji_thinking = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0xA4, (byte)0x94}, Charset.forName("UTF-8"));
-    
-    private final FakeMemberCreator fakeMemberCreator;
+
     private final SignupCodeRepository signupRepo;
     private final ConversationFactory conversationFactory;
 
@@ -69,12 +69,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public OnboardingConversationDevi(
             MemberService memberService,
             ProductPricingService productPricingClient,
-            FakeMemberCreator fakeMemberCreator,
             SignupCodeRepository signupRepo,
             ApplicationEventPublisher publisher,
             ConversationFactory conversationFactory) {
-        super("onboarding", memberService, productPricingClient);
-        this.fakeMemberCreator = fakeMemberCreator;
+        super("onboarding");
+        this.memberService = memberService;
+        this.productPricingService = productPricingClient;
         this.signupRepo = signupRepo;
         this.publisher = publisher;
         this.conversationFactory = conversationFactory;
@@ -918,7 +918,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     }
 
     private void completeOnboarding(UserContext userContext) {
-        String productId = this.productPricingClient.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
+        String productId = this.productPricingService.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
         userContext.getOnBoardingData().setProductId(productId);
         this.memberService.finalizeOnBoarding(userContext.getMemberId(), userContext.getOnBoardingData());
     }
@@ -1333,7 +1333,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         if(userContext.getOnBoardingData().getUserHasSigned()) {
             userContext.completeConversation(this.getClass().getName());
-            MainConversation mc = new MainConversation(memberService, productPricingClient);
+            Conversation mc = conversationFactory.createConversation(MainConversation.class);
             userContext.startConversation(mc);
         }
         else if(userContext.getDataEntry(LOGIN) != null) {

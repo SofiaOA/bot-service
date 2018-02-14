@@ -5,9 +5,6 @@ import com.hedvig.botService.dataTypes.TextInput;
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
-import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import org.h2.engine.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,12 +24,8 @@ public abstract class Conversation {
 
 	private TreeMap<String, Message> messageList = new TreeMap<String, Message>();
 	private TreeMap<String, String> relayList = new TreeMap<String, String>();
-	protected MemberService memberService;
-	protected ProductPricingService productPricingClient;
 
-	Conversation(String conversationId, MemberService memberService, ProductPricingService productPricingClient) {
-		this.memberService = memberService;
-		this.productPricingClient = productPricingClient;
+	Conversation(String conversationId) {
 		this.conversationName = conversationId;
 	}
 

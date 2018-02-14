@@ -2,7 +2,10 @@ package com.hedvig.botService.chat;
 
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.*;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyText;
+import com.hedvig.botService.enteties.message.SelectItem;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import org.joda.time.LocalDate;
@@ -21,7 +24,7 @@ public class UpdateInformationConversation extends Conversation {
 
 	@Autowired
 	public UpdateInformationConversation(MemberService memberService, ProductPricingService productPricingClient) {
-		super("info.update", memberService, productPricingClient);
+		super("info.update");
 
 		createMessage("message.info.update.email", new MessageBodyText("Ok, vad har du för mailadress?"));
 		

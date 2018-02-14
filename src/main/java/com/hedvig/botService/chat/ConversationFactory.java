@@ -35,15 +35,15 @@ public class ConversationFactory {
         }
 
         if(conversationClass.equals(MainConversation.class)) {
-            return new MainConversation(memberService, productPricingService);
+            return new MainConversation(productPricingService, this);
         }
 
         if(conversationClass.equals(OnboardingConversationDevi.class)) {
-            return new OnboardingConversationDevi(memberService, productPricingService, null,  signupCodeRepository, eventPublisher, this);
+            return new OnboardingConversationDevi(memberService, productPricingService, signupCodeRepository, eventPublisher, this);
         }
 
         if(conversationClass.equals(TrustlyConversation.class)) {
-                return new TrustlyConversation(memberService, productPricingService, triggerService, this);
+                return new TrustlyConversation(triggerService, this);
         }
 
         if(conversationClass.equals(UpdateInformationConversation.class)) {
