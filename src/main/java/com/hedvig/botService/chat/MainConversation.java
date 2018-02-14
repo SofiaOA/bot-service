@@ -19,11 +19,21 @@ import java.util.ArrayList;
 @Component
 public class MainConversation extends Conversation {
 
+	public static final String MESSAGE_HEDVIG_COM = "hedvig.com";
+	public static final String MESSAGE_QUESTION_RECIEVED = "message.question.recieved";
+	public static final String MESSAGE_MAIN_REFER_RECIEVED = "message.main.refer.recieved";
+	public static final String MESSAGE_MAIN_END = "message.main.end";
+	public static final String MESSAGE_MAIN_CALLME = "message.main.callme";
+	public static final String MESSAGE_MAIN_QUESTION = "main.question";
+	public static final String MESSAGE_MAIN_REFER = "message.main.refer";
+	public static final String MESSAGE_ERROR = "error";
+
 	private static Logger log = LoggerFactory.getLogger(MainConversation.class);
-	private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 	private final ConversationFactory conversationFactory;
 	private final ProductPricingService productPricingService;
 	private String emoji_hand_ok = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8C}, Charset.forName("UTF-8"));
+
+
 
     @Autowired
 	public MainConversation(ProductPricingService productPricingService, ConversationFactory conversationFactory) {
@@ -32,7 +42,7 @@ public class MainConversation extends Conversation {
 		this.conversationFactory = conversationFactory;
 		// TODO Auto-generated constructor stub
 
-		createMessage("hedvig.com",
+		createMessage(MESSAGE_HEDVIG_COM,
 				new MessageBodySingleSelect("Hej {NAME}, vad vill du göra idag?",
 						new ArrayList<SelectItem>(){{
 							add(new SelectOption("Rapportera en skada","message.main.report", false));
@@ -42,15 +52,15 @@ public class MainConversation extends Conversation {
 						}}
 				));
 		
-		createMessage("message.question.recieved",
+		createMessage(MESSAGE_QUESTION_RECIEVED,
 				new MessageBodySingleSelect("Tack {NAME}, jag återkommer så snart jag kan med svar på din fråga",
 						new ArrayList<SelectItem>(){{
 							add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
 							//add(new SelectOption("Ok tack!","hedvig.com", false));
 						}}
 				));
-		
-		createMessage("message.main.refer.recieved",
+
+		createMessage(MESSAGE_MAIN_REFER_RECIEVED,
 				new MessageBodySingleSelect("Då mailar din vän och tipsar om Hedvig" + emoji_hand_ok,
 						new ArrayList<SelectItem>(){{
 							add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
@@ -58,21 +68,21 @@ public class MainConversation extends Conversation {
 						}}
 				));
 		
-        createMessage("message.main.end",
+        createMessage(MESSAGE_MAIN_END,
                 new MessageBodySingleSelect("Tack. Jag ringer upp dig så snart jag kan",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
                         }}
                 ));
         
-		createMessage("message.main.callme", new MessageBodyNumber("Ok, ta det lugnt! Vad når jag dig på för nummer?"));
+		createMessage(MESSAGE_MAIN_CALLME, new MessageBodyNumber("Ok, ta det lugnt! Vad når jag dig på för nummer?"));
 		
-		createMessage("main.question", new MessageBodyText("Självklart, vad kan jag hjälpa dig med?"));
+		createMessage(MESSAGE_MAIN_QUESTION, new MessageBodyText("Självklart, vad kan jag hjälpa dig med?"));
 		
-		createMessage("message.main.refer", new MessageBodyText("Kul! Vad har din vän för emailadress?"));
+		createMessage(MESSAGE_MAIN_REFER, new MessageBodyText("Kul! Vad har din vän för emailadress?"));
 		setExpectedReturnType("message.main.refer", new EmailAdress());
 		
-		createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
+		createMessage(MESSAGE_ERROR, new MessageBodyText("Oj nu blev något fel..."));
 	}
 
 	@Override
@@ -84,7 +94,7 @@ public class MainConversation extends Conversation {
 		if(!validateReturnType(m,userContext, memberChat)){return;}
 		
 		switch(m.id){
-			case "hedvig.com": {
+			case MESSAGE_HEDVIG_COM: {
 				SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
 				m.body.text = item.text;
 				if(item.value.equals("message.main.report")) {
@@ -104,7 +114,7 @@ public class MainConversation extends Conversation {
 		case "main.question":
 			userContext.putUserData("{QUESTION_"+ new LocalDate().toString() + "}", m.body.text);
 			addToChat(m, userContext); // Response parsed to nice format
-			nxtMsg = "message.question.recieved";
+			nxtMsg = MESSAGE_QUESTION_RECIEVED;
 			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
 			break;
 		case "message.main.refer": 
@@ -191,13 +201,13 @@ public class MainConversation extends Conversation {
 	@Override
 	public void init(UserContext userContext) {
     	log.info("Starting main conversation");
-        startConversation(userContext, "hedvig.com"); // Id of first message
+        startConversation(userContext, MESSAGE_HEDVIG_COM); // Id of first message
 	}
 
 	@Override
 	public void init(UserContext userContext, String startMessage) {
     	log.info("Starting main conversation with message:" + startMessage);
-        startConversation(userContext, "hedvig.com"); // Id of first message
+        startConversation(userContext, MESSAGE_HEDVIG_COM); // Id of first message
 	}
 
 }
