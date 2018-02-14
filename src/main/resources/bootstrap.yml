@@ -4,7 +4,7 @@ spring:
 
 ---
 spring:
-  profiles: test
+  profiles: test, development
   cloud:
     kubernetes:
       enabled: false

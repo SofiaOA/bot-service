@@ -32,6 +32,9 @@ public class TrustlyConversationTest {
     @Mock
     TriggerService triggerService;
 
+    @Mock
+    ConversationFactory factory;
+
     private UserContext userContext;
     private TrustlyConversation testConversation;
 
@@ -41,7 +44,7 @@ public class TrustlyConversationTest {
         userContext = new UserContext(TOLVANSSON_MEMBER_ID);
         userContext.setMemberChat(new MemberChat());
 
-        testConversation = new TrustlyConversation(memberService, productPricingService, triggerService);
+        testConversation = new TrustlyConversation(memberService, productPricingService, triggerService, factory);
     }
 
     @Test

@@ -9,7 +9,6 @@ import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.MemberProfile;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
-import com.hedvig.botService.web.dto.Member;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -105,11 +104,12 @@ public class UserContext implements Serializable {
     /*
      * Start a conversation for a user
      * */
+
     public void startConversation(Conversation c){
     	log.info("Starting conversation of type:" + c.getClass().getName() + " for user:" + getMemberId());
 
 		if(conversationManager.startConversation(c.getClass())){
-			c.init(this, this.memberChat);
+			c.init(this);
 		}
 
     }
@@ -118,7 +118,7 @@ public class UserContext implements Serializable {
     	log.info("Starting conversation of type:" + c.getClass().getName() + " for user:" + getMemberId() + " with message:" + startMessage);
 
 		if(conversationManager.startConversation(c.getClass(), startMessage)){
-			c.init(this, this.memberChat, startMessage);
+			c.init(this, startMessage);
 		}
 
     }

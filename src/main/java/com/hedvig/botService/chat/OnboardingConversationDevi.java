@@ -6,8 +6,6 @@ import com.hedvig.botService.enteties.SignupCode;
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
-import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
-import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.FakeMemberCreator;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
@@ -62,21 +60,25 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     
     private final FakeMemberCreator fakeMemberCreator;
     private final SignupCodeRepository signupRepo;
+    private final ConversationFactory conversationFactory;
 
     //@Value("${hedvig.gateway.url:http://gateway.hedvig.com}")
     public String gatewayUrl = "http://gateway.hedvig.com";
     
     @Autowired
     public OnboardingConversationDevi(
-    		MemberService memberService, 
-    		ProductPricingService productPricingClient, 
-    		FakeMemberCreator fakeMemberCreator,
-    		SignupCodeRepository signupRepo,
-            ApplicationEventPublisher publisher) {
+            MemberService memberService,
+            ProductPricingService productPricingClient,
+            FakeMemberCreator fakeMemberCreator,
+            SignupCodeRepository signupRepo,
+            ApplicationEventPublisher publisher,
+            ConversationFactory conversationFactory) {
         super("onboarding", memberService, productPricingClient);
         this.fakeMemberCreator = fakeMemberCreator;
         this.signupRepo = signupRepo;
         this.publisher = publisher;
+        this.conversationFactory = conversationFactory;
+
 
         Image hImage = new Image("https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/Hedvig_Icon-60%402x.png",120,120);
         
@@ -688,7 +690,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
                         Optional<BankIdSignResponse> signData;
 
-                        String signText = "";
+                        String signText;
                         if(ud.getCurrentInsurer() != null) {
                             signText = "Jag har tagit del av förköpsinformation och villkor och bekräftar genom att signera att jag vill byta till Hedvig när min gamla försäkring går ut. Jag ger också  Hedvig fullmakt att byta försäkringen åt mig.";
                         } else {
@@ -733,7 +735,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodySingleSelect("Hurra! "+ emoji_tada + " Välkommen som medlem!"+
         "\fJag skickar en bekräftelse till din mail. Visst stämmer det att du har {EMAIL}?",
                         new ArrayList<SelectItem>() {{
-                        	add(new SelectOption("Ja", "message.kontrakt.charity"));
+                        	add(new SelectOption("Ja", "message.onboarding.end"));
                         	add(new SelectOption("Nej", "message.kontrakt.email"));
                             //add(new SelectLink("Börja utforska", "onboarding.done", "Dashboard", null, null,  false));
                         }}
@@ -742,34 +744,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage("message.kontrakt.email", new MessageBodyText("Ok, är din mailadress? "));
         setExpectedReturnType("message.kontrakt.email", new EmailAdress());
         
-        createChatMessage("message.kontrakt.charity",
-                new MessageBodySingleSelect("En sista grej bara.. \f" 
-                		+"Som Hedvig-medlem får du välja en välgörenhetsorganisation att stödja om det blir pengar över när alla skador har betalats",
-                        new ArrayList<SelectItem>() {{
-                        	add(new SelectOption("SOS Barnbyar", "charity.sosbarnbyar"));
-                        	add(new SelectOption("Cancerfonden", "charity.cancerfonden"));
-                        	add(new SelectOption("Berätta mer", "message.kontrakt.charity.tellmemore"));
-                        }}
-                ));
-        
-        createChatMessage("message.kontrakt.charity.tellmemore",
-                new MessageBodySingleSelect("Så här, jag fungerar inte som ett vanligt försäkringsbolag\f" + 
-					"Jag tar ut en fast avgift för att kunna ge dig bra service\f" + 
-					"Resten av det du betalar öronmärks för att ersätta skador\f" + 
-					"När alla skador har betalats skänks överskottet till organisationer som gör världen bättre\f" + 
-					"Du väljer själv vad ditt hjärta klappar för!",
-                        new ArrayList<SelectItem>() {{
-                        	add(new SelectOption("SOS Barnbyar", "charity.sosbarnbyar"));
-                        	add(new SelectOption("Cancerfonden", "charity.cancerfonden"));
-                        }}
-                ));        
-        
-        createMessage("message.kontrakt.charity.tack",
-                new MessageBodySingleSelect("Toppen, tack!",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Börja utforska appen", "onboarding.done", "Dashboard", null, null,  false));
-                        }}
-                ));
+
 
         createMessage("message.avslutvalkommen",
                 new MessageBodySingleSelect("Hej så länge och ännu en gång, varmt välkommen!",
@@ -844,23 +819,24 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         addRelay(messageId + ".bankid.error.invalidParameters", relayId);
     }
 
-    public void init(UserContext userContext, MemberChat memberChat) {
+    @Override
+    public void init(UserContext userContext) {
         log.info("Starting onboarding conversation");
         if(userContext.getDataEntry("{SIGNED_UP}") == null) {
-            startConversation(userContext, memberChat, "message.onboardingstart"); // Id of first message
+            startConversation(userContext, "message.onboardingstart"); // Id of first message
         }else{
-            startConversation(userContext, memberChat, "message.activate.ok.b"); // Id of first message
+            startConversation(userContext, "message.activate.ok.b"); // Id of first message
         }
 
     }
 
 	@Override
-	public void init(UserContext userContext, MemberChat memberChat, String startMessage) {
+	public void init(UserContext userContext, String startMessage) {
         log.info("Starting onboarding conversation with message:" + startMessage);
         if(startMessage.equals("message.start.login")) {
             userContext.putUserData(LOGIN, "true");
         }
-        startConversation(userContext, memberChat, startMessage); // Id of first message	
+        startConversation(userContext, startMessage); // Id of first message
 	}
     // --------------------------------------------------------------------------- //
 
@@ -878,18 +854,19 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         return "";
     }
 
-    public String getText(MessageBodySingleSelect body){
+    private String getText(MessageBodySingleSelect body){
 
         for(SelectItem o : body.choices){
             if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
                 return SelectOption.class.cast(o).text;
             }
         }
+
         return "";
     }
     
     public ArrayList<String> getValue(MessageBodyMultipleSelect body){
-        ArrayList<String> selectedOptions = new ArrayList<String>();
+        ArrayList<String> selectedOptions = new ArrayList<>();
         for(SelectItem o : body.choices){
             if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
                 selectedOptions.add(SelectOption.class.cast(o).value);
@@ -978,7 +955,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 		            if(!(onBoardingData.getEmail()!=null && !onBoardingData.getEmail().equals(""))){
 		            	nxtMsg = "message.signup.email";
 		            }else{ // Update position if there is a code
-		            	userContext.putUserData("{SIGNUP_POSITION}", new Integer(90 + getSignupQueuePosition(onBoardingData.getEmail())).toString());
+		            	userContext.putUserData("{SIGNUP_POSITION}", Objects.toString(getSignupQueuePosition(onBoardingData.getEmail())));
 		            }
 		        break;
 		        case "message.mockme":
@@ -1036,18 +1013,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 onBoardingData.setEmail(m.body.text);
                 m.body.text = m.body.text;
                 addToChat(m, userContext);
-                nxtMsg = "message.kontrakt.charity";
-                break;
-            case "message.kontrakt.charity.tellmemore":
-            case "message.kontrakt.charity":
-            	if(selectedOption.startsWith("charity")){
-	                m.body.text = "Jag vill att mitt överskott ska gå till " + selectedText;
-	                addToChat(m, userContext);
-	                userContext.putUserData("{CHARITY}", selectedOption);
-	                nxtMsg = "message.kontrakt.charity.tack";
-                    userContext.completeConversation(this.getClass().getName());
-            	}
-                break;
+                endConversation(userContext);
+                return;
+
+
             case "message.nyhetsbrev":
                 onBoardingData.setNewsLetterEmail(m.body.text);
                 nxtMsg = "message.nagotmer";
@@ -1079,12 +1048,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 	            	//userContext.putUserData("{SIGNUP_POSITION}", new Integer(90 + getSignupQueuePosition(userEmail)).toString());
 	            	nxtMsg = "message.signup.checkposition";
             	}
-            	userContext.putUserData("{SIGNUP_POSITION}", new Integer(90 + getSignupQueuePosition(userEmail)).toString());
+            	userContext.putUserData("{SIGNUP_POSITION}", Objects.toString(getSignupQueuePosition(userEmail)));
                 
                 break;
             case "message.signup.flerval":
             	// TODO: Remove constant when list is up
-            	userContext.putUserData("{SIGNUP_POSITION}", new Integer(90 + getSignupQueuePosition(onBoardingData.getEmail())).toString());
+            	userContext.putUserData("{SIGNUP_POSITION}", Objects.toString(getSignupQueuePosition(onBoardingData.getEmail())));
                 break;
             case "message.waitlist.user.alreadyactive":
             case "message.activate.nocode.tryagain":
@@ -1257,8 +1226,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     nxtMsg = "message.bankid.start.manual.error";
                 }else{
                     userContext.startBankIdAuth(ssnResponse.get());
-                    userContext.putUserData("{AUTOSTART_TOKEN}", ssnResponse.get().getAutoStartToken());
-                    userContext.putUserData("{REFERENCE_TOKEN}", ssnResponse.get().getReferenceToken());
                 }
 
 
@@ -1277,6 +1244,14 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
             case "message.kontrakt":
                 completeOnboarding(userContext);
+                break;
+
+            case "message.kontraktklar":
+
+                m.body.text = ((MessageBodySingleSelect)m.body).getSelectedItem().text;
+                addToChat(m, userContext);
+                endConversation(userContext);
+                return;
             default:
                 break;
         }
@@ -1298,6 +1273,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         completeRequest(nxtMsg, userContext, memberChat);
 
+    }
+
+    private void endConversation(UserContext userContext) {
+        userContext.completeConversation(this.getClass().toString());
+        userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
     }
 
     /*
@@ -1378,7 +1358,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     }
 
 
-    public void quoteAccepted(UserContext userContext, MemberChat memberChat) {
+    public void quoteAccepted(UserContext userContext) {
         addToChat(getMessage("message.kontrakt.great"), userContext);
     }
 
@@ -1390,8 +1370,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             log.info("Onboarding complete");
             addToChat(getMessage("message.kontraktklar"), userContext);
             userContext.getOnBoardingData().setUserHasSigned(true);
+            userContext.completeConversation(OnboardingConversationDevi.class.toString());
         }
-
     }
 
     @Override
@@ -1465,7 +1445,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     
     // ---------- Signup code logic ------------- //
     
-    public String validateSignupCode(String code, UserContext uc){
+    private String validateSignupCode(String code, UserContext uc){
     	log.debug("Validating signup code:" + code);
         Optional<SignupCode> sc = signupRepo.findByCode(code);
 
@@ -1480,13 +1460,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             	uc.putUserData("{SIGNED_UP}", "true");
             	return "message.activate.ok.a";       		
         	}
-        	uc.putUserData("{SIGNUP_POSITION}", new Integer(90 + getSignupQueuePosition(sc.get().email)).toString());
+        	uc.putUserData("{SIGNUP_POSITION}", Objects.toString(getSignupQueuePosition(sc.get().email)));
         	return "message.activate.notactive";
         }
         return "message.activate.nocode";
     }
     
-    public SignupCode createSignupCode(String email){
+    private SignupCode createSignupCode(String email){
     	log.debug("Generate signup code for email:" + email);
         SignupCode sc = signupRepo.findByEmail(email).orElseGet(() -> {
         	SignupCode newCode = new SignupCode(email);
@@ -1506,18 +1486,18 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         return sc;
     }
     
-    public Optional<SignupCode> findSignupCodeByEmail(String email){
+    private Optional<SignupCode> findSignupCodeByEmail(String email){
     	return signupRepo.findByEmail(email);
     }
     
-    public int getSignupQueuePosition(String email){
+    private int getSignupQueuePosition(String email){
         ArrayList<SignupCode> scList = (ArrayList<SignupCode>) signupRepo.findAllByOrderByDateAsc();
         int pos = 1;
         for(SignupCode sc : scList){
         	if(!sc.used){
         		log.debug(sc.code + "|" + sc.email + "(" + sc.date+"):" + (pos));
         		if(sc.email.equals(email)){
-        			return pos;
+        			return 90 + pos;
         		}
         		pos++;
         	}

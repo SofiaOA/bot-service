@@ -15,16 +15,20 @@ public class TrustlyConversation extends Conversation {
 
     public static final String START = "trustly.start";
     private final TriggerService triggerService;
+    private final ConversationFactory factory;
 
-    public TrustlyConversation(MemberService memberService, ProductPricingService productPricingService, TriggerService triggerService) {
+    public TrustlyConversation(MemberService memberService,
+                               ProductPricingService productPricingService,
+                               TriggerService triggerService,
+                               ConversationFactory factory) {
         super("conversation.trustly", memberService, productPricingService);
         this.triggerService = triggerService;
+        this.factory = factory;
 
         createMessage(START,
                 new MessageBodySingleSelect("Nu ska vi bara välja ett autogirokonto!",
                         new ArrayList<SelectItem>(){{
-                            add(new SelectLink("Ja välj trustlykonto", "trustly.choose.account",  null, null,  "https://google.com", false));
-
+                            add(new SelectOption("Ja välj trustlykonto", "trustly.choose.account", false));
                         }}
                 ));
     }
@@ -32,16 +36,27 @@ public class TrustlyConversation extends Conversation {
     @Override
     public void recieveMessage(UserContext userContext, MemberChat memberChat, Message m) {
 
+        switch (m.id) {
+            case START:
+                endConversation(userContext);
+        }
+
+    }
+
+    private void endConversation(UserContext userContext) {
+        userContext.completeConversation(this.getClass().toString());
+
+        userContext.startConversation(factory.createConversation(CharityConversation.class));
     }
 
     @Override
-    public void init(UserContext userContext, MemberChat memberChat) {
-        addToChat(getMessage("trustly.start"), userContext);
+    public void init(UserContext userContext) {
+        addToChat(START, userContext);
     }
 
     @Override
-    public void init(UserContext userContext, MemberChat memberChat, String startMessage) {
-        addToChat(getMessage(startMessage), userContext);
+    public void init(UserContext userContext, String startMessage) {
+        addToChat(startMessage, userContext);
     }
 
     @Override

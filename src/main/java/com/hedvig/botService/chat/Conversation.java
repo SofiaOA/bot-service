@@ -157,7 +157,7 @@ public abstract class Conversation {
 		createMessage(id,header,body);			
 	}
 
-	void startConversation(UserContext userContext, MemberChat memberChat, String startId){
+	void startConversation(UserContext userContext, String startId){
 		log.info("Starting conversation with message:" + startId);
 		addToChat(messageList.get(startId), userContext);
 	}
@@ -235,9 +235,9 @@ public abstract class Conversation {
 
 	public void recieveEvent(EventTypes e, String value, UserContext userContext, MemberChat memberChat) {}
 
-	public abstract void init(UserContext userContext, MemberChat memberChat);
+	public abstract void init(UserContext userContext);
 
-	public abstract void init(UserContext userContext, MemberChat memberChat, String startMessage);
+	public abstract void init(UserContext userContext, String startMessage);
 
 	// ----------------------------------------------------------------------------------------------------------------- //
 

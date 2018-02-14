@@ -93,14 +93,14 @@ public class UpdateInformationConversation extends Conversation {
 			super.completeRequest(nxtMsg, userContext, memberChat);
 	}
 
-	public void init(UserContext userContext, MemberChat memberChat, String startMessage) {
+	public void init(UserContext userContext, String startMessage) {
     	log.info("Starting main conversation");
-        startConversation(userContext, memberChat, startMessage); // Id of first message
+        startConversation(userContext, startMessage); // Id of first message
 	}
 
-	public void init(UserContext userContext, MemberChat memberChat) {
+	public void init(UserContext userContext) {
 		log.info("Starting main conversation with: message.info.update");
-		startConversation(userContext, memberChat, "message.info.update"); // Id of first message
+		startConversation(userContext, "message.info.update"); // Id of first message
 	}
 
 

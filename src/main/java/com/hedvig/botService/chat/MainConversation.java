@@ -1,7 +1,6 @@
 package com.hedvig.botService.chat;
 
 import java.nio.charset.Charset;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
@@ -192,15 +191,15 @@ public class MainConversation extends Conversation {
 	}
     
 	@Override
-	public void init(UserContext userContext, MemberChat memberChat) {
+	public void init(UserContext userContext) {
     	log.info("Starting main conversation");
-        startConversation(userContext, memberChat, "hedvig.com"); // Id of first message
+        startConversation(userContext, "hedvig.com"); // Id of first message
 	}
 
 	@Override
-	public void init(UserContext userContext, MemberChat memberChat, String startMessage) {
+	public void init(UserContext userContext, String startMessage) {
     	log.info("Starting main conversation with message:" + startMessage);
-        startConversation(userContext, memberChat, "hedvig.com"); // Id of first message
+        startConversation(userContext, "hedvig.com"); // Id of first message
 	}
 
 }

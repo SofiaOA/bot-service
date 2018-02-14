@@ -37,12 +37,13 @@ public class ConversationManager {
     
     public ConversationManager() {
     	//new Exception().printStackTrace(System.out);
+        conversations = new ArrayList<>();
     }
 
     public ConversationManager(String memberId) {
     	log.info("Instantiating ConversationManager for member:" + memberId);
         this.memberId = memberId;
-        this.conversations = new ArrayList<ConversationEntity>();
+        this.conversations = new ArrayList<>();
     }
 
     private void addConversation(ConversationEntity c) {

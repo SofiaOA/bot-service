@@ -4,7 +4,6 @@ import com.hedvig.botService.chat.*;
 import com.hedvig.botService.chat.Conversation.EventTypes;
 import com.hedvig.botService.enteties.*;
 import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.enteties.userContextHelpers.BankAccount;
 import com.hedvig.botService.serviceIntegration.FakeMemberCreator;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
@@ -12,7 +11,6 @@ import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingSer
 import com.hedvig.botService.web.dto.MemberAuthedEvent;
 import com.hedvig.botService.web.dto.SignupStatus;
 import com.hedvig.botService.web.dto.UpdateTypes;
-import com.hedvig.botService.web.dto.events.memberService.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,18 +39,20 @@ public class SessionManager {
     private final FakeMemberCreator fakeMemberCreator;
     private final SignupCodeRepository signupRepo;
     private final ApplicationEventPublisher publisher;
+    private final ConversationFactory conversationFactory;
 
     public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
 
 	
     @Autowired
-    public SessionManager(UserContextRepository userrepo, MemberService memberService, ProductPricingService client, FakeMemberCreator fakeMemberCreator, SignupCodeRepository signupRepo, ApplicationEventPublisher publisher) {
+    public SessionManager(UserContextRepository userrepo, MemberService memberService, ProductPricingService client, FakeMemberCreator fakeMemberCreator, SignupCodeRepository signupRepo, ApplicationEventPublisher publisher, ConversationFactory conversationFactory) {
         this.userrepo = userrepo;
         this.memberService = memberService;
         this.productPricingclient = client;
         this.fakeMemberCreator = fakeMemberCreator;
         this.signupRepo = signupRepo;
         this.publisher = publisher;
+        this.conversationFactory = conversationFactory;
     }
 
     public List<Message> getMessages(int i, String hid) {
@@ -146,7 +146,7 @@ public class SessionManager {
     }
 
     private OnboardingConversationDevi createOnboaringConversation() {
-        return new OnboardingConversationDevi(memberService, productPricingclient, fakeMemberCreator, signupRepo, publisher);
+        return new OnboardingConversationDevi(memberService, productPricingclient, fakeMemberCreator, signupRepo, publisher, conversationFactory);
     }
 
     /*
@@ -367,25 +367,15 @@ public class SessionManager {
         	
         	// Only deliver messages to ongoing conversations
         	if(!c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING))continue;
-        	
-        	switch(c.getClassName()){
-				case "com.hedvig.botService.chat.MainConversation":
-				    MainConversation mainConversation = new MainConversation(memberService, productPricingclient);
-		        	mainConversation.recieveMessage(uc, mc, m);
-					break;
-				case "com.hedvig.botService.chat.ClaimsConversation":
-				    ClaimsConversation claimsConversation = new ClaimsConversation(memberService, productPricingclient);
-		            claimsConversation.recieveMessage(uc, mc, m);
-					break;
-				case "com.hedvig.botService.chat.OnboardingConversationDevi":
-				    OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
-		        	onboardingConversation.recieveMessage(uc, mc, m);
-					break;
-				case "com.hedvig.botService.chat.UpdateInformationConversation":
-				    UpdateInformationConversation infoConversation = new UpdateInformationConversation(memberService, productPricingclient);
-		            infoConversation.recieveMessage(uc, mc, m);                     
-					break;
-			}
+
+            try {
+                final Class<?> conversationClass = Class.forName(c.getClassName());
+                final Conversation conversation = conversationFactory.createConversation(conversationClass);
+                conversation.recieveMessage(uc, mc, m);
+
+            } catch (ClassNotFoundException e) {
+                log.error("Could not load conversation from db!", e);
+            }
         }
 
         userrepo.saveAndFlush(uc);
