@@ -13,6 +13,7 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResp
 import com.hedvig.botService.serviceIntegration.memberService.exceptions.ErrorType;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.events.SignedOnWaitlistEvent;
+import com.hedvig.botService.session.events.UnderwritingLimitExcededEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1067,9 +1068,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 break;
             case "message.uwlimit.housingsize":
             case "message.uwlimit.householdsize":
-            	userContext.putUserData("{UWLIMIT_PHONENUMBER}", m.body.text);
-                addToChat(m, userContext);
-                nxtMsg = "message.uwlimit.tack";
+                nxtMsg = handleUnderwritingLimitResponse(userContext, m, getMessageId(m.id));
                 break;
             case "message.tipsa":
                 onBoardingData.setRecommendFriendEmail(m.body.text);
@@ -1273,6 +1272,28 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         completeRequest(nxtMsg, userContext, memberChat);
 
+    }
+
+    private String handleUnderwritingLimitResponse(UserContext userContext, Message m, String messageId) {
+        String nxtMsg;
+        userContext.putUserData("{UWLIMIT_PHONENUMBER}", m.body.text);
+        UnderwritingLimitExcededEvent.UnderwritingType type =
+                messageId.endsWith("householdsize") ?
+                        UnderwritingLimitExcededEvent.UnderwritingType.HouseholdSize:
+                        UnderwritingLimitExcededEvent.UnderwritingType.HouseingSize;
+
+        final UserData onBoardingData = userContext.getOnBoardingData();
+        publisher.publishEvent(
+                new UnderwritingLimitExcededEvent(
+                        userContext.getMemberId(),
+                        m.body.text,
+                        onBoardingData.getFirstName(),
+                        onBoardingData.getFamilyName(),
+                        type));
+
+        addToChat(m, userContext);
+        nxtMsg = "message.uwlimit.tack";
+        return nxtMsg;
     }
 
     private void endConversation(UserContext userContext) {

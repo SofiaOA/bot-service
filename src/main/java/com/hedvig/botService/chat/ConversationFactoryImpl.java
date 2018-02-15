@@ -36,7 +36,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
         }
 
         if(conversationClass.equals(MainConversation.class)) {
-            return new MainConversation(productPricingService, this);
+            return new MainConversation(productPricingService, this, eventPublisher);
         }
 
         if(conversationClass.equals(OnboardingConversationDevi.class)) {

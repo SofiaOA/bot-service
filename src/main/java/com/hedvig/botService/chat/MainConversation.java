@@ -5,15 +5,16 @@ import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.session.events.RequestPhoneCallEvent;
 import feign.FeignException;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.Charset;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 @Component
@@ -31,15 +32,17 @@ public class MainConversation extends Conversation {
 	private static Logger log = LoggerFactory.getLogger(MainConversation.class);
 	private final ConversationFactory conversationFactory;
 	private final ProductPricingService productPricingService;
+	private final ApplicationEventPublisher eventPublisher;
 	private String emoji_hand_ok = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8C}, Charset.forName("UTF-8"));
 
 
 
     @Autowired
-	public MainConversation(ProductPricingService productPricingService, ConversationFactory conversationFactory) {
+	public MainConversation(ProductPricingService productPricingService, ConversationFactory conversationFactory, ApplicationEventPublisher eventPublisher) {
 		super("main.menue");
 		this.productPricingService = productPricingService;
 		this.conversationFactory = conversationFactory;
+		this.eventPublisher = eventPublisher;
 		// TODO Auto-generated constructor stub
 
 		createMessage(MESSAGE_HEDVIG_COM,
@@ -106,7 +109,7 @@ public class MainConversation extends Conversation {
 			}
 		case "message.main.callme": 
 			userContext.putUserData("{PHONE_"+ new LocalDate().toString() + "}", m.body.text);
-
+			eventPublisher.publishEvent(new RequestPhoneCallEvent(userContext.getMemberId(), m.body.text, userContext.getOnBoardingData().getFirstName(), userContext.getOnBoardingData().getFamilyName()));
 			nxtMsg = "message.main.end";
 			addToChat(m, userContext); // Response parsed to nice format
 			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way

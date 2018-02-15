@@ -12,10 +12,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.context.ApplicationEventPublisher;
 
-import static com.hedvig.botService.session.TriggerServiceTest.TOLVANSSON_MEMBERID;
+import static com.hedvig.botService.testHelpers.TestData.*;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.isA;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MainConversationTest {
@@ -37,22 +35,23 @@ public class MainConversationTest {
 
     @Before
     public void setup() {
-        testConversation = new MainConversation(productPricingService, conversationFactory);
+        testConversation = new MainConversation(productPricingService, conversationFactory, eventPublisher);
 
-        uc = new UserContext(TOLVANSSON_MEMBERID);
+        uc = new UserContext(TOLVANSSON_MEMBER_ID);
         uc.setMemberChat(memberChat);
     }
 
     @Test
     public void recieveMessage() throws Exception {
         Message m = testConversation.getMessage(MainConversation.MESSAGE_MAIN_CALLME);
-        m.body.text = "0701234567";
+        m.body.text = TOLVANSSON_PHONE_NUMBER;
+
+        uc.getOnBoardingData().setFirstName(TOLVANSSON_FIRSTNAME);
+        uc.getOnBoardingData().setFamilyName(TOLVANSSON_LASTNAME);
 
         testConversation.recieveMessage(uc, memberChat, m);
 
-        then(eventPublisher).should().publishEvent(isA(RequestPhoneCallEvent.class));
-
-
+        then(eventPublisher).should().publishEvent(new RequestPhoneCallEvent(TOLVANSSON_MEMBER_ID, TOLVANSSON_PHONE_NUMBER , TOLVANSSON_FIRSTNAME, TOLVANSSON_LASTNAME));
     }
 
 }
