@@ -1,11 +1,9 @@
 package com.hedvig.botService.enteties;
 
-import javax.persistence.*;
-
 import com.hedvig.botService.chat.Conversation;
-
 import lombok.Getter;
-import org.axonframework.commandhandling.TargetAggregateIdentifier;
+
+import javax.persistence.*;
 
 /*
  * Stores persistent properties for a Conversation
