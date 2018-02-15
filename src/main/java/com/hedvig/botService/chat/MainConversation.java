@@ -5,6 +5,7 @@ import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.session.events.QuestionAskedEvent;
 import com.hedvig.botService.session.events.RequestPhoneCallEvent;
 import feign.FeignException;
 import org.joda.time.LocalDate;
@@ -114,11 +115,8 @@ public class MainConversation extends Conversation {
 			addToChat(m, userContext); // Response parsed to nice format
 			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
 			break;
-		case "main.question":
-			userContext.putUserData("{QUESTION_"+ new LocalDate().toString() + "}", m.body.text);
-			addToChat(m, userContext); // Response parsed to nice format
-			nxtMsg = MESSAGE_QUESTION_RECIEVED;
-			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
+		case MESSAGE_MAIN_QUESTION:
+			nxtMsg = handleQuestion(userContext, m);
 			break;
 		case "message.main.refer": 
 			userContext.putUserData("{REFERAL}", m.body.text);
@@ -147,7 +145,18 @@ public class MainConversation extends Conversation {
 		
 	}
 
-    /*
+	public String handleQuestion(UserContext userContext, Message m) {
+		String nxtMsg;
+		final String question = m.body.text;
+		userContext.putUserData("{QUESTION_"+ new LocalDate().toString() + "}", question);
+		addToChat(m, userContext); // Response parsed to nice format
+		eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), question));
+		nxtMsg = MESSAGE_QUESTION_RECIEVED;
+		userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
+		return nxtMsg;
+	}
+
+	/*
      * Generate next chat message or ends conversation
      * */
     @Override

@@ -1,10 +1,8 @@
 package com.hedvig.botService.session;
 
 
-import com.hedvig.botService.session.events.ClaimAudioReceivedEvent;
-import com.hedvig.botService.session.events.OnboardingQuestionAskedEvent;
-import com.hedvig.botService.session.events.RequestPhoneCallEvent;
-import com.hedvig.botService.session.events.UnderwritingLimitExcededEvent;
+import com.hedvig.botService.session.events.*;
+import com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolManagerImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +18,7 @@ import static org.mockito.Matchers.contains;
 @RunWith(MockitoJUnitRunner.class)
 public class NotificationServiceTest {
 
+    public static final String GOOD_QUESTION = "A long and good question";
     @Mock
     private NotificationMessagingTemplate messagingTemplate;
     private NotificationService notificationService;
@@ -56,7 +55,7 @@ public class NotificationServiceTest {
     public void OnboardingQuestionAskedEvent_SendsEventThatContains_MemberId() {
         OnboardingQuestionAskedEvent event = new OnboardingQuestionAskedEvent(
                 TOLVANSSON_MEMBER_ID,
-                "A long and good question"
+                GOOD_QUESTION
         );
 
         notificationService.on(event);
@@ -67,6 +66,15 @@ public class NotificationServiceTest {
     @Test
     public void ClaimAudioReceivedEvent_SendEventThatContains_MembeId() {
         ClaimAudioReceivedEvent event = new ClaimAudioReceivedEvent(TOLVANSSON_MEMBER_ID);
+
+        notificationService.on(event);
+
+        then(messagingTemplate).should().sendNotification(anyString(), contains(TOLVANSSON_MEMBER_ID), anyString());
+    }
+
+    @Test
+    public void QuestionAskedEvent_SendsEventThatContains_MemberId() {
+        QuestionAskedEvent event = new QuestionAskedEvent(TOLVANSSON_MEMBER_ID, GOOD_QUESTION);
 
         notificationService.on(event);
 
