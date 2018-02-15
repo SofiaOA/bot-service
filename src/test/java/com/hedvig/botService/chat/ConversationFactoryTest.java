@@ -1,7 +1,6 @@
 package com.hedvig.botService.chat;
 
 
-import com.hedvig.botService.enteties.SignupCode;
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
@@ -75,7 +74,7 @@ public class ConversationFactoryTest {
 
     @Test
     public void test(){
-        ConversationFactory factory = new ConversationFactory(memberService, productPricingService, triggerService, signupCodeRepository, applicationEventPublisher);
+        ConversationFactory factory = new ConversationFactoryImpl(memberService, productPricingService, triggerService, signupCodeRepository, applicationEventPublisher);
 
         Conversation conversation = factory.createConversation(conversationClass);
 

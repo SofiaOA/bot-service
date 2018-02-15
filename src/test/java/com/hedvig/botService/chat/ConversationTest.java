@@ -12,6 +12,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static com.hedvig.botService.testHelpers.MessageHelpers.createSingleSelectMessage;
+import static com.hedvig.botService.testHelpers.MessageHelpers.createTextMessage;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.then;
 
@@ -79,25 +81,6 @@ public class ConversationTest {
 
     }
 
-    private Message createSingleSelectMessage(final String text, final SelectItem... items) {
-        Arrays.asList(items);
 
-        return createMessage(new MessageBodySingleSelect(text, Arrays.asList(items)));
-    }
-
-    private Message createTextMessage(final String text) {
-        return createMessage(new MessageBodyText(text));
-    }
-
-    private Message createMessage(MessageBody body) {
-        Message m = new Message();
-        m.id = TESTMESSAGE_ID;
-        m.globalId = 1;
-        m.header = new MessageHeader();
-        m.header.fromId = -1L;
-        m.header.messageId = 1;
-        m.body = body;
-        return m;
-    }
 
 }
