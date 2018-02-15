@@ -1,6 +1,7 @@
 package com.hedvig.botService.session;
 
 
+import com.hedvig.botService.session.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.session.events.RequestPhoneCallEvent;
 import com.hedvig.botService.session.events.UnderwritingLimitExcededEvent;
 import org.junit.Before;
@@ -48,6 +49,18 @@ public class NotificationServiceTest {
         notificationService.on(event);
 
         then(messagingTemplate).should().sendNotification(anyString(), contains(TOLVANSSON_PHONE_NUMBER), anyString());
+    }
+
+    @Test
+    public void OnboardingQuestionAskedEvent_SendsEventThatContains_MemberId() {
+        OnboardingQuestionAskedEvent event = new OnboardingQuestionAskedEvent(
+                TOLVANSSON_MEMBER_ID,
+                "A long and good question"
+        );
+
+        notificationService.on(event);
+
+        then(messagingTemplate).should().sendNotification(anyString(), contains(TOLVANSSON_MEMBER_ID) ,anyString());
     }
 
 

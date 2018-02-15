@@ -12,6 +12,7 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResp
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
 import com.hedvig.botService.serviceIntegration.memberService.exceptions.ErrorType;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.session.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.session.events.SignedOnWaitlistEvent;
 import com.hedvig.botService.session.events.UnderwritingLimitExcededEvent;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
              * */
     private static Logger log = LoggerFactory.getLogger(OnboardingConversationDevi.class);
     private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    private final ApplicationEventPublisher publisher;
+    private final ApplicationEventPublisher eventPublisher;
     private final MemberService memberService;
     private final ProductPricingService productPricingService;
 
@@ -71,13 +72,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             MemberService memberService,
             ProductPricingService productPricingClient,
             SignupCodeRepository signupRepo,
-            ApplicationEventPublisher publisher,
+            ApplicationEventPublisher eventPublisher,
             ConversationFactory conversationFactory) {
         super("onboarding");
         this.memberService = memberService;
         this.productPricingService = productPricingClient;
         this.signupRepo = signupRepo;
-        this.publisher = publisher;
+        this.eventPublisher = eventPublisher;
         this.conversationFactory = conversationFactory;
 
 
@@ -1075,9 +1076,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 nxtMsg = "message.nagotmer";
                 break;
             case "message.frifraga":
-            	userContext.putUserData("{ONBOARDING_QUESTION}", m.body.text);
-                addToChat(m, userContext);
-                nxtMsg = "message.frifragatack";
+                nxtMsg = handleFriFraga(userContext, m);
                 break;
             case "message.pers":
                 int nr_persons = getValue((MessageBodyNumber)m.body);
@@ -1274,6 +1273,15 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     }
 
+    public String handleFriFraga(UserContext userContext, Message m) {
+        String nxtMsg;
+        userContext.putUserData("{ONBOARDING_QUESTION}", m.body.text);
+        eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(), m.body.text));
+        addToChat(m, userContext);
+        nxtMsg = "message.frifragatack";
+        return nxtMsg;
+    }
+
     private String handleUnderwritingLimitResponse(UserContext userContext, Message m, String messageId) {
         String nxtMsg;
         userContext.putUserData("{UWLIMIT_PHONENUMBER}", m.body.text);
@@ -1283,7 +1291,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         UnderwritingLimitExcededEvent.UnderwritingType.HouseingSize;
 
         final UserData onBoardingData = userContext.getOnBoardingData();
-        publisher.publishEvent(
+        eventPublisher.publishEvent(
                 new UnderwritingLimitExcededEvent(
                         userContext.getMemberId(),
                         m.body.text,
@@ -1502,7 +1510,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         }
 
 
-        publisher.publishEvent(new SignedOnWaitlistEvent(email));
+        eventPublisher.publishEvent(new SignedOnWaitlistEvent(email));
 
         return sc;
     }

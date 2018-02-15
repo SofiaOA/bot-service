@@ -7,7 +7,10 @@ import org.springframework.cloud.aws.messaging.core.NotificationMessagingTemplat
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.support.TaskUtils;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -39,6 +42,13 @@ public class BotServiceApplication {
 	@Profile(Profiles.PRODUCTION)
 	public NotificationMessagingTemplate notificationTemplate(AmazonSNS amazonSNS) {
 		return new NotificationMessagingTemplate(amazonSNS);
+	}
+
+	@Bean
+	public ApplicationEventMulticaster applicationEventMulticaster() {
+		SimpleApplicationEventMulticaster eventMulticaster = new SimpleApplicationEventMulticaster();
+		eventMulticaster.setErrorHandler(TaskUtils.LOG_AND_SUPPRESS_ERROR_HANDLER);
+		return eventMulticaster;
 	}
 
 }

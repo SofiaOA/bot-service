@@ -7,6 +7,7 @@ import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.session.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.session.events.UnderwritingLimitExcededEvent;
 import org.junit.Before;
 import org.junit.Test;
@@ -88,6 +89,21 @@ public class OnboardingConversationDeviTest {
                 TOLVANSSON_FIRSTNAME,
                 TOLVANSSON_LASTNAME,
                 UnderwritingLimitExcededEvent.UnderwritingType.HouseholdSize));
+
+    }
+
+    @Test
+    public void SendNotificationEventOn_FriFraga(){
+        addLastnameToContext(userContext, TOLVANSSON_LASTNAME);
+        addFirstnametoContext(userContext, TOLVANSSON_FIRSTNAME);
+
+        Message m = testConversation.getMessage("message.frifraga");
+        m.body.text = "I wonder if I can get a home insurance, even thouh my name is Tolvan?";
+
+        testConversation.recieveMessage(userContext, userContext.getMemberChat(), m);
+
+        then(publisher).should().publishEvent(new OnboardingQuestionAskedEvent(TOLVANSSON_MEMBER_ID,
+                m.body.text));
 
     }
 

@@ -1,5 +1,6 @@
 package com.hedvig.botService.session;
 
+import com.hedvig.botService.session.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.session.events.RequestPhoneCallEvent;
 import com.hedvig.botService.session.events.SignedOnWaitlistEvent;
 import com.hedvig.botService.session.events.UnderwritingLimitExcededEvent;
@@ -33,8 +34,16 @@ public class NotificationService {
         sendNotification(message, "CallMe");
     }
 
+    @EventListener
     public void on(UnderwritingLimitExcededEvent event) {
         final String message = String.format("Underwriting guideline, ring upp medlem: %s", event.getPhoneNumber());
+        sendNotification(message, "CallMe");
+    }
+
+
+    @EventListener
+    public void on(OnboardingQuestionAskedEvent event) {
+        final String message = String.format("Ny fråga från medlem: %s, \"%s\"", event.getMemberId(), event.getQuestion());
         sendNotification(message, "CallMe");
     }
 
@@ -45,6 +54,4 @@ public class NotificationService {
             log.error("Could not send SNS-notification", ex);
         }
     }
-
-
 }
