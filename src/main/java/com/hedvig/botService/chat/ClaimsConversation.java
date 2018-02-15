@@ -3,11 +3,11 @@ package com.hedvig.botService.chat;
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
-import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.session.events.ClaimAudioReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -19,11 +19,13 @@ public class ClaimsConversation extends Conversation {
 	 * Need to be stateless. I.e no variables apart from logger
 	 * */
 	private static Logger log = LoggerFactory.getLogger(ClaimsConversation.class);
+    private final ApplicationEventPublisher eventPublisher;
 
-	@Autowired
-	public ClaimsConversation(MemberService memberService, ProductPricingService productPricingClient) {
+    @Autowired
+	public ClaimsConversation(ApplicationEventPublisher eventPublisher) {
 		super("claims");
-		// TODO Auto-generated constructor stub
+        this.eventPublisher = eventPublisher;
+        // TODO Auto-generated constructor stub
 
         createMessage("init.asset.claim",
                 new MessageBodySingleSelect("Oj vad tråkigt att någon har hänt med din pryl. Självklart tar jag tag i det här",
@@ -74,7 +76,7 @@ public class ClaimsConversation extends Conversation {
         
         createMessage("message.claims.record.ok", new MessageBodyParagraph("Tack! Det är allt jag behöver just nu"),2000);
         createMessage("message.claims.record.ok2", new MessageBodyParagraph("Jag återkommer till dig om jag behöver något mer, eller för att meddela att jag kan betala ut ersättning direkt"),2000);
-        createMessage("message.claims.record.ok3", new MessageBodyParagraph("Tack för att du delat med dig om det som hänt. Ta hand om dig så länge, så hörs vi snart!"),2000);
+//        createMessage("message.claims.record.ok3", new MessageBodyParagraph("Tack för att du delat med dig om det som hänt. Ta hand om dig så länge, så hörs vi snart!"),2000);
 
         createMessage("message.claims.record.ok3",
                 new MessageBodySingleSelect("Tack för att du delat med dig om det som hänt. Ta hand om dig så länge, så hörs vi snart!",
@@ -108,12 +110,8 @@ public class ClaimsConversation extends Conversation {
 		if(!validateReturnType(m,userContext, memberChat)){return;}
 		
 		switch(m.id){
-		case "message.claims.audio": 
-			log.info("Audio recieved with m.body.text:" + m.body.text + " and URL:" + ((MessageBodyAudio)m.body).URL);
-			// TODO: Send to claims service!
-			m.body.text = "Inspelning klar";
-			addToChat(m,userContext); // Response parsed to nice format
-			nxtMsg = "message.claims.record.ok";
+		case "message.claims.audio":
+            nxtMsg = handleAudioReceived(userContext, m);
 			
 			break;
             case "message.claim.callme":
@@ -143,6 +141,20 @@ public class ClaimsConversation extends Conversation {
        completeRequest(nxtMsg,userContext, memberChat);
 		
 	}
+
+    public String handleAudioReceived(UserContext userContext, Message m) {
+        String nxtMsg;
+        log.info("Audio recieved with m.body.text:" + m.body.text + " and URL:" + ((MessageBodyAudio)m.body).URL);
+        // TODO: Send to claims service!
+        m.body.text = "Inspelning klar";
+
+        this.eventPublisher.publishEvent(new ClaimAudioReceivedEvent(userContext.getMemberId()));
+
+
+        addToChat(m,userContext); // Response parsed to nice format
+        nxtMsg = "message.claims.record.ok";
+        return nxtMsg;
+    }
 
     @Override
     public void recieveEvent(EventTypes e, String value, UserContext userContext, MemberChat memberChat){

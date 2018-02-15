@@ -89,7 +89,7 @@ public class SessionManager {
     
     public void initClaim(String hid){
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-        ClaimsConversation claimsConversation = new ClaimsConversation(memberService, productPricingclient);
+        Conversation claimsConversation = conversationFactory.createConversation(ClaimsConversation.class);
         uc.startConversation(claimsConversation);
 
         userrepo.saveAndFlush(uc);
@@ -97,7 +97,7 @@ public class SessionManager {
 
     public void initClaim(String hid, String assetId) {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
-        ClaimsConversation claimsConversation = new ClaimsConversation(memberService, productPricingclient);
+        Conversation claimsConversation = conversationFactory.createConversation(ClaimsConversation.class);
         uc.startConversation(claimsConversation, "init.asset.claim");
 
         userrepo.saveAndFlush(uc);
@@ -122,7 +122,7 @@ public class SessionManager {
 		        	mainConversation.recieveEvent(type, value, uc, mc);
 					break;
 				case "com.hedvig.botService.chat.ClaimsConversation":
-				    ClaimsConversation claimsConversation = new ClaimsConversation(memberService, productPricingclient);
+				    Conversation claimsConversation = conversationFactory.createConversation(ClaimsConversation.class);
 		            claimsConversation.recieveEvent(type, value, uc, mc);
 					break;
 				case "com.hedvig.botService.chat.OnboardingConversationDevi":

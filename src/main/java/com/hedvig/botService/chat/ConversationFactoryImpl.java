@@ -32,7 +32,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
         }
 
         if(conversationClass.equals(ClaimsConversation.class)) {
-            return new ClaimsConversation(memberService, productPricingService);
+            return new ClaimsConversation(eventPublisher);
         }
 
         if(conversationClass.equals(MainConversation.class)) {

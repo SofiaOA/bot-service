@@ -1,9 +1,6 @@
 package com.hedvig.botService.session;
 
-import com.hedvig.botService.session.events.OnboardingQuestionAskedEvent;
-import com.hedvig.botService.session.events.RequestPhoneCallEvent;
-import com.hedvig.botService.session.events.SignedOnWaitlistEvent;
-import com.hedvig.botService.session.events.UnderwritingLimitExcededEvent;
+import com.hedvig.botService.session.events.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.aws.messaging.core.NotificationMessagingTemplate;
@@ -44,6 +41,12 @@ public class NotificationService {
     @EventListener
     public void on(OnboardingQuestionAskedEvent event) {
         final String message = String.format("Ny fråga från medlem: %s, \"%s\"", event.getMemberId(), event.getQuestion());
+        sendNotification(message, "CallMe");
+    }
+
+    @EventListener
+    public void on(ClaimAudioReceivedEvent event) {
+        final String message = String.format("Ny skadeanmälan ifrån medlem: %s", event.getMemberId());
         sendNotification(message, "CallMe");
     }
 

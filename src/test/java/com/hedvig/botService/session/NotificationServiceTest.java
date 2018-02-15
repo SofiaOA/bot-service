@@ -1,6 +1,7 @@
 package com.hedvig.botService.session;
 
 
+import com.hedvig.botService.session.events.ClaimAudioReceivedEvent;
 import com.hedvig.botService.session.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.session.events.RequestPhoneCallEvent;
 import com.hedvig.botService.session.events.UnderwritingLimitExcededEvent;
@@ -61,6 +62,15 @@ public class NotificationServiceTest {
         notificationService.on(event);
 
         then(messagingTemplate).should().sendNotification(anyString(), contains(TOLVANSSON_MEMBER_ID) ,anyString());
+    }
+
+    @Test
+    public void ClaimAudioReceivedEvent_SendEventThatContains_MembeId() {
+        ClaimAudioReceivedEvent event = new ClaimAudioReceivedEvent(TOLVANSSON_MEMBER_ID);
+
+        notificationService.on(event);
+
+        then(messagingTemplate).should().sendNotification(anyString(), contains(TOLVANSSON_MEMBER_ID), anyString());
     }
 
 
