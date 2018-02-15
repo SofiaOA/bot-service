@@ -19,7 +19,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableFeignClients
 @EnableRetry
 @EnableTransactionManagement
-@EnableSwagger2
 public class BotServiceApplication {
 
 	public static void main(String[] args) {
