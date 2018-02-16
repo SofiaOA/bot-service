@@ -2,10 +2,7 @@ package com.hedvig.botService.chat;
 
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
-import com.hedvig.botService.enteties.message.SelectItem;
-import com.hedvig.botService.enteties.message.SelectOption;
+import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.session.triggerService.TriggerService;
 
@@ -27,7 +24,7 @@ public class TrustlyConversation extends Conversation {
         createMessage(START,
                 new MessageBodySingleSelect("Nu ska vi bara välja ett autogirokonto!",
                         new ArrayList<SelectItem>(){{
-                            add(new SelectOption("Ja välj trustlykonto", "trustly.choose.account", false));
+                            add(new SelectItemTrustly("Ja välj trustlykonto", "trustly.choose.account"));
                         }}
                 ));
     }
@@ -70,7 +67,7 @@ public class TrustlyConversation extends Conversation {
                     userContext.getMemberId()
                     );
 
-            userContext.putUserData("{TRUSTLY_TRIGGER_ID}", triggerUUID.toString());
+            userContext.putUserData(UserContext.TRUSTLY_TRIGGER_ID, triggerUUID.toString());
         }
 
         super.addToChat(m, userContext);

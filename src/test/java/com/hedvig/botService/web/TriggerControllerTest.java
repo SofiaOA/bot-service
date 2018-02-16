@@ -68,7 +68,8 @@ public class TriggerControllerTest {
                         post("/hedvig/trigger/" + triggerId.toString())
                                 .header("hedvig.token", TestData.TOLVANSSON_MEMBER_ID))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.url").value(triggerURL));
+                .andExpect(jsonPath("$.url").value(triggerURL))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
     }
 
     @Test
@@ -117,7 +118,7 @@ public class TriggerControllerTest {
                         accept(MediaType.APPLICATION_JSON_UTF8).
                         contentType(MediaType.APPLICATION_JSON_UTF8).
                         content(toJson(createDirectDebitMandateDTO))).
-                andExpect(content().string(triggerId.toString()));
+                andExpect(jsonPath("$.id").value(triggerId.toString()));
     }
 
 }

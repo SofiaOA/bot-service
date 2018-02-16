@@ -52,7 +52,7 @@ public class MainConversation extends Conversation {
 							add(new SelectOption("Rapportera en skada","message.main.report", false));
 							add(new SelectOption("Ring mig!","message.main.callme", false));
 							add(new SelectOption("Jag har en fråga","main.question", false));
-							//add(new SelectOption("Rekommendera en vän","message.main.refer", false));
+							add(new SelectOption("TRUSTLY!!1","message.main.refer", false));
 						}}
 				));
 		
@@ -105,6 +105,11 @@ public class MainConversation extends Conversation {
 					nxtMsg = "conversation.done";
 					//sessionManager.initClaim(userContext.getMemberId()); // Start claim here
 				}
+				else if(item.value.equals("message.main.refer")) {
+					userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
+					userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
+					return;
+				}
 				addToChat(m, userContext); // Response parsed to nice format
 				break;
 			}
@@ -122,7 +127,7 @@ public class MainConversation extends Conversation {
 			userContext.putUserData("{REFERAL}", m.body.text);
 			addToChat(m, userContext); // Response parsed to nice format
 			nxtMsg = "message.main.refer.recieved";
-			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
+
 			break;
 		}
 		

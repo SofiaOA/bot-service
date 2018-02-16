@@ -55,7 +55,7 @@ public class TriggerController {
         );
 
 
-        return ResponseEntity.ok(triggerId.toString());
+        return ResponseEntity.ok("{\"id\":\"" + triggerId.toString() + "\"}");
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)

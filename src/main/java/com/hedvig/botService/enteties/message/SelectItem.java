@@ -16,7 +16,8 @@ import com.hedvig.botService.enteties.UserContext;
 	      property = "type")
 	    @JsonSubTypes({
 	    	@JsonSubTypes.Type(value = SelectOption.class, name = "selection"),
-	        @JsonSubTypes.Type(value = SelectLink.class, name = "link")
+	        @JsonSubTypes.Type(value = SelectLink.class, name = "link"),
+			@JsonSubTypes.Type(value = SelectItemTrustly.class, name = "trustly")
 	    })
 public class SelectItem implements Serializable {
 

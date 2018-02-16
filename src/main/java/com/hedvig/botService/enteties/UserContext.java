@@ -28,8 +28,10 @@ import java.util.regex.Pattern;
  * */
 @Entity
 public class UserContext implements Serializable {
-	
-	private static Logger log = LoggerFactory.getLogger(UserContext.class);
+
+    public static final String TRUSTLY_TRIGGER_ID = "{TRUSTLY_TRIGGER_ID}";
+
+    private static Logger log = LoggerFactory.getLogger(UserContext.class);
 	private static HashMap<String, String> requiredData = new HashMap<String, String>(){{
 		put("{ADDRESS}","T.ex har jag vet jag inte var du bor. Vad har du för gatuadress?");
 		put("{ADDRESS_ZIP}", "T.ex har jag inte ditt postnummer?");
