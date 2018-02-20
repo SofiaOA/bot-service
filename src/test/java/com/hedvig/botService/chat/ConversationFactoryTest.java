@@ -74,7 +74,7 @@ public class ConversationFactoryTest {
 
     @Test
     public void test(){
-        ConversationFactory factory = new ConversationFactoryImpl(memberService, productPricingService, triggerService, signupCodeRepository, applicationEventPublisher);
+        ConversationFactory factory = new ConversationFactoryImpl(memberService, productPricingService, triggerService, signupCodeRepository, applicationEventPublisher, 0);
 
         Conversation conversation = factory.createConversation(conversationClass);
 

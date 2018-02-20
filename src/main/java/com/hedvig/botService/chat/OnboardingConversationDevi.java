@@ -18,7 +18,6 @@ import com.hedvig.botService.session.events.UnderwritingLimitExcededEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -67,8 +66,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     //@Value("${hedvig.gateway.url:http://gateway.hedvig.com}")
     public String gatewayUrl = "http://gateway.hedvig.com";
-    
-    @Value("${hedvig.waitlist.length}")
+
     public Integer queuePos;
     
     @Autowired

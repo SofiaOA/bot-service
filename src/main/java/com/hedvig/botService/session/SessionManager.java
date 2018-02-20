@@ -129,7 +129,8 @@ public class SessionManager {
 		            claimsConversation.recieveEvent(type, value, uc, mc);
 					break;
 				case "com.hedvig.botService.chat.OnboardingConversationDevi":
-				    OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
+
+                    OnboardingConversationDevi onboardingConversation = (OnboardingConversationDevi) conversationFactory.createConversation(OnboardingConversationDevi.class);
 		        	onboardingConversation.recieveEvent(type, value, uc, mc);
 					break;
 				case "com.hedvig.botService.chat.UpdateInformationConversation":
@@ -150,11 +151,7 @@ public class SessionManager {
 
         CollectService service = new CollectService(userrepo, memberService);
 
-        return service.collect(hid, referenceToken, createOnboaringConversation());
-    }
-
-    private OnboardingConversationDevi createOnboaringConversation() {
-        return new OnboardingConversationDevi(memberService, productPricingclient, signupRepo, publisher, conversationFactory);
+        return service.collect(hid, referenceToken, (BankIdChat) conversationFactory.createConversation(OnboardingConversationDevi.class));
     }
 
     /*
@@ -164,8 +161,8 @@ public class SessionManager {
     	
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
     	uc.putUserData("{WEB_USER}", "FALSE");
-    	
-        OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
+
+        Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);
         uc.startConversation(onboardingConversation, startMsg);
 
         userrepo.saveAndFlush(uc);
@@ -181,8 +178,8 @@ public class SessionManager {
     	// TODO: Make sure it is only possible to activate this endpoint ones
     	if(uc.getDataEntry("{WEB_USER}") == null){
 	    	uc.putUserData("{WEB_USER}", "TRUE");
-	    	
-	        OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
+
+            Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);
 	        uc.startConversation(onboardingConversation, startMsg);
 	
 	        userrepo.saveAndFlush(uc);
@@ -244,8 +241,8 @@ public class SessionManager {
 	    	uc.clearContext(); // Clear context
 	    	
 	    	uc.getOnBoardingData().setEmail(email); // TODO: remove hack
-	    	
-	        OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
+
+            Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);
 	        uc.startConversation(onboardingConversation);
 	    	userrepo.saveAndFlush(uc);
         }
@@ -353,8 +350,9 @@ public class SessionManager {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
 
 //        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
-            onboardingConversation.quoteAccepted(uc);
+
+        OnboardingConversationDevi onboardingConversation = (OnboardingConversationDevi) conversationFactory.createConversation(OnboardingConversationDevi.class);
+        onboardingConversation.quoteAccepted(uc);
 //        }
 
         userrepo.save(uc);
