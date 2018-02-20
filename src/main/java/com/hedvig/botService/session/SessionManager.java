@@ -14,6 +14,7 @@ import com.hedvig.botService.web.dto.UpdateTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +43,9 @@ public class SessionManager {
     private final ConversationFactory conversationFactory;
 
     public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
-
+    
+    @Value("${hedvig.waitlist.length}")
+    public Integer queuePos;
 	
     @Autowired
     public SessionManager(UserContextRepository userrepo, MemberService memberService, ProductPricingService client, FakeMemberCreator fakeMemberCreator, SignupCodeRepository signupRepo, ApplicationEventPublisher publisher, ConversationFactory conversationFactory) {
@@ -72,7 +75,7 @@ public class SessionManager {
         		log.debug(sc.code + " UUID:" + sc.externalToken + " email:" + sc.email + "(" + sc.date+"):" + (pos));
         		if(sc.externalToken.toString().equals(externalToken)){
         			if(!sc.active){
-        				ss.position = 90 + pos; // TODO: Remove constant!
+        				ss.position = queuePos + pos;
         				ss.status = SignupStatus.states.WAITLIST.toString();
         				return ss;
         			}else{
