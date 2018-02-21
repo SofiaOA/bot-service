@@ -56,7 +56,7 @@ public class TrustlyConversationTest {
         onBoardingData.setFamilyName(TOLVANSSON_LASTNAME);
         onBoardingData.setEmail(TOLVANSSON_EMAIL);
 
-        given(triggerService.createDirectDebitMandate(TOLVANSSON_SSN, TOLVANSSON_FIRSTNAME, TOLVANSSON_LASTNAME, TOLVANSSON_EMAIL, TOLVANSSON_MEMBER_ID)).willReturn(triggerUUID);
+        given(triggerService.createTrustlyDirectDebitMandate(TOLVANSSON_SSN, TOLVANSSON_FIRSTNAME, TOLVANSSON_LASTNAME, TOLVANSSON_EMAIL, TOLVANSSON_MEMBER_ID)).willReturn(triggerUUID);
 
         //ACT
         testConversation.addToChat(TrustlyConversation.START, userContext);

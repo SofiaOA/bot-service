@@ -29,4 +29,6 @@ public class DirectDebitMandateTrigger implements Serializable {
 
     @NotNull
     String memberId;
+
+    String orderId;
 }

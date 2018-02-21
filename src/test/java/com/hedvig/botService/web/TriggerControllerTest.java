@@ -110,7 +110,7 @@ public class TriggerControllerTest {
                 TestData.TOLVANSSON_EMAIL
         );
 
-        given(triggerService.createDirectDebitMandate(createDirectDebitMandateDTO, TOLVANSSON_MEMBER_ID)).willReturn(triggerId);
+        given(triggerService.createTrustlyDirectDebitMandate(createDirectDebitMandateDTO, TOLVANSSON_MEMBER_ID)).willReturn(triggerId);
 
         mockMvc.perform(
                 post("/hedvig/trigger/_/createDDM").

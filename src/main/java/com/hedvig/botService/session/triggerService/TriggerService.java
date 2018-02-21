@@ -4,6 +4,8 @@ import com.hedvig.botService.enteties.DirectDebitMandateTrigger;
 import com.hedvig.botService.enteties.DirectDebitRepository;
 import com.hedvig.botService.serviceIntegration.paymentService.PaymentService;
 import com.hedvig.botService.serviceIntegration.paymentService.dto.DirectDebitResponse;
+import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderInformation;
+import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderState;
 import com.hedvig.botService.session.exceptions.UnathorizedException;
 import com.hedvig.botService.session.triggerService.dto.CreateDirectDebitMandateDTO;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ public class TriggerService {
         this.paymentService = paymentService;
     }
 
-    public UUID createDirectDebitMandate(CreateDirectDebitMandateDTO data, String memberId) {
+    public UUID createTrustlyDirectDebitMandate(CreateDirectDebitMandateDTO data, String memberId) {
 
         DirectDebitMandateTrigger mandate = new DirectDebitMandateTrigger();
         mandate.setEmail(data.getEmail());
@@ -37,7 +39,7 @@ public class TriggerService {
         return mandate.getId();
     }
 
-    public UUID createDirectDebitMandate(String ssn, String firstName, String lastName, String email, String memberId) {
+    public UUID createTrustlyDirectDebitMandate(String ssn, String firstName, String lastName, String email, String memberId) {
 
         CreateDirectDebitMandateDTO mandate = new CreateDirectDebitMandateDTO(
                 ssn,
@@ -46,7 +48,7 @@ public class TriggerService {
                 email
         );
 
-        return createDirectDebitMandate(mandate, memberId);
+        return createTrustlyDirectDebitMandate(mandate, memberId);
     }
 
     public String getTriggerUrl(UUID triggerId, String memberId) {
@@ -59,9 +61,20 @@ public class TriggerService {
         if(one.getUrl() == null) {
             final DirectDebitResponse directDebitResponse = paymentService.registerTrustlyDirectDebit(one.getFirstName(), one.getLastName(), one.getSsn(), one.getEmail(), one.getMemberId());
             one.setUrl(directDebitResponse.getUrl());
+            one.setOrderId(directDebitResponse.getOrderId());
             repo.save(one);
         }
 
         return one.getUrl();
+    }
+
+    public OrderState getTrustlyOrderInformation(String triggerId) {
+
+        final DirectDebitMandateTrigger trigger = repo.findOne(UUID.fromString(triggerId));
+
+        final OrderInformation trustlyOrderInformation = paymentService.getTrustlyOrderInformation(trigger.getOrderId());
+
+        return trustlyOrderInformation.getState();
+
     }
 }

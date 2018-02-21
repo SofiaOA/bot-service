@@ -12,6 +12,13 @@ public class SelectItemTrustly extends SelectItem {
         super(false, text, value);
     }
 
+    public SelectItemTrustly(String text, String value, Boolean selected, String id) {
+        super(selected, text, value);
+        this.id = id;
+    }
+
+    public SelectItemTrustly(){}
+
     @Override
     public void render(UserContext userContext) {
         super.render(userContext);

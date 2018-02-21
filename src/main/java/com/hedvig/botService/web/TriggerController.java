@@ -49,7 +49,7 @@ public class TriggerController {
         }
 
 
-        final UUID triggerId = triggerService.createDirectDebitMandate(
+        final UUID triggerId = triggerService.createTrustlyDirectDebitMandate(
                 requestData,
                 hid
         );

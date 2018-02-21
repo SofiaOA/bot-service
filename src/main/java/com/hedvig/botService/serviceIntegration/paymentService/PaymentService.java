@@ -2,6 +2,7 @@ package com.hedvig.botService.serviceIntegration.paymentService;
 
 import com.hedvig.botService.serviceIntegration.paymentService.dto.DirectDebitRequest;
 import com.hedvig.botService.serviceIntegration.paymentService.dto.DirectDebitResponse;
+import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderInformation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,12 @@ public class PaymentService {
         final ResponseEntity<DirectDebitResponse> urlResponseResponseEntity = this.client.registerDirectDebit(dto);
 
         return urlResponseResponseEntity.getBody();
+    }
+
+    public OrderInformation getTrustlyOrderInformation(String orderId) {
+
+        final ResponseEntity<OrderInformation> orderInformationResponseEntity = this.client.orderInformation(orderId);
+        return orderInformationResponseEntity.getBody();
     }
 
 }

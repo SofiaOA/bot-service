@@ -36,6 +36,7 @@ public class TriggerServiceTest {
     public static final String TOLVANSSON_EMAIL = "tolvan@tolvansson.se";
     public static final String TOLVANSSON_MEMBERID = "1337";
     public static final String TRIGGER_URL = "http://localhost:8080";
+    public static final String ORDER_ID = UUID.randomUUID().toString();
     @Mock
     DirectDebitRepository repo;
 
@@ -71,7 +72,7 @@ public class TriggerServiceTest {
 
 
         //act
-        UUID triggerId = sut.createDirectDebitMandate(requestData, TOLVANSSON_MEMBERID);
+        UUID triggerId = sut.createTrustlyDirectDebitMandate(requestData, TOLVANSSON_MEMBERID);
 
         //assert
         assertThat(triggerId).isNotNull();
@@ -87,7 +88,7 @@ public class TriggerServiceTest {
 
         //act
 
-        final UUID triggerURL = sut.createDirectDebitMandate(requestData, TOLVANSSON_MEMBERID);
+        final UUID triggerURL = sut.createTrustlyDirectDebitMandate(requestData, TOLVANSSON_MEMBERID);
 
         //assert
 
@@ -105,7 +106,7 @@ public class TriggerServiceTest {
         DirectDebitMandateTrigger ddm = createDirectDebitMandateTrigger(triggerId, null, TOLVANSSON_MEMBERID);
         given(repo.findOne(triggerId)).willReturn(ddm);
 
-        given(pService.registerTrustlyDirectDebit(TOLVANSSON_FIRSTNAME, TOLVANSSON_LAST_NAME, TOLVANSSON_SSN, TOLVANSSON_EMAIL, TOLVANSSON_MEMBERID)).willReturn(new DirectDebitResponse(TRIGGER_URL));
+        given(pService.registerTrustlyDirectDebit(TOLVANSSON_FIRSTNAME, TOLVANSSON_LAST_NAME, TOLVANSSON_SSN, TOLVANSSON_EMAIL, TOLVANSSON_MEMBERID)).willReturn(new DirectDebitResponse(TRIGGER_URL,ORDER_ID));
 
         //act
 
@@ -115,6 +116,7 @@ public class TriggerServiceTest {
         assertThat(actualTriggerUrl).isEqualTo(TRIGGER_URL);
         then(repo).should().save(mandateCaptor.capture());
         assertThat(mandateCaptor.getValue().getUrl()).isEqualTo(TRIGGER_URL);
+        assertThat(mandateCaptor.getValue().getOrderId()).isEqualTo(ORDER_ID);
 
     }
 
