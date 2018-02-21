@@ -14,6 +14,7 @@ import com.hedvig.botService.web.dto.UpdateTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +43,9 @@ public class SessionManager {
     private final ConversationFactory conversationFactory;
 
     public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
-
+    
+    @Value("${hedvig.waitlist.length}")
+    public Integer queuePos;
 	
     @Autowired
     public SessionManager(UserContextRepository userrepo, MemberService memberService, ProductPricingService client, FakeMemberCreator fakeMemberCreator, SignupCodeRepository signupRepo, ApplicationEventPublisher publisher, ConversationFactory conversationFactory) {
@@ -72,7 +75,7 @@ public class SessionManager {
         		log.debug(sc.code + " UUID:" + sc.externalToken + " email:" + sc.email + "(" + sc.date+"):" + (pos));
         		if(sc.externalToken.toString().equals(externalToken)){
         			if(!sc.active){
-        				ss.position = 90 + pos; // TODO: Remove constant!
+        				ss.position = queuePos + pos;
         				ss.status = SignupStatus.states.WAITLIST.toString();
         				return ss;
         			}else{
@@ -103,6 +106,18 @@ public class SessionManager {
         userrepo.saveAndFlush(uc);
     }
     
+    public void savePushToken(String hid, String pushToken) {
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        uc.putUserData("PUSH-TOKEN", pushToken);
+        userrepo.saveAndFlush(uc);
+    }
+    
+    public String getPushToken(String hid) {
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        return uc.getDataEntry("PUSH-TOKEN");
+    }
+    
+    
     public void recieveEvent(String eventtype, String value, String hid){
 
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
@@ -126,7 +141,8 @@ public class SessionManager {
 		            claimsConversation.recieveEvent(type, value, uc, mc);
 					break;
 				case "com.hedvig.botService.chat.OnboardingConversationDevi":
-				    OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
+
+                    OnboardingConversationDevi onboardingConversation = (OnboardingConversationDevi) conversationFactory.createConversation(OnboardingConversationDevi.class);
 		        	onboardingConversation.recieveEvent(type, value, uc, mc);
 					break;
 				case "com.hedvig.botService.chat.UpdateInformationConversation":
@@ -147,11 +163,7 @@ public class SessionManager {
 
         CollectService service = new CollectService(userrepo, memberService);
 
-        return service.collect(hid, referenceToken, createOnboaringConversation());
-    }
-
-    private OnboardingConversationDevi createOnboaringConversation() {
-        return new OnboardingConversationDevi(memberService, productPricingclient, signupRepo, publisher, conversationFactory);
+        return service.collect(hid, referenceToken, (BankIdChat) conversationFactory.createConversation(OnboardingConversationDevi.class));
     }
 
     /*
@@ -161,8 +173,8 @@ public class SessionManager {
     	
     	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
     	uc.putUserData("{WEB_USER}", "FALSE");
-    	
-        OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
+
+        Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);
         uc.startConversation(onboardingConversation, startMsg);
 
         userrepo.saveAndFlush(uc);
@@ -178,8 +190,8 @@ public class SessionManager {
     	// TODO: Make sure it is only possible to activate this endpoint ones
     	if(uc.getDataEntry("{WEB_USER}") == null){
 	    	uc.putUserData("{WEB_USER}", "TRUE");
-	    	
-	        OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
+
+            Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);
 	        uc.startConversation(onboardingConversation, startMsg);
 	
 	        userrepo.saveAndFlush(uc);
@@ -241,8 +253,8 @@ public class SessionManager {
 	    	uc.clearContext(); // Clear context
 	    	
 	    	uc.getOnBoardingData().setEmail(email); // TODO: remove hack
-	    	
-	        OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
+
+            Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);
 	        uc.startConversation(onboardingConversation);
 	    	userrepo.saveAndFlush(uc);
         }
@@ -350,8 +362,9 @@ public class SessionManager {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
 
 //        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-            OnboardingConversationDevi onboardingConversation = createOnboaringConversation();
-            onboardingConversation.quoteAccepted(uc);
+
+        OnboardingConversationDevi onboardingConversation = (OnboardingConversationDevi) conversationFactory.createConversation(OnboardingConversationDevi.class);
+        onboardingConversation.quoteAccepted(uc);
 //        }
 
         userrepo.save(uc);

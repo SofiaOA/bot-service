@@ -2,6 +2,7 @@ hedvig:
   gateway:
     url: localhost:8080
   product-pricing.url: localhost:4085
+  waitlist.length: 90
 
 cloud:
   aws:

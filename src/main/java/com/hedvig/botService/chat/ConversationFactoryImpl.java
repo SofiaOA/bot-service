@@ -4,6 +4,7 @@ import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.triggerService.TriggerService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -15,13 +16,17 @@ public class ConversationFactoryImpl implements ConversationFactory {
     private final SignupCodeRepository signupCodeRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-    public ConversationFactoryImpl(MemberService memberService, ProductPricingService productPricingService, TriggerService triggerService, SignupCodeRepository signupCodeRepository, ApplicationEventPublisher eventPublisher) {
+
+    private Integer queuePos;
+
+    public ConversationFactoryImpl(MemberService memberService, ProductPricingService productPricingService, TriggerService triggerService, SignupCodeRepository signupCodeRepository, ApplicationEventPublisher eventPublisher, @Value("${hedvig.waitlist.length}") Integer queuePos) {
         this.memberService = memberService;
         this.productPricingService = productPricingService;
         this.triggerService = triggerService;
 
         this.signupCodeRepository = signupCodeRepository;
         this.eventPublisher = eventPublisher;
+        this.queuePos = queuePos;
     }
 
     @Override
@@ -40,7 +45,9 @@ public class ConversationFactoryImpl implements ConversationFactory {
         }
 
         if(conversationClass.equals(OnboardingConversationDevi.class)) {
-            return new OnboardingConversationDevi(memberService, productPricingService, signupCodeRepository, eventPublisher, this);
+            final OnboardingConversationDevi onboardingConversationDevi = new OnboardingConversationDevi(memberService, productPricingService, signupCodeRepository, eventPublisher, this);
+            onboardingConversationDevi.queuePos = queuePos;
+            return onboardingConversationDevi;
         }
 
         if(conversationClass.equals(TrustlyConversation.class)) {
