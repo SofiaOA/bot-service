@@ -106,6 +106,18 @@ public class SessionManager {
         userrepo.saveAndFlush(uc);
     }
     
+    public void savePushToken(String hid, String pushToken) {
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        uc.putUserData("PUSH-TOKEN", pushToken);
+        userrepo.saveAndFlush(uc);
+    }
+    
+    public String getPushToken(String hid) {
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        return uc.getDataEntry("PUSH-TOKEN");
+    }
+    
+    
     public void recieveEvent(String eventtype, String value, String hid){
 
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
