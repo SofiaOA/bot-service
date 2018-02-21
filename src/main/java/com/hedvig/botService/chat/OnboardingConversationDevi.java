@@ -22,6 +22,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -414,13 +415,15 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         setExpectedReturnType("message.tipsa", new EmailAdress());
         createMessage("message.frifraga", new MessageBodyText("Fråga på! Skriv vad du undrar här så hör jag och mina kollegor av oss snart " + emoji_postal_horn));
 
+        createMessage("message.frionboardingfraga", new MessageBodyText("Fråga på! Skriv vad du undrar här så hör jag och mina kollegor av oss snart " + emoji_postal_horn));
+
         
         
         createMessage("message.nagotmer",
                 new MessageBodySingleSelect("Tack! Vill du hitta på något mer nu när vi har varandra på tråden?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Jag vill tipsa någon om dig", "message.tipsa"));
-                            add(new SelectOption("Jag har en fråga", "message.frifraga"));
+                            add(new SelectOption("Jag har en fråga", "message.frionboardingfraga"));
                             add(new SelectOption("Nej tack!", "message.avslutok"));
 
                         }}
@@ -604,6 +607,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
                         	add(new SelectOption("Jag har en annan fråga", "message.frifraga"));
                             //add(new SelectOption("Jag vill bli medlem", "message.forslag"));
+                        }}
+                ));
+        
+        createMessage("message.frionboardingfragatack",
+                new MessageBodySingleSelect("Tack! Jag hör av mig inom kort",
+                        new ArrayList<SelectItem>() {{
+                            add(new SelectOption("Jag har fler frågor", "message.frionboardingfraga"));
                         }}
                 ));
         
@@ -1078,7 +1088,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 nxtMsg = "message.nagotmer";
                 break;
             case "message.frifraga":
-                nxtMsg = handleFriFraga(userContext, m);
+                handleFriFraga(userContext, m);
+                nxtMsg = "message.frifragatack";
+                break;
+            case "message.frionboardingfraga":
+                handleFriFraga(userContext, m);
+                nxtMsg = "message.frionboardingfragatack";
                 break;
             case "message.pers":
                 int nr_persons = getValue((MessageBodyNumber)m.body);
@@ -1282,13 +1297,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     }
 
-    public String handleFriFraga(UserContext userContext, Message m) {
-        String nxtMsg;
-        userContext.putUserData("{ONBOARDING_QUESTION}", m.body.text);
+    public void handleFriFraga(UserContext userContext, Message m) {
+        userContext.putUserData("{ONBOARDING_QUESTION_"+LocalDateTime.now().toString()+"}", m.body.text);
         eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(), m.body.text));
         addToChat(m, userContext);
-        nxtMsg = "message.frifragatack";
-        return nxtMsg;
     }
 
     private String handleUnderwritingLimitResponse(UserContext userContext, Message m, String messageId) {
