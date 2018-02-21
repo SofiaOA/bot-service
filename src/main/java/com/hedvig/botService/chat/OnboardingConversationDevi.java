@@ -207,7 +207,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage("message.uwlimit.tack",
                 new MessageBodySingleSelect("Tack! Jag hör av mig så fort jag kan",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill starta om chatten", "message.onboardingstart"));
+                            add(new SelectOption("Jag vill starta om chatten", "message.activate.ok.a"));
 
                         }}
                 ));
@@ -762,7 +762,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage("message.avslutok",
                 new MessageBodySingleSelect("Okej! Trevligt att chattas, ha det fint och hoppas vi hörs igen!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill starta om chatten", "message.onboardingstart"));
+                            add(new SelectOption("Jag vill starta om chatten", "message.activate.ok.a"));
 
                         }}
                 ));
