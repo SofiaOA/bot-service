@@ -1,10 +1,9 @@
 package com.hedvig.botService.serviceIntegration.paymentService;
 
-import com.hedvig.botService.serviceIntegration.paymentService.dto.SelectAccountDTO;
-import com.hedvig.botService.serviceIntegration.paymentService.dto.UrlResponse;
+import com.hedvig.botService.serviceIntegration.paymentService.dto.DirectDebitRequest;
+import com.hedvig.botService.serviceIntegration.paymentService.dto.DirectDebitResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 @Component
 public class PaymentService {
@@ -16,16 +15,11 @@ public class PaymentService {
     }
 
 
-    public UrlResponse startPayment(String firstName, String lastName, String ssn, String email) {
+    public DirectDebitResponse registerTrustlyDirectDebit(String firstName, String lastName, String ssn, String email, String memberId) {
 
-        SelectAccountDTO dto = new SelectAccountDTO();
-        dto.firstName = firstName;
-        dto.lastName = lastName;
-        dto.ssn = ssn;
-        dto.email = email;
+        DirectDebitRequest dto = new DirectDebitRequest(firstName, lastName, ssn, email, memberId);
 
-
-        final ResponseEntity<UrlResponse> urlResponseResponseEntity = this.client.startPayment(dto);
+        final ResponseEntity<DirectDebitResponse> urlResponseResponseEntity = this.client.registerDirectDebit(dto);
 
         return urlResponseResponseEntity.getBody();
     }

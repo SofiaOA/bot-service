@@ -3,7 +3,7 @@ package com.hedvig.botService.session.triggerService;
 import com.hedvig.botService.enteties.DirectDebitMandateTrigger;
 import com.hedvig.botService.enteties.DirectDebitRepository;
 import com.hedvig.botService.serviceIntegration.paymentService.PaymentService;
-import com.hedvig.botService.serviceIntegration.paymentService.dto.UrlResponse;
+import com.hedvig.botService.serviceIntegration.paymentService.dto.DirectDebitResponse;
 import com.hedvig.botService.session.exceptions.UnathorizedException;
 import com.hedvig.botService.session.triggerService.dto.CreateDirectDebitMandateDTO;
 import org.springframework.stereotype.Service;
@@ -57,8 +57,8 @@ public class TriggerService {
         }
 
         if(one.getUrl() == null) {
-            final UrlResponse urlResponse = paymentService.startPayment(one.getFirstName(), one.getLastName(), one.getSsn(), one.getEmail());
-            one.setUrl(urlResponse.getUrl());
+            final DirectDebitResponse directDebitResponse = paymentService.registerTrustlyDirectDebit(one.getFirstName(), one.getLastName(), one.getSsn(), one.getEmail(), one.getMemberId());
+            one.setUrl(directDebitResponse.getUrl());
             repo.save(one);
         }
 

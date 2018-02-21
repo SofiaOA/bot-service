@@ -3,7 +3,7 @@ package com.hedvig.botService.session;
 import com.hedvig.botService.enteties.DirectDebitMandateTrigger;
 import com.hedvig.botService.enteties.DirectDebitRepository;
 import com.hedvig.botService.serviceIntegration.paymentService.PaymentService;
-import com.hedvig.botService.serviceIntegration.paymentService.dto.UrlResponse;
+import com.hedvig.botService.serviceIntegration.paymentService.dto.DirectDebitResponse;
 import com.hedvig.botService.session.exceptions.UnathorizedException;
 import com.hedvig.botService.session.triggerService.TriggerService;
 import com.hedvig.botService.session.triggerService.dto.CreateDirectDebitMandateDTO;
@@ -105,7 +105,7 @@ public class TriggerServiceTest {
         DirectDebitMandateTrigger ddm = createDirectDebitMandateTrigger(triggerId, null, TOLVANSSON_MEMBERID);
         given(repo.findOne(triggerId)).willReturn(ddm);
 
-        given(pService.startPayment(TOLVANSSON_FIRSTNAME, TOLVANSSON_LAST_NAME, TOLVANSSON_SSN, TOLVANSSON_EMAIL)).willReturn(new UrlResponse(TRIGGER_URL, "12345"));
+        given(pService.registerTrustlyDirectDebit(TOLVANSSON_FIRSTNAME, TOLVANSSON_LAST_NAME, TOLVANSSON_SSN, TOLVANSSON_EMAIL, TOLVANSSON_MEMBERID)).willReturn(new DirectDebitResponse(TRIGGER_URL));
 
         //act
 
@@ -132,7 +132,7 @@ public class TriggerServiceTest {
 
         //assert
         assertThat(actualTriggerUrl).isEqualTo(TRIGGER_URL);
-        then(pService).should(never()).startPayment(any(),any(),any(),any());
+        then(pService).should(never()).registerTrustlyDirectDebit(any(),any(),any(),any(),any());
     }
 
     @Test

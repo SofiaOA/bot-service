@@ -27,6 +27,12 @@ public class TrustlyConversation extends Conversation {
                             add(new SelectItemTrustly("Ja välj trustlykonto", "trustly.choose.account"));
                         }}
                 ));
+
+        createMessage("trustly.poll",
+                new MessageBodySingleSelect("Väntar på svar ifrån trustly.",
+                        new ArrayList<SelectItem>(){{
+                            add(new SelectOption("Kolla om något hänt", "trustly.poll"));
+                        }}));
     }
 
     @Override

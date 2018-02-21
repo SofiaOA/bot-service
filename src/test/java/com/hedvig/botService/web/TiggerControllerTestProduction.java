@@ -31,7 +31,7 @@ public class TiggerControllerTestProduction {
     TriggerService triggerService;
 
     @Test
-    public void createTriggerWorksInDevelopmentProfile() throws Exception {
+    public void createDDM_returns404_WHEN_environmentEQProduction() throws Exception {
 
         CreateDirectDebitMandateDTO createDirectDebitMandateDTO = new CreateDirectDebitMandateDTO(
                 TOLVANSSON_SSN,
