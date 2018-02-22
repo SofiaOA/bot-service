@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
-@FeignClient(value = "payment-service", url ="${hedvig.member-service.url:payment-service}")
+@FeignClient(value = "payment-service", url ="${hedvig.payment-service.url:payment-service}")
 public interface PaymentServiceClient {
 
     @RequestMapping(value = "/_/trustlyOrder/registerDirectDebit", method = POST, produces = "application/json")
