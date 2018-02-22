@@ -34,7 +34,7 @@ public class InternalUserDataController {
 		this.messageRepository = messageRepository;
     }
 
-    @GetMapping("{hid}/push-token", produces="application/json")
+    @GetMapping(value = "{hid}/push-token", produces="application/json")
     ResponseEntity<String> pushToken(@PathVariable String hid){
         log.info("Get pushtoken for memberId:{}, is: {}", value("memberId", ""));
         String token = sessionManager.getPushToken(hid);
