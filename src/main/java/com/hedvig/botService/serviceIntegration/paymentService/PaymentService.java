@@ -6,6 +6,8 @@ import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderInformat
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class PaymentService {
 
@@ -16,9 +18,9 @@ public class PaymentService {
     }
 
 
-    public DirectDebitResponse registerTrustlyDirectDebit(String firstName, String lastName, String ssn, String email, String memberId) {
+    public DirectDebitResponse registerTrustlyDirectDebit(String firstName, String lastName, String ssn, String email, String memberId, UUID triggerId) {
 
-        DirectDebitRequest dto = new DirectDebitRequest(firstName, lastName, ssn, email, memberId);
+        DirectDebitRequest dto = new DirectDebitRequest(firstName, lastName, ssn, email, memberId, triggerId.toString());
 
         final ResponseEntity<DirectDebitResponse> urlResponseResponseEntity = this.client.registerDirectDebit(dto);
 
