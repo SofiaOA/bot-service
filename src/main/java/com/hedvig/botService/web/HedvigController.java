@@ -65,6 +65,15 @@ public class HedvigController {
     	return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("trustlyClosed")
+    ResponseEntity<String> trustlyClosed(@RequestHeader(value="hedvig.token") String hid) {
+        log.info("GET trustlyClosed");
+
+        this.sessionManager.trustlyClosed(hid);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("collect")
     ResponseEntity<?> collect(@RequestParam  String referenceToken,
                               @RequestHeader(value="hedvig.token") String hid) {

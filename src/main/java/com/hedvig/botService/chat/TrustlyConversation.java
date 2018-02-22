@@ -1,5 +1,6 @@
 package com.hedvig.botService.chat;
 
+import com.hedvig.botService.enteties.DirectDebitMandateTrigger;
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
@@ -77,10 +78,10 @@ public class TrustlyConversation extends Conversation {
                 //endConversation(userContext);
                 break;
             case TRUSTLY_POLL:
-                final OrderState orderState = triggerService.getTrustlyOrderInformation(userContext.getDataEntry(UserContext.TRUSTLY_TRIGGER_ID));
-                if(orderState.equals(OrderState.CANCELED)) {
+                final DirectDebitMandateTrigger.TriggerStatus orderState = triggerService.getTrustlyOrderInformation(userContext.getDataEntry(UserContext.TRUSTLY_TRIGGER_ID));
+                if(orderState.equals(DirectDebitMandateTrigger.TriggerStatus.FAILED)) {
                     nxtMsg = CANCEL;
-                }else if(orderState.equals(OrderState.COMPLETE)) {
+                }else if(orderState.equals(DirectDebitMandateTrigger.TriggerStatus.SUCCESS)) {
                     nxtMsg = COMPLETE;
                 }else {
                     nxtMsg = TRUSTLY_POLL;
@@ -126,5 +127,20 @@ public class TrustlyConversation extends Conversation {
         }
 
         super.addToChat(m, userContext);
+    }
+
+    public void windowClosed(UserContext uc) {
+        String nxtMsg;
+
+        final DirectDebitMandateTrigger.TriggerStatus orderState = triggerService.getTrustlyOrderInformation(uc.getDataEntry(UserContext.TRUSTLY_TRIGGER_ID));
+        if(orderState.equals(DirectDebitMandateTrigger.TriggerStatus.FAILED)) {
+            nxtMsg = CANCEL;
+        }else if(orderState.equals(DirectDebitMandateTrigger.TriggerStatus.SUCCESS)) {
+            nxtMsg = COMPLETE;
+        }else {
+            nxtMsg = TRUSTLY_POLL;
+        }
+
+        addToChat(getMessage(nxtMsg), uc);
     }
 }

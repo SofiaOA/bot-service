@@ -4,6 +4,8 @@ import com.hedvig.botService.enteties.DirectDebitMandateTrigger;
 import com.hedvig.botService.enteties.DirectDebitRepository;
 import com.hedvig.botService.serviceIntegration.paymentService.PaymentService;
 import com.hedvig.botService.serviceIntegration.paymentService.dto.DirectDebitResponse;
+import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderInformation;
+import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderState;
 import com.hedvig.botService.session.exceptions.UnathorizedException;
 import com.hedvig.botService.session.triggerService.TriggerService;
 import com.hedvig.botService.session.triggerService.dto.CreateDirectDebitMandateDTO;
@@ -36,7 +38,9 @@ public class TriggerServiceTest {
     public static final String TOLVANSSON_EMAIL = "tolvan@tolvansson.se";
     public static final String TOLVANSSON_MEMBERID = "1337";
     public static final String TRIGGER_URL = "http://localhost:8080";
-    public static final String ORDER_ID = UUID.randomUUID().toString();
+    public static final UUID ORDER_ID = UUID.randomUUID();
+    public static final UUID TRIGGER_ID = UUID.randomUUID();
+    public static final String IFRAME_URL = "https://trustly.com/iframeURL";
     @Mock
     DirectDebitRepository repo;
 
@@ -49,6 +53,7 @@ public class TriggerServiceTest {
     public ExpectedException thrown = ExpectedException.none();
 
     private UUID generatedTriggerId;
+    ;
 
     @Before
     public void setUp(){
@@ -106,7 +111,7 @@ public class TriggerServiceTest {
         DirectDebitMandateTrigger ddm = createDirectDebitMandateTrigger(triggerId, null, TOLVANSSON_MEMBERID);
         given(repo.findOne(triggerId)).willReturn(ddm);
 
-        given(pService.registerTrustlyDirectDebit(TOLVANSSON_FIRSTNAME, TOLVANSSON_LAST_NAME, TOLVANSSON_SSN, TOLVANSSON_EMAIL, TOLVANSSON_MEMBERID)).willReturn(new DirectDebitResponse(TRIGGER_URL,ORDER_ID));
+        given(pService.registerTrustlyDirectDebit(TOLVANSSON_FIRSTNAME, TOLVANSSON_LAST_NAME, TOLVANSSON_SSN, TOLVANSSON_EMAIL, TOLVANSSON_MEMBERID)).willReturn(new DirectDebitResponse(TRIGGER_URL,ORDER_ID.toString()));
 
         //act
 
@@ -116,7 +121,7 @@ public class TriggerServiceTest {
         assertThat(actualTriggerUrl).isEqualTo(TRIGGER_URL);
         then(repo).should().save(mandateCaptor.capture());
         assertThat(mandateCaptor.getValue().getUrl()).isEqualTo(TRIGGER_URL);
-        assertThat(mandateCaptor.getValue().getOrderId()).isEqualTo(ORDER_ID);
+        assertThat(mandateCaptor.getValue().getOrderId()).isEqualTo(ORDER_ID.toString());
 
     }
 
@@ -140,17 +145,63 @@ public class TriggerServiceTest {
     @Test
     public void getTriggerUrl_willThrow_UnathorizedException_if_memberIdDoesNotMatch() {
         //arrange
-        UUID triggerId = UUID.randomUUID();
 
-        DirectDebitMandateTrigger ddm = createDirectDebitMandateTrigger(triggerId, TRIGGER_URL, TOLVANSSON_MEMBERID);
-        given(repo.findOne(triggerId)).willReturn(ddm);
+        DirectDebitMandateTrigger ddm = createDirectDebitMandateTrigger(TRIGGER_ID, TRIGGER_URL, TOLVANSSON_MEMBERID);
+        given(repo.findOne(TRIGGER_ID)).willReturn(ddm);
 
         //act
         thrown.expect(UnathorizedException.class);
-        final String actualTriggerUrl = sut.getTriggerUrl(triggerId, "1338");
+        final String actualTriggerUrl = sut.getTriggerUrl(TRIGGER_ID, "1338");
 
         //assert
 
+    }
+
+    @Test
+    public void GIVEN_directDebitTriggerWithStatusNull_THEN_getTrustlyOrderInformation_WILL_callPaymentService() {
+
+        DirectDebitMandateTrigger ddm = createDirectDebitMandateTrigger(TRIGGER_ID, TRIGGER_URL, TOLVANSSON_MEMBERID);
+        given(repo.findOne(TRIGGER_ID)).willReturn(ddm);
+
+        getTrustlyOrderInformationWillReturnGiven(OrderState.COMPLETE, ddm.getOrderId());
+
+        final DirectDebitMandateTrigger.TriggerStatus trustlyOrderInformation = sut.getTrustlyOrderInformation(TRIGGER_ID.toString());
+
+        assertThat(trustlyOrderInformation).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.SUCCESS);
+        assertThat(ddm.getStatus()).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.SUCCESS);
+    }
+
+    public void getTrustlyOrderInformationWillReturnGiven(OrderState returns, String given) {
+        given(this.pService.getTrustlyOrderInformation(given)).willReturn(new OrderInformation(ORDER_ID, IFRAME_URL, returns));
+    }
+
+    @Test
+    public void GIVEN_directDebitTriggerWithStatusCOMPLETE_THEN_getTrustlyOrderInformation_WILL_NotCallPaymentService() {
+
+        DirectDebitMandateTrigger ddm = createDirectDebitMandateTrigger(TRIGGER_ID, TRIGGER_URL, TOLVANSSON_MEMBERID);
+
+        given(repo.findOne(TRIGGER_ID)).willReturn(ddm);
+        getTrustlyOrderInformationWillReturnGiven(OrderState.CANCELED, ddm.getOrderId());
+
+        final DirectDebitMandateTrigger.TriggerStatus trustlyOrderInformation = sut.getTrustlyOrderInformation(TRIGGER_ID.toString());
+
+        assertThat(trustlyOrderInformation).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.FAILED);
+        assertThat(ddm.getStatus()).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.FAILED);
+    }
+
+    @Test
+    public void GIVEN_getTrustlyOrderInformationCONFIRMED_THEN_directdebittriggerStatus_WILL_EQ_IN_PROGRESS() {
+
+        DirectDebitMandateTrigger ddm = createDirectDebitMandateTrigger(TRIGGER_ID, TRIGGER_URL, TOLVANSSON_MEMBERID);
+
+
+        given(repo.findOne(TRIGGER_ID)).willReturn(ddm);
+        getTrustlyOrderInformationWillReturnGiven(OrderState.CONFIRMED, ddm.getOrderId());
+
+        final DirectDebitMandateTrigger.TriggerStatus trustlyOrderInformation = sut.getTrustlyOrderInformation(TRIGGER_ID.toString());
+
+        assertThat(trustlyOrderInformation).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.IN_PROGRESS);
+        assertThat(ddm.getStatus()).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.IN_PROGRESS);
     }
 
 
@@ -167,6 +218,7 @@ public class TriggerServiceTest {
         ddm.setEmail(TOLVANSSON_EMAIL);
         ddm.setUrl(triggerUrl);
         ddm.setMemberId(tolvanssonMemberid);
+        ddm.setOrderId(ORDER_ID.toString());
         return ddm;
     }
 

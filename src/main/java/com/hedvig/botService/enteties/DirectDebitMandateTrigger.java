@@ -1,5 +1,6 @@
 package com.hedvig.botService.enteties;
 
+import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderState;
 import lombok.Data;
 import org.assertj.core.util.diff.myers.Equalizer;
 
@@ -11,9 +12,18 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.UUID;
 
+import static jdk.net.SocketFlow.Status.IN_PROGRESS;
+
 @Entity
 @Data
 public class DirectDebitMandateTrigger implements Serializable {
+
+    public enum TriggerStatus {
+        CRATED,
+        IN_PROGRESS,
+        FAILED,
+        SUCCESS
+    }
 
     @Id
     @GeneratedValue
@@ -31,4 +41,6 @@ public class DirectDebitMandateTrigger implements Serializable {
     String memberId;
 
     String orderId;
+
+    TriggerStatus  status;
 }

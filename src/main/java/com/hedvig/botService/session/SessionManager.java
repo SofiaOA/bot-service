@@ -371,6 +371,18 @@ public class SessionManager {
 
     }
 
+    public void trustlyClosed(String hid) {
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+
+
+
+        TrustlyConversation tr = (TrustlyConversation) conversationFactory.createConversation(TrustlyConversation.class);
+        tr.windowClosed(uc);
+
+
+        userrepo.save(uc);
+    }
+
     public void receiveMessage(Message m, String hid) {
         log.info("Recieving messages from user:" + hid);
         log.info(m.toString());

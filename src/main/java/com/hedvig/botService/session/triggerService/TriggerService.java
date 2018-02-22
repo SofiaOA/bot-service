@@ -18,6 +18,9 @@ import java.util.UUID;
 public class TriggerService {
 
 
+    public static final String NOTIFICATION_SUCCESS_URL = "hedvig-test://trustly/payment-success";
+    public static final String NOTIFICATON_FAILED_URL = "hedvig-test://trustly/payment-success";
+    public static final String NOTIFICATION_ERROR_URL = "https://www.hedvig.com/notification-error";
     private final DirectDebitRepository repo;
     private final PaymentService paymentService;
 
@@ -68,13 +71,49 @@ public class TriggerService {
         return one.getUrl();
     }
 
-    public OrderState getTrustlyOrderInformation(String triggerId) {
+    public DirectDebitMandateTrigger.TriggerStatus getTrustlyOrderInformation(String triggerId) {
 
         final DirectDebitMandateTrigger trigger = repo.findOne(UUID.fromString(triggerId));
 
-        final OrderInformation trustlyOrderInformation = paymentService.getTrustlyOrderInformation(trigger.getOrderId());
+        if(     trigger.getStatus() == null ||
+                trigger.getStatus() == DirectDebitMandateTrigger.TriggerStatus.IN_PROGRESS ||
+                trigger.getStatus() == DirectDebitMandateTrigger.TriggerStatus.CRATED) {
 
-        return trustlyOrderInformation.getState();
 
+            OrderInformation trustlyOrderInformation = paymentService.getTrustlyOrderInformation(trigger.getOrderId());
+
+            if (trustlyOrderInformation.getState() == OrderState.COMPLETE) {
+                trigger.setStatus(DirectDebitMandateTrigger.TriggerStatus.SUCCESS);
+            } else if (trustlyOrderInformation.getState() == OrderState.CANCELED) {
+                trigger.setStatus(DirectDebitMandateTrigger.TriggerStatus.FAILED);
+            } else {
+                trigger.setStatus(DirectDebitMandateTrigger.TriggerStatus.IN_PROGRESS);
+            }
+        }
+
+        repo.save(trigger);
+
+        return trigger.getStatus();
+    }
+
+    public String clientNotificationReceived(UUID triggerId, DirectDebitMandateTrigger.TriggerStatus status) {
+        DirectDebitMandateTrigger trigger = repo.findOne(triggerId);
+        if(trigger.getStatus() == null ||
+                trigger.getStatus() == DirectDebitMandateTrigger.TriggerStatus.IN_PROGRESS ||
+                trigger.getStatus() == DirectDebitMandateTrigger.TriggerStatus.CRATED) {
+            trigger.setStatus(status);
+        }
+
+        repo.save(trigger);
+
+        if(status == DirectDebitMandateTrigger.TriggerStatus.SUCCESS) {
+            return NOTIFICATION_SUCCESS_URL;
+        }
+
+        if(status == DirectDebitMandateTrigger.TriggerStatus.FAILED) {
+            return NOTIFICATON_FAILED_URL;
+        }
+
+        return NOTIFICATION_ERROR_URL;
     }
 }

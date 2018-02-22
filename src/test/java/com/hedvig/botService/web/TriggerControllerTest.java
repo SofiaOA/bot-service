@@ -1,6 +1,7 @@
 package com.hedvig.botService.web;
 
 import com.hedvig.botService.BotServiceApplicationTests;
+import com.hedvig.botService.enteties.DirectDebitMandateTrigger;
 import com.hedvig.botService.session.triggerService.TriggerService;
 import com.hedvig.botService.session.exceptions.UnathorizedException;
 import com.hedvig.botService.testHelpers.TestData;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -21,18 +23,22 @@ import java.util.UUID;
 import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_MEMBER_ID;
 import static com.hedvig.botService.testHelpers.TestData.toJson;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
+@SuppressWarnings("unchecked")
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = TriggerController.class)
 @ActiveProfiles("development")
 @ContextConfiguration(classes=BotServiceApplicationTests.class)
+@TestPropertySource(properties = {
+        "hedvig.trigger.errorPageUrl=" + TriggerControllerTest.ERROR_PAGE_URL
+})
 public class TriggerControllerTest {
 
+    static final String ERROR_PAGE_URL = "https://hedvig.com/error-redirect";
     @MockBean
     private TriggerService triggerService;
 
@@ -41,9 +47,8 @@ public class TriggerControllerTest {
 
 
     @Test
-    public void returns_401_if_trigger_does_not_belong_to_member() throws Exception {
+    public void GIVEN_triggerIdThatDoesNotBelongToMember_THEN_trigger_WILL_return_404() throws Exception {
         final UUID triggerId = UUID.randomUUID();
-
 
         //noinspection unchecked
         given(triggerService.getTriggerUrl(triggerId, TestData.TOLVANSSON_MEMBER_ID)).willThrow(UnathorizedException.class);
@@ -56,10 +61,9 @@ public class TriggerControllerTest {
     }
 
     @Test
-    public void trigger_returns_trigger_url() throws Exception {
+    public void GIVEN_validTriggerId_THEN_trigger_WILL_return_triggerURL() throws Exception {
         final UUID triggerId = UUID.randomUUID();
         final String triggerURL = "http://localhost:8080";
-
 
         given(triggerService.getTriggerUrl(triggerId, TestData.TOLVANSSON_MEMBER_ID)).willReturn(triggerURL);
 
@@ -73,7 +77,7 @@ public class TriggerControllerTest {
     }
 
     @Test
-    public void no_trigger_return_404() throws Exception {
+    public void GIVEN_noTriggerId_trigger_WILL_return_404() throws Exception {
         final UUID triggerId = UUID.randomUUID();
 
         given(triggerService.getTriggerUrl(triggerId, TestData.TOLVANSSON_MEMBER_ID)).willReturn(null);
@@ -86,10 +90,7 @@ public class TriggerControllerTest {
     }
 
     @Test
-    public void triggerId_isNotValid_UUID() throws Exception {
-        final UUID triggerId = UUID.randomUUID();
-
-        given(triggerService.getTriggerUrl(triggerId, TestData.TOLVANSSON_MEMBER_ID)).willReturn(null);
+    public void GIVEN_invalidUUID_THEN_trigger_WILL_return400() throws Exception {
 
         mockMvc
                 .perform(
@@ -100,7 +101,7 @@ public class TriggerControllerTest {
     }
 
     @Test
-    public void createTriggerWorksInDevelopmentProfile() throws Exception {
+    public void GIVEN_developmentProfile_THEN_createDDMWorks() throws Exception {
         final UUID triggerId = UUID.randomUUID();
 
         CreateDirectDebitMandateDTO createDirectDebitMandateDTO = new CreateDirectDebitMandateDTO(
@@ -121,5 +122,32 @@ public class TriggerControllerTest {
                 andExpect(jsonPath("$.id").value(triggerId.toString()));
     }
 
+    @Test
+    public void GIVEN_notificationReceived_THEN_notification_WILL_RedirectToURL() throws Exception {
+        final UUID triggerId = UUID.randomUUID();
+
+        final String SUCCESS_URL = "https://hedvig.com/notification-success";
+        given(triggerService.clientNotificationReceived(triggerId, DirectDebitMandateTrigger.TriggerStatus.SUCCESS))
+                .willReturn(SUCCESS_URL);
+
+        mockMvc.perform(
+                    get("/hedvig/trigger/notification?clientCompletion=SUCCESS&triggerId=" + triggerId))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("location", SUCCESS_URL));
+    }
+
+    @Test
+    public void GIVEN_triggerService_throwsException_THEN_notification_willRedirectToErrorPage() throws Exception {
+        final UUID triggerId = UUID.randomUUID();
+
+        given(triggerService.clientNotificationReceived(triggerId, DirectDebitMandateTrigger.TriggerStatus.SUCCESS))
+                .willThrow(RuntimeException.class);
+
+        mockMvc.perform(
+                get("/hedvig/trigger/notification?clientCompletion=SUCCESS&triggerId=" + triggerId))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("location", ERROR_PAGE_URL));
+
+    }
 }
 
