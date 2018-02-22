@@ -72,7 +72,7 @@ public class TriggerControllerTest {
                         post("/hedvig/trigger/" + triggerId.toString())
                                 .header("hedvig.token", TestData.TOLVANSSON_MEMBER_ID))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.url").value(triggerURL))
+                .andExpect(jsonPath("$.url").value(triggerURL + "&gui=native&color=%230F7A64&bordercolor=%230F7A64"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
     }
 
@@ -144,7 +144,7 @@ public class TriggerControllerTest {
                 .willThrow(RuntimeException.class);
 
         mockMvc.perform(
-                get("/hedvig/trigger/notification?clientCompletion=SUCCESS&triggerId=" + triggerId))
+                get("/hedvig/trigger/notification?status=SUCCESS&triggerId=" + triggerId))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("location", ERROR_PAGE_URL));
 
