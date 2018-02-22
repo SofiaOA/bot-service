@@ -68,7 +68,7 @@ public class TriggerController {
     }
 
     @GetMapping("/notification")
-    public ResponseEntity<?> getNotification(@RequestParam("triggerId") UUID triggerId, DirectDebitMandateTrigger.TriggerStatus status) {
+    public ResponseEntity<?> getNotification(@RequestParam("triggerId") UUID triggerId,@RequestParam("status")  DirectDebitMandateTrigger.TriggerStatus status) {
 
         try {
             final String redirectionUrl = triggerService.clientNotificationReceived(triggerId, status);

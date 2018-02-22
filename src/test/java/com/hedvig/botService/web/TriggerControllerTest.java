@@ -131,7 +131,7 @@ public class TriggerControllerTest {
                 .willReturn(SUCCESS_URL);
 
         mockMvc.perform(
-                    get("/hedvig/trigger/notification?clientCompletion=SUCCESS&triggerId=" + triggerId))
+                    get("/hedvig/trigger/notification?status=SUCCESS&triggerId=" + triggerId))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("location", SUCCESS_URL));
     }
