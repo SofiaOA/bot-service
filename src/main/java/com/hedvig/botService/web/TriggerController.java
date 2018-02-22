@@ -75,14 +75,14 @@ public class TriggerController {
         try {
             final String redirectionUrl = triggerService.clientNotificationReceived(triggerId, status);
 
-            log.info("Redirecting to: ", redirectionUrl);
+            log.info("Redirecting to: {}", redirectionUrl);
             return ResponseEntity.status(304).location(URI.create(redirectionUrl)).build();//.location()
         }
         catch(Exception ex) {
             log.error("Exception caught in TriggerController.getNotificaiton, redirecting to " + errorPageUrl, ex);
         }
 
-        log.info("Redirecting to: ", this.errorPageUrl);
+        log.info("Redirecting to: {}", this.errorPageUrl);
         return ResponseEntity.status(304).location(this.errorPageUrl).build();
     }
 
