@@ -76,7 +76,7 @@ public class TrustlyConversation extends Conversation {
         switch (m.id) {
             case START:
                 //endConversation(userContext);
-                break;
+                return;
             case TRUSTLY_POLL:
                 final DirectDebitMandateTrigger.TriggerStatus orderState = triggerService.getTrustlyOrderInformation(userContext.getDataEntry(UserContext.TRUSTLY_TRIGGER_ID));
                 if(orderState.equals(DirectDebitMandateTrigger.TriggerStatus.FAILED)) {

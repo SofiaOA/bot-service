@@ -18,9 +18,9 @@ import java.util.UUID;
 public class TriggerService {
 
 
-    public static final String NOTIFICATION_SUCCESS_URL = "hedvig-test://trustly/payment-success";
-    public static final String NOTIFICATON_FAILED_URL = "hedvig-test://trustly/payment-success";
-    public static final String NOTIFICATION_ERROR_URL = "https://www.hedvig.com/notification-error";
+    public static final String NOTIFICATION_SUCCESS_URL = "${hedvig.trustly.notification.successUrl}";
+    public static final String NOTIFICATON_FAILED_URL = "${hedvig.trustly.notification.failUrl}";
+    public static final String NOTIFICATION_ERROR_URL = "${hedvig.trustly.notification.errorUrl}";
     private final DirectDebitRepository repo;
     private final PaymentService paymentService;
 
