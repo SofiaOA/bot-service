@@ -48,7 +48,7 @@ public class TrustlyConversation extends Conversation {
                         }}));
 
         createMessage(COMPLETE,
-                new MessageBodySingleSelect("Tack! Ingen är gladare än jag att ha dig här :angel:",
+                new MessageBodySingleSelect("Tack! Ingen är gladare än jag att ha dig här",
                         new ArrayList<SelectItem>(){{
                             add(new SelectLink("Nu kan du börja utforska appen", "end", "Dashboard", null, null, false));
                         }}));
