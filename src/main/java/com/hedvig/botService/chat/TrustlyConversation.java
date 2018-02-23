@@ -36,19 +36,19 @@ public class TrustlyConversation extends Conversation {
                 ));
 
         createMessage(TRUSTLY_POLL,
-                new MessageBodySingleSelect("Väntar på svar ifrån trustly.",
+                new MessageBodySingleSelect("Just nu har vi bara autogiro som betalsätt",
                         new ArrayList<SelectItem>(){{
-                            add(new SelectOption("Kolla om något hänt", "trustly.poll"));
+                            add(new SelectItemTrustly("Fortsätt med registeringen", "trustly.poll"));
                         }}));
 
         createMessage(CANCEL,
-                new MessageBodySingleSelect("Just nu har vi bara autogiro som betalsätt, välj konto igen annars...",
+                new MessageBodySingleSelect("Ett fel har uppstått med autogiro registreringen, just nu tillåter vi bara betalning med autogiro.",
                         new ArrayList<SelectItem>(){{
-                            add(new SelectOption("OK.. jag väljer konto", START));
+                            add(new SelectItemTrustly("Försök igen", "trustly.poll"));
                         }}));
 
         createMessage(COMPLETE,
-                new MessageBodySingleSelect("Woho nu återsår bara en sak :) :) :)",
+                new MessageBodySingleSelect("Tack!",
                         new ArrayList<SelectItem>(){{
                             add(new SelectOption("Visa mig", START));
                         }}));
@@ -78,15 +78,9 @@ public class TrustlyConversation extends Conversation {
                 //endConversation(userContext);
                 return;
             case TRUSTLY_POLL:
-                final DirectDebitMandateTrigger.TriggerStatus orderState = triggerService.getTrustlyOrderInformation(userContext.getDataEntry(UserContext.TRUSTLY_TRIGGER_ID));
-                if(orderState.equals(DirectDebitMandateTrigger.TriggerStatus.FAILED)) {
-                    nxtMsg = CANCEL;
-                }else if(orderState.equals(DirectDebitMandateTrigger.TriggerStatus.SUCCESS)) {
-                    nxtMsg = COMPLETE;
-                }else {
-                    nxtMsg = TRUSTLY_POLL;
-                }
-                break;
+                return;
+            case CANCEL:
+                return;
             case COMPLETE:
                 endConversation(userContext);
         }
@@ -113,7 +107,8 @@ public class TrustlyConversation extends Conversation {
 
     @Override
     void addToChat(Message m, UserContext userContext) {
-        if(m.id.equals(START) && m.header.fromId == HEDVIG_USER_ID) {
+        if((m.id.equals(START) || m.id.equals(CANCEL)) &&
+                m.header.fromId == HEDVIG_USER_ID) {
             final UserData userData = userContext.getOnBoardingData();
             UUID triggerUUID = triggerService.createTrustlyDirectDebitMandate(
                     userData.getSSN(),
@@ -137,6 +132,9 @@ public class TrustlyConversation extends Conversation {
             nxtMsg = CANCEL;
         }else if(orderState.equals(DirectDebitMandateTrigger.TriggerStatus.SUCCESS)) {
             nxtMsg = COMPLETE;
+            addToChat(getMessage(nxtMsg), uc);
+            endConversation(uc);
+            return;
         }else {
             nxtMsg = TRUSTLY_POLL;
         }
