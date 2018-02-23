@@ -28,29 +28,29 @@ public class TrustlyConversation extends Conversation {
         this.factory = factory;
 
 
-        createMessage(START,
-                new MessageBodySingleSelect("Nu ska vi bara välja ett autogirokonto!",
+        createChatMessage(START,
+                new MessageBodySingleSelect("Fantastiskt! Nu är allt klart, vi ska bara sätta upp betalning \fDet ska såklart vara lika smidigt som allt annat, så vi använder digitalt autogiro genom Trustly",
                         new ArrayList<SelectItem>(){{
-                            add(new SelectItemTrustly("Ja välj trustlykonto", "trustly.poll"));
+                            add(new SelectItemTrustly("Välj bankkonto", "trustly.poll"));
                         }}
                 ));
 
         createMessage(TRUSTLY_POLL,
-                new MessageBodySingleSelect("Just nu har vi bara autogiro som betalsätt",
+                new MessageBodySingleSelect("Hej igen {NAME}! För att din försäkring ska gälla behöver vi koppla din månadsbetalning :) ",
                         new ArrayList<SelectItem>(){{
-                            add(new SelectItemTrustly("Fortsätt med registeringen", "trustly.poll"));
+                            add(new SelectItemTrustly("Välj bankkonto", "trustly.poll"));
                         }}));
 
         createMessage(CANCEL,
-                new MessageBodySingleSelect("Ett fel har uppstått med autogiro registreringen, just nu tillåter vi bara betalning med autogiro.",
+                new MessageBodySingleSelect("Oj, nu verkar det som att något gick lite fel med betalningsregistreringen. Vi testar igen!",
                         new ArrayList<SelectItem>(){{
-                            add(new SelectItemTrustly("Försök igen", "trustly.poll"));
+                            add(new SelectItemTrustly("Välj bankkonto", "trustly.poll"));
                         }}));
 
         createMessage(COMPLETE,
-                new MessageBodySingleSelect("Tack!",
+                new MessageBodySingleSelect("Tack! Ingen är gladare än jag att ha dig här :angel:",
                         new ArrayList<SelectItem>(){{
-                            add(new SelectOption("Visa mig", START));
+                            add(new SelectOption("Nu kan du börja utforska appen", START));
                         }}));
     }
 
@@ -93,6 +93,23 @@ public class TrustlyConversation extends Conversation {
         userContext.completeConversation(this.getClass().toString());
 
         userContext.startConversation(factory.createConversation(CharityConversation.class));
+    }
+
+    @Override
+    public void recieveEvent(EventTypes e, String value, UserContext userContext, MemberChat memberChat){
+
+        switch(e){
+            // This is used to let Hedvig say multiple message after another
+            case MESSAGE_FETCHED:
+                //log.info("Message fetched:" + value);
+
+                // New way of handeling relay messages
+                String relay = getRelay(value);
+                if(relay!=null){
+                    completeRequest(relay, userContext, memberChat);
+                }
+                break;
+        }
     }
 
     @Override

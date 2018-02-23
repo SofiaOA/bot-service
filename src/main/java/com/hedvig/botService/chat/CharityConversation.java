@@ -11,12 +11,14 @@ import java.util.ArrayList;
 public class CharityConversation extends Conversation {
 
     private final Logger log = LoggerFactory.getLogger(CharityConversation.class);
+    private final ConversationFactory conversationFactory;
 
-    public CharityConversation() {
+    public CharityConversation(ConversationFactory factory) {
         super("charity");
+        this.conversationFactory = factory;
 
         createChatMessage("message.kontrakt.charity",
-                new MessageBodySingleSelect("En sista grej bara.. \f"
+                new MessageBodySingleSelect("En grej till! \f"
                         +"Som Hedvig-medlem får du välja en välgörenhetsorganisation att stödja om det blir pengar över när alla skador har betalats",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("SOS Barnbyar", "charity.sosbarnbyar"));
@@ -40,7 +42,7 @@ public class CharityConversation extends Conversation {
         createMessage("message.kontrakt.charity.tack",
                 new MessageBodySingleSelect("Toppen, tack!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Börja utforska appen", "onboarding.done", "Dashboard", null, null,  false));
+                            //add(new SelectLink("Börja utforska appen", "onboarding.done", "Dashboard", null, null,  false));
                         }}
                 ));
     }
@@ -60,7 +62,10 @@ public class CharityConversation extends Conversation {
                     addToChat(m, userContext);
                     userContext.putUserData("{CHARITY}", selectedItem.value);
                     nxtMsg = "message.kontrakt.charity.tack";
+                    addToChat(getMessageId(nxtMsg), userContext);
                     userContext.completeConversation(this.getClass().getName());
+                    userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
+                    return;
                 }
                 else{
                     m.body.text = selectedItem.text;

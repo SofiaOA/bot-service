@@ -107,7 +107,7 @@ public class MainConversation extends Conversation {
 				}
 				else if(item.value.equals("message.main.refer")) {
 					userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
-					userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
+					userContext.startConversation(conversationFactory.createConversation(CharityConversation.class));
 					return;
 				}
 				addToChat(m, userContext); // Response parsed to nice format

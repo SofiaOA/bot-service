@@ -755,7 +755,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         }}
                 ));
         
-        createMessage("message.kontrakt.email", new MessageBodyText("Ok, vad är din mailadress? "));
+        createMessage("message.kontrakt.email", new MessageBodyText("OK! Vad är din mailadress?"));
         setExpectedReturnType("message.kontrakt.email", new EmailAdress());
         
 

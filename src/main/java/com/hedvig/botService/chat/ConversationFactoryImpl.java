@@ -33,7 +33,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
     public Conversation createConversation(Class conversationClass) {
 
         if(conversationClass.equals(CharityConversation.class)) {
-            return new CharityConversation();
+            return new CharityConversation(this);
         }
 
         if(conversationClass.equals(ClaimsConversation.class)) {

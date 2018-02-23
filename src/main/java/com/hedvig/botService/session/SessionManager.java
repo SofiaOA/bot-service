@@ -153,6 +153,9 @@ public class SessionManager {
                     Conversation conversation = conversationFactory.createConversation(CharityConversation.class);
                     conversation.recieveEvent(type, value, uc, mc);
                     break;
+                case "com.hedvig.botService.chat.TrustlyConversation":
+                    Conversation trustlyConversation = conversationFactory.createConversation(TrustlyConversation.class);
+                    trustlyConversation.recieveEvent(type, value, uc, mc);
 			}
         }
 

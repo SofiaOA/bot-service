@@ -80,7 +80,7 @@ public class TrustlyConversationTest {
     public void responding_to_START_addNoNewMessageToChat() {
         UUID triggerUUID = UUID.randomUUID();
 
-        final Message message = testConversation.getMessage(START);
+        final Message message = testConversation.getMessage(START + ".2");
         ((MessageBodySingleSelect)message.body).choices.get(0).selected = true;
 
         addTolvansonToUserContext();
@@ -89,7 +89,7 @@ public class TrustlyConversationTest {
 
         testConversation.recieveMessage(userContext, userContext.getMemberChat(), message);
 
-        assertThat(userContext.getMemberChat().chatHistory.size()).isEqualTo(1);
+        assertThat(userContext.getMemberChat().chatHistory.size()).isEqualTo(2);
     }
 
 }
