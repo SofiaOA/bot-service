@@ -50,7 +50,7 @@ public class TrustlyConversation extends Conversation {
         createMessage(COMPLETE,
                 new MessageBodySingleSelect("Tack! Ingen är gladare än jag att ha dig här :angel:",
                         new ArrayList<SelectItem>(){{
-                            add(new SelectOption("Nu kan du börja utforska appen", START));
+                            add(new SelectLink("Nu kan du börja utforska appen", "end", "Dashboard", null, null, false));
                         }}));
     }
 
@@ -83,6 +83,7 @@ public class TrustlyConversation extends Conversation {
                 return;
             case COMPLETE:
                 endConversation(userContext);
+                return;
         }
 
 
@@ -91,8 +92,6 @@ public class TrustlyConversation extends Conversation {
 
     private void endConversation(UserContext userContext) {
         userContext.completeConversation(this.getClass().toString());
-
-        userContext.startConversation(factory.createConversation(CharityConversation.class));
     }
 
     @Override
