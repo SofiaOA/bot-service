@@ -8,6 +8,7 @@ import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderInformat
 import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderState;
 import com.hedvig.botService.session.exceptions.UnathorizedException;
 import com.hedvig.botService.session.triggerService.dto.CreateDirectDebitMandateDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,10 +18,15 @@ import java.util.UUID;
 @Service
 public class TriggerService {
 
+    @Value("${hedvig.trustly.notification.successUrl}")
+    public String NOTIFICATION_SUCCESS_URL;
 
-    public static final String NOTIFICATION_SUCCESS_URL = "${hedvig.trustly.notification.successUrl}";
-    public static final String NOTIFICATON_FAILED_URL = "${hedvig.trustly.notification.failUrl}";
-    public static final String NOTIFICATION_ERROR_URL = "${hedvig.trustly.notification.errorUrl}";
+    @Value("${hedvig.trustly.notification.failUrl}")
+    public String NOTIFICATON_FAILED_URL;
+
+    @Value("${hedvig.trustly.notification.errorUrl}")
+    public String NOTIFICATION_ERROR_URL;
+
     private final DirectDebitRepository repo;
     private final PaymentService paymentService;
 

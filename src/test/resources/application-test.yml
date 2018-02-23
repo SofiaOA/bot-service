@@ -4,6 +4,9 @@ hedvig:
   product-pricing.url: localhost:4085
   waitlist.length: 90
   trigger.errorPageUrl: http://hedvig.com/error
+  trustly.notification.failUrl: http://hedvig.com/fail
+  trustly.notification.successUrl: http://hedvig.com/success
+  trustly.notification.errorUrl: http://hedvig.com/success
 
 cloud:
   aws:
