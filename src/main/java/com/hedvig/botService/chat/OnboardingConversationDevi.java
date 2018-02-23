@@ -397,7 +397,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         );
 
         createChatMessage("message.hus",
-                new MessageBodySingleSelect("Åh, typiskt! Just nu är det bara lägenheter jag kan försäkra\f"
+                new MessageBodySingleSelect("Åh, typiskt! Just nu försäkrar jag bara lägenheter\f"
                 		+ "Men jag hör gärna av mig till dig så fort jag är viktiga nyheter om annat jag kan försäkra\f"
                 		+ "Jag skickar ingen spam. Lovar!",
                         new ArrayList<SelectItem>() {{
@@ -476,13 +476,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage("message.lghtyp",
                 new MessageBodySingleSelect("Okej! Hur bor du?",
                         new ArrayList<SelectItem>() {{
+                        	add(new SelectOption("Hyr hyresrätt", ProductTypes.RENT.toString()));
                             add(new SelectOption("Äger bostadsrätt", ProductTypes.BRF.toString()));
-                            add(new SelectOption("Hyr hyresrätt", ProductTypes.RENT.toString()));
                             //add(new SelectOption("Hyr bostadsrätt", ProductTypes.SUBLET.toString()));
-                            add(new SelectOption("Hyr i andra hand", "message.lghtyp.sublet"));
-                            add(new SelectOption("Hyr studentrum", ProductTypes.STUDENT.toString()));
+                            //add(new SelectOption("Hyr i andra hand", "message.lghtyp.sublet"));
+                            //add(new SelectOption("Hyr studentrum", ProductTypes.STUDENT.toString()));
                             //add(new SelectOption("Är inneboende", ProductTypes.LODGER.toString()));
-
                         }}
                 ));
 
@@ -989,6 +988,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 	        	
 	        	// Additional question for sublet contracts
 	        	m.body.text = "Jag " + item.text.toLowerCase();
+            	addToChat(m, userContext);
 	        	if(item.value.equals("message.lghtyp.sublet")){
 	        		nxtMsg = "message.lghtyp.sublet";
 	        		break;
