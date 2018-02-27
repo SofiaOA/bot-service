@@ -1327,7 +1327,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     private void endConversation(UserContext userContext) {
         userContext.completeConversation(this.getClass().toString());
-        userContext.startConversation(conversationFactory.createConversation(CharityConversation.class));
+        userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
     }
 
     /*
