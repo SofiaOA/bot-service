@@ -35,7 +35,7 @@ public class MainConversationTest {
     @Mock
     ProductPricingService productPricingService;
 
-    @Autowired
+    @Mock
     Environment springEnvironment;
 
     MainConversation testConversation;
