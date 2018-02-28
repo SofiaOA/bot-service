@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.Charset;
@@ -34,16 +35,18 @@ public class MainConversation extends Conversation {
 	private final ConversationFactory conversationFactory;
 	private final ProductPricingService productPricingService;
 	private final ApplicationEventPublisher eventPublisher;
+	private final Environment springEnvironment;
 	private String emoji_hand_ok = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8C}, Charset.forName("UTF-8"));
 
 
 
     @Autowired
-	public MainConversation(ProductPricingService productPricingService, ConversationFactory conversationFactory, ApplicationEventPublisher eventPublisher) {
+	public MainConversation(ProductPricingService productPricingService, ConversationFactory conversationFactory, ApplicationEventPublisher eventPublisher, Environment springEnvironment) {
 		super("main.menue");
 		this.productPricingService = productPricingService;
 		this.conversationFactory = conversationFactory;
 		this.eventPublisher = eventPublisher;
+		this.springEnvironment = springEnvironment;
 		// TODO Auto-generated constructor stub
 
 		createMessage(MESSAGE_HEDVIG_COM,
@@ -52,7 +55,9 @@ public class MainConversation extends Conversation {
 							add(new SelectOption("Rapportera en skada","message.main.report", false));
 							add(new SelectOption("Ring mig!","message.main.callme", false));
 							add(new SelectOption("Jag har en fråga","main.question", false));
-							add(new SelectOption("TRUSTLY!!1","message.main.refer", false));
+							if(!springEnvironment.acceptsProfiles("production")) {
+								add(new SelectOption("Välj autogiro konto", "message.main.refer", false));
+							}
 						}}
 				));
 		
