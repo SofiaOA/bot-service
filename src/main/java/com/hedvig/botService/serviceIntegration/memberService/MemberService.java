@@ -29,4 +29,9 @@ public interface MemberService {
     void startOnBoardingWithSSN(String memberId, String ssn);
 
     void sendSignupMail(String email, UUID uuid);
+
+    void sendOnboardedActiveLater(String email, String name, String proxyLink);
+
+    void sendOnboardedActiveToday(String email, String name);
+
 }

@@ -12,7 +12,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.env.Environment;
 
 import static com.hedvig.botService.testHelpers.TestData.*;
 import static org.mockito.BDDMockito.then;
@@ -33,12 +35,15 @@ public class MainConversationTest {
     @Mock
     ProductPricingService productPricingService;
 
+    @Autowired
+    Environment springEnvironment;
+
     MainConversation testConversation;
     UserContext uc;
 
     @Before
     public void setup() {
-        testConversation = new MainConversation(productPricingService, conversationFactory, eventPublisher);
+        testConversation = new MainConversation(productPricingService, conversationFactory, eventPublisher, springEnvironment);
 
         uc = new UserContext(TOLVANSSON_MEMBER_ID);
         uc.setMemberChat(memberChat);

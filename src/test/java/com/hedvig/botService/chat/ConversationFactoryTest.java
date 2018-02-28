@@ -9,7 +9,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.env.Environment;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,6 +37,9 @@ public class ConversationFactoryTest {
 
     @Mock
     ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    Environment springEnvironment;
 
     @Parameterized.Parameters
     public static Collection<Object> data() {
@@ -74,7 +79,7 @@ public class ConversationFactoryTest {
 
     @Test
     public void test(){
-        ConversationFactory factory = new ConversationFactoryImpl(memberService, productPricingService, triggerService, signupCodeRepository, applicationEventPublisher, 0);
+        ConversationFactory factory = new ConversationFactoryImpl(memberService, productPricingService, triggerService, signupCodeRepository, applicationEventPublisher, springEnvironment, 0);
 
         Conversation conversation = factory.createConversation(conversationClass);
 

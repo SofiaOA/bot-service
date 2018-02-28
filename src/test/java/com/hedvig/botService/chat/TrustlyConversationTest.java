@@ -21,7 +21,6 @@ import static com.hedvig.botService.testHelpers.TestData.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -49,7 +48,7 @@ public class TrustlyConversationTest {
         userContext = new UserContext(TOLVANSSON_MEMBER_ID);
         userContext.setMemberChat(new MemberChat());
 
-        testConversation = new TrustlyConversation(triggerService, factory);
+        testConversation = new TrustlyConversation(triggerService, factory, memberService);
     }
 
     @Test

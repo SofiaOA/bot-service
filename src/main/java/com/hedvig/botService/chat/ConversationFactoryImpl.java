@@ -6,6 +6,7 @@ import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingSer
 import com.hedvig.botService.session.triggerService.TriggerService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,17 +16,19 @@ public class ConversationFactoryImpl implements ConversationFactory {
     private final TriggerService triggerService;
     private final SignupCodeRepository signupCodeRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final Environment springEnvironment;
 
 
     private Integer queuePos;
 
-    public ConversationFactoryImpl(MemberService memberService, ProductPricingService productPricingService, TriggerService triggerService, SignupCodeRepository signupCodeRepository, ApplicationEventPublisher eventPublisher, @Value("${hedvig.waitlist.length}") Integer queuePos) {
+    public ConversationFactoryImpl(MemberService memberService, ProductPricingService productPricingService, TriggerService triggerService, SignupCodeRepository signupCodeRepository, ApplicationEventPublisher eventPublisher, Environment springEnvironment, @Value("${hedvig.waitlist.length}") Integer queuePos) {
         this.memberService = memberService;
         this.productPricingService = productPricingService;
         this.triggerService = triggerService;
 
         this.signupCodeRepository = signupCodeRepository;
         this.eventPublisher = eventPublisher;
+        this.springEnvironment = springEnvironment;
         this.queuePos = queuePos;
     }
 
@@ -41,7 +44,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
         }
 
         if(conversationClass.equals(MainConversation.class)) {
-            return new MainConversation(productPricingService, this, eventPublisher);
+            return new MainConversation(productPricingService, this, eventPublisher, springEnvironment);
         }
 
         if(conversationClass.equals(OnboardingConversationDevi.class)) {
@@ -51,7 +54,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
         }
 
         if(conversationClass.equals(TrustlyConversation.class)) {
-                return new TrustlyConversation(triggerService, this);
+                return new TrustlyConversation(triggerService, this, memberService);
         }
 
         if(conversationClass.equals(UpdateInformationConversation.class)) {

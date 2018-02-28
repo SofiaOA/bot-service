@@ -5,8 +5,7 @@ import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
-import com.hedvig.botService.serviceIntegration.paymentService.PaymentService;
-import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderState;
+import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.session.triggerService.TriggerService;
 
 import java.util.ArrayList;
@@ -20,12 +19,14 @@ public class TrustlyConversation extends Conversation {
     private static final String COMPLETE = "trustly.complete";
     private final TriggerService triggerService;
     private final ConversationFactory factory;
+    private final MemberService memberService;
 
     public TrustlyConversation(TriggerService triggerService,
-                               ConversationFactory factory) {
+                               ConversationFactory factory, MemberService memberService) {
         super("conversation.trustly");
         this.triggerService = triggerService;
         this.factory = factory;
+        this.memberService = memberService;
 
 
         createChatMessage(START,
@@ -92,6 +93,22 @@ public class TrustlyConversation extends Conversation {
 
     private void endConversation(UserContext userContext) {
         userContext.completeConversation(this.getClass().toString());
+
+        sendOnboardingCompleteEmail(userContext);
+
+    }
+
+    private void sendOnboardingCompleteEmail(UserContext userContext) {
+        final UserData onBoardingData = userContext.getOnBoardingData();
+        final String name = onBoardingData.getFirstName() + " " + onBoardingData.getFamilyName();
+        final String email = onBoardingData.getEmail();
+        final String currentInsurer = onBoardingData.getCurrentInsurer();
+
+        if(currentInsurer != null) {
+            memberService.sendOnboardedActiveLater(email, name, "");
+        }else {
+            memberService.sendOnboardedActiveToday(email, name);
+        }
     }
 
     @Override

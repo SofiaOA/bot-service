@@ -3,6 +3,8 @@ package com.hedvig.botService.serviceIntegration.memberService;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.dto.*;
 import com.hedvig.botService.web.dto.Member;
+import com.hedvig.memberservice.web.dto.SendOnboardedActiveLaterRequest;
+import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -120,5 +122,23 @@ public class MemberServiceFeign implements MemberService {
         final Long requestId = Math.round(Math.random() * 1000);
         final SendSignupRequest sendSignupRequest = new SendSignupRequest(uuid, email, requestId.toString());
         this.client.sendSignup(sendSignupRequest);
+    }
+
+    @Override
+    public void sendOnboardedActiveLater(String email, String name, String proxyLink) {
+        send(() -> this.client.sendOnboardedActiveLater(new SendOnboardedActiveLaterRequest(email, name, proxyLink)));
+    }
+
+    @Override
+    public void sendOnboardedActiveToday(String email, String name) {
+        send( () -> this.client.sendOnboardedActiveToday(new SendOnboardedActiveTodayRequest(email, name)));
+    }
+
+    private void send(Runnable supplier) {
+        try {
+            supplier.run();
+        }catch (FeignException ex) {
+            log.error("Could not send request to member-service", ex);
+        }
     }
 }

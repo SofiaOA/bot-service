@@ -2,6 +2,7 @@ package com.hedvig.botService.serviceIntegration.memberService;
 
 import com.hedvig.botService.serviceIntegration.memberService.dto.*;
 import com.hedvig.botService.web.dto.Member;
+import com.hedvig.memberservice.web.dto.SendOnboardedActiveLaterRequest;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,4 +30,17 @@ public interface MemberServiceClient {
 
     @RequestMapping(value = "/_/mail/sendSignup")
     ResponseEntity<String> sendSignup(@RequestBody SendSignupRequest request);
+
+    @RequestMapping(value = "/_/mail/sendWaitIsOver")
+    ResponseEntity<String> sendWaitIsOver(@RequestBody SendWaitIsOverRequest request);
+
+    @RequestMapping(value = "/_/mail/sendActivated")
+    ResponseEntity<String> sendActivated(@RequestBody SendActivatedRequest request);
+
+    @RequestMapping(value = "/_/mail/sendOnboardedActiveLater")
+    ResponseEntity<String> sendOnboardedActiveLater(@RequestBody SendOnboardedActiveLaterRequest request);
+
+    @RequestMapping(value = "/_/mail/sendOnboardedActiveToday")
+    ResponseEntity<String> sendOnboardedActiveToday(@RequestBody SendOnboardedActiveTodayRequest request);
+
 }

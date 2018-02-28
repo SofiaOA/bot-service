@@ -76,4 +76,14 @@ public class MemberServiceFake implements MemberService {
     public void sendSignupMail(String email, UUID uuid) {
 
     }
+
+    @Override
+    public void sendOnboardedActiveLater(String email, String name, String proxyLink) {
+        return;
+    }
+
+    @Override
+    public void sendOnboardedActiveToday(String email, String name) {
+        return;
+    }
 }
