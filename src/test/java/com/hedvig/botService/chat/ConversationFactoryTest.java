@@ -5,10 +5,12 @@ import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.triggerService.TriggerService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
@@ -17,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 @RunWith(Parameterized.class)
 public class ConversationFactoryTest {
@@ -38,7 +41,7 @@ public class ConversationFactoryTest {
     @Mock
     ApplicationEventPublisher applicationEventPublisher;
 
-    @Autowired
+    @Mock
     Environment springEnvironment;
 
     @Parameterized.Parameters
@@ -56,26 +59,11 @@ public class ConversationFactoryTest {
         this.conversationClass = conversationClass;
     }
 
-    /*@Test
-    public void canResturnTrustlyConversation() {
-
-        ConversationFactory factory = new ConversationFactory(memberService, productPricingService, triggerService);
-
-        Conversation conversation = factory.createConversation(TrustlyConversation.class);
-
-        assertThat(conversation).isNotNull();
+    @Before
+    public void setUp() {
+        springEnvironment = Mockito.mock(Environment.class);
+        given(springEnvironment.acceptsProfiles("development")).willReturn(true);
     }
-
-    @Test
-    public void canResturnCharityConversation() {
-
-        ConversationFactory factory = new ConversationFactory(memberService, productPricingService, triggerService);
-
-        Conversation conversation = factory.createConversation(CharityConversation.class);
-
-        assertThat(conversation).isNotNull();
-        assertThat(conversation).isInstanceOf(CharityConversation.class);
-    }*/
 
     @Test
     public void test(){
