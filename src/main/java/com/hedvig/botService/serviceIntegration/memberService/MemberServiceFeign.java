@@ -125,8 +125,8 @@ public class MemberServiceFeign implements MemberService {
     }
 
     @Override
-    public void sendOnboardedActiveLater(String email, String name, String proxyLink) {
-        send(() -> this.client.sendOnboardedActiveLater(new SendOnboardedActiveLaterRequest(email, name, proxyLink)));
+    public void sendOnboardedActiveLater(String email, String name, String memberId) {
+        send(() -> this.client.sendOnboardedActiveLater(new SendOnboardedActiveLaterRequest(email, name, memberId)));
     }
 
     @Override

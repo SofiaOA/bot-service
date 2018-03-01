@@ -78,7 +78,7 @@ public class MemberServiceFake implements MemberService {
     }
 
     @Override
-    public void sendOnboardedActiveLater(String email, String name, String proxyLink) {
+    public void sendOnboardedActiveLater(String email, String name, String memberId) {
         return;
     }
 

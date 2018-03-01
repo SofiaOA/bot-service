@@ -1,4 +1,4 @@
-package com.hedvig.memberservice.web.dto;
+package com.hedvig.botService.serviceIntegration.memberService.dto;
 
 import lombok.Value;
 
