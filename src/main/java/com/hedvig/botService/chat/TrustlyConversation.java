@@ -83,7 +83,7 @@ public class TrustlyConversation extends Conversation {
             case CANCEL:
                 return;
             case COMPLETE:
-                endConversation(userContext);
+                //endConversation(userContext);
                 return;
         }
 
@@ -95,7 +95,6 @@ public class TrustlyConversation extends Conversation {
         userContext.completeConversation(this.getClass().toString());
 
         sendOnboardingCompleteEmail(userContext);
-
     }
 
     private void sendOnboardingCompleteEmail(UserContext userContext) {
