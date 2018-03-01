@@ -3,7 +3,6 @@ package com.hedvig.botService.serviceIntegration.memberService;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.dto.*;
 import com.hedvig.botService.web.dto.Member;
-import com.hedvig.memberservice.web.dto.SendOnboardedActiveLaterRequest;
 import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
