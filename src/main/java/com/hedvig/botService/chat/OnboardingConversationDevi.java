@@ -413,9 +413,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         setExpectedReturnType("message.nyhetsbrev", new EmailAdress());
         createMessage("message.tipsa", new MessageBodyText("Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmail till"));
         setExpectedReturnType("message.tipsa", new EmailAdress());
-        createMessage("message.frifraga", new MessageBodyText("Fråga på! Skriv vad du undrar här så hör jag och mina kollegor av oss snart " + emoji_postal_horn));
+        createMessage("message.frifraga", new MessageBodyText("Fråga på!"));
 
-        createMessage("message.frionboardingfraga", new MessageBodyText("Fråga på! Skriv vad du undrar här så hör jag och mina kollegor av oss snart " + emoji_postal_horn));
+        createMessage("message.frionboardingfraga", new MessageBodyText("Fråga på! "));
 
         
         
@@ -474,10 +474,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 ));
 
         createMessage("message.lghtyp",
-                new MessageBodySingleSelect("Okej! Hur bor du?",
+                new MessageBodySingleSelect("Okej! Hyr du eller äger du den?",
                         new ArrayList<SelectItem>() {{
-                        	add(new SelectOption("Hyr hyresrätt", ProductTypes.RENT.toString()));
-                            add(new SelectOption("Äger bostadsrätt", ProductTypes.BRF.toString()));
+                        	add(new SelectOption("Jag hyr den", ProductTypes.RENT.toString()));
+                            add(new SelectOption("Jag äger den", ProductTypes.BRF.toString()));
                             //add(new SelectOption("Hyr bostadsrätt", ProductTypes.SUBLET.toString()));
                             //add(new SelectOption("Hyr i andra hand", "message.lghtyp.sublet"));
                             //add(new SelectOption("Hyr studentrum", ProductTypes.STUDENT.toString()));
@@ -635,7 +635,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 );
         
         createChatMessage("message.pris",
-                new MessageBodySingleSelect("Grundskyddet som jag ger är också bredare än det du oftast får på annat håll\fOch det jag prioriterar allra mest är att vara där på dina villkor. Jag utvecklas alltid för att vara så snabb, smidig och smart som möjligt",
+                new MessageBodySingleSelect("Det är svårt att jämföra försäkringspriser, för alla försäkringar är lite olika. Men grundskyddet som jag ger är bredare än det du oftast får på annat håll\fSom Hedvigmedlem gör du dessutom skillnad för världen runtomkring dig, vilket du garanterat inte gör genom din gamla försäkring!",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
                         	//add(new SelectOption("Jag vill bli medlem", "message.forslag"));
@@ -1099,7 +1099,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 int nr_persons = getValue((MessageBodyNumber)m.body);
                 onBoardingData.setPersonInHouseHold(nr_persons);
                 if(nr_persons==1){ m.body.text = "Jag bor själv"; }
-                else{ m.body.text = "Vi är " + nr_persons + " i hushållet"; }
+                else{ m.body.text = "Vi är " + nr_persons; }
                 addToChat(m, userContext);
                 
                 if(nr_persons > 6){
