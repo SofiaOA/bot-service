@@ -42,7 +42,7 @@ public class TriggerController {
             return ResponseEntity.notFound().build();
         }
 
-        TriggerResponseDTO response = new TriggerResponseDTO(triggerUrl + "&gui=native&color=%230F7A64&bordercolor=%230F7A64");
+        TriggerResponseDTO response = new TriggerResponseDTO(triggerUrl + "&gui=native&color=%23651EFF&bordercolor=%230F007A");
         return ResponseEntity.ok(response);
     }
 
