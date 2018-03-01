@@ -72,7 +72,7 @@ public class TriggerControllerTest {
                         post("/hedvig/trigger/" + triggerId.toString())
                                 .header("hedvig.token", TestData.TOLVANSSON_MEMBER_ID))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.url").value(triggerURL + "&gui=native&color=%230F7A64&bordercolor=%230F7A64"))
+                .andExpect(jsonPath("$.url").value(triggerURL + "&gui=native&color=%23651EFF&bordercolor=%230F007A"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
     }
 
