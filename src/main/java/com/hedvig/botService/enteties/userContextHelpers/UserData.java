@@ -33,7 +33,6 @@ public class UserData {
     public static final String BANK_ID_MESSAGE = "{BANK_ID_MESSAGE}";
     public static final String FLOOR = "{FLOOR}";
     private final UserContext ctx;
-    private String address;
 
     public UserData(UserContext ctx) {
         this.ctx = ctx;
@@ -170,7 +169,7 @@ public class UserData {
     }
 
     public void setAddressCity(String city) {
-        ctx.putUserData(ADDRESS_CITY, address);
+        ctx.putUserData(ADDRESS_CITY, city);
     }
 
     public String getAddressCity() {
