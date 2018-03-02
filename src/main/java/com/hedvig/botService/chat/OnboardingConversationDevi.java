@@ -689,7 +689,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage("message.kontrakt",
                 new MessageBodySingleSelect("Då är det bara att signera, sen är vi klara",
                         new ArrayList<SelectItem>() {{
-                        	add(new SelectOption("Signera med BankId", "message.kontraktpop.startBankId"));
+                        	add(new SelectOption("Okej!", "message.kontraktpop.startBankId"));
                         	//add(new SelectLink("Läs igenom", "message.kontrakt", null, null, gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));
                         }}
                 ),
@@ -727,9 +727,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         );
 
         createMessage("message.kontraktpop.startBankId",
-                new MessageBodySingleSelect("Då återstår bara signeringen",
+                new MessageBodySingleSelect("För signeringen använder vi BankID",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Signera", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null, false));
+                            add(new SelectLink("Öppna BankID", "message.kontraktpop.bankid.collect", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null, false));
                         }}
                 ),
                 (m, uc) -> {
@@ -987,7 +987,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 	        	SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
 	        	
 	        	// Additional question for sublet contracts
-	        	m.body.text = "Jag " + item.text.toLowerCase();
+	        	m.body.text = item.text.toLowerCase();
             	addToChat(m, userContext);
 	        	if(item.value.equals("message.lghtyp.sublet")){
 	        		nxtMsg = "message.lghtyp.sublet";
