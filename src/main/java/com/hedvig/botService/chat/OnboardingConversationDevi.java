@@ -1502,9 +1502,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         if(sc.isPresent()){
         	uc.putUserData("{EMAIL}", sc.get().email);
         	if(sc.get().getActive()){
-        		if(sc.get().getUsed()){
-        			return "message.activate.code.used";
-        		}
             	sc.get().setUsed(true);
             	signupRepo.saveAndFlush(sc.get());
             	uc.putUserData("{SIGNED_UP}", "true");
