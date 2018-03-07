@@ -63,8 +63,4 @@ public class SignupCode {
 		this();
 		this.email=email;
 	}
-
-	public static void main(String args[]){
-		SignupCode sc = new SignupCode();
-	}
 }
