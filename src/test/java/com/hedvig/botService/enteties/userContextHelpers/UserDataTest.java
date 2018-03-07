@@ -1,3 +1,5 @@
+package com.hedvig.botService.enteties.userContextHelpers;
+
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import org.junit.Test;
