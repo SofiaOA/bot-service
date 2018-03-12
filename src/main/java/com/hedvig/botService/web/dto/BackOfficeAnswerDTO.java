@@ -6,8 +6,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class BackOfficeAnswerDTO {
+    private String userId;
 
-    public String userId;
-
-    public String msg;
+    private String msg;
 }
