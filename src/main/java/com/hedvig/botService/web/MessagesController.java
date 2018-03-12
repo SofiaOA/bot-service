@@ -100,6 +100,9 @@ public class MessagesController {
         msg.globalId = null;
         msg.header.messageId = null;
         msg.body.id = null;
+        if(msg.body.text != null) {
+            msg.body.text = msg.body.text.trim();
+        }
         
         sessionManager.receiveMessage(msg, hid);
 
