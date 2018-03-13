@@ -8,15 +8,6 @@ management:
     enabled: false
 
 hedvig:
-  product-pricing.url: localhost:4085
-  kafka:
-    acks: all
-    retries: 3
-    bootstrap:
-      servers: localhost:9092
-      schema:
-        registry:
-          url: http://localhost:8081
 
 spring:
   jpa:
