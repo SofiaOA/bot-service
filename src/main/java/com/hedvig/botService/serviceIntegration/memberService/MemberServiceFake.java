@@ -2,8 +2,6 @@ package com.hedvig.botService.serviceIntegration.memberService;
 
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.dto.*;
-import com.hedvig.botService.web.dto.Member;
-import org.apache.zookeeper.Op;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.client.RestClientException;
 

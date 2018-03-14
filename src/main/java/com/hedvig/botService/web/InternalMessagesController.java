@@ -1,8 +1,11 @@
 package com.hedvig.botService.web;
 
+import com.google.common.collect.Lists;
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.enteties.MessageRepository;
 import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.BackOfficeAnswerDTO;
 import com.hedvig.botService.web.dto.BackOfficeMessageDTO;
@@ -60,7 +63,14 @@ public class InternalMessagesController {
     public ResponseEntity<?> addAnswer(@Valid @RequestBody() BackOfficeAnswerDTO backOfficeAnswer) {
         log.info("Received answer Hedvig to hid: {} with message {}", backOfficeAnswer.getUserId(), backOfficeAnswer.getMsg());
 
-        // TODO: John please create and send message here
+        Message msg = new Message();
+        msg.body = new MessageBodySingleSelect(backOfficeAnswer.getMsg(), Lists.newArrayList(new SelectOption("Jag har en till fråga",  "message.frifraga")));
+        msg.header.fromId = Conversation.HEDVIG_USER_ID;
+        msg.globalId = null;
+        msg.header.messageId = null;
+        msg.body.id = null;
+
+        sessionManager.addMessageFromHedvig(msg, backOfficeAnswer.getUserId());
 
         return ResponseEntity.noContent().build();
     }

@@ -55,7 +55,9 @@ public class Message {
 	@JsonIgnore
 	public HedvigDataType expectedType;
 	
-	public Message(){}
+	public Message(){
+		header = new MessageHeader();
+	}
 
 	public String toString(){
 		return "[globalId:" + globalId + " id:" + id + " header:" + header + " body("+body.getClass()+"):" + body + "]";
