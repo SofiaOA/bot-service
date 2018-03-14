@@ -95,7 +95,7 @@ public class MainConversation extends Conversation {
 	}
 
 	@Override
-	public void recieveMessage(UserContext userContext, MemberChat memberChat, Message m) {
+	public void receiveMessage(UserContext userContext, MemberChat memberChat, Message m) {
 		log.info(m.toString());
 		
 		String nxtMsg = "";

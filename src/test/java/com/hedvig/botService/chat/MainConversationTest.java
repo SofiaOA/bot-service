@@ -6,13 +6,11 @@ import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.events.QuestionAskedEvent;
 import com.hedvig.botService.session.events.RequestPhoneCallEvent;
-import com.hedvig.botService.testHelpers.TestData;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
 
@@ -57,7 +55,7 @@ public class MainConversationTest {
         uc.getOnBoardingData().setFirstName(TOLVANSSON_FIRSTNAME);
         uc.getOnBoardingData().setFamilyName(TOLVANSSON_LASTNAME);
 
-        testConversation.recieveMessage(uc, memberChat, m);
+        testConversation.receiveMessage(uc, memberChat, m);
 
         then(eventPublisher).should().publishEvent(new RequestPhoneCallEvent(TOLVANSSON_MEMBER_ID, TOLVANSSON_PHONE_NUMBER , TOLVANSSON_FIRSTNAME, TOLVANSSON_LASTNAME));
     }
@@ -68,7 +66,7 @@ public class MainConversationTest {
         Message m = testConversation.getMessage(MainConversation.MESSAGE_MAIN_QUESTION);
         m.body.text = QUESTION;
 
-        testConversation.recieveMessage(uc, memberChat, m);
+        testConversation.receiveMessage(uc, memberChat, m);
 
         then(eventPublisher).should().publishEvent(new QuestionAskedEvent(TOLVANSSON_MEMBER_ID, QUESTION));
 

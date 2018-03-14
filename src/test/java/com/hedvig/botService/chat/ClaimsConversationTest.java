@@ -39,7 +39,7 @@ public class ClaimsConversationTest {
         Message m = testConversation.getMessage("message.claims.audio");
         m.body.text = "http://somes3.url";
 
-        testConversation.recieveMessage(userContext, userContext.getMemberChat(), m);
+        testConversation.receiveMessage(userContext, userContext.getMemberChat(), m);
 
 
         then(eventPublisher).should().publishEvent(new ClaimAudioReceivedEvent(userContext.getMemberId()));

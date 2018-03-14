@@ -219,7 +219,7 @@ public abstract class Conversation {
 
 	// ------------------------------------------------------------------------------- //
 
-	public abstract void recieveMessage(UserContext userContext, MemberChat memberChat, Message m);
+	public abstract void receiveMessage(UserContext userContext, MemberChat memberChat, Message m);
 	public void completeRequest(String nxtMsg, UserContext userContext, MemberChat memberChat) {
 		if(getMessage(nxtMsg)!=null) {
 			addToChat(getMessage(nxtMsg), userContext);

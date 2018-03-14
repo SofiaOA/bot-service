@@ -404,7 +404,7 @@ public class SessionManager {
             try {
                 final Class<?> conversationClass = Class.forName(c.getClassName());
                 final Conversation conversation = conversationFactory.createConversation(conversationClass);
-                conversation.recieveMessage(uc, mc, m);
+                conversation.receiveMessage(uc, mc, m);
 
             } catch (ClassNotFoundException e) {
                 log.error("Could not load conversation from db!", e);

@@ -56,7 +56,7 @@ public class TrustlyConversation extends Conversation {
     }
 
     @Override
-    public void recieveMessage(final UserContext userContext, final MemberChat memberChat, final Message m) {
+    public void receiveMessage(final UserContext userContext, final MemberChat memberChat, final Message m) {
 
         String nxtMsg = "";
               /*

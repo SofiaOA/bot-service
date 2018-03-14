@@ -20,8 +20,6 @@ import static com.hedvig.botService.chat.TrustlyConversation.START;
 import static com.hedvig.botService.testHelpers.TestData.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TrustlyConversationTest {
@@ -86,7 +84,7 @@ public class TrustlyConversationTest {
 
         given(triggerService.createTrustlyDirectDebitMandate(TOLVANSSON_SSN, TOLVANSSON_FIRSTNAME, TOLVANSSON_LASTNAME, TOLVANSSON_EMAIL, TOLVANSSON_MEMBER_ID)).willReturn(triggerUUID);
 
-        testConversation.recieveMessage(userContext, userContext.getMemberChat(), message);
+        testConversation.receiveMessage(userContext, userContext.getMemberChat(), message);
 
         assertThat(userContext.getMemberChat().chatHistory.size()).isEqualTo(2);
     }

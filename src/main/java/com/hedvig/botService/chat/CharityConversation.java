@@ -2,7 +2,10 @@ package com.hedvig.botService.chat;
 
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.*;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.enteties.message.SelectOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +51,7 @@ public class CharityConversation extends Conversation {
     }
 
     @Override
-    public void recieveMessage(UserContext userContext, MemberChat memberChat, Message m) {
+    public void receiveMessage(UserContext userContext, MemberChat memberChat, Message m) {
 
         String nxtMsg = "message.kontrakt.charity";
         switch (m.id) {

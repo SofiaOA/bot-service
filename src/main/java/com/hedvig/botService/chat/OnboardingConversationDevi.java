@@ -781,8 +781,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     }
 
     @Override
-    public void recieveMessage(UserContext userContext, MemberChat memberChat, Message m) {
-        log.info("recieveMessage:" + m.toString());
+    public void receiveMessage(UserContext userContext, MemberChat memberChat, Message m) {
+        log.info("receiveMessage:" + m.toString());
 
         String nxtMsg = "";
 

@@ -61,7 +61,7 @@ public class OnboardingConversationDeviTest {
         Message m = testConversation.getMessage("message.uwlimit.housingsize");
         m.body.text = TOLVANSSON_PHONE_NUMBER;
 
-        testConversation.recieveMessage(userContext, userContext.getMemberChat(), m);
+        testConversation.receiveMessage(userContext, userContext.getMemberChat(), m);
 
         then(publisher).should().publishEvent(new UnderwritingLimitExcededEvent(
                 TOLVANSSON_MEMBER_ID,
@@ -81,7 +81,7 @@ public class OnboardingConversationDeviTest {
         Message m = testConversation.getMessage("message.uwlimit.householdsize");
         m.body.text = TOLVANSSON_PHONE_NUMBER;
 
-        testConversation.recieveMessage(userContext, userContext.getMemberChat(), m);
+        testConversation.receiveMessage(userContext, userContext.getMemberChat(), m);
 
         then(publisher).should().publishEvent(new UnderwritingLimitExcededEvent(
                 TOLVANSSON_MEMBER_ID,
@@ -100,7 +100,7 @@ public class OnboardingConversationDeviTest {
         Message m = testConversation.getMessage("message.frifraga");
         m.body.text = "I wonder if I can get a home insurance, even thouh my name is Tolvan?";
 
-        testConversation.recieveMessage(userContext, userContext.getMemberChat(), m);
+        testConversation.receiveMessage(userContext, userContext.getMemberChat(), m);
 
         then(publisher).should().publishEvent(new OnboardingQuestionAskedEvent(TOLVANSSON_MEMBER_ID,
                 m.body.text));
