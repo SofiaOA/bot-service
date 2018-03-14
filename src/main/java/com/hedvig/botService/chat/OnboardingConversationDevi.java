@@ -260,6 +260,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodySingleSelect("Bara att logga in så ser du din försäkring",
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}",  null, false));
+                            add(new SelectOption("Jag är inte medlem", "message.onboardingstart"));
                         }}
                 ),
                 (m, uc) -> {
