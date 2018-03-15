@@ -58,7 +58,7 @@ public abstract class Conversation {
 		userContext.addToHistory(m);
 	}
 
-	private void createMessage(String id, MessageHeader header, MessageBody body){
+	protected void createMessage(String id, MessageHeader header, MessageBody body){
 		Message m = new Message();
 		m.id = id;
 		m.header = header;

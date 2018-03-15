@@ -22,6 +22,15 @@ public class MessageHeader {
 		this.loadingIndicator = "loader"; // Default value
 		this.shouldRequestPushNotifications = false;
 	}
+
+	public MessageHeader(long hedvigUserId, String responsePath, long timeStamp, boolean shouldRequestPushNotifications) {
+		this.fromId = hedvigUserId;
+		this.responsePath = responsePath;
+		this.timeStamp = timeStamp;
+		this.pollingInterval = 1000l;
+		this.loadingIndicator = "loader";
+		this.shouldRequestPushNotifications = shouldRequestPushNotifications;
+	}
 	
 	
 	/*public MessageHeader(int fromId, String type, String responsePath, double timeStamp) {
@@ -45,5 +54,5 @@ public class MessageHeader {
 	public void setType(String t){
 		this.type = Type.valueOf(t);
 	}*/
-	public boolean shouldRequestPushNotifications; // Should responding to this message prompt user to turn on push notifications
+	public Boolean shouldRequestPushNotifications; // Should responding to this message prompt user to turn on push notifications
 }

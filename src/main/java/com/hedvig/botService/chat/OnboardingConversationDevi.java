@@ -308,7 +308,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         setExpectedReturnType("message.nyhetsbrev", new EmailAdress());
         createMessage("message.tipsa", new MessageBodyText("Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmail till"));
         setExpectedReturnType("message.tipsa", new EmailAdress());
-        createNotifiyingMessage("message.frifraga", new MessageBodyText("Fråga på!"));
+        createMessage("message.frifraga", new MessageHeader(Conversation.HEDVIG_USER_ID, "/response", -1, true), new MessageBodyText("Fråga på!"));
 
         createMessage("message.frionboardingfraga", new MessageBodyText("Fråga på! "));
         
