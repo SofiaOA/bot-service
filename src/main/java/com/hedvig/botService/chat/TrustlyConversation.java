@@ -138,6 +138,11 @@ public class TrustlyConversation extends Conversation {
     }
 
     @Override
+    public void receiveAnswer(UserContext uc, Message msg) {
+        //NOOP
+    }
+
+    @Override
     void addToChat(Message m, UserContext userContext) {
         if((m.id.equals(START) || m.id.equals(CANCEL)) &&
                 m.header.fromId == HEDVIG_USER_ID) {

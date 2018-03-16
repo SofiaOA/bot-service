@@ -1,16 +1,19 @@
 package com.hedvig.botService.session;
 
+import com.google.common.collect.Lists;
 import com.hedvig.botService.chat.*;
 import com.hedvig.botService.chat.Conversation.EventTypes;
 import com.hedvig.botService.enteties.*;
 import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.serviceIntegration.FakeMemberCreator;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.web.dto.MemberAuthedEvent;
-import com.hedvig.botService.web.dto.SignupStatus;
-import com.hedvig.botService.web.dto.UpdateTypes;
+import com.hedvig.botService.web.dto.*;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -231,12 +234,47 @@ public class SessionManager {
     	mc.revertLastInput();
     	userrepo.saveAndFlush(uc);
     }
-    
-    public void addMessageFromHedvig(Message m, String hid){
-    	
+
+    public void addAnswerFromHedvig(BackOfficeAnswerDTO backOfficeAnswer) {
+        UserContext uc = userrepo.findByMemberId(backOfficeAnswer.getUserId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+        MemberChat mc = uc.getMemberChat();
+
+        Message msg = new Message();
+
+        msg.body = new MessageBodySingleSelect(backOfficeAnswer.getMsg(), Lists.newArrayList());
+        msg.header.fromId = Conversation.HEDVIG_USER_ID;
+        msg.globalId = null;
+        msg.header.messageId = null;
+        msg.body.id = null;
+        msg.id = "message.answer";
+
+
+        //For the current active conversation send answer
+        for(ConversationEntity e :  uc.getOngoingConversations()) {
+            val conversation = conversationFactory.createConversation(e.getClassName());
+            if(conversation != null) {
+                conversation.receiveAnswer(uc, msg);
+            }
+        }
+
+        userrepo.saveAndFlush(uc);
+    }
+
+
+    public void addMessageFromHedvig(BackOfficeMessageDTO backOfficeMessage) {
+        Message msg = backOfficeMessage.msg;
+        String hid = backOfficeMessage.userId;
+
+        msg.header.fromId = Conversation.HEDVIG_USER_ID; //new Long(hid);
+
+        // Clear all key information to generate a new entry
+        msg.globalId = null;
+        msg.header.messageId = null;
+        msg.body.id = null;
+
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
     	MemberChat mc = uc.getMemberChat();
-    	mc.addToHistory(m);
+    	mc.addToHistory(msg);
     	userrepo.saveAndFlush(uc);
     	
     }

@@ -4,6 +4,8 @@ import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.triggerService.TriggerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
@@ -11,12 +13,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ConversationFactoryImpl implements ConversationFactory {
+    private final Logger log = LoggerFactory.getLogger(ConversationFactoryImpl.class);
     private final MemberService memberService;
     private final ProductPricingService productPricingService;
     private final TriggerService triggerService;
     private final SignupCodeRepository signupCodeRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final Environment springEnvironment;
+
 
 
     private Integer queuePos;
@@ -44,7 +48,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
         }
 
         if(conversationClass.equals(MainConversation.class)) {
-            return new MainConversation(productPricingService, this, eventPublisher, springEnvironment);
+            return new MainConversation(productPricingService, this, eventPublisher);
         }
 
         if(conversationClass.equals(OnboardingConversationDevi.class)) {
@@ -63,6 +67,19 @@ public class ConversationFactoryImpl implements ConversationFactory {
 
         return null;
     }
+
+    @Override
+    public Conversation createConversation(String conversationClassName) {
+        try {
+            Class concreteClass = Class.forName(conversationClassName);
+            createConversation(concreteClass);
+        }catch(ClassNotFoundException ex) {
+            log.error("Could not create conversation for classname: {}", conversationClassName, ex);
+        }
+
+        return null;
+    }
+
 
 
 }

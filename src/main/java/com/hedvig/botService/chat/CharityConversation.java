@@ -51,6 +51,11 @@ public class CharityConversation extends Conversation {
     }
 
     @Override
+    public void receiveAnswer(UserContext uc, Message msg) {
+        //NOOP
+    }
+
+    @Override
     public void receiveMessage(UserContext userContext, MemberChat memberChat, Message m) {
 
         String nxtMsg = "message.kontrakt.charity";
