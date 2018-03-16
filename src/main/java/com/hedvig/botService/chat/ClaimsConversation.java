@@ -84,7 +84,7 @@ public class ClaimsConversation extends Conversation {
                         	add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
                         }}
                 ));
-        
+
 		createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 	}
 
@@ -101,7 +101,12 @@ public class ClaimsConversation extends Conversation {
 	    init(userContext, "message.claims.start");
     }
 
-	@Override
+    @Override
+    public void receiveAnswer(UserContext uc, Message msg) {
+        //NOOP
+    }
+
+    @Override
 	public void receiveMessage(UserContext userContext, MemberChat memberChat, Message m) {
 		log.info(m.toString());
 		

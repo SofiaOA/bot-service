@@ -41,7 +41,7 @@ public class MainConversationTest {
 
     @Before
     public void setup() {
-        testConversation = new MainConversation(productPricingService, conversationFactory, eventPublisher, springEnvironment);
+        testConversation = new MainConversation(productPricingService, conversationFactory, eventPublisher);
 
         uc = new UserContext(TOLVANSSON_MEMBER_ID);
         uc.setMemberChat(memberChat);

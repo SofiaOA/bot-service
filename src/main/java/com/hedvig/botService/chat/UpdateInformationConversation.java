@@ -38,6 +38,11 @@ public class UpdateInformationConversation extends Conversation {
 	}
 
 	@Override
+	public void receiveAnswer(UserContext uc, Message msg) {
+
+	}
+
+	@Override
 	public void receiveMessage(UserContext userContext, MemberChat memberChat, Message m) {
 		log.info(m.toString());
 		String nxtMsg = "";

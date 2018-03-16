@@ -15,6 +15,14 @@ public class SelectLink extends SelectItem {
 	public SelectLink(){
     }  // NOTE! All objects need to have a default constructor in order for Jackson to marshall.
 
+	public static SelectLink toDashboard(String text, String value) {
+		return new SelectLink(text, value, "Dashboard", null, null,  false);
+	}
+
+	public static SelectLink toOffer(String text, String value) {
+		return new SelectLink(text, value, "Offer", null, null, false);
+	}
+
 	public String view;
 	public String appUrl;
 	public String webUrl;
