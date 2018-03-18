@@ -1,5 +1,6 @@
 package com.hedvig.botService.chat;
 
+import com.google.common.collect.Lists;
 import com.hedvig.botService.dataTypes.*;
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.SignupCode;
@@ -15,18 +16,17 @@ import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingSer
 import com.hedvig.botService.session.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.session.events.SignedOnWaitlistEvent;
 import com.hedvig.botService.session.events.UnderwritingLimitExcededEvent;
-import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import sun.awt.image.ImageWatched;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -86,7 +86,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             SignupCodeRepository signupRepo,
             ApplicationEventPublisher eventPublisher,
             ConversationFactory conversationFactory) {
-        super("onboarding");
+        super();
         this.memberService = memberService;
         this.productPricingService = productPricingClient;
         this.signupRepo = signupRepo;
@@ -1220,9 +1220,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     }
 
     @Override
-    public void receiveAnswer(UserContext uc, Message msg) {
+    public List<SelectItem> getSelectItemsForAnswer(UserContext uc) {
 
-        val body = (MessageBodySingleSelect) msg.body;
+        final List<SelectItem> items = Lists.newArrayList();
 
         String questionId;
         if(uc.getOnBoardingData().getHouseType().equals(MESSAGE_HUS)) {
@@ -1230,12 +1230,17 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         } else {
             questionId = MESSAGE_FRIFRAGA;
-            body.choices.add(SelectLink.toOffer("Visa mig förslaget", "message.forslag.dashboard"));
+            items.add(SelectLink.toOffer("Visa mig förslaget", "message.forslag.dashboard"));
         }
 
-        body.choices.add(new SelectOption("Jag har en till fråga", questionId));
+        items.add(new SelectOption("Jag har en till fråga", questionId));
 
-        uc.getMemberChat().addToHistory(msg);
+        return items;
+    }
+
+    @Override
+    public boolean canAcceptAnswerToQuestion() {
+        return true;
     }
 
     @Override

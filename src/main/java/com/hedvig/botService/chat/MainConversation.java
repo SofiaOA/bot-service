@@ -14,10 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.Charset;
+import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -45,7 +45,7 @@ public class MainConversation extends Conversation {
 
     @Autowired
 	public MainConversation(ProductPricingService productPricingService, ConversationFactory conversationFactory, ApplicationEventPublisher eventPublisher) {
-		super("main.menue");
+		super();
 		this.productPricingService = productPricingService;
 		this.conversationFactory = conversationFactory;
 		this.eventPublisher = eventPublisher;
@@ -189,8 +189,16 @@ public class MainConversation extends Conversation {
     }
 
 	@Override
-	public void receiveAnswer(UserContext uc, Message msg) {
-		//NOOP
+	public List<SelectItem> getSelectItemsForAnswer(UserContext uc) {
+		return Lists.newArrayList(
+				new SelectOption("Jag har en till fråga", MESSAGE_MAIN_QUESTION),
+				new SelectOption("Tack det var vad jag behövde veta", MESSAGE_HEDVIG_COM)
+		);
+	}
+
+	@Override
+	public boolean canAcceptAnswerToQuestion() {
+		return true;
 	}
 
 	@Override

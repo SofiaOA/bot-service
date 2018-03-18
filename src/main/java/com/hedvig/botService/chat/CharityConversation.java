@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class CharityConversation extends Conversation {
 
@@ -17,7 +18,7 @@ public class CharityConversation extends Conversation {
     private final ConversationFactory conversationFactory;
 
     public CharityConversation(ConversationFactory factory) {
-        super("charity");
+        super();
         this.conversationFactory = factory;
 
         createChatMessage("message.kontrakt.charity",
@@ -51,8 +52,13 @@ public class CharityConversation extends Conversation {
     }
 
     @Override
-    public void receiveAnswer(UserContext uc, Message msg) {
-        //NOOP
+    public List<SelectItem> getSelectItemsForAnswer(UserContext uc) {
+        return null;
+    }
+
+    @Override
+    public boolean canAcceptAnswerToQuestion() {
+        return false;
     }
 
     @Override
