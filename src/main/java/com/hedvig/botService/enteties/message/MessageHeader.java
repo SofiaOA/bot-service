@@ -1,7 +1,5 @@
 package com.hedvig.botService.enteties.message;
 
-import java.time.Instant;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,6 +20,16 @@ public class MessageHeader {
 		this.timeStamp = timeStamp;
 		this.pollingInterval = 1000l; // Default value = 1s
 		this.loadingIndicator = "loader"; // Default value
+		this.shouldRequestPushNotifications = false;
+	}
+
+	public MessageHeader(long hedvigUserId, String responsePath, long timeStamp, boolean shouldRequestPushNotifications) {
+		this.fromId = hedvigUserId;
+		this.responsePath = responsePath;
+		this.timeStamp = timeStamp;
+		this.pollingInterval = 1000l;
+		this.loadingIndicator = "loader";
+		this.shouldRequestPushNotifications = shouldRequestPushNotifications;
 	}
 	
 	
@@ -46,4 +54,5 @@ public class MessageHeader {
 	public void setType(String t){
 		this.type = Type.valueOf(t);
 	}*/
+	public Boolean shouldRequestPushNotifications; // Should responding to this message prompt user to turn on push notifications
 }

@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import sun.awt.image.ImageWatched;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
@@ -47,7 +46,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
              * Also, message names cannot end with numbers!! Numbers are used for internal sectioning
              * */
     private static Logger log = LoggerFactory.getLogger(OnboardingConversationDevi.class);
-    private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private final ApplicationEventPublisher eventPublisher;
     private final MemberService memberService;
     private final ProductPricingService productPricingService;
@@ -317,9 +315,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         setExpectedReturnType(MESSAGE_NYHETSBREV, new EmailAdress());
         createMessage(MESSAGE_TIPSA, new MessageBodyText("Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmail till"));
         setExpectedReturnType(MESSAGE_TIPSA, new EmailAdress());
-        createMessage(MESSAGE_FRIFRAGA, new MessageBodyText("Fråga på!"));
+        createMessage(MESSAGE_FRIFRAGA, new MessageHeader(Conversation.HEDVIG_USER_ID, "/response", -1, true), new MessageBodyText("Fråga på!"));
 
-        createMessage(MESSAGE_FRIONBOARDINGFRAGA, new MessageBodyText("Fråga på! "));
+        createMessage(MESSAGE_FRIONBOARDINGFRAGA, new MessageHeader(Conversation.HEDVIG_USER_ID, "/response", -1, true), new MessageBodyText("Fråga på! "));
         
         
         createMessage(MESSAGE_NAGOTMER,

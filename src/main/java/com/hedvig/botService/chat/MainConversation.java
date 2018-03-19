@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.Charset;
@@ -81,7 +80,7 @@ public class MainConversation extends Conversation {
 		createMessage(MESSAGE_MAIN_CALLME,
 				new MessageBodyNumber("Ok, ta det lugnt! Vad når jag dig på för nummer?"));
 		
-		createMessage(MESSAGE_MAIN_QUESTION,
+		createMessage(MESSAGE_MAIN_QUESTION, new MessageHeader(Conversation.HEDVIG_USER_ID, "/response", -1, true),
 				new MessageBodyText("Självklart, vad kan jag hjälpa dig med?"));
 		
 		createMessage(MESSAGE_MAIN_REFER,
