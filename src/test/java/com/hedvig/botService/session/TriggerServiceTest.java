@@ -150,6 +150,7 @@ public class TriggerServiceTest {
 
         //act
         thrown.expect(UnathorizedException.class);
+        sut.getTriggerUrl(TRIGGER_ID, "1338");
 
         //assert
 
