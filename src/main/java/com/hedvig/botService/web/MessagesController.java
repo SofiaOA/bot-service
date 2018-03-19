@@ -4,7 +4,6 @@ import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.AvatarDTO;
 import com.hedvig.botService.web.dto.EventDTO;
-import com.hedvig.botService.web.dto.ExpoDeviceInfoDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

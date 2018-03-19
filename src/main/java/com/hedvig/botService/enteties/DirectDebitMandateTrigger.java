@@ -1,8 +1,6 @@
 package com.hedvig.botService.enteties;
 
-import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderState;
 import lombok.Data;
-import org.assertj.core.util.diff.myers.Equalizer;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,8 +9,6 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.UUID;
-
-import static jdk.net.SocketFlow.Status.IN_PROGRESS;
 
 @Entity
 @Data

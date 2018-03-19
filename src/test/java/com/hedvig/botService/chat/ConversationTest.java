@@ -9,9 +9,6 @@ import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import static com.hedvig.botService.testHelpers.MessageHelpers.createSingleSelectMessage;
 import static com.hedvig.botService.testHelpers.MessageHelpers.createTextMessage;
 import static org.assertj.core.api.Assertions.assertThat;

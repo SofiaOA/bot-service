@@ -6,8 +6,6 @@ import com.hedvig.botService.chat.Conversation.EventTypes;
 import com.hedvig.botService.enteties.*;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
-import com.hedvig.botService.enteties.message.SelectItem;
-import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.serviceIntegration.FakeMemberCreator;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
@@ -40,9 +38,7 @@ public class SessionManager {
     private final UserContextRepository userrepo;
     private final MemberService memberService;
     private final ProductPricingService productPricingclient;
-    private final FakeMemberCreator fakeMemberCreator;
     private final SignupCodeRepository signupRepo;
-    private final ApplicationEventPublisher publisher;
     private final ConversationFactory conversationFactory;
 
     public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
@@ -55,9 +51,7 @@ public class SessionManager {
         this.userrepo = userrepo;
         this.memberService = memberService;
         this.productPricingclient = client;
-        this.fakeMemberCreator = fakeMemberCreator;
         this.signupRepo = signupRepo;
-        this.publisher = publisher;
         this.conversationFactory = conversationFactory;
     }
 
@@ -237,7 +231,6 @@ public class SessionManager {
 
     public void addAnswerFromHedvig(BackOfficeAnswerDTO backOfficeAnswer) {
         UserContext uc = userrepo.findByMemberId(backOfficeAnswer.getUserId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-        MemberChat mc = uc.getMemberChat();
 
         Message msg = new Message();
 
@@ -453,9 +446,6 @@ public class SessionManager {
     }
 
 	public Integer getWaitlistPosition(String email) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-
-
 }

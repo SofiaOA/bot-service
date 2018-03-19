@@ -25,7 +25,6 @@ public class ClaimsConversation extends Conversation {
 	public ClaimsConversation(ApplicationEventPublisher eventPublisher) {
 		super("claims");
         this.eventPublisher = eventPublisher;
-        // TODO Auto-generated constructor stub
 
         createMessage("init.asset.claim",
                 new MessageBodySingleSelect("Oj vad tråkigt att någon har hänt med din pryl. Självklart tar jag tag i det här",
@@ -181,6 +180,9 @@ public class ClaimsConversation extends Conversation {
                 case "message.claims.record.ok": completeRequest("message.claims.record.ok2", userContext, memberChat); break;
                 case "message.claims.record.ok2": completeRequest("message.claims.record.ok3", userContext, memberChat); break;
                 }
+                break;
+            default:
+                break;
         }
     }
 

@@ -3,8 +3,6 @@ package com.hedvig.botService.enteties.message;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.hedvig.botService.enteties.UserContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 
@@ -35,8 +33,6 @@ public class MessageBody {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public Integer id;
-
-	private static Logger log = LoggerFactory.getLogger(MessageBody.class);
 
 	@Column(length=10485760)
 	public String text;

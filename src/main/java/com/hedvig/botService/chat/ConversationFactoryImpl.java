@@ -19,9 +19,6 @@ public class ConversationFactoryImpl implements ConversationFactory {
     private final TriggerService triggerService;
     private final SignupCodeRepository signupCodeRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final Environment springEnvironment;
-
-
 
     private Integer queuePos;
 
@@ -32,12 +29,11 @@ public class ConversationFactoryImpl implements ConversationFactory {
 
         this.signupCodeRepository = signupCodeRepository;
         this.eventPublisher = eventPublisher;
-        this.springEnvironment = springEnvironment;
         this.queuePos = queuePos;
     }
 
     @Override
-    public Conversation createConversation(Class conversationClass) {
+    public Conversation createConversation(Class<?> conversationClass) {
 
         if(conversationClass.equals(CharityConversation.class)) {
             return new CharityConversation(this);
@@ -71,7 +67,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
     @Override
     public Conversation createConversation(String conversationClassName) {
         try {
-            Class concreteClass = Class.forName(conversationClassName);
+            Class<?> concreteClass = Class.forName(conversationClassName);
             createConversation(concreteClass);
         }catch(ClassNotFoundException ex) {
             log.error("Could not create conversation for classname: {}", conversationClassName, ex);

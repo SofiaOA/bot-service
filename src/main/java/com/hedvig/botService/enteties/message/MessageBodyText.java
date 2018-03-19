@@ -1,8 +1,5 @@
 package com.hedvig.botService.enteties.message;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
@@ -10,7 +7,6 @@ import javax.persistence.Entity;
 @DiscriminatorValue("text")
 public class MessageBodyText extends MessageBody {
 
-	private static Logger log = LoggerFactory.getLogger(MessageBodyText.class);
     public MessageBodyText(String content) {
     	super(content);
 	}

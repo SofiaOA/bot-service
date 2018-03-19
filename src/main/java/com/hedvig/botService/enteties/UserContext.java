@@ -1,9 +1,7 @@
 package com.hedvig.botService.enteties;
 
-import com.google.common.collect.Lists;
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.Conversation.conversationStatus;
-import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
@@ -23,7 +21,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /*
  * Contains all state information related to a member

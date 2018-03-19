@@ -18,14 +18,12 @@ public class TrustlyConversation extends Conversation {
     private static final String CANCEL = "trustly.cancel";
     private static final String COMPLETE = "trustly.complete";
     private final TriggerService triggerService;
-    private final ConversationFactory factory;
     private final MemberService memberService;
 
     public TrustlyConversation(TriggerService triggerService,
                                ConversationFactory factory, MemberService memberService) {
         super("conversation.trustly");
         this.triggerService = triggerService;
-        this.factory = factory;
         this.memberService = memberService;
 
 
@@ -123,6 +121,8 @@ public class TrustlyConversation extends Conversation {
                 if(relay!=null){
                     completeRequest(relay, userContext, memberChat);
                 }
+                break;
+            default:
                 break;
         }
     }

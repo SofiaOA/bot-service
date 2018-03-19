@@ -2,8 +2,6 @@ package com.hedvig.botService.enteties;
 
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdProgressStatus;
 import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -12,7 +10,6 @@ import java.time.Instant;
 @Data
 public class BankIdSessionImpl implements BankIdSession {
 
-    private static Logger log = LoggerFactory.getLogger(BankIdSessionImpl.class);
     private Boolean done;
 
     @Override
