@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class ClaimsConversation extends Conversation {
@@ -23,7 +24,7 @@ public class ClaimsConversation extends Conversation {
 
     @Autowired
 	public ClaimsConversation(ApplicationEventPublisher eventPublisher) {
-		super("claims");
+		super();
         this.eventPublisher = eventPublisher;
         // TODO Auto-generated constructor stub
 
@@ -102,8 +103,13 @@ public class ClaimsConversation extends Conversation {
     }
 
     @Override
-    public void receiveAnswer(UserContext uc, Message msg) {
-        //NOOP
+    public List<SelectItem> getSelectItemsForAnswer(UserContext uc) {
+        return null;
+    }
+
+    @Override
+    public boolean canAcceptAnswerToQuestion() {
+        return false;
     }
 
     @Override

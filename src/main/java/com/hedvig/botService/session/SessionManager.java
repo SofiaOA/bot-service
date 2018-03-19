@@ -1,13 +1,10 @@
 package com.hedvig.botService.session;
 
-import com.google.common.collect.Lists;
 import com.hedvig.botService.chat.*;
 import com.hedvig.botService.chat.Conversation.EventTypes;
 import com.hedvig.botService.enteties.*;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
-import com.hedvig.botService.enteties.message.SelectItem;
-import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.serviceIntegration.FakeMemberCreator;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
@@ -235,29 +232,27 @@ public class SessionManager {
     	userrepo.saveAndFlush(uc);
     }
 
-    public void addAnswerFromHedvig(BackOfficeAnswerDTO backOfficeAnswer) {
+    public boolean addAnswerFromHedvig(BackOfficeAnswerDTO backOfficeAnswer) {
         UserContext uc = userrepo.findByMemberId(backOfficeAnswer.getUserId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
         MemberChat mc = uc.getMemberChat();
 
         Message msg = new Message();
+        val conversation = conversationFactory.createConversation(uc.getActiveConversation().getClassName());
 
-        msg.body = new MessageBodySingleSelect(backOfficeAnswer.getMsg(), Lists.newArrayList());
+        if (!conversation.canAcceptAnswerToQuestion()) {
+            return false;
+        }
+        val selectionItems = conversation.getSelectItemsForAnswer(uc);
+        msg.body = new MessageBodySingleSelect(backOfficeAnswer.getMsg(), selectionItems);
         msg.header.fromId = Conversation.HEDVIG_USER_ID;
         msg.globalId = null;
         msg.header.messageId = null;
         msg.body.id = null;
         msg.id = "message.answer";
-
-
-        //For the current active conversation send answer
-        for(ConversationEntity e :  uc.getOngoingConversations()) {
-            val conversation = conversationFactory.createConversation(e.getClassName());
-            if(conversation != null) {
-                conversation.receiveAnswer(uc, msg);
-            }
-        }
+        mc.addToHistory(msg);
 
         userrepo.saveAndFlush(uc);
+        return true;
     }
 
 
@@ -267,15 +262,16 @@ public class SessionManager {
 
         msg.header.fromId = Conversation.HEDVIG_USER_ID; //new Long(hid);
 
+
         // Clear all key information to generate a new entry
         msg.globalId = null;
         msg.header.messageId = null;
         msg.body.id = null;
 
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-    	MemberChat mc = uc.getMemberChat();
-    	mc.addToHistory(msg);
-    	userrepo.saveAndFlush(uc);
+        MemberChat mc = uc.getMemberChat();
+        mc.addToHistory(msg);
+        userrepo.saveAndFlush(uc);
     	
     }
     

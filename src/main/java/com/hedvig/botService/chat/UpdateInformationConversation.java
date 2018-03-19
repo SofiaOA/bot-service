@@ -1,5 +1,6 @@
 package com.hedvig.botService.chat;
 
+import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
@@ -14,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class UpdateInformationConversation extends Conversation {
 
@@ -24,7 +27,7 @@ public class UpdateInformationConversation extends Conversation {
 
 	@Autowired
 	public UpdateInformationConversation(MemberService memberService, ProductPricingService productPricingClient) {
-		super("info.update");
+		super();
 
 		createMessage("message.info.update.email", new MessageBodyText("Ok, vad har du för mailadress?"));
 		
@@ -38,8 +41,13 @@ public class UpdateInformationConversation extends Conversation {
 	}
 
 	@Override
-	public void receiveAnswer(UserContext uc, Message msg) {
+	public List<SelectItem> getSelectItemsForAnswer(UserContext uc) {
+		return Lists.newArrayList();
+	}
 
+	@Override
+	public boolean canAcceptAnswerToQuestion() {
+		return false;
 	}
 
 	@Override

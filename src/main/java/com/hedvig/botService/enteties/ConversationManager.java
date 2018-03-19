@@ -2,6 +2,7 @@ package com.hedvig.botService.enteties;
 
 import com.hedvig.botService.chat.Conversation;
 import lombok.Getter;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +32,9 @@ public class ConversationManager {
     @OneToMany(mappedBy="conversationManager", cascade = CascadeType.ALL, orphanRemoval=true)
     public List<ConversationEntity> conversations;
 
+    @OneToOne()
+    private ConversationEntity activeConversation;
+
     public String toString(){	
     	return this.memberId + " " + this.conversations;
     }
@@ -40,53 +44,24 @@ public class ConversationManager {
         conversations = new ArrayList<>();
     }
 
-    public ConversationManager(String memberId) {
+    ConversationManager(String memberId) {
     	log.info("Instantiating ConversationManager for member:" + memberId);
         this.memberId = memberId;
         this.conversations = new ArrayList<>();
     }
 
-    private void addConversation(ConversationEntity c) {
-        c.setConversationManager(this);
-        conversations.add(c);
-    }
 
-    /*
-     * Check if there is a conversation that needs to be initiated
-     * */
-    public boolean hasInitiatedConversations(){
-    	for(ConversationEntity c: conversations)if(c.conversationStatus.equals(Conversation.conversationStatus.INITIATED))return true;
-    	return false;
-    }
-
-    /*
-     * Check if there is an existing conversation of a certain type with status ONGOING
-     * */
-    public boolean containsOngoingConversationOfType(String type){
-        if(!type.contains(".")) {
-            type = ("com.hedvig.botService.chat." + type); // TODO: Refactor/remove hack
-        }
-
-    	for(ConversationEntity c : conversations){
-    		if(c.getClassName().equals(type) && c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING))return true;
-    	}
-    	return false;
-    }
     
-	public List<ConversationEntity> getConversations() {
+	List<ConversationEntity> getConversations() {
 		return conversations;
 	}
 
-	public void setConversations(List<ConversationEntity> conversations) {
-		this.conversations = conversations;
-	}
-
-    public boolean startConversation(Class<? extends Conversation> conversationClass) {
+    boolean startConversation(Class<? extends Conversation> conversationClass) {
 
         return startConversation(conversationClass, null);
     }
 
-    public boolean startConversation(Class<? extends Conversation> conversationClass, String startMessage) {
+    boolean startConversation(Class<? extends Conversation> conversationClass, String startMessage) {
 
         for(ConversationEntity c : conversations){
             if(c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING)) {
@@ -98,6 +73,8 @@ public class ConversationManager {
             }
         }
 
+
+
         ConversationEntity conv = new ConversationEntity();
         conv.setClassName(conversationClass.getName());
         conv.setMemberId(getMemberId());
@@ -106,8 +83,26 @@ public class ConversationManager {
             conv.setStartMessage(startMessage);
         }
 
-        addConversation(conv);
+        addConversationAndSetActive(conv);
 
         return true;
+    }
+
+    ConversationEntity getActiveConversation() {
+        if(this.activeConversation == null) {
+            val activeConversation = conversations.
+                    stream().
+                    filter(x -> x.getConversationStatus() == Conversation.conversationStatus.ONGOING).
+                    findFirst();
+            return activeConversation.orElseThrow(() -> new RuntimeException("Could not find any active conversations"));
+        }
+
+        return activeConversation;
+    }
+
+    private void addConversationAndSetActive(ConversationEntity c) {
+        c.setConversationManager(this);
+        conversations.add(c);
+        activeConversation = c;
     }
 }
