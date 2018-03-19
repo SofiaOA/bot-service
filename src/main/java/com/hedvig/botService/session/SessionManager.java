@@ -241,17 +241,15 @@ public class SessionManager {
 
         if (!conversation.canAcceptAnswerToQuestion()) {
             return false;
-        } else {
-            val selectionItems = conversation.getSelectItemsForAnswer(uc);
-            msg.body = new MessageBodySingleSelect(backOfficeAnswer.getMsg(), selectionItems);
-            msg.header.fromId = Conversation.HEDVIG_USER_ID;
-            msg.globalId = null;
-            msg.header.messageId = null;
-            msg.body.id = null;
-            msg.id = "message.answer";
-            mc.addToHistory(msg);
         }
-
+        val selectionItems = conversation.getSelectItemsForAnswer(uc);
+        msg.body = new MessageBodySingleSelect(backOfficeAnswer.getMsg(), selectionItems);
+        msg.header.fromId = Conversation.HEDVIG_USER_ID;
+        msg.globalId = null;
+        msg.header.messageId = null;
+        msg.body.id = null;
+        msg.id = "message.answer";
+        mc.addToHistory(msg);
 
         userrepo.saveAndFlush(uc);
         return true;
