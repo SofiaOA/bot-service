@@ -1,7 +1,9 @@
 package com.hedvig.botService.enteties;
 
+import com.google.common.collect.Lists;
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.Conversation.conversationStatus;
+import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
@@ -17,11 +19,11 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /*
  * Contains all state information related to a member
@@ -30,8 +32,9 @@ import java.util.regex.Pattern;
 public class UserContext implements Serializable {
 
     public static final String TRUSTLY_TRIGGER_ID = "{TRUSTLY_TRIGGER_ID}";
+	public static final String NEW_QUESTION_MESSAGE = "{NEW_QUESTION_MESSAGE}";
 
-    private static Logger log = LoggerFactory.getLogger(UserContext.class);
+	private static Logger log = LoggerFactory.getLogger(UserContext.class);
 	private static HashMap<String, String> requiredData = new HashMap<String, String>(){{
 		put("{ADDRESS}","T.ex har jag vet jag inte var du bor. Vad har du för gatuadress?");
 		put("{ADDRESS_ZIP}", "T.ex har jag inte ditt postnummer?");
@@ -75,8 +78,8 @@ public class UserContext implements Serializable {
 	@OneToMany(mappedBy = "userContext", cascade = CascadeType.ALL)
 	@MapKey(name="referenceToken")
 	private Map<String, BankIdSessionImpl> bankIdStatus;
-    
-    /*
+
+	/*
      * Lookup if there is a value for the key in the user context
      * */
     public String getDataEntry(String key){
@@ -273,6 +276,22 @@ public class UserContext implements Serializable {
     public void addToHistory(Message m) {
         getMemberChat().addToHistory(m);
     }
+
+	public void askedQuestion(String s) {
+		putUserData(NEW_QUESTION_MESSAGE, "message.frionboardingfraga");
+	}
+
+	public String getQuestionMessageId() {
+    	return getDataEntry(NEW_QUESTION_MESSAGE);
+	}
+
+	public List<ConversationEntity> getOngoingConversations() {
+
+		return getConversations().
+				stream().
+				filter(c -> c.getConversationStatus().equals(conversationStatus.ONGOING)).
+				collect(Collectors.toList());
+	}
 }
 
 

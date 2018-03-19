@@ -25,7 +25,7 @@ public class CharityConversation extends Conversation {
                         +"Som Hedvig-medlem får du välja en välgörenhetsorganisation att stödja om det blir pengar över när alla skador har betalats",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("SOS Barnbyar", "charity.sosbarnbyar"));
-                            add(new SelectOption("Cancerfonden", "charity.cancerfonden"));
+                            add(new SelectOption("Barncancerfonden", "charity.barncancerfonden"));
                             add(new SelectOption("Berätta mer", "message.kontrakt.charity.tellmemore"));
                         }}
                 ));
@@ -48,6 +48,11 @@ public class CharityConversation extends Conversation {
                             //add(new SelectLink("Börja utforska appen", "onboarding.done", "Dashboard", null, null,  false));
                         }}
                 ));
+    }
+
+    @Override
+    public void receiveAnswer(UserContext uc, Message msg) {
+        //NOOP
     }
 
     @Override

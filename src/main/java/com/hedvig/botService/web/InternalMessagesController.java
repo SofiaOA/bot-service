@@ -1,11 +1,7 @@
 package com.hedvig.botService.web;
 
-import com.google.common.collect.Lists;
-import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.enteties.MessageRepository;
 import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
-import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.BackOfficeAnswerDTO;
 import com.hedvig.botService.web.dto.BackOfficeMessageDTO;
@@ -39,19 +35,9 @@ public class InternalMessagesController {
      */
     @RequestMapping(path = {"/_/messages/addmessage", "/addmessage"}, method = RequestMethod.POST, produces = "application/json; charset=utf-8")
     public ResponseEntity<?> addMessage(@Valid @RequestBody BackOfficeMessageDTO backOfficeMessage) {
-        Message msg = backOfficeMessage.msg;
-        String hid = backOfficeMessage.userId;
+        log.info("Message from Hedvig to hid: {} with messageId: {}", backOfficeMessage.userId, backOfficeMessage.msg.globalId);
 
-        log.info("Message from Hedvig to hid: {} with messageId: {}", hid, msg.globalId);
-
-        msg.header.fromId = Conversation.HEDVIG_USER_ID; //new Long(hid);
-
-        // Clear all key information to generate a new entry
-        msg.globalId = null;
-        msg.header.messageId = null;
-        msg.body.id = null;
-
-        sessionManager.addMessageFromHedvig(msg, hid);
+        sessionManager.addMessageFromHedvig(backOfficeMessage);
 
         return ResponseEntity.noContent().build();
     }
@@ -61,16 +47,9 @@ public class InternalMessagesController {
      */
     @RequestMapping(path = "/_/messages/addanswer", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
     public ResponseEntity<?> addAnswer(@Valid @RequestBody() BackOfficeAnswerDTO backOfficeAnswer) {
-        log.info("Received answer Hedvig to hid: {} with message {}", backOfficeAnswer.getUserId(), backOfficeAnswer.getMsg());
+        log.info("Received answer from Hedvig to hid: {} with message {}", backOfficeAnswer.getUserId(), backOfficeAnswer.getMsg());
 
-        Message msg = new Message();
-        msg.body = new MessageBodySingleSelect(backOfficeAnswer.getMsg(), Lists.newArrayList(new SelectOption("Jag har en till fråga",  "message.frifraga")));
-        msg.header.fromId = Conversation.HEDVIG_USER_ID;
-        msg.globalId = null;
-        msg.header.messageId = null;
-        msg.body.id = null;
-
-        sessionManager.addMessageFromHedvig(msg, backOfficeAnswer.getUserId());
+        sessionManager.addAnswerFromHedvig(backOfficeAnswer);
 
         return ResponseEntity.noContent().build();
     }

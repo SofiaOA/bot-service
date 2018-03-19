@@ -15,6 +15,7 @@ import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingSer
 import com.hedvig.botService.session.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.session.events.SignedOnWaitlistEvent;
 import com.hedvig.botService.session.events.UnderwritingLimitExcededEvent;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +33,19 @@ import java.util.Optional;
 public class OnboardingConversationDevi extends Conversation implements BankIdChat {
 
     public static final String LOGIN = "{LOGIN}";
+    public static final String MESSAGE_HUS = "message.hus";
+    public static final String MESSAGE_NYHETSBREV = "message.nyhetsbrev";
+    public static final String MESSAGE_FRIONBOARDINGFRAGA = "message.frionboardingfraga";
+    public static final String MESSAGE_FRIFRAGA = "message.frifraga";
+    public static final String MESSAGE_TIPSA = "message.tipsa";
+    public static final String MESSAGE_AVSLUTOK = "message.avslutok";
+    public static final String MESSAGE_NAGOTMER = "message.nagotmer";
     /*
              * Need to be stateless. I.e no data beyond response scope
              * 
              * Also, message names cannot end with numbers!! Numbers are used for internal sectioning
              * */
     private static Logger log = LoggerFactory.getLogger(OnboardingConversationDevi.class);
-    private static DateTimeFormatter datetimeformatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private final ApplicationEventPublisher eventPublisher;
     private final MemberService memberService;
     private final ProductPricingService productPricingService;
@@ -220,7 +227,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 		"Första frågan! Bor du i lägenhet eller eget hus?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Lägenhet", "message.lagenhet"));
-                            add(new SelectOption("Hus", "message.hus"));
+                            add(new SelectOption("Hus", MESSAGE_HUS));
                         }}
                 ), "h_to_house");
 
@@ -293,32 +300,32 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodyBankIdCollect( "{REFERENCE_TOKEN}")
         );
 
-        createChatMessage("message.hus",
+        createChatMessage(MESSAGE_HUS,
                 new MessageBodySingleSelect("Åh, typiskt! Just nu försäkrar jag bara lägenheter\f"
                 		+ "Men jag hör gärna av mig till dig så fort jag är viktiga nyheter om annat jag kan försäkra\f"
                 		+ "Jag skickar ingen spam. Lovar!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Skicka mig nyhetsbrev", "message.nyhetsbrev"));
+                            add(new SelectOption("Skicka mig nyhetsbrev", MESSAGE_NYHETSBREV));
                             add(new SelectOption("Tack, men nej tack", "message.avslutok"));
 
                         }}
                 ));
 
-        createMessage("message.nyhetsbrev", new MessageBodyText("Vad är din mailadress?"));
-        setExpectedReturnType("message.nyhetsbrev", new EmailAdress());
-        createMessage("message.tipsa", new MessageBodyText("Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmail till"));
-        setExpectedReturnType("message.tipsa", new EmailAdress());
-        createMessage("message.frifraga", new MessageHeader(Conversation.HEDVIG_USER_ID, "/response", -1, true), new MessageBodyText("Fråga på!"));
+        createMessage(MESSAGE_NYHETSBREV, new MessageBodyText("Vad är din mailadress?"));
+        setExpectedReturnType(MESSAGE_NYHETSBREV, new EmailAdress());
+        createMessage(MESSAGE_TIPSA, new MessageBodyText("Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmail till"));
+        setExpectedReturnType(MESSAGE_TIPSA, new EmailAdress());
+        createMessage(MESSAGE_FRIFRAGA, new MessageHeader(Conversation.HEDVIG_USER_ID, "/response", -1, true), new MessageBodyText("Fråga på!"));
 
-        createMessage("message.frionboardingfraga", new MessageBodyText("Fråga på! "));
+        createMessage(MESSAGE_FRIONBOARDINGFRAGA, new MessageHeader(Conversation.HEDVIG_USER_ID, "/response", -1, true), new MessageBodyText("Fråga på! "));
         
         
-        createMessage("message.nagotmer",
+        createMessage(MESSAGE_NAGOTMER,
                 new MessageBodySingleSelect("Tack! Vill du hitta på något mer nu när vi har varandra på tråden?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill tipsa någon om dig", "message.tipsa"));
-                            add(new SelectOption("Jag har en fråga", "message.frionboardingfraga"));
-                            add(new SelectOption("Nej tack!", "message.avslutok"));
+                            add(new SelectOption("Jag vill tipsa någon om dig", MESSAGE_TIPSA));
+                            add(new SelectOption("Jag har en fråga", MESSAGE_FRIONBOARDINGFRAGA));
+                            add(new SelectOption("Nej tack!", MESSAGE_AVSLUTOK));
 
                         }}
                 ));
@@ -464,7 +471,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 		+ "Jag har en trygghetspartner som är en av världens största återförsäkringskoncerner\fDe är där för mig, så jag alltid kan vara där för dig\fJag är självklart också auktoriserad av Finansinspektionen" + emoji_mag,
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
-                            add(new SelectOption("Jag har en annan fråga", "message.frifraga"));
+                            add(new SelectOption("Jag har en annan fråga", MESSAGE_FRIFRAGA));
                         }}
                 ));
         
@@ -473,7 +480,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 		+ "Med mig har du samma grundskydd som vanliga försäkringsbolag\fUtöver det ingår alltid drulle, alltså till exempel om du tappar din telefon i golvet och den går sönder, och ett bra reseskydd",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
-                        	add(new SelectOption("Jag har en annan fråga", "message.frifraga"));
+                        	add(new SelectOption("Jag har en annan fråga", MESSAGE_FRIFRAGA));
                             //add(new SelectOption("Jag vill bli medlem", "message.forslag"));
                         }}
                 ));
@@ -481,7 +488,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage("message.frionboardingfragatack",
                 new MessageBodySingleSelect("Tack! Jag hör av mig inom kort",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag har fler frågor", "message.frionboardingfraga"));
+                            add(new SelectOption("Jag har fler frågor", MESSAGE_FRIONBOARDINGFRAGA));
                         }}
                 ));
         
@@ -489,7 +496,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodySingleSelect("Tack! Jag hör av mig inom kort",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
-                            add(new SelectOption("Jag har fler frågor", "message.frifraga"));
+                            add(new SelectOption("Jag har fler frågor", MESSAGE_FRIFRAGA));
 
                         }}
                 ));
@@ -506,7 +513,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodySingleSelect("Det är svårt att jämföra försäkringspriser, för alla försäkringar är lite olika. Men grundskyddet som jag ger är bredare än det du oftast får på annat håll\fSom Hedvigmedlem gör du dessutom skillnad för världen runtomkring dig, vilket du garanterat inte gör genom din gamla försäkring!",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
-                            add(new SelectOption("Jag har fler frågor", "message.frifraga"));
+                            add(new SelectOption("Jag har fler frågor", MESSAGE_FRIFRAGA));
 
                         }}
                 ));
@@ -635,7 +642,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                             add(new SelectOption("Är Hedvig tryggt?", "message.tryggt"));
                             add(new SelectOption("Ger Hedvig ett bra skydd?", "message.skydd"));
                             add(new SelectOption("Är Hedvig prisvärt?", "message.pris"));
-                            add(new SelectOption("Jag har en annan fråga", "message.frifraga"));
+                            add(new SelectOption("Jag har en annan fråga", MESSAGE_FRIFRAGA));
                             add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
 
                         }}
@@ -875,9 +882,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 return;
 
 
-            case "message.nyhetsbrev":
+            case MESSAGE_NYHETSBREV:
                 onBoardingData.setNewsLetterEmail(m.body.text);
-                nxtMsg = "message.nagotmer";
+                nxtMsg = MESSAGE_NAGOTMER;
                 break;
             case "message.signup.email" :
             case "message.waitlist":
@@ -927,15 +934,17 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             case "message.uwlimit.householdsize":
                 nxtMsg = handleUnderwritingLimitResponse(userContext, m, getMessageId(m.id));
                 break;
-            case "message.tipsa":
+            case MESSAGE_TIPSA:
                 onBoardingData.setRecommendFriendEmail(m.body.text);
-                nxtMsg = "message.nagotmer";
+                nxtMsg = MESSAGE_NAGOTMER;
                 break;
-            case "message.frifraga":
+            case MESSAGE_FRIFRAGA:
+                userContext.askedQuestion(MESSAGE_FRIFRAGA);
                 handleFriFraga(userContext, m);
                 nxtMsg = "message.frifragatack";
                 break;
-            case "message.frionboardingfraga":
+            case MESSAGE_FRIONBOARDINGFRAGA:
+                userContext.askedQuestion(MESSAGE_FRIONBOARDINGFRAGA);
                 handleFriFraga(userContext, m);
                 nxtMsg = "message.frionboardingfragatack";
                 break;
@@ -1171,7 +1180,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     private void endConversation(UserContext userContext) {
         userContext.completeConversation(this.getClass().toString());
-        userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
+        userContext.startConversation(conversationFactory.createConversation(CharityConversation.class));
     }
 
     /*
@@ -1206,6 +1215,25 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         }
 
         super.completeRequest(nxtMsg, userContext, memberChat);
+    }
+
+    @Override
+    public void receiveAnswer(UserContext uc, Message msg) {
+
+        val body = (MessageBodySingleSelect) msg.body;
+
+        String questionId;
+        if(uc.getOnBoardingData().getHouseType().equals(MESSAGE_HUS)) {
+            questionId = MESSAGE_FRIONBOARDINGFRAGA;
+
+        } else {
+            questionId = MESSAGE_FRIFRAGA;
+            body.choices.add(SelectLink.toOffer("Visa mig förslaget", "message.forslag.dashboard"));
+        }
+
+        body.choices.add(new SelectOption("Jag har en till fråga", questionId));
+
+        uc.getMemberChat().addToHistory(msg);
     }
 
     @Override
