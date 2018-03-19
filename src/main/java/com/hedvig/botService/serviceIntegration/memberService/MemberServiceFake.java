@@ -84,4 +84,9 @@ public class MemberServiceFake implements MemberService {
     public void sendOnboardedActiveToday(String email, String name) {
         return;
     }
+
+    @Override
+    public void selectCashback(String memberId, UUID charityId) {
+
+    }
 }
