@@ -1,9 +1,7 @@
 package com.hedvig.botService.enteties;
 
-import com.google.common.collect.Lists;
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.Conversation.conversationStatus;
-import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
@@ -19,11 +17,11 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /*
  * Contains all state information related to a member
@@ -285,12 +283,9 @@ public class UserContext implements Serializable {
     	return getDataEntry(NEW_QUESTION_MESSAGE);
 	}
 
-	public List<ConversationEntity> getOngoingConversations() {
+	public ConversationEntity getActiveConversation() {
 
-		return getConversations().
-				stream().
-				filter(c -> c.getConversationStatus().equals(conversationStatus.ONGOING)).
-				collect(Collectors.toList());
+		return conversationManager.getActiveConversation();
 	}
 }
 
