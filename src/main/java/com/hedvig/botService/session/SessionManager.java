@@ -239,7 +239,9 @@ public class SessionManager {
         Message msg = new Message();
         val conversation = conversationFactory.createConversation(uc.getActiveConversation().getClassName());
 
-        if(conversation.canAcceptAnswerToQuestion()) {
+        if (!conversation.canAcceptAnswerToQuestion()) {
+            return false;
+        } else {
             val selectionItems = conversation.getSelectItemsForAnswer(uc);
             msg.body = new MessageBodySingleSelect(backOfficeAnswer.getMsg(), selectionItems);
             msg.header.fromId = Conversation.HEDVIG_USER_ID;
@@ -248,8 +250,6 @@ public class SessionManager {
             msg.body.id = null;
             msg.id = "message.answer";
             mc.addToHistory(msg);
-        }else{
-            return false;
         }
 
 
@@ -272,8 +272,8 @@ public class SessionManager {
 
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
         MemberChat mc = uc.getMemberChat();
-    	mc.addToHistory(msg);
-    	userrepo.saveAndFlush(uc);
+        mc.addToHistory(msg);
+        userrepo.saveAndFlush(uc);
     	
     }
     
