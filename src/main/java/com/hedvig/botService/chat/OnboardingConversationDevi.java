@@ -121,7 +121,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 ));
 
         
-        // TODO these messages should generate push notice questions
         createMessage(
             MESSAGE_SIGNUP_TO_WAITLIST,
             new MessageHeader(Conversation.HEDVIG_USER_ID, "/response", -1, true),
