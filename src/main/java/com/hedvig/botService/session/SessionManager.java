@@ -281,11 +281,11 @@ public class SessionManager {
         // Conversations can only be reset during onboarding
         if(!uc.hasCompletedOnboarding()){
         	
-        	String email = uc.getOnBoardingData().getEmail(); // TODO: remove hack
+        	String email = uc.getOnBoardingData().getEmail();
 	    	mc.reset(); // Clear chat
 	    	uc.clearContext(); // Clear context
 	    	
-	    	uc.getOnBoardingData().setEmail(email); // TODO: remove hack
+	    	uc.getOnBoardingData().setEmail(email);
 
             Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);
 	        uc.startConversation(onboardingConversation);
