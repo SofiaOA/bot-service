@@ -979,7 +979,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             case MESSAGE_SIGNUP_NOT_REGISTERED_YET:
             case MESSAGE_SIGNUP_NOT_ACTIVATED_YET:
             case "message.signup.checkposition": {
-                m.body.text = selectedOption;
+                m.body.text = ((MessageBodySingleSelect)m.body).getSelectedItem().text;
                 addToChat(m, userContext);
                 val email = userContext.getDataEntry(EMAIL);
                 if (email == null) {
