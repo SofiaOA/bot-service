@@ -230,6 +230,7 @@ public class SessionManager {
 
     public boolean addAnswerFromHedvig(BackOfficeAnswerDTO backOfficeAnswer) {
         UserContext uc = userrepo.findByMemberId(backOfficeAnswer.getUserId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+        MemberChat mc = uc.getMemberChat();
 
         Message msg = new Message();
         val conversation = conversationFactory.createConversation(uc.getActiveConversation().getClassName());
