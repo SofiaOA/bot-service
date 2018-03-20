@@ -17,10 +17,11 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /*
  * Contains all state information related to a member
@@ -282,12 +283,9 @@ public class UserContext implements Serializable {
     	return getDataEntry(NEW_QUESTION_MESSAGE);
 	}
 
-	public List<ConversationEntity> getOngoingConversations() {
+	public ConversationEntity getActiveConversation() {
 
-		return getConversations().
-				stream().
-				filter(c -> c.getConversationStatus().equals(conversationStatus.ONGOING)).
-				collect(Collectors.toList());
+		return conversationManager.getActiveConversation();
 	}
 }
 

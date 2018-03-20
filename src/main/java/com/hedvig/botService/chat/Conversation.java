@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -17,29 +18,23 @@ public abstract class Conversation {
 	public static final long  HEDVIG_USER_ID = 1; // The id hedvig uses to chat
 	private Map<String, SelectItemMessageCallback> callbacks = new TreeMap<>();
 
-	public abstract void receiveAnswer(UserContext uc, Message msg);
 
-	public static enum conversationStatus {INITIATED, ONGOING, COMPLETE}
-	public static enum EventTypes {ANIMATION_COMPLETE, MODAL_CLOSED, MESSAGE_FETCHED, MISSING_DATA};
+
+	public enum conversationStatus {INITIATED, ONGOING, COMPLETE}
+	public enum EventTypes {ANIMATION_COMPLETE, MODAL_CLOSED, MESSAGE_FETCHED, MISSING_DATA};
 
 	private static Logger log = LoggerFactory.getLogger(Conversation.class);
-	private String conversationName; // Id for the conversation
 
 	private TreeMap<String, Message> messageList = new TreeMap<String, Message>();
 	private TreeMap<String, String> relayList = new TreeMap<String, String>();
 
-	Conversation(String conversationId) {
-		this.conversationName = conversationId;
+	Conversation() {
 	}
 
 	public Message getMessage(String key){
 		Message m = messageList.get(key);
 		if(m==null)log.info("Message not found with id:" + key);
 		return m;
-	}
-
-	public String getConversationName() {
-		return conversationName;
 	}
 
 	public void addRelay(String s1, String s2){
@@ -54,6 +49,10 @@ public abstract class Conversation {
 	void addToChat(String messageId, UserContext userContext) {
 		addToChat(getMessage(messageId), userContext);
 	}
+
+	public abstract List<SelectItem> getSelectItemsForAnswer(UserContext uc);
+
+	public abstract boolean canAcceptAnswerToQuestion();
 
 	void addToChat(Message m, UserContext userContext) {
 		m.render(userContext);

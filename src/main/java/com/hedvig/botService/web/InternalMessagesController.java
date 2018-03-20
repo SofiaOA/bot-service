@@ -8,6 +8,7 @@ import com.hedvig.botService.web.dto.BackOfficeMessageDTO;
 import com.hedvig.botService.web.dto.ExpoDeviceInfoDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,9 +50,11 @@ public class InternalMessagesController {
     public ResponseEntity<?> addAnswer(@Valid @RequestBody() BackOfficeAnswerDTO backOfficeAnswer) {
         log.info("Received answer from Hedvig to hid: {} with message {}", backOfficeAnswer.getUserId(), backOfficeAnswer.getMsg());
 
-        sessionManager.addAnswerFromHedvig(backOfficeAnswer);
+        if(sessionManager.addAnswerFromHedvig(backOfficeAnswer) == true) {
+            return ResponseEntity.noContent().build();
+        }
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @RequestMapping(path = "/_/messages/{from}", method = RequestMethod.GET)

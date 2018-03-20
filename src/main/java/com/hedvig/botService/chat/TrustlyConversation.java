@@ -1,5 +1,6 @@
 package com.hedvig.botService.chat;
 
+import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.DirectDebitMandateTrigger;
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
@@ -9,6 +10,7 @@ import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.session.triggerService.TriggerService;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class TrustlyConversation extends Conversation {
@@ -22,7 +24,7 @@ public class TrustlyConversation extends Conversation {
 
     public TrustlyConversation(TriggerService triggerService,
                                ConversationFactory factory, MemberService memberService) {
-        super("conversation.trustly");
+        super();
         this.triggerService = triggerService;
         this.memberService = memberService;
 
@@ -138,8 +140,13 @@ public class TrustlyConversation extends Conversation {
     }
 
     @Override
-    public void receiveAnswer(UserContext uc, Message msg) {
-        //NOOP
+    public List<SelectItem> getSelectItemsForAnswer(UserContext uc) {
+        return Lists.newArrayList();
+    }
+
+    @Override
+    public boolean canAcceptAnswerToQuestion() {
+        return false;
     }
 
     @Override
