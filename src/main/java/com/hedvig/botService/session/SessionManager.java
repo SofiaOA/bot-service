@@ -37,9 +37,7 @@ public class SessionManager {
     private final UserContextRepository userrepo;
     private final MemberService memberService;
     private final ProductPricingService productPricingclient;
-    private final FakeMemberCreator fakeMemberCreator;
     private final SignupCodeRepository signupRepo;
-    private final ApplicationEventPublisher publisher;
     private final ConversationFactory conversationFactory;
 
     public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
@@ -52,9 +50,7 @@ public class SessionManager {
         this.userrepo = userrepo;
         this.memberService = memberService;
         this.productPricingclient = client;
-        this.fakeMemberCreator = fakeMemberCreator;
         this.signupRepo = signupRepo;
-        this.publisher = publisher;
         this.conversationFactory = conversationFactory;
     }
 
@@ -449,9 +445,6 @@ public class SessionManager {
     }
 
 	public Integer getWaitlistPosition(String email) {
-		// TODO Auto-generated method stub
 		return null;
 	}
-
-
 }

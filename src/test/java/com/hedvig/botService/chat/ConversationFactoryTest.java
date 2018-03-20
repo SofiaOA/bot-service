@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
 
@@ -24,7 +23,7 @@ import static org.mockito.BDDMockito.given;
 @RunWith(Parameterized.class)
 public class ConversationFactoryTest {
 
-    private final Class conversationClass;
+    private final Class<?> conversationClass;
 
     @Mock
     private MemberService memberService;
@@ -55,7 +54,7 @@ public class ConversationFactoryTest {
                 UpdateInformationConversation.class});
     }
 
-    public ConversationFactoryTest(Class conversationClass) {
+    public ConversationFactoryTest(Class<?> conversationClass) {
         this.conversationClass = conversationClass;
     }
 

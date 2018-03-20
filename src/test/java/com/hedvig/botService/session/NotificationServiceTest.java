@@ -2,7 +2,6 @@ package com.hedvig.botService.session;
 
 
 import com.hedvig.botService.session.events.*;
-import com.sun.corba.se.impl.orbutil.threadpool.ThreadPoolManagerImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

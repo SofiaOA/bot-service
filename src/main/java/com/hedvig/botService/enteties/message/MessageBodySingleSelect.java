@@ -3,9 +3,6 @@ package com.hedvig.botService.enteties.message;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.hedvig.botService.enteties.UserContext;
-import org.h2.engine.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -16,7 +13,6 @@ import java.util.function.Predicate;
 @Entity
 @DiscriminatorValue("singleSelect")
 public class MessageBodySingleSelect extends MessageBody {
-	private static Logger log = LoggerFactory.getLogger(MessageBodySingleSelect.class);
 
 	public ArrayList<SelectItem> choices = new ArrayList<SelectItem>();
 	

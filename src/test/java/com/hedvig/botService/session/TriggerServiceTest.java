@@ -26,7 +26,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -151,7 +150,7 @@ public class TriggerServiceTest {
 
         //act
         thrown.expect(UnathorizedException.class);
-        final String actualTriggerUrl = sut.getTriggerUrl(TRIGGER_ID, "1338");
+        sut.getTriggerUrl(TRIGGER_ID, "1338");
 
         //assert
 

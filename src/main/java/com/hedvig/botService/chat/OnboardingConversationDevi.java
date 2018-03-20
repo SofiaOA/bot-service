@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +40,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public static final String MESSAGE_TIPSA = "message.tipsa";
     public static final String MESSAGE_AVSLUTOK = "message.avslutok";
     public static final String MESSAGE_NAGOTMER = "message.nagotmer";
+    public final static String MESSAGE_ONBOARDING_START = "message.onboardingstart";
     /*
              * Need to be stateless. I.e no data beyond response scope
              * 
@@ -92,10 +92,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         this.eventPublisher = eventPublisher;
         this.conversationFactory = conversationFactory;
 
-
-        Image hImage = new Image("https://s3.eu-central-1.amazonaws.com/com-hedvig-web-content/Hedvig_Icon-60%402x.png",120,120);
-        
-        createChatMessage("message.onboardingstart",
+		createChatMessage(MESSAGE_ONBOARDING_START,
                 new MessageBodySingleSelect("Hej! Det är jag som är Hedvig " + emoji_waving_hand 
                 		+"\fKul att ha dig här!"
                 		+"\fIngenting är viktigare för mig än att du ska få fantastisk service"
@@ -196,7 +193,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage("message.fileupload.result",
                 new MessageBodySingleSelect("Ok uppladdningen gick bra!",
                         new ArrayList<SelectItem>() {{
-                        	add(new SelectOption("Hem", "message.onboardingstart"));
+                        	add(new SelectOption("Hem", MESSAGE_ONBOARDING_START));
                         }}
                 ));
 
@@ -268,7 +265,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodySingleSelect("Bara att logga in så ser du din försäkring",
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}",  null, false));
-                            add(new SelectOption("Jag är inte medlem", "message.onboardingstart"));
+                            add(new SelectOption("Jag är inte medlem", MESSAGE_ONBOARDING_START));
                         }}
                 ),
                 (m, uc) -> {
@@ -719,17 +716,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         return "";
     }
 
-    private String getText(MessageBodySingleSelect body){
-
-        for(SelectItem o : body.choices){
-            if(SelectOption.class.isInstance(o) && SelectOption.class.cast(o).selected){
-                return SelectOption.class.cast(o).text;
-            }
-        }
-
-        return "";
-    }
-    
     public ArrayList<String> getValue(MessageBodyMultipleSelect body){
         ArrayList<String> selectedOptions = new ArrayList<>();
         for(SelectItem o : body.choices){
@@ -807,9 +793,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         
         String selectedOption = (m.body.getClass().equals(MessageBodySingleSelect.class))?
         		getValue((MessageBodySingleSelect)m.body):null;
-        		
-		String selectedText = (m.body.getClass().equals(MessageBodySingleSelect.class))?
-        		getText((MessageBodySingleSelect)m.body):null;
         		
         if(selectedOption != null){ // TODO: Think this over
 	        // Check the selected option first...
@@ -1080,7 +1063,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 }
                 break;
             case "message.forslagstart3":
-                String selectedValue = getValue((MessageBodySingleSelect)m.body);
                 addToChat(m, userContext);
                 break;
                 

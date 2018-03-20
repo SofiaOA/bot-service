@@ -106,6 +106,8 @@ public class CharityConversation extends Conversation {
                     completeRequest(relay, userContext, memberChat);
                 }
                 break;
+            default:
+            break;
         }
     }
 

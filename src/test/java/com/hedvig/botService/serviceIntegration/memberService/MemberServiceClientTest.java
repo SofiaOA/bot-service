@@ -95,7 +95,7 @@ public class MemberServiceClientTest {
                         .withBody(objectMapper.writeValueAsString(response))));
 
         thrown.expect(FeignException.class);
-        ResponseEntity<BankIdAuthResponse> adadad = feignClient.auth(new BankIdAuthRequest("", ""));
+        feignClient.auth(new BankIdAuthRequest("", ""));
     }
     
     @Test()
@@ -108,7 +108,7 @@ public class MemberServiceClientTest {
                         .withBody("")));
 
         thrown.expect(FeignException.class);
-        ResponseEntity<BankIdAuthResponse> adadad = feignClient.auth(new BankIdAuthRequest("", ""));
+        feignClient.auth(new BankIdAuthRequest("", ""));
     }
 
     @Test()
@@ -119,7 +119,7 @@ public class MemberServiceClientTest {
 
 
         thrown.expect(RetryableException.class);
-        ResponseEntity<BankIdAuthResponse> adadad = feignClient.auth(new BankIdAuthRequest("", ""));
+        feignClient.auth(new BankIdAuthRequest("", ""));
 
     }
 

@@ -75,7 +75,7 @@ public class MemberServiceFeign implements MemberService {
         address.setFloor(data.getFloor());
         req.setAddress(address);
         try {
-            ResponseEntity<FinalizeOnBoardingResponse> response = this.client.finalizeOnBoarding(memberId, req);
+            this.client.finalizeOnBoarding(memberId, req);
         }catch (RestClientResponseException ex) {
             log.error("Could not finalize member {}", memberId, ex);
         }
