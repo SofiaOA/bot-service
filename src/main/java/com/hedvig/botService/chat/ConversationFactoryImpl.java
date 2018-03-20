@@ -68,7 +68,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
     public Conversation createConversation(String conversationClassName) {
         try {
             Class<?> concreteClass = Class.forName(conversationClassName);
-            createConversation(concreteClass);
+            return createConversation(concreteClass);
         }catch(ClassNotFoundException ex) {
             log.error("Could not create conversation for classname: {}", conversationClassName, ex);
         }
