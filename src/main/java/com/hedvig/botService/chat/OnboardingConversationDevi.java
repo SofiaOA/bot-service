@@ -49,7 +49,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public static final String MESSAGE_SIGNUP_TO_WAITLIST = "message.waitlist";
     public static final String MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST = "message.activate";
     public static final String MESSAGE_WAITLIST_NOT_ACTIVATED = "message.activate.notactive";
-    public static final String MESSAGE_SIGNUP_NOT_ACTIVED_YET = "message.signup.notactivatedyet";
+    public static final String MESSAGE_SIGNUP_NOT_ACTIVATED_YET = "message.signup.notactivatedyet";
     public static final String MESSAGE_SIGNUP_NOT_REGISTERED_YET = "message.signup.notregisteredyet";
     /*
              * Need to be stateless. I.e no data beyond response scope
@@ -138,16 +138,14 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         setExpectedReturnType("message.signup.email", new EmailAdress());
 
         createChatMessage("message.signup.checkposition",
-	        new MessageBodySingleSelect("Du står på plats {SIGNUP_POSITION} på väntelistan"
-	                		+"\fSå snart jag har gett alla framför dig en chans att bli medlem så är det din tur!"
-	                		+"\fKom tillbaka hit när du fått ditt aktiveringsmail"
-	                		+"\fHa en fin dag, så hörs vi snart!",
+	        new MessageBodySingleSelect("Tack!"
+	                		+"\fJag hör av mig till dig snart, ha det fint så länge! ✌️",
 	                        new ArrayList<SelectItem>() {{
 	                            add(new SelectOption("Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST)); }}
             ));
             
         createChatMessage(
-            MESSAGE_SIGNUP_NOT_ACTIVED_YET,
+            MESSAGE_SIGNUP_NOT_ACTIVATED_YET,
             new MessageBodySingleSelect(
                 "Hmm, det verkar inte som att du är aktiverad än"
                 + "\fTitta in igen när du fått aktiveringsmailet"
@@ -974,13 +972,14 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     nxtMsg = MESSAGE_SIGNUP_NOT_REGISTERED_YET;
                     break;
                 }
-                nxtMsg = MESSAGE_SIGNUP_NOT_ACTIVED_YET;
+                nxtMsg = MESSAGE_SIGNUP_NOT_ACTIVATED_YET;
                 addToChat(m, userContext);
                 break;
             }
             case MESSAGE_SIGNUP_NOT_REGISTERED_YET:
-            case MESSAGE_SIGNUP_NOT_ACTIVED_YET:
+            case MESSAGE_SIGNUP_NOT_ACTIVATED_YET:
             case "message.signup.checkposition": {
+                m.body.text = selectedOption;
                 addToChat(m, userContext);
                 val email = userContext.getDataEntry(EMAIL);
                 if (email == null) {
@@ -989,7 +988,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 if (emailIsActivated(email)) {
                     nxtMsg = MESSAGE_ONBOARDING_START;
                 } else {
-                    nxtMsg = MESSAGE_SIGNUP_NOT_ACTIVED_YET;
+                    nxtMsg = MESSAGE_SIGNUP_NOT_ACTIVATED_YET;
                 }
                 break;
             }
