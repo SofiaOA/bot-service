@@ -98,11 +98,13 @@ public class CharityConversation extends Conversation {
 
         String nxtMsg = MESSAGE_KONTRAKT_CHARITY;
         switch (getMessageId(m.id)) {
+            case MESSAGE_CHARITY_UNKOWN_CHOICE:
             case MESSAGE_KONTRAKT_CHARITY_TELLMEMORE:
             case MESSAGE_KONTRAKT_CHARITY:
 
                 MessageBodySingleSelect mss = (MessageBodySingleSelect) m.body;
                 final SelectItem selectedItem = mss.getSelectedItem();
+
                 if(selectedItem.value.startsWith("charity")){
                     m.body.text = "Jag vill att mitt överskott ska gå till " + selectedItem.text;
                     addToChat(m, userContext);
