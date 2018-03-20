@@ -122,16 +122,22 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         
         // TODO these messages should generate push notice questions
-        createMessage(MESSAGE_SIGNUP_TO_WAITLIST, new MessageBodyText("Det ordnar jag! Vad är din mailadress?"));
+        createMessage(
+            MESSAGE_SIGNUP_TO_WAITLIST,
+            new MessageHeader(Conversation.HEDVIG_USER_ID, "/response", -1, true),
+            new MessageBodyText("Det ordnar jag! Vad är din mailadress?"));
         setExpectedReturnType(MESSAGE_SIGNUP_TO_WAITLIST, new EmailAdress());
         
-        createMessage("message.signup.email", new MessageBodyText("Det ordnar jag! Vad är din mailadress?"));
+        createMessage(
+            "message.signup.email",
+            new MessageHeader(Conversation.HEDVIG_USER_ID, "/response", -1, true),
+            new MessageBodyText("Det ordnar jag! Vad är din mailadress?"));
         setExpectedReturnType("message.signup.email", new EmailAdress());
 
         createChatMessage("message.signup.checkposition",
 	        new MessageBodySingleSelect("Du står på plats {SIGNUP_POSITION} på väntelistan"
 	                		+"\fSå snart jag har gett alla framför dig en chans att bli medlem så är det din tur!"
-	                		+"\fKom tillbaka hit när du fått ditt aktiveringsmail" // TODO Copy
+	                		+"\fKom tillbaka hit när du fått ditt aktiveringsmail"
 	                		+"\fHa en fin dag, så hörs vi snart!",
 	                        new ArrayList<SelectItem>() {{
 	                            add(new SelectOption("Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST)); }}
@@ -178,7 +184,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     	        ));
 
         
-        createMessage(MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST, new MessageBodyText("Kul! Skriv in din mailadress här"));
+        createMessage(
+            MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST,
+            new MessageHeader(Conversation.HEDVIG_USER_ID, "/response", -1, true),
+            new MessageBodyText("Kul! Skriv in din mailadress här"));
         
         createMessage("message.activate.ok.a", new MessageBodyParagraph("Välkommen!"),1000);
         addRelay("message.activate.ok.a","message.activate.ok.b");
@@ -888,7 +897,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             case "message.signup.email":
             case MESSAGE_SIGNUP_TO_WAITLIST:
             	// Logic goes here
-            	String userEmail = m.body.text.toLowerCase();
+            	String userEmail = m.body.text.toLowerCase().trim();
             	onBoardingData.setEmail(userEmail);
             	m.body.text = userEmail;
             	addToChat(m, userContext);
@@ -907,7 +916,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             			nxtMsg = "message.signup.checkposition";
             		}
             	}else{
-	            	SignupCode sc = createSignupCode(userEmail);
+                    SignupCode sc = createSignupCode(userEmail);
+                    userContext.putUserData(EMAIL, userEmail);
 	            	userContext.putUserData("{SIGNUP_CODE}", sc.code);
 	            	nxtMsg = "message.signup.checkposition";
             	}
@@ -921,7 +931,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             case "message.activate.nocode.tryagain":
             case MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST: {
                 // Logic goes here
-                val email = m.body.text;
+                val email = m.body.text.trim();
                 if (emailIsActivated(email)) {
                     flagCodeAsUsed(email);
                     nxtMsg = MESSAGE_ONBOARDING_START;
@@ -1389,26 +1399,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         addToChat(getMessage(messageID), uc);
     }
     
-    // ---------- Signup code logic ------------- //
-    
-    private String validateSignupCode(String code, UserContext uc){
-    	log.debug("Validating signup code:" + code);
-        Optional<SignupCode> sc = signupRepo.findByCode(code);
-
-        if(sc.isPresent()){
-        	uc.putUserData(EMAIL, sc.get().email);
-        	if(sc.get().getActive()){
-            	sc.get().setUsed(true);
-            	signupRepo.saveAndFlush(sc.get());
-            	uc.putUserData("{SIGNED_UP}", "true");
-            	return "message.activate.ok.a";       		
-        	}
-        	uc.putUserData("{SIGNUP_POSITION}", Objects.toString(getSignupQueuePosition(sc.get().email)));
-        	return MESSAGE_WAITLIST_NOT_ACTIVATED;
-        }
-        return "message.activate.nocode";
-    }
-    
     private SignupCode createSignupCode(String email){
     	log.debug("Generate signup code for email:" + email);
         SignupCode sc = signupRepo.findByEmail(email).orElseGet(() -> {
@@ -1476,6 +1466,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         val maybeSignupCode = signupRepo.findByEmail(email);
         if (maybeSignupCode.isPresent() == false) {
             log.error("Attempted to flag nonexistent code as used with email: {}", email);
+            return;
         }
         val signupCode = maybeSignupCode.get();
         signupCode.setUsed(true);
