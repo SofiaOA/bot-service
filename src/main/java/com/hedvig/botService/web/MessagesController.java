@@ -1,5 +1,6 @@
 package com.hedvig.botService.web;
 
+import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.AvatarDTO;
@@ -163,7 +164,7 @@ public class MessagesController {
     public ResponseEntity<?> chatStartWeb(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Chat start web event from user: " + hid);
-        sessionManager.startOnboardingConversationWeb(hid, "message.onboardingstart");
+        sessionManager.startOnboardingConversationWeb(hid, OnboardingConversationDevi.MESSAGE_WAITLIST_START);
     	return ResponseEntity.noContent().build();
     }
     
@@ -174,7 +175,7 @@ public class MessagesController {
     public ResponseEntity<?> chatStart(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Chat start event from user: " + hid);
-        sessionManager.startOnboardingConversation(hid, "message.onboardingstart");
+        sessionManager.startOnboardingConversation(hid, OnboardingConversationDevi.MESSAGE_WAITLIST_START);
     	return ResponseEntity.noContent().build();
     }
     
