@@ -105,8 +105,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 		createChatMessage(MESSAGE_WAITLIST_START,
                 new MessageBodySingleSelect("Hej! Det är jag som är Hedvig " + emoji_waving_hand 
                 		+"\fKul att ha dig här!"
-                		+"\fIngenting är viktigare för mig än att du ska få fantastisk service"
-                		+"\fMen eftersom många vill bli medlemmar just nu, så måste jag ta in ett begränsat antal i taget",
+                        +"\fFler än vad jag hade räknat med vill bli medlemmar just nu"
+                        +"\fSå det kommer dröja lite innan jag kan välkomna dig"
+                        +"\fMen skriv upp dig på väntelistan så hör jag av mig så snart det är din tur!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Sätt upp mig på väntelistan", MESSAGE_SIGNUP_TO_WAITLIST));
                             add(new SelectOption("Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST));
