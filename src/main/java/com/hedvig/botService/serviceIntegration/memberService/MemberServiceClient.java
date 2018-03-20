@@ -3,8 +3,11 @@ package com.hedvig.botService.serviceIntegration.memberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.*;
 import com.hedvig.botService.web.dto.Member;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @FeignClient(name="memberServiceClient", url = "${hedvig.member-service.url:member-service}", configuration = FeignConfiguration.class)
 public interface MemberServiceClient {
@@ -41,5 +44,8 @@ public interface MemberServiceClient {
 
     @RequestMapping(value = "/_/mail/sendOnboardedActiveToday")
     ResponseEntity<String> sendOnboardedActiveToday(@RequestBody SendOnboardedActiveTodayRequest request);
+
+    @RequestMapping(value = "/cashback", method = RequestMethod.POST)
+    ResponseEntity<String> selectCashback(@RequestHeader("hedvig.token") String hid, @RequestParam("optionId") UUID optionId);
 
 }

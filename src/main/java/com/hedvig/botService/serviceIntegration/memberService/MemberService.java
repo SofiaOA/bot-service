@@ -33,4 +33,5 @@ public interface MemberService {
 
     void sendOnboardedActiveToday(String email, String name);
 
+    void selectCashback(String memberId, UUID charityId);
 }

@@ -133,6 +133,11 @@ public class MemberServiceFeign implements MemberService {
         send( () -> this.client.sendOnboardedActiveToday(new SendOnboardedActiveTodayRequest(email, name)));
     }
 
+    @Override
+    public void selectCashback(String memberId, UUID charityId) {
+        send( () -> this.client.selectCashback(memberId, charityId));
+    }
+
     private void send(Runnable supplier) {
         try {
             supplier.run();
