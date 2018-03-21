@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /*
  * All timestamp information is set from here
@@ -88,16 +89,15 @@ public class ConversationManager {
         return true;
     }
 
-    ConversationEntity getActiveConversation() {
+    Optional<ConversationEntity> getActiveConversation() {
         if(this.activeConversation == null) {
-            val activeConversation = conversations.
+            return  conversations.
                     stream().
                     filter(x -> x.getConversationStatus() == Conversation.conversationStatus.ONGOING).
                     findFirst();
-            return activeConversation.orElseThrow(() -> new RuntimeException("Could not find any active conversations"));
         }
 
-        return activeConversation;
+        return Optional.of(activeConversation);
     }
 
     private void addConversationAndSetActive(ConversationEntity c) {

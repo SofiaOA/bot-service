@@ -5,6 +5,7 @@ import com.hedvig.botService.chat.Conversation.EventTypes;
 import com.hedvig.botService.enteties.*;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.SelectItem;
 import com.hedvig.botService.serviceIntegration.FakeMemberCreator;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
@@ -233,12 +234,19 @@ public class SessionManager {
         MemberChat mc = uc.getMemberChat();
 
         Message msg = new Message();
-        val conversation = conversationFactory.createConversation(uc.getActiveConversation().getClassName());
+        Conversation conversation = uc.getActiveConversation().
+                map(x -> conversationFactory.createConversation(x.getClassName())).
+                orElseGet(() -> {
+                    val newConversation = conversationFactory.createConversation(MainConversation.class);
+                    uc.startConversation(newConversation);
+                    return newConversation;
+                });
 
         if (!conversation.canAcceptAnswerToQuestion()) {
             return false;
         }
-        val selectionItems = conversation.getSelectItemsForAnswer(uc);
+
+        List<SelectItem> selectionItems = conversation.getSelectItemsForAnswer(uc);
         msg.body = new MessageBodySingleSelect(backOfficeAnswer.getMsg(), selectionItems);
         msg.header.fromId = Conversation.HEDVIG_USER_ID;
         msg.globalId = null;
