@@ -147,7 +147,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createChatMessage(
             MESSAGE_SIGNUP_NOT_ACTIVATED_YET,
             new MessageBodySingleSelect(
-                "Hmm, det verkar inte som att du är aktiverad än"
+                "Hmm, det verkar inte som att du är aktiverad än 👀"
                 + "\fTitta in igen när du fått aktiveringsmailet"
                 + "\fJag hör av mig snart!",
                 new ArrayList<SelectItem>() {{
@@ -207,7 +207,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         
         createMessage(
             MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST,
-            new MessageHeader(Conversation.HEDVIG_USER_ID, "/response", -1, true),
             new MessageBodyText("Kul! Skriv in din mailadress här"));
         
         createMessage("message.activate.ok.a", new MessageBodyParagraph("Välkommen!"),1000);
@@ -868,7 +867,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 	        	SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
 	        	
 	        	// Additional question for sublet contracts
-	        	m.body.text = item.text.toLowerCase();
+	        	m.body.text = item.text;
             	addToChat(m, userContext);
 	        	if(item.value.equals("message.lghtyp.sublet")){
 	        		nxtMsg = "message.lghtyp.sublet";
@@ -954,10 +953,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             case "message.activate.nocode.tryagain":
             case MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST: {
                 // Logic goes here
-                val email = m.body.text.trim();
+                val email = m.body.text.trim().toLowerCase();
                 if (emailIsActivated(email)) {
                     flagCodeAsUsed(email);
                     userContext.putUserData(SIGNED_UP, "true");
+                    userContext.putUserData(EMAIL, email);
                     nxtMsg = MESSAGE_ONBOARDING_START;
                     addToChat(m, userContext);
                     break;
@@ -979,7 +979,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             case MESSAGE_SIGNUP_NOT_REGISTERED_YET:
             case MESSAGE_SIGNUP_NOT_ACTIVATED_YET:
             case "message.signup.checkposition": {
-                m.body.text = selectedOption;
+                m.body.text = ((MessageBodySingleSelect)m.body).getSelectedItem().text;
                 addToChat(m, userContext);
                 val email = userContext.getDataEntry(EMAIL);
                 if (email == null) {
@@ -1127,7 +1127,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             case "message.annatbolag":
             	String _comp = m.body.text;
                 userContext.putUserData("{INSURANCE_COMPANY_TODAY}", _comp);
-                m.body.text = "Idag har jag " + _comp;
+                m.body.text = _comp;
                 nxtMsg = "message.bytesinfo";
                 addToChat(m, userContext);
                 break;
@@ -1135,7 +1135,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 String comp = getValue((MessageBodySingleSelect)m.body);
                 if(!comp.startsWith("message.")){
 	                userContext.putUserData("{INSURANCE_COMPANY_TODAY}", comp);
-	                m.body.text = "Idag har jag " + comp;
+	                m.body.text = comp;
 	                nxtMsg = "message.bytesinfo";
 	                addToChat(m, userContext);
                 }
