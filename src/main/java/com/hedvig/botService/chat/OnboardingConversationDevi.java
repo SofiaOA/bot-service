@@ -207,7 +207,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         
         createMessage(
             MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST,
-            new MessageHeader(Conversation.HEDVIG_USER_ID, "/response", -1, true),
             new MessageBodyText("Kul! Skriv in din mailadress här"));
         
         createMessage("message.activate.ok.a", new MessageBodyParagraph("Välkommen!"),1000);
