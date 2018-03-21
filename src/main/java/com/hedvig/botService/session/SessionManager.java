@@ -233,11 +233,18 @@ public class SessionManager {
         MemberChat mc = uc.getMemberChat();
 
         Message msg = new Message();
-        val conversation = conversationFactory.createConversation(uc.getActiveConversation().getClassName());
+        val conversation = uc.getActiveConversation().
+                map(x -> conversationFactory.createConversation(x.getClassName())).
+                orElseGet(() -> {
+                    val newConversation = conversationFactory.createConversation(MainConversation.class);
+                    uc.startConversation(newConversation);
+                    return newConversation;
+                });
 
         if (!conversation.canAcceptAnswerToQuestion()) {
             return false;
         }
+
         val selectionItems = conversation.getSelectItemsForAnswer(uc);
         msg.body = new MessageBodySingleSelect(backOfficeAnswer.getMsg(), selectionItems);
         msg.header.fromId = Conversation.HEDVIG_USER_ID;

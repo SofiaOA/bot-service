@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -114,7 +115,6 @@ public class UserContext implements Serializable {
 		if(conversationManager.startConversation(c.getClass())){
 			c.init(this);
 		}
-
     }
     
     public void startConversation(Conversation c, String startMessage){
@@ -283,7 +283,7 @@ public class UserContext implements Serializable {
     	return getDataEntry(NEW_QUESTION_MESSAGE);
 	}
 
-	public ConversationEntity getActiveConversation() {
+	public Optional<ConversationEntity> getActiveConversation() {
 
 		return conversationManager.getActiveConversation();
 	}
