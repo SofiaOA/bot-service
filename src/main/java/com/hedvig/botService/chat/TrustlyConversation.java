@@ -30,16 +30,17 @@ public class TrustlyConversation extends Conversation {
 
 
         createChatMessage(START,
-                new MessageBodySingleSelect("Fantastiskt! Nu är allt klart, jag ska bara sätta upp din betalning \fDet ska vara smidigt såklart, så jag använder digitalt autogiro genom Trustly",
+                new MessageBodySingleSelect("Fantastiskt! Nu är allt klart, jag ska bara sätta upp din betalning \fDet ska vara smidigt såklart, så jag använder digitalt autogiro genom Trustly\fInga pengar dras såklart förrän försäkringen börjar gälla!",
                         new ArrayList<SelectItem>(){{
                             add(new SelectItemTrustly("Välj bankkonto", "trustly.poll"));
                         }}
                 ));
 
         createMessage(TRUSTLY_POLL,
-                new MessageBodySingleSelect("Hej igen {NAME}! För att din försäkring ska gälla behöver vi koppla din månadsbetalning \uD83D\uDE42",
+                new MessageBodySingleSelect("Hej igen {NAME}! Om du hellre vill så kan vi vänta med att sätta upp betalningen\fDå hör jag av mig till dig lite innan din försäkring aktiveras",
                         new ArrayList<SelectItem>(){{
-                            add(new SelectItemTrustly("Välj bankkonto", "trustly.poll"));
+                            add(new SelectItemTrustly("Vi gör klart det nu", "trustly.poll"));
+                            add(SelectLink.toDashboard("Vi gör det senare, ta mig till appen!", "end"));
                         }}));
 
         createMessage(CANCEL,
