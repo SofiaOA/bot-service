@@ -36,7 +36,7 @@ public class TrustlyConversation extends Conversation {
                         }}
                 ));
 
-        createMessage(TRUSTLY_POLL,
+        createChatMessage(TRUSTLY_POLL,
                 new MessageBodySingleSelect("Hej igen {NAME}! Om du hellre vill så kan vi vänta med att sätta upp betalningen\fDå hör jag av mig till dig lite innan din försäkring aktiveras",
                         new ArrayList<SelectItem>(){{
                             add(new SelectItemTrustly("Vi gör klart det nu", "trustly.poll"));
