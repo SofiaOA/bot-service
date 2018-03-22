@@ -165,7 +165,7 @@ public class MainConversation extends Conversation {
 				userContext.startConversation(conversationFactory.createConversation(ClaimsConversation.class));
 
                 return;
-			case MESSAGE_HEDVIG_COM:
+			case MESSAGE_HEDVIG_COM + ".4":
 				val message = getMessage(MESSAGE_HEDVIG_COM);
 				val body = (MessageBodySingleSelect) message.body;
 				String forceTrustly = userContext.getDataEntry(FORCE_TRUSTLY_CHOICE);
