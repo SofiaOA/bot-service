@@ -166,12 +166,7 @@ public class MainConversation extends Conversation {
 
                 return;
 			case MESSAGE_HEDVIG_COM + ".4":
-				val message = getMessage(MESSAGE_HEDVIG_COM);
-				val body = (MessageBodySingleSelect) message.body;
-				String forceTrustly = userContext.getDataEntry(FORCE_TRUSTLY_CHOICE);
-				if(forceTrustly != null && "true".equalsIgnoreCase(forceTrustly)) {
-					body.choices.add(new SelectOption("Koppla autogiro", MESSAGE_MAIN_START_TRUSTLY));
-				}
+				addTrustlyButton(userContext);
             case "":
                 log.error("I dont know where to go next...");
                 nxtMsg = "error";
@@ -181,6 +176,15 @@ public class MainConversation extends Conversation {
 
         super.completeRequest(nxtMsg, userContext, memberChat);
     }
+
+	public void addTrustlyButton(UserContext userContext) {
+		val message = getMessage(MESSAGE_HEDVIG_COM);
+		val body = (MessageBodySingleSelect) message.body;
+		String forceTrustly = userContext.getDataEntry(FORCE_TRUSTLY_CHOICE);
+		if(forceTrustly != null && "true".equalsIgnoreCase(forceTrustly)) {
+            body.choices.add(new SelectOption("Koppla autogiro", MESSAGE_MAIN_START_TRUSTLY));
+        }
+	}
 
 	@Override
 	public List<SelectItem> getSelectItemsForAnswer(UserContext uc) {
@@ -229,13 +233,15 @@ public class MainConversation extends Conversation {
 	@Override
 	public void init(UserContext userContext) {
     	log.info("Starting main conversation");
+		addTrustlyButton(userContext);
         startConversation(userContext, MESSAGE_HEDVIG_COM); // Id of first message
 	}
 
 	@Override
 	public void init(UserContext userContext, String startMessage) {
     	log.info("Starting main conversation with message:" + startMessage);
-        startConversation(userContext, MESSAGE_HEDVIG_COM); // Id of first message
+        addTrustlyButton(userContext);
+    	startConversation(userContext, MESSAGE_HEDVIG_COM); // Id of first message
 	}
 
 }
