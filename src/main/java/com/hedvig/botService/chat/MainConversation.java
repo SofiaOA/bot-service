@@ -99,6 +99,7 @@ public class MainConversation extends Conversation {
 					nxtMsg = CONVERSATION_DONE;
 				}
 				else if(Objects.equals(item.value, MESSAGE_MAIN_START_TRUSTLY)) {
+					addToChat(m, userContext);
 					userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
 					userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
 					userContext.putUserData(FORCE_TRUSTLY_CHOICE, "false");
