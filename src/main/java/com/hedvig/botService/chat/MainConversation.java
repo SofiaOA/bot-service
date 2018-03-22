@@ -9,6 +9,7 @@ import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingSer
 import com.hedvig.botService.session.events.QuestionAskedEvent;
 import com.hedvig.botService.session.events.RequestPhoneCallEvent;
 import feign.FeignException;
+import lombok.val;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,15 +26,15 @@ public class MainConversation extends Conversation {
 
 	public static final String MESSAGE_HEDVIG_COM = "hedvig.com";
 	public static final String MESSAGE_QUESTION_RECIEVED = "message.question.recieved";
-	public static final String MESSAGE_MAIN_REFER_RECIEVED = "message.main.refer.recieved";
 	public static final String MESSAGE_MAIN_END = "message.main.end";
 	public static final String MESSAGE_MAIN_CALLME = "message.main.callme";
 	public static final String MESSAGE_MAIN_QUESTION = "main.question";
-	public static final String MESSAGE_MAIN_REFER = "message.main.refer";
+	public static final String MESSAGE_MAIN_START_TRUSTLY = "message.main.start_trustly";
 	public static final String MESSAGE_ERROR = "error";
 	public static final String MESSAGE_MAIN_REPORT = "message.main.report";
 	public static final String MESSAGE_MAIN_ONBOARDING_DONE = "onboarding.done";
 	public static final String CONVERSATION_DONE = "conversation.done";
+	public static final String FORCE_TRUSTLY_CHOICE = "{FORCE_TRUSTLY_CHOICE}";
 
 	private static Logger log = LoggerFactory.getLogger(MainConversation.class);
 	private final ConversationFactory conversationFactory;
@@ -63,13 +64,6 @@ public class MainConversation extends Conversation {
 						Lists.newArrayList(
 							SelectLink.toDashboard("Hem", MESSAGE_MAIN_ONBOARDING_DONE)
 				)));
-
-		createMessage(MESSAGE_MAIN_REFER_RECIEVED,
-				new MessageBodySingleSelect("Då mailar din vän och tipsar om Hedvig" + emoji_hand_ok,
-						Lists.newArrayList(
-							SelectLink.toDashboard("Hem", MESSAGE_MAIN_ONBOARDING_DONE)
-						)
-				));
 		
         createMessage(MESSAGE_MAIN_END,
                 new MessageBodySingleSelect("Tack. Jag ringer upp dig så snart jag kan",
@@ -83,10 +77,7 @@ public class MainConversation extends Conversation {
 		
 		createMessage(MESSAGE_MAIN_QUESTION, new MessageHeader(Conversation.HEDVIG_USER_ID, "/response", -1, true),
 				new MessageBodyText("Självklart, vad kan jag hjälpa dig med?"));
-		
-		createMessage(MESSAGE_MAIN_REFER,
-				new MessageBodyText("Kul! Vad har din vän för emailadress?"));
-		setExpectedReturnType(MESSAGE_MAIN_REFER, new EmailAdress());
+
 		
 		createMessage(MESSAGE_ERROR,
 				new MessageBodyText("Oj nu blev något fel..."));
@@ -107,9 +98,10 @@ public class MainConversation extends Conversation {
 				if(Objects.equals(item.value, MESSAGE_MAIN_REPORT)) {
 					nxtMsg = CONVERSATION_DONE;
 				}
-				else if(Objects.equals(item.value, MESSAGE_MAIN_REFER)) {
+				else if(Objects.equals(item.value, MESSAGE_MAIN_START_TRUSTLY)) {
 					userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
 					userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
+					userContext.putUserData(FORCE_TRUSTLY_CHOICE, "false");
 					return;
 				}
 
@@ -126,12 +118,6 @@ public class MainConversation extends Conversation {
 		case MESSAGE_MAIN_QUESTION:
 			userContext.askedQuestion(MESSAGE_MAIN_QUESTION);
 			nxtMsg = handleQuestion(userContext, m);
-			break;
-		case MESSAGE_MAIN_REFER:
-			userContext.putUserData("{REFERAL}", m.body.text);
-			addToChat(m, userContext); // Response parsed to nice format
-			nxtMsg = MESSAGE_MAIN_REFER_RECIEVED;
-
 			break;
 		}
 		
@@ -179,10 +165,18 @@ public class MainConversation extends Conversation {
 				userContext.startConversation(conversationFactory.createConversation(ClaimsConversation.class));
 
                 return;
+			case MESSAGE_HEDVIG_COM:
+				val message = getMessage(MESSAGE_HEDVIG_COM);
+				val body = (MessageBodySingleSelect) message.body;
+				String forceTrustly = userContext.getDataEntry(FORCE_TRUSTLY_CHOICE);
+				if(forceTrustly != null && "true".equalsIgnoreCase(forceTrustly)) {
+					body.choices.add(new SelectOption("Koppla autogiro", MESSAGE_MAIN_START_TRUSTLY));
+				}
             case "":
                 log.error("I dont know where to go next...");
                 nxtMsg = "error";
                 break;
+
         }
 
         super.completeRequest(nxtMsg, userContext, memberChat);
