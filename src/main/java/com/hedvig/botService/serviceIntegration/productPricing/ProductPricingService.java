@@ -3,7 +3,7 @@ package com.hedvig.botService.serviceIntegration.productPricing;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.productPricing.dto.*;
 import com.hedvig.botService.web.dto.InsuranceStatusDTO;
-
+import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,5 +101,19 @@ public class ProductPricingService {
     		return isd.getBody().getInsuranceStatus();
     	}
     	return null;
+    }
+
+    public Boolean isMemberInsuranceActive(final String memberId) {
+        Boolean isActive = false;
+        try{
+            isActive = this.getInsuranceStatus(memberId).equals("ACTIVE");
+        }catch(FeignException ex){
+            if(ex.status() != 404) {
+                log.error(ex.getMessage());
+            }
+        }catch (Exception ex) {
+            log.error(ex.getMessage());
+        }
+        return isActive;
     }
 }
