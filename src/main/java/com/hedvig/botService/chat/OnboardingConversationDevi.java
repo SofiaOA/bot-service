@@ -51,6 +51,14 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public static final String MESSAGE_WAITLIST_NOT_ACTIVATED = "message.activate.notactive";
     public static final String MESSAGE_SIGNUP_NOT_ACTIVATED_YET = "message.signup.notactivatedyet";
     public static final String MESSAGE_SIGNUP_NOT_REGISTERED_YET = "message.signup.notregisteredyet";
+    public static final String MESSAGE_50K_LIMIT = "message.50k.limit";
+    public static final String MESSAGE_FORSLAG = "message.forslag";
+    public static final String MESSAGE_FORSLAG2 = "message.forslag2";
+    public static final String MESSAGE_50K_LIMIT_YES_NO = "message.50k.limit.yes.no";
+    public static final String MESSAGE_50K_LIMIT_YES_YES = "message.50k.limit.yes.yes";
+    public static final String MESSAGE_50K_LIMIT_YES = "message.50k.limit.yes";
+    public static final String MESSAGE_50K_LIMIT_NO = "message.50k.limit.no";
+    public static final String MESSAGE_50K_LIMIT_NO_1 = "message.50k.limit.no.1";
     /*
              * Need to be stateless. I.e no data beyond response scope
              * 
@@ -445,7 +453,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodySingleSelect("Då är vi snart klara! Har du någon hemförsäkring idag?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ja", "message.forsakringidagja"));
-                            add(new SelectOption("Nej", "message.forslag"));
+                            add(new SelectOption("Nej", MESSAGE_50K_LIMIT));
 
                         }}
                 ));
@@ -465,7 +473,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 ));
 
         createMessage("message.bolag.vetej",new MessageBodyParagraph("Inga problem, det kan vi ta senare"));
-        addRelay("message.bolag.vetej", "message.forslag");
+        addRelay("message.bolag.vetej", MESSAGE_50K_LIMIT);
 
         createMessage("message.annatbolag", new MessageBodyText("Okej, vilket försäkringsbolag har du?"),2000);
 
@@ -473,7 +481,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodySingleSelect("Ja, ibland är det dags att prova något nytt. De kommer nog förstå\f"
                 		+ "Om du blir medlem hos mig sköter jag bytet åt dig. Så när din gamla försäkring går ut, flyttas du automatiskt till din nya hos mig",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag förstår", "message.forslag")); //Create product
+                            add(new SelectOption("Jag förstår", MESSAGE_50K_LIMIT)); //Create product
                             add(new SelectOption("Förklara mer", "message.bytesinfo3"));
                         }}
                 ));
@@ -487,19 +495,47 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 		+ "Sen börjar din nya försäkring gälla direkt när den gamla går ut\f"
                 		+ "Så du behöver aldrig vara orolig att gå utan försäkring efter att du skrivit på med mig",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Okej!", "message.forslag")); //Create product
+                            add(new SelectOption("Okej!", MESSAGE_50K_LIMIT)); //Create product
                         }}
                 ));
 
-        createMessage("message.forslag", new MessageBodyParagraph("Okej! Nu har jag allt för att ge dig ett förslag. Ska bara räkna lite..."),2000);
-        createMessage("message.forslag2",
+        createMessage(MESSAGE_50K_LIMIT, new MessageBodySingleSelect("Äger du någon pryl som är värd över 50,000kr? \uD83D\uDC8E\uD83C\uDFFA\uD83D\uDCF8",
+                Lists.newArrayList(
+                        new SelectOption("Ja", MESSAGE_50K_LIMIT_YES),
+                        new SelectOption("Nej", MESSAGE_50K_LIMIT_NO)
+                )));
+
+        createChatMessage(MESSAGE_50K_LIMIT_YES, new MessageBodySingleSelect("All right! Anledningen att jag frågar är att drulleförsäkring ingår för alla prylar under 50,000kr\fSka jag be en kollega höra av sig till dig efteråt för att ordna försäkring för dina dyrare prylar också?",
+        Lists.newArrayList(
+                new SelectOption("Ja", MESSAGE_50K_LIMIT_YES_YES),
+                new SelectOption("Nej", MESSAGE_50K_LIMIT_YES_NO)
+        )));
+
+        createMessage(MESSAGE_50K_LIMIT_YES_YES,
+                new MessageBodyParagraph("Det fixar jag!"), 1500);
+        addRelay(MESSAGE_50K_LIMIT_YES_YES, MESSAGE_FORSLAG);
+
+        createMessage(MESSAGE_50K_LIMIT_YES_NO,
+                new MessageBodyParagraph("OK, då skippar jag det " + emoji_thumbs_up), 2000);
+        addRelay(MESSAGE_50K_LIMIT_YES_NO, MESSAGE_FORSLAG);
+
+        createMessage(MESSAGE_50K_LIMIT_NO, new MessageBodyParagraph("Vad bra! Då täcks alla dina prylar av drulleförsäkringen"), 2000);
+
+        createMessage(MESSAGE_50K_LIMIT_NO_1, new MessageBodyParagraph("Köper du någon dyrgrip i framtiden så fixar jag så klart det också!"), 2000);
+
+        addRelay(MESSAGE_50K_LIMIT_NO, MESSAGE_50K_LIMIT_NO_1);
+
+        addRelay(MESSAGE_50K_LIMIT_NO_1, MESSAGE_FORSLAG);
+
+        createMessage(MESSAGE_FORSLAG, new MessageBodyParagraph("Okej! Nu har jag allt för att ge dig ett förslag. Ska bara räkna lite..."),2000);
+
+        createMessage(MESSAGE_FORSLAG2,
                 new MessageBodySingleSelect("Sådärja!",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectLink("Visa mig förslaget", "message.forslag.dashboard", "Offer", null, null, false  ));
-
-                        }}
-                ));
-        addRelay("message.forslag","message.forslag2");
+                        Lists.newArrayList(
+                            SelectLink.toOffer("Visa mig förslaget", "message.forslag.dashboard"))
+                )
+        );
+        addRelay(MESSAGE_FORSLAG, MESSAGE_FORSLAG2);
 
         createChatMessage("message.tryggt",
                 new MessageBodySingleSelect(""
@@ -646,7 +682,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         new ArrayList<SelectItem>() {{
                         	add(new SelectOption("Ja", "message.onboarding.end"));
                         	add(new SelectOption("Nej", "message.kontrakt.email"));
-                            //add(new SelectLink("Börja utforska", "onboarding.done", "Dashboard", null, null,  false));
                         }}
                 ));
         
@@ -777,7 +812,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 if(relay!=null){
                     completeRequest(relay, userContext, memberChat);
                 }
-                if(value.equals("message.forslag")) {
+                if(value.equals(MESSAGE_FORSLAG)) {
                     completeOnboarding(userContext);
                 }
                 break;
@@ -1102,7 +1137,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             case "message.bytesinfo2":
             case "message.forsakringidag":
             case "message.missingvalue":
-            case "message.forslag2":
+            case MESSAGE_FORSLAG2:
 
                 SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
 
@@ -1121,7 +1156,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     addToChat(getMessage("message.missingvalue"), userContext);
                     break;
                 }
-                else if(m.id.equals("message.missingvalue") || item.value.equals("message.forslag2")) {
+                else if(m.id.equals("message.missingvalue") || item.value.equals(MESSAGE_FORSLAG2)) {
                     completeOnboarding(userContext);
                 }
                 break;

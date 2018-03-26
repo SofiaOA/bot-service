@@ -25,8 +25,8 @@ public abstract class Conversation {
 
 	private static Logger log = LoggerFactory.getLogger(Conversation.class);
 
-	private TreeMap<String, Message> messageList = new TreeMap<String, Message>();
-	private TreeMap<String, String> relayList = new TreeMap<String, String>();
+	private TreeMap<String, Message> messageList = new TreeMap<>();
+	private TreeMap<String, String> relayList = new TreeMap<>();
 
 	Conversation() {
 	}
@@ -37,11 +37,11 @@ public abstract class Conversation {
 		return m;
 	}
 
-	public void addRelay(String s1, String s2){
+	void addRelay(String s1, String s2){
 		relayList.put(s1, s2);
 	}
 
-	public String getRelay(String s1){
+	String getRelay(String s1){
 		return relayList.get(s1);
 	}
 
