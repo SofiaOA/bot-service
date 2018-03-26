@@ -36,7 +36,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
     public Conversation createConversation(Class<?> conversationClass) {
 
         if(conversationClass.equals(CharityConversation.class)) {
-            return new CharityConversation(this, memberService);
+            return new CharityConversation(this, memberService, productPricingService);
         }
 
         if(conversationClass.equals(ClaimsConversation.class)) {

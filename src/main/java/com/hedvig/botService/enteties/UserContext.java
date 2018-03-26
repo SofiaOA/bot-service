@@ -129,21 +129,19 @@ public class UserContext implements Serializable {
     /*
      * Set conversation to COMPLETE
      * */
-    public void completeConversation(String conversationClassName){
-    	if(!conversationClassName.contains(".")) {
-			conversationClassName = ("com.hedvig.botService.chat." + conversationClassName); // TODO: Refactor/remove hack
-		}
 
-    	for(ConversationEntity c : this.conversationManager.conversations){
-    		if(c.getClassName().equals(conversationClassName) && c.conversationStatus.equals(conversationStatus.ONGOING)){
-    			c.conversationStatus=conversationStatus.COMPLETE;
-			}
-    	}
-    	
-    	//putUserData("{" +conversationClassName+ "}", Conversation.conversationStatus.COMPLETE.toString());
-    }
-    
-    // Check if there is at least one conversation containing name 'Onboarding' with state COMPLETE
+    public void completeConversation(Conversation conversationClass) {
+		String conversationClassName = conversationClass.getClass().getName();
+
+		for(ConversationEntity c : this.conversationManager.conversations){
+            if(c.getClassName().equals(conversationClassName) && c.conversationStatus.equals(conversationStatus.ONGOING)){
+                c.conversationStatus=conversationStatus.COMPLETE;
+            }
+        }
+
+	}
+
+	// Check if there is at least one conversation containing name 'Onboarding' with state COMPLETE
     public boolean hasCompletedOnboarding(){
     	for(ConversationEntity c : this.conversationManager.conversations){
     		if(c.getClassName().contains("Onboarding") && c.conversationStatus.equals(conversationStatus.COMPLETE)){

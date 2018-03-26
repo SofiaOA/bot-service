@@ -127,7 +127,7 @@ public class ClaimsConversation extends Conversation {
             case "message.claim.callme":
                 userContext.putUserData("{PHONE}", m.body.text);
                 addToChat(m, userContext); // Response parsed to nice format
-                userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
+                userContext.completeConversation(this); // TODO: End conversation in better way
                 nxtMsg = "message.claims.callme.end";
                 break;
 

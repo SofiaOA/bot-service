@@ -101,7 +101,7 @@ public class UpdateInformationConversation extends Conversation {
 		switch(nxtMsg){
 			case "message.info.complete":
 				log.info("Update conversation complete");
-				userContext.completeConversation(this.getClass().getName());
+				userContext.completeConversation(this);
 				//userContext.onboardingComplete(true);
 				break;
 			}

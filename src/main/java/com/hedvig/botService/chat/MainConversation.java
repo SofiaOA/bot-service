@@ -1,14 +1,12 @@
 package com.hedvig.botService.chat;
 
 import com.google.common.collect.Lists;
-import com.hedvig.botService.dataTypes.EmailAdress;
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.events.QuestionAskedEvent;
 import com.hedvig.botService.session.events.RequestPhoneCallEvent;
-import feign.FeignException;
 import lombok.val;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -100,7 +98,7 @@ public class MainConversation extends Conversation {
 				}
 				else if(Objects.equals(item.value, MESSAGE_MAIN_START_TRUSTLY)) {
 					addToChat(m, userContext);
-					userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
+					userContext.completeConversation(this); // TODO: End conversation in better way
 					userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
 					userContext.putUserData(FORCE_TRUSTLY_CHOICE, "false");
 					return;
@@ -114,7 +112,7 @@ public class MainConversation extends Conversation {
 			eventPublisher.publishEvent(new RequestPhoneCallEvent(userContext.getMemberId(), m.body.text, userContext.getOnBoardingData().getFirstName(), userContext.getOnBoardingData().getFamilyName()));
 			nxtMsg = MESSAGE_MAIN_END;
 			addToChat(m, userContext); // Response parsed to nice format
-			userContext.completeConversation(this.getClass().getName()); // TODO: End conversation in better way
+			userContext.completeConversation(this); // TODO: End conversation in better way
 			break;
 		case MESSAGE_MAIN_QUESTION:
 			userContext.askedQuestion(MESSAGE_MAIN_QUESTION);
@@ -148,7 +146,7 @@ public class MainConversation extends Conversation {
 		addToChat(m, userContext); // Response parsed to nice format
 		eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), question));
 		nxtMsg = MESSAGE_QUESTION_RECIEVED;
-		userContext.completeConversation(this.getClass().getName());
+		userContext.completeConversation(this);
 		return nxtMsg;
 	}
 
@@ -161,8 +159,7 @@ public class MainConversation extends Conversation {
         switch(nxtMsg){
             case CONVERSATION_DONE:
                 log.info("conversation complete");
-                userContext.completeConversation(this.getClass().getName());
-
+                userContext.completeConversation(this);
 				userContext.startConversation(conversationFactory.createConversation(ClaimsConversation.class));
 
                 return;
@@ -206,7 +203,8 @@ public class MainConversation extends Conversation {
 			MessageBodySingleSelect mss = (MessageBodySingleSelect) m.body;
 
 			// Do not show report claim option when user is not active
-			Boolean isActive = userHasActiveInsurance(userContext);
+
+			Boolean isActive = productPricingService.isMemberInsuranceActive(userContext.getMemberId());
 
 			if (!isActive) {
 				mss.removeItemIf(x -> x instanceof SelectOption && ((SelectOption) x).value.equals(MESSAGE_MAIN_REPORT));
@@ -217,20 +215,6 @@ public class MainConversation extends Conversation {
 		super.addToChat(m,userContext);
 	}
 
-	private Boolean userHasActiveInsurance(UserContext userContext) {
-		Boolean isActive = false;
-		try{
-			isActive = productPricingService.getInsuranceStatus(userContext.getMemberId()).equals("ACTIVE");
-		}catch(FeignException ex){
-			if(ex.status() != 404) {
-				log.error(ex.getMessage());
-			}
-		}catch (Exception ex) {
-			log.error(ex.getMessage());
-		}
-		return isActive;
-	}
-    
 	@Override
 	public void init(UserContext userContext) {
     	log.info("Starting main conversation");

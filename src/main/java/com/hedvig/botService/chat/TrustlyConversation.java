@@ -93,7 +93,7 @@ public class TrustlyConversation extends Conversation {
     }
 
     private void endConversation(UserContext userContext) {
-        userContext.completeConversation(this.getClass().toString());
+        userContext.completeConversation(this);
 
         sendOnboardingCompleteEmail(userContext);
     }
