@@ -2,10 +2,7 @@ package com.hedvig.botService.chat;
 
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
-import com.hedvig.botService.enteties.message.SelectItem;
-import com.hedvig.botService.enteties.message.SelectOption;
+import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import lombok.val;
@@ -31,6 +28,7 @@ public class CharityConversation extends Conversation {
     private static final String MESSAGE_KONTRAKT_CHARITY = "message.kontrakt.charity";
     private static final String MESSAGE_KONTRAKT_CHARITY_TELLMEMORE = "message.kontrakt.charity.tellmemore";
     private static final String MESSAGE_KONTRAKT_CHARITY_TACK = "message.kontrakt.charity.tack";
+    private static final String MESSAGE_KONTRAKT_CHARITY_TACK_END = "message.kontrakt.charity.tack.end";
 
 
     private final Logger log = LoggerFactory.getLogger(CharityConversation.class);
@@ -82,6 +80,13 @@ public class CharityConversation extends Conversation {
                             //add(new SelectLink("Börja utforska appen", "onboarding.done", "Dashboard", null, null,  false));
                         }}
                 ));
+
+        createMessage(MESSAGE_KONTRAKT_CHARITY_TACK_END,
+                new MessageBodySingleSelect("Toppen, tack!",
+                        new ArrayList<SelectItem>() {{
+                            add(SelectLink.toDashboard("Börja utforska appen", "onboarding.done"));
+                        }}
+                ));
     }
 
     @Override
@@ -118,15 +123,16 @@ public class CharityConversation extends Conversation {
 
                         memberService.selectCashback(userContext.getMemberId(), charityId.get());
 
-                        nxtMsg = MESSAGE_KONTRAKT_CHARITY_TACK;
-                        addToChat(nxtMsg, userContext);
                         userContext.completeConversation(this);
                         if(productPricingService.isMemberInsuranceActive(userContext.getMemberId())) {
+                            nxtMsg = MESSAGE_KONTRAKT_CHARITY_TACK;
+                            addToChat(nxtMsg, userContext);
                             userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
                         }
                         else
                         {
-                            userContext.completeConversation(this);
+                            nxtMsg = MESSAGE_KONTRAKT_CHARITY_TACK_END;
+                            addToChat(nxtMsg, userContext);
                         }
                         return;
                     }

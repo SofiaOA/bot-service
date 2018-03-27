@@ -58,6 +58,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public static final String MESSAGE_50K_LIMIT_YES = "message.50k.limit.yes";
     public static final String MESSAGE_50K_LIMIT_NO = "message.50k.limit.no";
     public static final String MESSAGE_50K_LIMIT_NO_1 = "message.50k.limit.no.1";
+    public static final String MESSAGE_PHONENUMBER = "message.phonenumber";
+    public static final String MESSAGE_FORSAKRINGIDAG = "message.forsakringidag";
+    public static final String MESSAGE_SAKERHET = "message.sakerhet";
     /*
              * Need to be stateless. I.e no data beyond response scope
              * 
@@ -436,20 +439,25 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage("message.pers", new MessageBodyNumber("Hoppas du trivs! Bor du själv eller med andra? Fyll i hur många som bor i lägenheten"));
         setExpectedReturnType("message.pers", new HouseholdMemberNumber());
 
-        createMessage("message.sakerhet",
+        createMessage(MESSAGE_SAKERHET,
                 new MessageBodyMultipleSelect("Tack! Finns någon av de här säkerhetsgrejerna i lägenheten?",
-                        new ArrayList<SelectItem>(){{
-                            add(new SelectOption("Brandvarnare", "safety.alarm"));
-                            add(new SelectOption("Brandsläckare", "safety.extinguisher"));
-                            add(new SelectOption("Säkerhetsdörr", "safety.door"));
-                            add(new SelectOption("Gallergrind", "safety.gate"));
-                            add(new SelectOption("Inbrottslarm", "safety.burglaralarm"));
-                            add(new SelectOption("Inget av dessa", "safety.none", false, true));
-                        }}
-                ));
+                        Lists.newArrayList(
+                            new SelectOption("Brandvarnare", "safety.alarm"),
+                            new SelectOption("Brandsläckare", "safety.extinguisher"),
+                            new SelectOption("Säkerhetsdörr", "safety.door"),
+                            new SelectOption("Gallergrind", "safety.gate"),
+                            new SelectOption("Inbrottslarm", "safety.burglaralarm"),
+                            new SelectOption("Inget av dessa", "safety.none", false, true)
+                        )
+                )
+        );
 
-        createMessage("message.forsakringidag",
-                new MessageBodySingleSelect("Då är vi snart klara! Har du någon hemförsäkring idag?",
+        createMessage(MESSAGE_PHONENUMBER,
+                new MessageBodyNumber("Nu är vi snart klara! Vad är ditt telefonnummer?"));
+        setExpectedReturnType(MESSAGE_PHONENUMBER, new TextInput());
+
+        createMessage(MESSAGE_FORSAKRINGIDAG,
+                new MessageBodySingleSelect("Tackar! Har du någon hemförsäkring idag?",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ja", "message.forsakringidagja"));
                             add(new SelectOption("Nej", MESSAGE_50K_LIMIT));
@@ -1056,7 +1064,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 	nxtMsg = "message.uwlimit.householdsize";
                 	break;
                 }
-                nxtMsg = "message.sakerhet";
+                nxtMsg = MESSAGE_SAKERHET;
                 break;
             case "message.kvadrat":
                 String kvm = m.body.text;
@@ -1116,7 +1124,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 addToChat(m, userContext);
                 nxtMsg = "message.kontrakt";
                 break;
-            case "message.sakerhet":
+            case MESSAGE_SAKERHET:
                 MessageBodyMultipleSelect body = (MessageBodyMultipleSelect)m.body;
 
                 if(body.getNoSelectedOptions() == 0) {
@@ -1129,12 +1137,19 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     }
                 }
                 addToChat(m, userContext);
-                nxtMsg = "message.forsakringidag";
+                nxtMsg = MESSAGE_PHONENUMBER;
+                break;
+            case MESSAGE_PHONENUMBER:
+                String trim = m.body.text.trim();
+                userContext.putUserData("{PHONE_NUMBER}", trim);
+                m.body.text = "Mitt telefonnummer är " + trim;
+                addToChat(m, userContext);
+                nxtMsg = MESSAGE_FORSAKRINGIDAG;
                 break;
 
             //case "message.bytesinfo":
             case "message.bytesinfo2":
-            case "message.forsakringidag":
+            case MESSAGE_FORSAKRINGIDAG:
             case "message.missingvalue":
             case MESSAGE_FORSLAG2:
 
@@ -1254,7 +1269,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     private String handleUnderwritingLimitResponse(UserContext userContext, Message m, String messageId) {
         String nxtMsg;
-        userContext.putUserData("{UWLIMIT_PHONENUMBER}", m.body.text);
+        userContext.putUserData("{PHONENUMBER}", m.body.text);
         UnderwritingLimitExcededEvent.UnderwritingType type =
                 messageId.endsWith("householdsize") ?
                         UnderwritingLimitExcededEvent.UnderwritingType.HouseholdSize:
@@ -1393,7 +1408,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             log.info("Onboarding complete");
             addToChat(getMessage("message.kontraktklar"), userContext);
             userContext.getOnBoardingData().setUserHasSigned(true);
-            userContext.completeConversation(this);
+            //userContext.completeConversation(this);
         }
     }
 
