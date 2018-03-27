@@ -16,13 +16,12 @@ import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingSer
 import com.hedvig.botService.session.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.session.events.SignedOnWaitlistEvent;
 import com.hedvig.botService.session.events.UnderwritingLimitExcededEvent;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-
-import lombok.val;
 
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
@@ -1276,7 +1275,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     }
 
     private void endConversation(UserContext userContext) {
-        userContext.completeConversation(this.getClass().toString());
+        userContext.completeConversation(this);
         userContext.startConversation(conversationFactory.createConversation(CharityConversation.class));
     }
 
@@ -1356,7 +1355,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public void bankIdAuthComplete(UserContext userContext) {
 
         if(userContext.getOnBoardingData().getUserHasSigned()) {
-            userContext.completeConversation(this.getClass().getName());
+            userContext.completeConversation(this);
             Conversation mc = conversationFactory.createConversation(MainConversation.class);
             userContext.startConversation(mc);
         }
@@ -1394,7 +1393,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             log.info("Onboarding complete");
             addToChat(getMessage("message.kontraktklar"), userContext);
             userContext.getOnBoardingData().setUserHasSigned(true);
-            userContext.completeConversation(OnboardingConversationDevi.class.toString());
+            userContext.completeConversation(this);
         }
     }
 

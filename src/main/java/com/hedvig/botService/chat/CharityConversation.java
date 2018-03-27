@@ -7,6 +7,7 @@ import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
 import com.hedvig.botService.enteties.message.SelectItem;
 import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
+import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,14 +36,14 @@ public class CharityConversation extends Conversation {
     private final Logger log = LoggerFactory.getLogger(CharityConversation.class);
     private final ConversationFactory conversationFactory;
     private final MemberService memberService;
+    private final ProductPricingService productPricingService;
 
 
-
-
-    CharityConversation(ConversationFactory factory, MemberService memberService) {
+    CharityConversation(ConversationFactory factory, MemberService memberService, ProductPricingService productPricingService) {
         super();
         this.conversationFactory = factory;
         this.memberService = memberService;
+        this.productPricingService = productPricingService;
 
         createChatMessage(MESSAGE_KONTRAKT_CHARITY,
                 new MessageBodySingleSelect("En grej till! \f"
@@ -119,8 +120,14 @@ public class CharityConversation extends Conversation {
 
                         nxtMsg = MESSAGE_KONTRAKT_CHARITY_TACK;
                         addToChat(nxtMsg, userContext);
-                        userContext.completeConversation(this.getClass().getName());
-                        userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
+                        userContext.completeConversation(this);
+                        if(productPricingService.isMemberInsuranceActive(userContext.getMemberId())) {
+                            userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
+                        }
+                        else
+                        {
+                            userContext.completeConversation(this);
+                        }
                         return;
                     }
 
