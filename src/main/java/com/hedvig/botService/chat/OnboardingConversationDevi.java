@@ -50,9 +50,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public static final String MESSAGE_WAITLIST_NOT_ACTIVATED = "message.activate.notactive";
     public static final String MESSAGE_SIGNUP_NOT_ACTIVATED_YET = "message.signup.notactivatedyet";
     public static final String MESSAGE_SIGNUP_NOT_REGISTERED_YET = "message.signup.notregisteredyet";
-    public static final String MESSAGE_50K_LIMIT = "message.50k.limit";
     public static final String MESSAGE_FORSLAG = "message.forslag";
     public static final String MESSAGE_FORSLAG2 = "message.forslag2";
+    public static final String MESSAGE_50K_LIMIT = "message.50k.limit";
     public static final String MESSAGE_50K_LIMIT_YES_NO = "message.50k.limit.yes.no";
     public static final String MESSAGE_50K_LIMIT_YES_YES = "message.50k.limit.yes.yes";
     public static final String MESSAGE_50K_LIMIT_YES = "message.50k.limit.yes";
@@ -61,6 +61,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public static final String MESSAGE_PHONENUMBER = "message.phonenumber";
     public static final String MESSAGE_FORSAKRINGIDAG = "message.forsakringidag";
     public static final String MESSAGE_SAKERHET = "message.sakerhet";
+    public static final String MESSAGE_FORSAKRINGIDAGJA = "message.forsakringidagja";
+    public static final String MESSAGE_BYTESINFO = "message.bytesinfo";
+    public static final String MESSAGE_ANNATBOLAG = "message.annatbolag";
     /*
              * Need to be stateless. I.e no data beyond response scope
              * 
@@ -459,13 +462,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage(MESSAGE_FORSAKRINGIDAG,
                 new MessageBodySingleSelect("Tackar! Har du någon hemförsäkring idag?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Ja", "message.forsakringidagja"));
-                            add(new SelectOption("Nej", MESSAGE_50K_LIMIT));
+                            add(new SelectOption("Ja", MESSAGE_FORSAKRINGIDAGJA));
+                            add(new SelectOption("Nej", MESSAGE_FORSLAG));
 
                         }}
                 ));
 
-        createMessage("message.forsakringidagja",
+        createMessage(MESSAGE_FORSAKRINGIDAGJA,
                 new MessageBodySingleSelect("Klokt av dig att redan ha försäkring! Vilket försäkringsbolag har du?",
                         new ArrayList<SelectItem>(){{
                         	add(new SelectOption("If", "if"));
@@ -473,22 +476,22 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                             add(new SelectOption("Trygg-Hansa", "Trygg-Hansa"));
                             add(new SelectOption("Länsförsäkringar", "Länsförsäkringar"));
                             //add(new SelectOption("Moderna", "Moderna"));
-                            add(new SelectOption("Annat bolag", "message.annatbolag"));
+                            add(new SelectOption("Annat bolag", MESSAGE_ANNATBOLAG));
                             add(new SelectOption("Ingen aning", "message.bolag.vetej"));
 
                         }}
                 ));
 
         createMessage("message.bolag.vetej",new MessageBodyParagraph("Inga problem, det kan vi ta senare"));
-        addRelay("message.bolag.vetej", MESSAGE_50K_LIMIT);
+        addRelay("message.bolag.vetej", MESSAGE_FORSLAG);
 
-        createMessage("message.annatbolag", new MessageBodyText("Okej, vilket försäkringsbolag har du?"),2000);
+        createMessage(MESSAGE_ANNATBOLAG, new MessageBodyText("Okej, vilket försäkringsbolag har du?"),2000);
 
-        createChatMessage("message.bytesinfo",
+        createChatMessage(MESSAGE_BYTESINFO,
                 new MessageBodySingleSelect("Ja, ibland är det dags att prova något nytt. De kommer nog förstå\f"
                 		+ "Om du blir medlem hos mig sköter jag bytet åt dig. Så när din gamla försäkring går ut, flyttas du automatiskt till din nya hos mig",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag förstår", MESSAGE_50K_LIMIT)); //Create product
+                            add(new SelectOption("Jag förstår", MESSAGE_FORSLAG)); //Create product
                             add(new SelectOption("Förklara mer", "message.bytesinfo3"));
                         }}
                 ));
@@ -502,17 +505,17 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 		+ "Sen börjar din nya försäkring gälla direkt när den gamla går ut\f"
                 		+ "Så du behöver aldrig vara orolig att gå utan försäkring efter att du skrivit på med mig",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Okej!", MESSAGE_50K_LIMIT)); //Create product
+                            add(new SelectOption("Okej!", MESSAGE_FORSLAG)); //Create product
                         }}
                 ));
 
-        createMessage(MESSAGE_50K_LIMIT, new MessageBodySingleSelect("Äger du någon pryl som är värd över 50,000kr? \uD83D\uDC8E\uD83C\uDFFA\uD83D\uDCF8",
+        createMessage(MESSAGE_50K_LIMIT, new MessageBodySingleSelect("Äger du någon pryl som är värd över 50,000 kr? \uD83D\uDC8E\uD83C\uDFFA",
                 Lists.newArrayList(
                         new SelectOption("Ja", MESSAGE_50K_LIMIT_YES),
                         new SelectOption("Nej", MESSAGE_50K_LIMIT_NO)
                 )));
 
-        createChatMessage(MESSAGE_50K_LIMIT_YES, new MessageBodySingleSelect("All right! Anledningen att jag frågar är att drulleförsäkring ingår för alla prylar under 50,000kr\fSka jag be en kollega höra av sig till dig efteråt för att ordna försäkring för dina dyrare prylar också?",
+        createChatMessage(MESSAGE_50K_LIMIT_YES, new MessageBodySingleSelect("All right! Anledningen att jag frågar är att drulleförsäkring ingår för alla prylar under 50,000 kr\fSka jag be en kollega höra av sig till dig efteråt för att ordna försäkring för dina dyrare prylar också?",
         Lists.newArrayList(
                 new SelectOption("Ja", MESSAGE_50K_LIMIT_YES_YES),
                 new SelectOption("Nej", MESSAGE_50K_LIMIT_YES_NO)
@@ -520,11 +523,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         createMessage(MESSAGE_50K_LIMIT_YES_YES,
                 new MessageBodyParagraph("Det fixar jag!"), 1500);
-        addRelay(MESSAGE_50K_LIMIT_YES_YES, MESSAGE_FORSLAG);
+        addRelay(MESSAGE_50K_LIMIT_YES_YES, MESSAGE_PHONENUMBER);
 
         createMessage(MESSAGE_50K_LIMIT_YES_NO,
-                new MessageBodyParagraph("OK, då skippar jag det " + emoji_thumbs_up), 2000);
-        addRelay(MESSAGE_50K_LIMIT_YES_NO, MESSAGE_FORSLAG);
+                new MessageBodyParagraph("Då skippar jag det " + emoji_thumbs_up), 2000);
+        addRelay(MESSAGE_50K_LIMIT_YES_NO, MESSAGE_PHONENUMBER);
 
         createMessage(MESSAGE_50K_LIMIT_NO, new MessageBodyParagraph("Vad bra! Då täcks alla dina prylar av drulleförsäkringen"), 2000);
 
@@ -532,7 +535,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         addRelay(MESSAGE_50K_LIMIT_NO, MESSAGE_50K_LIMIT_NO_1);
 
-        addRelay(MESSAGE_50K_LIMIT_NO_1, MESSAGE_FORSLAG);
+        addRelay(MESSAGE_50K_LIMIT_NO_1, MESSAGE_PHONENUMBER);
 
         createMessage(MESSAGE_FORSLAG, new MessageBodyParagraph("Okej! Nu har jag allt för att ge dig ett förslag. Ska bara räkna lite..."),2000);
 
@@ -1137,7 +1140,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     }
                 }
                 addToChat(m, userContext);
-                nxtMsg = MESSAGE_PHONENUMBER;
+                nxtMsg = MESSAGE_50K_LIMIT;//MESSAGE_PHONENUMBER;
                 break;
             case MESSAGE_PHONENUMBER:
                 String trim = m.body.text.trim();
@@ -1174,19 +1177,19 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     completeOnboarding(userContext);
                 }
                 break;
-            case "message.annatbolag":
+            case MESSAGE_ANNATBOLAG:
             	String _comp = m.body.text;
                 userContext.putUserData("{INSURANCE_COMPANY_TODAY}", _comp);
                 m.body.text = _comp;
-                nxtMsg = "message.bytesinfo";
+                nxtMsg = MESSAGE_BYTESINFO;
                 addToChat(m, userContext);
                 break;
-            case "message.forsakringidagja":
+            case MESSAGE_FORSAKRINGIDAGJA:
                 String comp = getValue((MessageBodySingleSelect)m.body);
                 if(!comp.startsWith("message.")){
 	                userContext.putUserData("{INSURANCE_COMPANY_TODAY}", comp);
 	                m.body.text = comp;
-	                nxtMsg = "message.bytesinfo";
+	                nxtMsg = MESSAGE_BYTESINFO;
 	                addToChat(m, userContext);
                 }
                 break;
