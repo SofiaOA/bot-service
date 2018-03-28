@@ -10,11 +10,11 @@ import javax.persistence.Entity;
 @DiscriminatorValue("audio")
 public class MessageBodyAudio extends MessageBody {
 
-	public String URL;
+	public String url;
 	private static Logger log = LoggerFactory.getLogger(MessageBodyAudio.class);
-    public MessageBodyAudio(String content, String URL) {
+    public MessageBodyAudio(String content, String url) {
     	super(content);
-    	this.URL = URL;
+    	this.url = url;
 	}
     MessageBodyAudio(){log.info("Instansiating MessageBodyAudio");}
 }

@@ -149,7 +149,7 @@ public class ClaimsConversation extends Conversation {
 
     public String handleAudioReceived(UserContext userContext, Message m) {
         String nxtMsg;
-        String audioUrl = ((MessageBodyAudio) m.body).URL;
+        String audioUrl = ((MessageBodyAudio) m.body).url;
         log.info("Audio recieved with m.body.text:" + m.body.text + " and URL:" + audioUrl);
         // TODO: Send to claims service!
         m.body.text = "Inspelning klar";

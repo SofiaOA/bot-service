@@ -10,11 +10,11 @@ import javax.persistence.Entity;
 @DiscriminatorValue("photo_upload")
 public class MessageBodyPhotoUpload extends MessageBody {
 
-	public String URL;
+	public String url;
 	private static Logger log = LoggerFactory.getLogger(MessageBodyPhotoUpload.class);
-    public MessageBodyPhotoUpload(String content, String URL) {
+    public MessageBodyPhotoUpload(String content, String url) {
     	super(content);
-    	this.URL = URL;
+    	this.url = url;
 	}
     MessageBodyPhotoUpload(){log.info("Instansiating MessageBodyPhotoUpload");}
 }
