@@ -100,31 +100,31 @@ public abstract class Conversation {
 	}
 
 	void createMessage(String id, MessageBody body, Integer delay){
-		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); //Default value
 		createMessage(id,header,body,delay);    	
 	}
 
 	void createMessage(String id, MessageBody body, Integer delay, SelectItemMessageCallback callback){
-		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); //Default value
 		createMessage(id,header,body,delay);
 		this.setMessageCallback(id, callback);
 	}
 
 	void createMessage(String id, MessageBody body, String avatarName, Integer delay){
-		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); //Default value
 		header.avatarName = avatarName;
 		createMessage(id,header,body,delay);		
 	}
 
 	void createMessage(String id, MessageBody body, String avatarName, SelectItemMessageCallback callback){
-		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); //Default value
 		header.avatarName = avatarName;
 		this.setMessageCallback(id, callback);
 		createMessage(id,header,body);		
 	}
 
 	void createMessage(String id, MessageBody body, Image image, Integer delay){
-		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); //Default value
 		body.imageURL = image.imageURL;
 		body.imageHeight = image.imageHeight;
 		body.imageWidth = image.imageWidth;
@@ -134,18 +134,18 @@ public abstract class Conversation {
 	// -------------------------
 
 	void createMessage(String id, MessageBody body){
-		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); //Default value
 		createMessage(id,header,body);
 	}
 
 	void createMessage(String id, MessageBody body, String avatarName){
-		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); //Default value
 		header.avatarName = avatarName;
 		createMessage(id,header,body);		
 	}
 
 	void createMessage(String id, MessageBody body, Image image){
-		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID,"/response",-1); //Default value
+		MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); //Default value
 		body.imageURL = image.imageURL;
 		body.imageHeight = image.imageHeight;
 		body.imageWidth = image.imageWidth;

@@ -13,19 +13,16 @@ public class MessageHeader {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public Integer messageId;
 
-	public MessageHeader(long hedvigUserId, String responsePath, long timeStamp) {
+	public MessageHeader(long hedvigUserId, long timeStamp) {
 		this.fromId = hedvigUserId;
-		//this.type = type;
-		this.responsePath = responsePath;
 		this.timeStamp = timeStamp;
 		this.pollingInterval = 1000l; // Default value = 1s
 		this.loadingIndicator = "loader"; // Default value
 		this.shouldRequestPushNotifications = false;
 	}
 
-	public MessageHeader(long hedvigUserId, String responsePath, long timeStamp, boolean shouldRequestPushNotifications) {
+	public MessageHeader(long hedvigUserId, long timeStamp, boolean shouldRequestPushNotifications) {
 		this.fromId = hedvigUserId;
-		this.responsePath = responsePath;
 		this.timeStamp = timeStamp;
 		this.pollingInterval = 1000l;
 		this.loadingIndicator = "loader";
@@ -42,7 +39,6 @@ public class MessageHeader {
 	 * Header elements
 	 * */
 	public Long fromId;
-	public String responsePath;
 	public Long timeStamp; // Time when sent/recieved on API-GW
 	public String loadingIndicator; // Link to animation to show during load
 	public String avatarName; // Link to avatar animation to show over message
