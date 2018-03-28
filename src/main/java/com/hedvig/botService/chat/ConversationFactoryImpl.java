@@ -1,6 +1,7 @@
 package com.hedvig.botService.chat;
 
 import com.hedvig.botService.enteties.SignupCodeRepository;
+import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.triggerService.TriggerService;
@@ -19,16 +20,25 @@ public class ConversationFactoryImpl implements ConversationFactory {
     private final TriggerService triggerService;
     private final SignupCodeRepository signupCodeRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final ClaimsService claimsService;
 
     private Integer queuePos;
 
-    public ConversationFactoryImpl(MemberService memberService, ProductPricingService productPricingService, TriggerService triggerService, SignupCodeRepository signupCodeRepository, ApplicationEventPublisher eventPublisher, Environment springEnvironment, @Value("${hedvig.waitlist.length}") Integer queuePos) {
+    public ConversationFactoryImpl(MemberService memberService,
+                                   ProductPricingService productPricingService,
+                                   TriggerService triggerService,
+                                   SignupCodeRepository signupCodeRepository,
+                                   ApplicationEventPublisher eventPublisher,
+                                   ClaimsService claimsService,
+                                   Environment springEnvironment,
+                                   @Value("${hedvig.waitlist.length}") Integer queuePos) {
         this.memberService = memberService;
         this.productPricingService = productPricingService;
         this.triggerService = triggerService;
 
         this.signupCodeRepository = signupCodeRepository;
         this.eventPublisher = eventPublisher;
+        this.claimsService = claimsService;
         this.queuePos = queuePos;
     }
 
@@ -40,7 +50,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
         }
 
         if(conversationClass.equals(ClaimsConversation.class)) {
-            return new ClaimsConversation(eventPublisher);
+            return new ClaimsConversation(eventPublisher, claimsService);
         }
 
         if(conversationClass.equals(MainConversation.class)) {

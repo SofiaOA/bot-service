@@ -2,6 +2,7 @@ package com.hedvig.botService.chat;
 
 
 import com.hedvig.botService.enteties.SignupCodeRepository;
+import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.triggerService.TriggerService;
@@ -30,6 +31,9 @@ public class ConversationFactoryTest {
 
     @Mock
     private ProductPricingService productPricingService;
+
+    @Mock
+    ClaimsService claimsService;
 
     @Mock
     SignupCodeRepository signupCodeRepository;
@@ -66,15 +70,11 @@ public class ConversationFactoryTest {
 
     @Test
     public void test(){
-        ConversationFactory factory = new ConversationFactoryImpl(memberService, productPricingService, triggerService, signupCodeRepository, applicationEventPublisher, springEnvironment, 0);
+        ConversationFactory factory = new ConversationFactoryImpl(memberService, productPricingService, triggerService, signupCodeRepository, applicationEventPublisher, claimsService, springEnvironment, 0);
 
         Conversation conversation = factory.createConversation(conversationClass);
 
         assertThat(conversation).isNotNull();
         assertThat(conversation).isInstanceOf(conversationClass);
     }
-
-
-
-
 }

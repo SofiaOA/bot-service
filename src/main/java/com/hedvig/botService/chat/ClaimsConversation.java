@@ -3,6 +3,7 @@ package com.hedvig.botService.chat;
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
+import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.session.events.ClaimAudioReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +22,13 @@ public class ClaimsConversation extends Conversation {
 	 * */
 	private static Logger log = LoggerFactory.getLogger(ClaimsConversation.class);
     private final ApplicationEventPublisher eventPublisher;
+    private final ClaimsService claimsService;
 
     @Autowired
-	public ClaimsConversation(ApplicationEventPublisher eventPublisher) {
+	public ClaimsConversation(ApplicationEventPublisher eventPublisher, ClaimsService claimsService) {
 		super();
         this.eventPublisher = eventPublisher;
+        this.claimsService = claimsService;
 
         createMessage("init.asset.claim",
                 new MessageBodySingleSelect("Oj vad tråkigt att någon har hänt med din pryl. Självklart tar jag tag i det här",
@@ -154,11 +157,15 @@ public class ClaimsConversation extends Conversation {
 
     public String handleAudioReceived(UserContext userContext, Message m) {
         String nxtMsg;
-        log.info("Audio recieved with m.body.text:" + m.body.text + " and URL:" + ((MessageBodyAudio)m.body).URL);
+        String audioUrl = ((MessageBodyAudio) m.body).URL;
+        log.info("Audio recieved with m.body.text:" + m.body.text + " and URL:" + audioUrl);
         // TODO: Send to claims service!
         m.body.text = "Inspelning klar";
 
+        claimsService.createClaimFromAudio(userContext.getMemberId(), audioUrl);
+
         this.eventPublisher.publishEvent(new ClaimAudioReceivedEvent(userContext.getMemberId()));
+
 
 
         addToChat(m,userContext); // Response parsed to nice format

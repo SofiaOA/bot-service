@@ -3,6 +3,7 @@ package com.hedvig.botService.chat;
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.session.events.ClaimAudioReceivedEvent;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,13 +23,16 @@ public class ClaimsConversationTest {
     private
     ApplicationEventPublisher eventPublisher;
 
+    @Mock
+    private ClaimsService claimsService;
+
     private ClaimsConversation testConversation;
     private UserContext userContext;
 
     @Before
     public void setUp() {
 
-        testConversation = new ClaimsConversation(eventPublisher);
+        testConversation = new ClaimsConversation(eventPublisher, claimsService);
         userContext = new UserContext(TOLVANSSON_MEMBER_ID);
         userContext.setMemberChat(new MemberChat());
     }
