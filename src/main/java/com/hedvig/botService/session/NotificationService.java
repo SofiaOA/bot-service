@@ -56,6 +56,12 @@ public class NotificationService {
         sendNotification(message, "CallMe");
     }
 
+    @EventListener
+    public void on(RequestObjectInsuranceEvent event) {
+        final String message = String.format("Medlem nr: %s, har någon pryl som är dyrare än 50':- och vill bli kontaktad", event.getMemberId());
+        sendNotification(message, "CallMe");
+    }
+
     private void sendNotification(String message, String subject) {
         try {
             template.sendNotification("newMembers", message, subject);

@@ -80,5 +80,14 @@ public class NotificationServiceTest {
         then(messagingTemplate).should().sendNotification(anyString(), contains(TOLVANSSON_MEMBER_ID), anyString());
     }
 
+    @Test
+    public void RequestObjectInsuranceEvent_SendsEventThatContains_MemberId() {
+        RequestObjectInsuranceEvent event = new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID);
+
+        notificationService.on(event);
+
+        then(messagingTemplate).should().sendNotification(anyString(), contains(TOLVANSSON_MEMBER_ID), anyString());
+    }
+
 
 }

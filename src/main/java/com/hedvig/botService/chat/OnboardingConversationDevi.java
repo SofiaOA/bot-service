@@ -14,6 +14,7 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResp
 import com.hedvig.botService.serviceIntegration.memberService.exceptions.ErrorType;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.events.OnboardingQuestionAskedEvent;
+import com.hedvig.botService.session.events.RequestObjectInsuranceEvent;
 import com.hedvig.botService.session.events.SignedOnWaitlistEvent;
 import com.hedvig.botService.session.events.UnderwritingLimitExcededEvent;
 import lombok.val;
@@ -1140,7 +1141,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     }
                 }
                 addToChat(m, userContext);
-                nxtMsg = MESSAGE_50K_LIMIT;//MESSAGE_PHONENUMBER;
+                nxtMsg = MESSAGE_50K_LIMIT;
                 break;
             case MESSAGE_PHONENUMBER:
                 String trim = m.body.text.trim();
@@ -1149,7 +1150,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 addToChat(m, userContext);
                 nxtMsg = MESSAGE_FORSAKRINGIDAG;
                 break;
-
+            case MESSAGE_50K_LIMIT_YES:
+                nxtMsg = handle50KLimitAnswer(nxtMsg, userContext, (MessageBodySingleSelect)m.body);
+                break;
             //case "message.bytesinfo":
             case "message.bytesinfo2":
             case MESSAGE_FORSAKRINGIDAG:
@@ -1264,7 +1267,17 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     }
 
-    public void handleFriFraga(UserContext userContext, Message m) {
+    private String handle50KLimitAnswer(String nxtMsg, UserContext userContext, MessageBodySingleSelect body) {
+        if(body.getSelectedItem().value.equalsIgnoreCase(MESSAGE_50K_LIMIT_YES_YES)) {
+            userContext.putUserData("{50K_LIMIT}", "true");
+            eventPublisher.publishEvent(
+                    new RequestObjectInsuranceEvent(
+                            userContext.getMemberId()));
+        }
+        return nxtMsg;
+    }
+
+    private void handleFriFraga(UserContext userContext, Message m) {
         userContext.putUserData("{ONBOARDING_QUESTION_"+LocalDateTime.now().toString()+"}", m.body.text);
         eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(), m.body.text));
         addToChat(m, userContext);
