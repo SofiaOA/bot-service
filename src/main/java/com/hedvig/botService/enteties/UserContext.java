@@ -4,7 +4,6 @@ import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.Conversation.conversationStatus;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.enteties.userContextHelpers.AutogiroData;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.MemberProfile;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
@@ -93,10 +92,6 @@ public class UserContext implements Serializable {
 	public void removeDataEntry(String key) {
     	userData.remove(key);
 	}
-
-    public AutogiroData getAutogiroData(){
-        return new AutogiroData(this);
-    };
     
     public List<ConversationEntity> getConversations(){
     	return this.conversationManager.getConversations();
@@ -168,28 +163,7 @@ public class UserContext implements Serializable {
     	this.memberChat.chatHistory.clear();
     }
 
-    public void mockMe(){
-    	putUserData("{ADDRESS}", "Margaretavägen 8D");
-    	putUserData("{ADDRESS_ZIP}","18774");
-    	putUserData("{AUTOSTART_TOKEN}","cbead301-1796-401e-bec3-26d67fd7bc9e");
-    	putUserData("{com.hedvig.botService.chat.OnboardingConversationDevi}","ONGOING");
-    	putUserData("{EMAIL}","johan@hedvi.com");
-    	putUserData("{FAMILY_NAME}","Tjelldén");
-    	putUserData("{HOUSE}","bostdsrätt");
-    	putUserData("{INSURANCE_COMPANY_TODAY}","trygg-hansa");
-    	putUserData("{KVM}","123");
-    	putUserData("{MEMBER_BIRTH_DATE}","1984-09-18");
-    	putUserData("{NAME}","Johan");
-    	putUserData("{NR_PERSONS}","3");
-    	putUserData("{REFERENCE_TOKEN}","a903a93f-a53a-4b4a-93a4-9cf4a4c9f15e");
-    	putUserData("{SECURE_ITEM_0}","safety.extinguisher");
-    	putUserData("{SECURE_ITEM_1}","safety.door");
-    	putUserData("{SECURE_ITEMS_NO}","2");
-    	putUserData("{SSN}", "190101013443");
-
-    }
-    
-    /*
+	/*
      * Validate that all required information is collected during onboarding and if not enable Hedvig to ask for it
      * */
     public String getMissingDataItem(){
@@ -275,10 +249,6 @@ public class UserContext implements Serializable {
 
 	public void askedQuestion(String s) {
 		putUserData(NEW_QUESTION_MESSAGE, "message.frionboardingfraga");
-	}
-
-	public String getQuestionMessageId() {
-    	return getDataEntry(NEW_QUESTION_MESSAGE);
 	}
 
 	public Optional<ConversationEntity> getActiveConversation() {

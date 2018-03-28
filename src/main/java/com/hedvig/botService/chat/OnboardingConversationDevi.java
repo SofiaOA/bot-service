@@ -76,8 +76,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     private final ProductPricingService productPricingService;
 
     public static enum ProductTypes {BRF, RENT, RENT_BRF, SUBLET_RENTAL, SUBLET_BRF, STUDENT, LODGER};
-    //private final MemberService memberService;
-    //private final ProductPricingService productPricingClient;
 
 
     public final static String emoji_smile = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0x81}, Charset.forName("UTF-8"));
@@ -97,10 +95,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     private final SignupCodeRepository signupRepo;
     private final ConversationFactory conversationFactory;
 
-    //@Value("${hedvig.gateway.url:http://gateway.hedvig.com}")
-    public String gatewayUrl = "http://gateway.hedvig.com";
-
-    public Integer queuePos;
+    Integer queuePos;
     
     @Autowired
     public OnboardingConversationDevi(
@@ -248,7 +243,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         }}
                 ));
 
-        createMessage("message.mockme", new MessageBodyText("Ok! Klart"+ emoji_hand_ok + " du heter nu {NAME} och bor på {ADDRESS} i en {HOUSE}.\n\f Vilket meddelande vill du gå till?"));
 
         createMessage("message.medlem",
                 new MessageBodySingleSelect("Välkommen tillbaka "+ emoji_hug +"\n\n Logga in med BankID så är du inne i appen igen",
@@ -889,13 +883,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 		            	userContext.putUserData("{SIGNUP_POSITION}", Objects.toString(getSignupQueuePosition(onBoardingData.getEmail())));
 		            }
 		        break;
-		        case "message.mockme":
-		        	log.info("Mocking data...");
-		            m.body.text = "Mocka mina uppgifter tack!";
-		            userContext.clearContext();
-		            userContext.mockMe();	        
-		            addToChat(m, userContext);
-		        break;
 	        }
         }
         
@@ -1112,11 +1099,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 onBoardingData.setAddressZipCode(m.body.text);
                 addToChat(m, userContext);
                 nxtMsg = "message.kvadrat";
-                break;                
-            case "message.mockme":
-                nxtMsg = m.body.text.toLowerCase();
-                m.body.text = "Jag vill gå till " + nxtMsg + " tack";
-                addToChat(m, userContext);
                 break;
             case "message.varbordu":
                 onBoardingData.setAddressStreet(m.body.text);
@@ -1219,12 +1201,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 }
 
                 addToChat(m, userContext);
-                break;
-
-            case "message.fetch.account.complete":
-                SelectItem it = ((MessageBodySingleSelect)m.body).getSelectedItem();
-                userContext.getAutogiroData().setSelecteBankAccount(Integer.parseInt(it.value));
-                nxtMsg = "message.kontrakt";
                 break;
 
             case "message.kontrakt":
