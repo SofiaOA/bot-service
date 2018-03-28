@@ -30,14 +30,6 @@ public class ClaimsConversation extends Conversation {
         this.eventPublisher = eventPublisher;
         this.claimsService = claimsService;
 
-        createMessage("init.asset.claim",
-                new MessageBodySingleSelect("Oj vad tråkigt att någon har hänt med din pryl. Självklart tar jag tag i det här",
-                    new ArrayList<SelectItem>() {{
-                        add(new SelectOption("Ring mig!", "message.claim.callme"));
-                        add(new SelectOption("Jag vill chatta", "message.claims.chat"));
-                    }}
-                ));
-
 
         createMessage("message.claims.start", new MessageBodyParagraph("Okej, det här löser vi på nolltid!"),2000);
 		
