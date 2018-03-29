@@ -66,6 +66,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public static final String MESSAGE_BYTESINFO = "message.bytesinfo";
     public static final String MESSAGE_ANNATBOLAG = "message.annatbolag";
     public static final String MESSAGE_FORSLAGSTART = "message.forslagstart";
+    public static final String MESSAGE_EMAIL = "message.email";
     /*
              * Need to be stateless. I.e no data beyond response scope
              * 
@@ -452,6 +453,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage(MESSAGE_PHONENUMBER,
                 new MessageBodyNumber("Nu är vi snart klara! Vad är ditt telefonnummer?"));
         setExpectedReturnType(MESSAGE_PHONENUMBER, new TextInput());
+
+        createMessage(MESSAGE_EMAIL,
+                new MessageBodyNumber("Tack! Vad har du för email?"));
+        setExpectedReturnType(MESSAGE_EMAIL, new EmailAdress());
 
         createMessage(MESSAGE_FORSAKRINGIDAG,
                 new MessageBodySingleSelect("Tackar! Har du någon hemförsäkring idag?",
@@ -1129,8 +1134,16 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 userContext.putUserData("{PHONE_NUMBER}", trim);
                 m.body.text = "Mitt telefonnummer är " + trim;
                 addToChat(m, userContext);
+                nxtMsg = MESSAGE_EMAIL;
+                break;
+            case MESSAGE_EMAIL:
+                String trim2 = m.body.text.trim();
+                userContext.putUserData("{EMAIL}", trim2);
+                m.body.text = "Min email är " + trim2;
+                addToChat(m, userContext);
                 nxtMsg = MESSAGE_FORSAKRINGIDAG;
                 break;
+
             case MESSAGE_50K_LIMIT_YES:
                 nxtMsg = handle50KLimitAnswer(nxtMsg, userContext, (MessageBodySingleSelect)m.body);
                 break;
