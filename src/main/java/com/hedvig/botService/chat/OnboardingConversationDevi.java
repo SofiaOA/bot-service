@@ -455,7 +455,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         setExpectedReturnType(MESSAGE_PHONENUMBER, new TextInput());
 
         createMessage(MESSAGE_EMAIL,
-                new MessageBodyNumber("Tack! Vad har du för email?"));
+                new MessageBodyText("Tack! Vad har du för email?"));
         setExpectedReturnType(MESSAGE_EMAIL, new EmailAdress());
 
         createMessage(MESSAGE_FORSAKRINGIDAG,
