@@ -1,10 +1,14 @@
 package com.hedvig.botService.chat;
 
+import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
+import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.events.ClaimAudioReceivedEvent;
+import com.hedvig.botService.session.events.ClaimCallMeEvent;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,31 +21,52 @@ import java.util.List;
 @Component
 public class ClaimsConversation extends Conversation {
 
-	/*
-	 * Need to be stateless. I.e no variables apart from logger
-	 * */
+    static final String MESSAGE_CLAIMS_START = "message.claims.start";
+    static final String MESSAGE_CLAIMS_NOT_ACTIVE = "message.claims.not_active";
+    private static final String MESSAGE_CLAIMS_NOT_ACTIVE_CALL_ME = "message.claims.not_active.call_me";
+    private static final String MESSAGE_CLAIMS_NOT_ACTIVE_OK = "message.claims.not_active.ok";
+    static final String MESSAGE_CLAIM_CALLME = "message.claim.callme";
+    /*
+                 * Need to be stateless. I.e no variables apart from logger
+                 * */
 	private static Logger log = LoggerFactory.getLogger(ClaimsConversation.class);
     private final ApplicationEventPublisher eventPublisher;
     private final ClaimsService claimsService;
+    private final ProductPricingService productPricingService;
+    private final ConversationFactory conversationFactory;
 
     @Autowired
-	public ClaimsConversation(ApplicationEventPublisher eventPublisher, ClaimsService claimsService) {
+    ClaimsConversation(
+            ApplicationEventPublisher eventPublisher,
+            ClaimsService claimsService,
+            ProductPricingService productPricingService,
+            ConversationFactory conversationFactory) {
 		super();
         this.eventPublisher = eventPublisher;
         this.claimsService = claimsService;
+        this.productPricingService = productPricingService;
+        this.conversationFactory = conversationFactory;
 
 
-        createMessage("message.claims.start", new MessageBodyParagraph("Okej, det här löser vi på nolltid!"),2000);
+        createMessage(MESSAGE_CLAIMS_START, new MessageBodyParagraph("Okej, det här löser vi på nolltid!"),2000);
+
+        createMessage(MESSAGE_CLAIMS_NOT_ACTIVE,
+                new MessageBodySingleSelect("Din försäkring har inte ännu flyttats till Hedvig, du har fortfarande bindningstid kvar hos ditt gamla försäkringsbolag. Så tills vidare skulle jag rekommendera dig att prata med dem. \fBehöver du stöd eller hjälp kan jag så klart be en av mina kollegor att ringa dig?",
+                    Lists.newArrayList(
+                        new SelectOption("Jag förstår", MESSAGE_CLAIMS_NOT_ACTIVE_OK),
+                        new SelectOption("Ring mig", MESSAGE_CLAIMS_NOT_ACTIVE_CALL_ME))
+                )
+        );
 		
         createMessage("message.claim.menu",
                 new MessageBodySingleSelect("Är du i en krissituation just nu? Om det är akut så ser jag till att en kollega ringer upp dig",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Ring mig!", "message.claim.callme"));
+                            add(new SelectOption("Ring mig!", MESSAGE_CLAIM_CALLME));
                             add(new SelectOption("Jag vill chatta", "message.claims.chat"));
                         }}
                 ));
         
-		createMessage("message.claim.callme", new MessageBodyNumber("Vilket telefonnummer nås du på?"));
+		createMessage(MESSAGE_CLAIM_CALLME, new MessageBodyNumber("Vilket telefonnummer nås du på?"));
         createMessage("message.claims.callme.end",
                 new MessageBodySingleSelect("Tack! En kollega ringer dig så snart som möjligt",
                         new ArrayList<SelectItem>() {{
@@ -93,7 +118,12 @@ public class ClaimsConversation extends Conversation {
 
 	@Override
 	public void init(UserContext userContext) {
-	    init(userContext, "message.claims.start");
+	    if(productPricingService.isMemberInsuranceActive(userContext.getMemberId()) == false) {
+            init(userContext, MESSAGE_CLAIMS_NOT_ACTIVE);
+            return;
+        }
+
+        init(userContext, MESSAGE_CLAIMS_START);
     }
 
     @Override
@@ -119,13 +149,20 @@ public class ClaimsConversation extends Conversation {
             nxtMsg = handleAudioReceived(userContext, m);
 			
 			break;
-            case "message.claim.callme":
+            case MESSAGE_CLAIM_CALLME:
                 userContext.putUserData("{PHONE}", m.body.text);
                 addToChat(m, userContext); // Response parsed to nice format
-                userContext.completeConversation(this); // TODO: End conversation in better way
+                userContext.completeConversation(this);
+                sendCallMeEvent(userContext, m);
                 nxtMsg = "message.claims.callme.end";
                 break;
 
+            case MESSAGE_CLAIMS_NOT_ACTIVE:
+                nxtMsg = handleClaimNotActive(userContext, (MessageBodySingleSelect) m.body);
+                if(nxtMsg == null) {
+                    return;
+                }
+                break;
 		}
 		
         /*
@@ -147,18 +184,35 @@ public class ClaimsConversation extends Conversation {
 		
 	}
 
-    public String handleAudioReceived(UserContext userContext, Message m) {
+    private void sendCallMeEvent(UserContext userContext, Message m) {
+	    val isInsuranceActive = productPricingService.isMemberInsuranceActive(userContext.getMemberId());
+        eventPublisher.publishEvent(new ClaimCallMeEvent(
+                userContext.getMemberId(),
+                userContext.getOnBoardingData().getFirstName(),
+                userContext.getOnBoardingData().getFamilyName(),
+                m.body.text,
+                isInsuranceActive));
+    }
+
+    private String handleClaimNotActive(UserContext userContext, MessageBodySingleSelect body) {
+        if(body.getSelectedItem().value.equals(MESSAGE_CLAIMS_NOT_ACTIVE_CALL_ME)) {
+            return MESSAGE_CLAIM_CALLME;
+        }
+
+        userContext.completeConversation(this);
+        userContext.startConversation(conversationFactory.createConversation(MainConversation.class));
+        return null;
+    }
+
+    private String handleAudioReceived(UserContext userContext, Message m) {
         String nxtMsg;
         String audioUrl = ((MessageBodyAudio) m.body).url;
         log.info("Audio recieved with m.body.text:" + m.body.text + " and URL:" + audioUrl);
-        // TODO: Send to claims service!
         m.body.text = "Inspelning klar";
 
         claimsService.createClaimFromAudio(userContext.getMemberId(), audioUrl);
 
         this.eventPublisher.publishEvent(new ClaimAudioReceivedEvent(userContext.getMemberId()));
-
-
 
         addToChat(m,userContext); // Response parsed to nice format
         nxtMsg = "message.claims.record.ok";
@@ -173,7 +227,7 @@ public class ClaimsConversation extends Conversation {
             case MESSAGE_FETCHED:
                 log.info("Message fetched:" + value);
                 switch(value){                
-                case "message.claims.start": completeRequest("message.claims.chat", userContext, memberChat); break;
+                case MESSAGE_CLAIMS_START: completeRequest("message.claims.chat", userContext, memberChat); break;
                 case "message.claims.chat": completeRequest("message.claims.chat2", userContext, memberChat); break;
                 case "message.claims.chat2": completeRequest("message.claim.promise", userContext, memberChat); break;
                 case "message.claims.ok": completeRequest("message.claims.record", userContext, memberChat); break;

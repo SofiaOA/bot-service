@@ -104,7 +104,7 @@ public class ProductPricingService {
     }
 
     public Boolean isMemberInsuranceActive(final String memberId) {
-        Boolean isActive = false;
+        Boolean isActive = true;
         try{
             isActive = this.getInsuranceStatus(memberId).equals("ACTIVE");
         }catch(FeignException ex){

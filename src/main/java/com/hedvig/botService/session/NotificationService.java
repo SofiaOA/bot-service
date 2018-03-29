@@ -62,6 +62,17 @@ public class NotificationService {
         sendNotification(message, "CallMe");
     }
 
+    @EventListener
+    public void on(ClaimCallMeEvent event) {
+        final  String message = String.format(
+                "Medlem %s %s med %s försäkring har fått en skada och vill bli uppringd på %s",
+                event.getFirstName(),
+                event.getFamilyName(),
+                event.isInsuranceActive() ? "AKTIV" : "INAKTIV",
+                event.getPhoneNumber());
+        sendNotification(message, "CallMe");
+    }
+
     private void sendNotification(String message, String subject) {
         try {
             template.sendNotification("newMembers", message, subject);
