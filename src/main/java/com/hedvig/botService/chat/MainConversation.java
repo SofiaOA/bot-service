@@ -69,7 +69,7 @@ public class MainConversation extends Conversation {
                 ));
         
 		createMessage(MESSAGE_MAIN_CALLME,
-				new MessageBodyNumber("Ok, ta det lugnt! Vad når jag dig på för nummer?"));
+				new MessageBodyNumber("Vad når jag dig på för nummer?"));
 		
 		createMessage(MESSAGE_MAIN_QUESTION, new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
 				new MessageBodyText("Självklart, vad kan jag hjälpa dig med?"));
