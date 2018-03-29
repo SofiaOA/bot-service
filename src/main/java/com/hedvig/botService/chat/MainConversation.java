@@ -186,7 +186,7 @@ public class MainConversation extends Conversation {
 	public List<SelectItem> getSelectItemsForAnswer(UserContext uc) {
 		return Lists.newArrayList(
 				new SelectOption("Jag har en till fråga", MESSAGE_MAIN_QUESTION),
-				new SelectOption("Tack det var vad jag behövde veta", MESSAGE_HEDVIG_COM)
+				new SelectOption("Tack, det var vad jag behövde veta", MESSAGE_HEDVIG_COM)
 		);
 	}
 
