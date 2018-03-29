@@ -87,14 +87,6 @@ public class SessionManager {
         return ss;
     }
     
-    public void initClaim(String hid){
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-        Conversation claimsConversation = conversationFactory.createConversation(ClaimsConversation.class);
-        uc.startConversation(claimsConversation);
-
-        userrepo.saveAndFlush(uc);
-    }
-    
     public void savePushToken(String hid, String pushToken) {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
         uc.putUserData("PUSH-TOKEN", pushToken);

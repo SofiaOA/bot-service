@@ -130,14 +130,6 @@ public class MessagesController {
     	return new ResponseEntity<List<AvatarDTO>>(avatars,HttpStatus.OK);
     }
     
-    @PostMapping(path = "/initclaim")
-    public ResponseEntity<?> initClaim(@RequestHeader(value="hedvig.token", required = false) String hid) {
-
-     	log.info("Init claim for member:" + hid);
-        sessionManager.initClaim(hid);
-    	return ResponseEntity.noContent().build();
-    }
-    
     @PostMapping(path = "/event")
     public ResponseEntity<?> eventRecieved(@RequestBody EventDTO e, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
