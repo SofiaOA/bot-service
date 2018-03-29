@@ -53,8 +53,6 @@ public class OnboardingConversationDeviTest {
         userContext = new UserContext(TOLVANSSON_MEMBER_ID);
         userContext.setMemberChat(new MemberChat());
 
-        userContext.putUserData("{WEB_USER}", "TRUE");
-
         testConversation = new OnboardingConversationDevi(memberService, productPricingService, signupRepo, publisher, conversationFactory);
     }
 

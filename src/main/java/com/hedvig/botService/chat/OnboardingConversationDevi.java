@@ -1349,10 +1349,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         if(m.body.getClass() == MessageBodySingleSelect.class) {
             MessageBodySingleSelect mss = (MessageBodySingleSelect) m.body;
 
-            // Do not show activation option on web
-            if(userContext.getDataEntry("{WEB_USER}").equals("TRUE")){
-                mss.removeItemIf( x->x instanceof SelectOption && ((SelectOption)x).value.equals(MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST));
-            }
         }
 
         super.addToChat(m,userContext);

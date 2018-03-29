@@ -165,24 +165,6 @@ public class SessionManager {
     }
     
     /*
-     * Kicks off onboarding web conversation
-     * */
-    public void startOnboardingConversationWeb(String hid, String startMsg){
-    	
-    	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-    	
-    	// TODO: Make sure it is only possible to activate this endpoint ones
-    	if(uc.getDataEntry("{WEB_USER}") == null){
-	    	uc.putUserData("{WEB_USER}", "TRUE");
-
-            Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);
-	        uc.startConversation(onboardingConversation, startMsg);
-	
-	        userrepo.saveAndFlush(uc);
-    	}
-    }    
-    
-    /*
      * Create a new users chat and context
      * */
     public void init(String hid, String linkUri){
