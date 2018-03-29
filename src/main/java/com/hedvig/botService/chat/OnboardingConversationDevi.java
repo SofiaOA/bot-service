@@ -65,6 +65,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public static final String MESSAGE_FORSAKRINGIDAGJA = "message.forsakringidagja";
     public static final String MESSAGE_BYTESINFO = "message.bytesinfo";
     public static final String MESSAGE_ANNATBOLAG = "message.annatbolag";
+    public static final String MESSAGE_FORSLAGSTART = "message.forslagstart";
     /*
              * Need to be stateless. I.e no data beyond response scope
              * 
@@ -111,26 +112,24 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         this.eventPublisher = eventPublisher;
         this.conversationFactory = conversationFactory;
 
-		createChatMessage(MESSAGE_WAITLIST_START,
-                new MessageBodySingleSelect("Hej! Det är jag som är Hedvig " + emoji_waving_hand 
-                		+"\fKul att ha dig här!"
-                        +"\fFler än vad jag hade räknat med vill bli medlemmar just nu"
-                        +"\fSå det kommer dröja lite innan jag kan välkomna dig"
-                        +"\fMen skriv upp dig på väntelistan så hör jag av mig så snart det är din tur!",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Sätt upp mig på väntelistan", MESSAGE_SIGNUP_TO_WAITLIST));
-                            add(new SelectOption("Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST));
-                        }}
-                ));
+
+
+
+        createChatMessage(MESSAGE_WAITLIST_START,
+                new MessageBodySingleSelect("Hej, jag heter Hedvig! " + emoji_waving_hand +"\fJag tar fram ett försäkringsförslag till dig på nolltid",
+                        Lists.newArrayList(
+                                new SelectOption("Låter bra!", MESSAGE_FORSLAGSTART),
+                              new SelectOption("Jag är redan medlem", "message.bankid.start")
+                        )
+                )
+        );
 
         createChatMessage("message.membernotfound",
                 new MessageBodySingleSelect("Hmm, det verkar som att du inte är medlem här hos mig ännu"
-                        +"\fJag vill gärna ha dig som medlem och ingenting är viktigare för mig än att du ska få fantastisk service"
-                        +"\fMen eftersom att det är många som vill bli medlemmar just nu, så måste jag ta in ett begränsat antal i taget",
-                        new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Sätt upp mig på väntelistan", MESSAGE_SIGNUP_TO_WAITLIST));
-                            add(new SelectOption("Jag har ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST));
-                        }}
+                        +"\f\fMen jag tar gärna fram ett försäkringsförslag till dig, det är precis som allt anntat med mig superenkelt",
+                        Lists.newArrayList(
+                            new SelectOption("Sätt upp mig på väntelistan", MESSAGE_FORSLAGSTART)
+                        )
                 ));
 
         
@@ -223,7 +222,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         addRelay("message.activate.ok.a","message.activate.ok.b");
         
         createMessage("message.activate.ok.b", new MessageBodyParagraph("Nu ska jag ta fram ett försäkringsförslag åt dig"),2000);
-        addRelay("message.activate.ok.b","message.forslagstart");
+        addRelay("message.activate.ok.b", MESSAGE_FORSLAGSTART);
         
         
         createMessage("message.uwlimit.tack",
@@ -265,7 +264,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
        );
         setupBankidErrorHandlers("message.medlem");
 
-        createMessage("message.forslagstart",
+        createMessage(MESSAGE_FORSLAGSTART,
                 new MessageBodySingleSelect(
                 		"Första frågan! Bor du i lägenhet eller eget hus?",
                         new ArrayList<SelectItem>() {{
@@ -934,7 +933,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             case "message.phototest":
             	nxtMsg = "message.fileupload.result";
             	break;
-            case "message.forslagstart":
+            case MESSAGE_FORSLAGSTART:
                 onBoardingData.setHouseType(((MessageBodySingleSelect)m.body).getSelectedItem().value);
                 break;
             case "message.kontrakt.email":
