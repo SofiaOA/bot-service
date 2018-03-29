@@ -38,11 +38,9 @@ public class MainConversation extends Conversation {
 	private final ConversationFactory conversationFactory;
 	private final ProductPricingService productPricingService;
 	private final ApplicationEventPublisher eventPublisher;
-	private String emoji_hand_ok = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8C}, Charset.forName("UTF-8"));
 
 
-
-    @Autowired
+	@Autowired
 	public MainConversation(ProductPricingService productPricingService, ConversationFactory conversationFactory, ApplicationEventPublisher eventPublisher) {
 		super();
 		this.productPricingService = productPricingService;
@@ -195,24 +193,6 @@ public class MainConversation extends Conversation {
 	@Override
 	public boolean canAcceptAnswerToQuestion() {
 		return true;
-	}
-
-	@Override
-	void addToChat(Message m, UserContext userContext) {
-		if(m.body.getClass() == MessageBodySingleSelect.class) {
-			MessageBodySingleSelect mss = (MessageBodySingleSelect) m.body;
-
-			// Do not show report claim option when user is not active
-
-			Boolean isActive = productPricingService.isMemberInsuranceActive(userContext.getMemberId());
-
-			if (!isActive) {
-				mss.removeItemIf(x -> x instanceof SelectOption && ((SelectOption) x).value.equals(MESSAGE_MAIN_REPORT));
-
-			}
-		}
-
-		super.addToChat(m,userContext);
 	}
 
 	@Override
