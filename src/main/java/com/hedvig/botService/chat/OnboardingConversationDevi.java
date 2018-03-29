@@ -67,6 +67,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public static final String MESSAGE_ANNATBOLAG = "message.annatbolag";
     public static final String MESSAGE_FORSLAGSTART = "message.forslagstart";
     public static final String MESSAGE_EMAIL = "message.email";
+    public static final String MESSAGE_PRE_FORSLAGSTART = "message.pre.forslagstart";
     /*
              * Need to be stateless. I.e no data beyond response scope
              * 
@@ -117,9 +118,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
 
         createChatMessage(MESSAGE_WAITLIST_START,
-                new MessageBodySingleSelect("Hej, jag heter Hedvig! " + emoji_waving_hand +"\fJag tar fram ett försäkringsförslag till dig på nolltid",
+                new MessageBodySingleSelect("Hej! Jag heter Hedvig " + emoji_waving_hand +"\fJag har designat om försäkring från grunden för att göra det öppet och schysst!\fJag kommer ta fram ett försäkringsförslag till dig på nolltid",
                         Lists.newArrayList(
-                                new SelectOption("Låter bra!", MESSAGE_FORSLAGSTART),
+                                new SelectOption("Låter bra!", MESSAGE_PRE_FORSLAGSTART),
                               new SelectOption("Jag är redan medlem", "message.bankid.start")
                         )
                 )
@@ -127,9 +128,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         createChatMessage("message.membernotfound",
                 new MessageBodySingleSelect("Hmm, det verkar som att du inte är medlem här hos mig ännu"
-                        +"\f\fMen jag tar gärna fram ett försäkringsförslag till dig, det är precis som allt anntat med mig superenkelt",
+                        +"\fMen jag tar gärna fram ett försäkringsförslag till dig, det är precis som allt anntat med mig superenkelt",
                         Lists.newArrayList(
-                            new SelectOption("Sätt upp mig på väntelistan", MESSAGE_FORSLAGSTART)
+                            new SelectOption("Låter bra!", MESSAGE_PRE_FORSLAGSTART)
                         )
                 ));
 
@@ -223,7 +224,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         addRelay("message.activate.ok.a","message.activate.ok.b");
         
         createMessage("message.activate.ok.b", new MessageBodyParagraph("Nu ska jag ta fram ett försäkringsförslag åt dig"),2000);
-        addRelay("message.activate.ok.b", MESSAGE_FORSLAGSTART);
+        addRelay("message.activate.ok.b", MESSAGE_PRE_FORSLAGSTART);
         
         
         createMessage("message.uwlimit.tack",
@@ -264,6 +265,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 }
        );
         setupBankidErrorHandlers("message.medlem");
+
+        createMessage(MESSAGE_PRE_FORSLAGSTART, new MessageBodyParagraph("Toppen! Då ställer jag några frågor så att jag kan räkna ut ditt pris"),1500);
+        addRelay(MESSAGE_PRE_FORSLAGSTART, MESSAGE_FORSLAGSTART);
 
         createMessage(MESSAGE_FORSLAGSTART,
                 new MessageBodySingleSelect(
