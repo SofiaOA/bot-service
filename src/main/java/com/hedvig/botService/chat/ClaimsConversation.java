@@ -158,7 +158,7 @@ public class ClaimsConversation extends Conversation {
                 break;
 
             case MESSAGE_CLAIMS_NOT_ACTIVE:
-                nxtMsg = handleClaimNotActive(userContext, (MessageBodySingleSelect) m.body);
+                nxtMsg = handleClaimNotActive(userContext, m);
                 if(nxtMsg == null) {
                     return;
                 }
@@ -194,8 +194,11 @@ public class ClaimsConversation extends Conversation {
                 isInsuranceActive));
     }
 
-    private String handleClaimNotActive(UserContext userContext, MessageBodySingleSelect body) {
-        if(body.getSelectedItem().value.equals(MESSAGE_CLAIMS_NOT_ACTIVE_CALL_ME)) {
+    private String handleClaimNotActive(UserContext userContext, Message m) {
+        addToChat(m, userContext);
+
+        MessageBodySingleSelect body = (MessageBodySingleSelect) m.body;
+	    if(body.getSelectedItem().value.equals(MESSAGE_CLAIMS_NOT_ACTIVE_CALL_ME)) {
             return MESSAGE_CLAIM_CALLME;
         }
 
