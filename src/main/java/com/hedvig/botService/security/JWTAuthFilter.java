@@ -13,6 +13,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -84,6 +85,8 @@ public class JWTAuthFilter implements Filter {
             }
         } catch (JWTVerificationException e) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setHeader("content-type", MediaType.TEXT_PLAIN_VALUE);
+            response.getWriter().write(e.getMessage());
             return;
         }
 
