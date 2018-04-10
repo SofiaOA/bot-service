@@ -3,6 +3,7 @@ package com.hedvig.botService.web;
 import com.hedvig.botService.enteties.MessageRepository;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.session.SessionManager;
+import com.hedvig.botService.web.dto.AddMessageRequestDTO;
 import com.hedvig.botService.web.dto.BackOfficeAnswerDTO;
 import com.hedvig.botService.web.dto.BackOfficeMessageDTO;
 import com.hedvig.botService.web.dto.ExpoDeviceInfoDTO;
@@ -35,12 +36,14 @@ public class InternalMessagesController {
      * This endpoint is used internally to send messages from back-office personnel to end users
      */
     @RequestMapping(path = {"/_/messages/addmessage", "/addmessage"}, method = RequestMethod.POST, produces = "application/json; charset=utf-8")
-    public ResponseEntity<?> addMessage(@Valid @RequestBody BackOfficeMessageDTO backOfficeMessage) {
-        log.info("Message from Hedvig to hid: {} with messageId: {}", backOfficeMessage.userId, backOfficeMessage.msg.globalId);
+    public ResponseEntity<?> addMessage(@Valid @RequestBody AddMessageRequestDTO backOfficeMessage) {
+        log.info("Message from Hedvig to hid: {} with messageId: {}", backOfficeMessage.getMemberId(), backOfficeMessage.getMsg());
 
-        sessionManager.addMessageFromHedvig(backOfficeMessage);
+        if(sessionManager.addMessageFromHedvig(backOfficeMessage) == true) {
+            return ResponseEntity.noContent().build();
+        }
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     /**

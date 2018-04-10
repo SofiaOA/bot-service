@@ -1,5 +1,6 @@
 package com.hedvig.botService.session;
 
+import com.google.common.collect.Lists;
 import com.hedvig.botService.chat.*;
 import com.hedvig.botService.chat.Conversation.EventTypes;
 import com.hedvig.botService.enteties.*;
@@ -200,13 +201,7 @@ public class SessionManager {
         MemberChat mc = uc.getMemberChat();
 
         Message msg = new Message();
-        Conversation conversation = uc.getActiveConversation().
-                map(x -> conversationFactory.createConversation(x.getClassName())).
-                orElseGet(() -> {
-                    val newConversation = conversationFactory.createConversation(MainConversation.class);
-                    uc.startConversation(newConversation);
-                    return newConversation;
-                });
+        Conversation conversation = getActiveConversationOrStart(uc, MainConversation.class);
 
         if (!conversation.canAcceptAnswerToQuestion()) {
             return false;
@@ -226,25 +221,36 @@ public class SessionManager {
     }
 
 
-    public void addMessageFromHedvig(BackOfficeMessageDTO backOfficeMessage) {
-        Message msg = backOfficeMessage.msg;
-        String hid = backOfficeMessage.userId;
+    public boolean addMessageFromHedvig(AddMessageRequestDTO backOfficeMessage) {
+        val uc = userrepo.findByMemberId(backOfficeMessage.getMemberId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
-        msg.header.fromId = Conversation.HEDVIG_USER_ID; //new Long(hid);
+        Conversation activeConversation = getActiveConversationOrStart(uc, MainConversation.class);
+        if(activeConversation.canAcceptAnswerToQuestion() == false) {
+            return false;
+        }
 
+        Message msg = new Message();
+        msg.header.fromId = Conversation.HEDVIG_USER_ID;
+        val messageBody =  new MessageBodySingleSelect(backOfficeMessage.getMsg(), Lists.newArrayList());
+        messageBody.choices = Lists.newArrayList(activeConversation.getSelectItemsForAnswer(uc));
+        msg.body = messageBody;
+        msg.id = "message.bo.message";
 
-        // Clear all key information to generate a new entry
-        msg.globalId = null;
-        msg.header.messageId = null;
-        msg.body.id = null;
+        uc.getMemberChat().addToHistory(msg);
 
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-        MemberChat mc = uc.getMemberChat();
-        mc.addToHistory(msg);
-        userrepo.saveAndFlush(uc);
-    	
+        return true;
     }
-    
+
+    private Conversation getActiveConversationOrStart(UserContext uc, Class<MainConversation> conversationToStart) {
+        return uc.getActiveConversation().
+                map(x -> conversationFactory.createConversation(x.getClassName())).
+                orElseGet(() -> {
+                    val newConversation = conversationFactory.createConversation(conversationToStart);
+                    uc.startConversation(newConversation);
+                    return newConversation;
+                });
+    }
+
     /*
      * Mark all messages (incl) last input from user deleted
      * */
