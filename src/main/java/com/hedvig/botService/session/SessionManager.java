@@ -203,7 +203,7 @@ public class SessionManager {
         Message msg = new Message();
         Conversation conversation = getActiveConversationOrStart(uc, MainConversation.class);
 
-        if (!conversation.canAcceptAnswerToQuestion()) {
+        if (!conversation.canAcceptAnswerToQuestion(uc)) {
             return false;
         }
 
@@ -225,7 +225,7 @@ public class SessionManager {
         val uc = userrepo.findByMemberId(backOfficeMessage.getMemberId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
         Conversation activeConversation = getActiveConversationOrStart(uc, MainConversation.class);
-        if(activeConversation.canAcceptAnswerToQuestion() == false) {
+        if(activeConversation.canAcceptAnswerToQuestion(uc) == false) {
             return false;
         }
 

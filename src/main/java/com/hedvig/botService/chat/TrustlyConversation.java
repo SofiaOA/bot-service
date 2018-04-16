@@ -146,7 +146,7 @@ public class TrustlyConversation extends Conversation {
     }
 
     @Override
-    public boolean canAcceptAnswerToQuestion() {
+    public boolean canAcceptAnswerToQuestion(UserContext uc) {
         return false;
     }
 

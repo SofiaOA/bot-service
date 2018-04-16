@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
 
@@ -191,7 +190,7 @@ public class MainConversation extends Conversation {
 	}
 
 	@Override
-	public boolean canAcceptAnswerToQuestion() {
+	public boolean canAcceptAnswerToQuestion(UserContext uc) {
 		return true;
 	}
 

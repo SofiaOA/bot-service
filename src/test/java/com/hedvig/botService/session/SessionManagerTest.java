@@ -4,17 +4,17 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.ConversationFactory;
-import com.hedvig.botService.chat.OnboardingConversationDevi;
-import com.hedvig.botService.enteties.*;
+import com.hedvig.botService.enteties.MemberChat;
+import com.hedvig.botService.enteties.SignupCodeRepository;
+import com.hedvig.botService.enteties.UserContext;
+import com.hedvig.botService.enteties.UserContextRepository;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
 import com.hedvig.botService.enteties.message.SelectLink;
-import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.web.dto.AddMessageRequestDTO;
 import lombok.val;
-import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,7 +69,7 @@ public class SessionManagerTest {
         when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID)).thenReturn(Optional.of(tolvanssonUserContext));
         when(conversationFactory.createConversation(anyString())).thenReturn(mockConversation);
 
-        when(mockConversation.canAcceptAnswerToQuestion()).thenReturn(true);
+        when(mockConversation.canAcceptAnswerToQuestion(tolvanssonUserContext)).thenReturn(true);
         when(mockConversation.getSelectItemsForAnswer(tolvanssonUserContext)).thenReturn(Lists.newArrayList(SELECT_LINK));
 
         AddMessageRequestDTO requestDTO = new AddMessageRequestDTO(TOLVANSSON_MEMBERID, MESSAGE);
@@ -91,7 +91,7 @@ public class SessionManagerTest {
         val tolvanssonUserContext = makeTolvanssonUserContext();
 
         when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID)).thenReturn(Optional.of(tolvanssonUserContext));
-        when(mockConversation.canAcceptAnswerToQuestion()).thenReturn(false);
+        when(mockConversation.canAcceptAnswerToQuestion(tolvanssonUserContext)).thenReturn(false);
         when(conversationFactory.createConversation(anyString())).thenReturn(mockConversation);
 
         AddMessageRequestDTO requestDTO = new AddMessageRequestDTO(TOLVANSSON_MEMBERID, MESSAGE);

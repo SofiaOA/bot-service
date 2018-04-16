@@ -95,7 +95,7 @@ public class CharityConversation extends Conversation {
     }
 
     @Override
-    public boolean canAcceptAnswerToQuestion() {
+    public boolean canAcceptAnswerToQuestion(UserContext uc) {
         return false;
     }
 

@@ -1356,8 +1356,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     }
 
     @Override
-    public boolean canAcceptAnswerToQuestion() {
-        return true;
+    public boolean canAcceptAnswerToQuestion(UserContext uc) {
+        return uc.getOnBoardingData().getHouseType() != null;
     }
 
     @Override

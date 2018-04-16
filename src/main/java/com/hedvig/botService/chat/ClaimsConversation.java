@@ -132,7 +132,7 @@ public class ClaimsConversation extends Conversation {
     }
 
     @Override
-    public boolean canAcceptAnswerToQuestion() {
+    public boolean canAcceptAnswerToQuestion(UserContext uc) {
         return false;
     }
 

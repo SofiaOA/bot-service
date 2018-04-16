@@ -22,6 +22,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import static com.hedvig.botService.chat.OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES_NO;
 import static com.hedvig.botService.chat.OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES_YES;
 import static com.hedvig.botService.testHelpers.TestData.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
@@ -131,6 +132,25 @@ public class OnboardingConversationDeviTest {
 
         testConversation.receiveMessage(userContext, userContext.getMemberChat(), m);
         then(publisher).should(times(0)).publishEvent(new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID));
+    }
+
+    @Test
+    public void ReturnFalse_WhenChat_IsBeforeHouseChoice() {
+
+        val canAcceptAnswer = testConversation.canAcceptAnswerToQuestion(userContext);
+
+        assertThat(canAcceptAnswer).isEqualTo(false);
+    }
+
+
+    @Test
+    public void ReturnTrue_WhenUserContext_ContainsHouseChoice() {
+
+        userContext.getOnBoardingData().setHouseType(OnboardingConversationDevi.ProductTypes.BRF.toString());
+
+        val canAcceptAnswer = testConversation.canAcceptAnswerToQuestion(userContext);
+
+        assertThat(canAcceptAnswer).isEqualTo(true);
     }
 
 }

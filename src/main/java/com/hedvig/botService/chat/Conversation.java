@@ -52,7 +52,7 @@ public abstract class Conversation {
 
 	public abstract List<SelectItem> getSelectItemsForAnswer(UserContext uc);
 
-	public abstract boolean canAcceptAnswerToQuestion();
+	public abstract boolean canAcceptAnswerToQuestion(UserContext uc);
 
 	void addToChat(Message m, UserContext userContext) {
 		m.render(userContext);
