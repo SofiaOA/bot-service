@@ -11,7 +11,10 @@ import com.hedvig.botService.serviceIntegration.FakeMemberCreator;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.web.dto.*;
+import com.hedvig.botService.web.dto.AddMessageRequestDTO;
+import com.hedvig.botService.web.dto.BackOfficeAnswerDTO;
+import com.hedvig.botService.web.dto.SignupStatus;
+import com.hedvig.botService.web.dto.UpdateTypes;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -365,10 +368,6 @@ public class SessionManager {
 
         uc.startConversation(infoConversation, startingMessage);
         userrepo.saveAndFlush(uc);
-    }
-    
-    public void receiveEvent(MemberAuthedEvent e){
-    	log.warn("Received unwanted MemberAuthedEvent {}", e.toString());
     }
 
     public void quoteAccepted(String hid) {

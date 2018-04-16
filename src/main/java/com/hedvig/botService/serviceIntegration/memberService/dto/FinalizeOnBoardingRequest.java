@@ -1,6 +1,5 @@
 package com.hedvig.botService.serviceIntegration.memberService.dto;
 
-import com.hedvig.botService.serviceIntegration.memberService.dto.Address;
 import lombok.Data;
 
 @Data

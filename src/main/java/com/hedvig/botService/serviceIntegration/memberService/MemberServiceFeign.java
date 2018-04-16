@@ -42,11 +42,6 @@ public class MemberServiceFeign implements MemberService {
     }
 
     @Override
-    public String startBankAccountRetrieval(String memberId, String bankShortId) {
-        return null;
-    }
-
-    @Override
     public Optional<BankIdSignResponse> sign(String ssn, String userMessage, String memberId) {
         BankIdSignRequest request = new BankIdSignRequest(ssn, userMessage, memberId);
         try {

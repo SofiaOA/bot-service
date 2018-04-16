@@ -23,11 +23,6 @@ public class MemberServiceFake implements MemberService {
     }
 
     @Override
-    public String startBankAccountRetrieval(String memberId, String bankShortId) {
-        return "";
-    }
-
-    @Override
     public Optional<BankIdSignResponse> sign(String ssn, String userMessage, String memberId) {
         return Optional.empty();
     }
