@@ -58,7 +58,7 @@ public class SessionManagerTest {
 
     @Before
     public void setUp() {
-        sessionManager = new SessionManager(userContextRepository, memberService, productPricingService, null, signupCodeRepository, null, conversationFactory);
+        sessionManager = new SessionManager(userContextRepository, memberService, productPricingService, signupCodeRepository, conversationFactory);
     }
 
     @Test
