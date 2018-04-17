@@ -2,7 +2,6 @@ package com.hedvig.botService.chat;
 
 import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.DirectDebitMandateTrigger;
-import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
@@ -57,7 +56,7 @@ public class TrustlyConversation extends Conversation {
     }
 
     @Override
-    public void receiveMessage(final UserContext userContext, final MemberChat memberChat, final Message m) {
+    public void receiveMessage(final UserContext userContext, final Message m) {
 
         String nxtMsg = "";
               /*
@@ -89,7 +88,7 @@ public class TrustlyConversation extends Conversation {
         }
 
 
-        completeRequest(nxtMsg, userContext, memberChat);
+        completeRequest(nxtMsg, userContext);
     }
 
     private void endConversation(UserContext userContext) {
@@ -112,7 +111,7 @@ public class TrustlyConversation extends Conversation {
     }
 
     @Override
-    public void recieveEvent(EventTypes e, String value, UserContext userContext, MemberChat memberChat){
+    public void recieveEvent(EventTypes e, String value, UserContext userContext){
 
         switch(e){
             // This is used to let Hedvig say multiple message after another
@@ -122,7 +121,7 @@ public class TrustlyConversation extends Conversation {
                 // New way of handeling relay messages
                 String relay = getRelay(value);
                 if(relay!=null){
-                    completeRequest(relay, userContext, memberChat);
+                    completeRequest(relay, userContext);
                 }
                 break;
             default:

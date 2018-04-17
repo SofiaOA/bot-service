@@ -104,7 +104,6 @@ public class SessionManager {
     public void recieveEvent(String eventtype, String value, String hid){
 
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-        MemberChat mc = uc.getMemberChat();
 
         EventTypes type = EventTypes.valueOf(eventtype);
 
@@ -117,28 +116,28 @@ public class SessionManager {
         	switch(c.getClassName()){
 				case "com.hedvig.botService.chat.MainConversation":
 				    Conversation mainConversation = conversationFactory.createConversation(MainConversation.class);
-		        	mainConversation.recieveEvent(type, value, uc, mc);
+		        	mainConversation.recieveEvent(type, value, uc);
 					break;
 				case "com.hedvig.botService.chat.ClaimsConversation":
 				    Conversation claimsConversation = conversationFactory.createConversation(ClaimsConversation.class);
-		            claimsConversation.recieveEvent(type, value, uc, mc);
+		            claimsConversation.recieveEvent(type, value, uc);
 					break;
 				case "com.hedvig.botService.chat.OnboardingConversationDevi":
 
                     OnboardingConversationDevi onboardingConversation = (OnboardingConversationDevi) conversationFactory.createConversation(OnboardingConversationDevi.class);
-		        	onboardingConversation.recieveEvent(type, value, uc, mc);
+		        	onboardingConversation.recieveEvent(type, value, uc);
 					break;
 				case "com.hedvig.botService.chat.UpdateInformationConversation":
 				    UpdateInformationConversation infoConversation = new UpdateInformationConversation(memberService, productPricingclient);
-		            infoConversation.recieveEvent(type, value, uc, mc);                    
+		            infoConversation.recieveEvent(type, value, uc);
 					break;
                 case "com.hedvig.botService.chat.CharityConversation":
                     Conversation conversation = conversationFactory.createConversation(CharityConversation.class);
-                    conversation.recieveEvent(type, value, uc, mc);
+                    conversation.recieveEvent(type, value, uc);
                     break;
                 case "com.hedvig.botService.chat.TrustlyConversation":
                     Conversation trustlyConversation = conversationFactory.createConversation(TrustlyConversation.class);
-                    trustlyConversation.recieveEvent(type, value, uc, mc);
+                    trustlyConversation.recieveEvent(type, value, uc);
 			}
         }
 
@@ -173,9 +172,6 @@ public class SessionManager {
 
         UserContext uc = userrepo.findByMemberId(hid).orElseGet(() -> {
             UserContext newUserContext = new UserContext(hid);
-            MemberChat newChat = new MemberChat(hid);
-            newChat.userContext = newUserContext;
-            newUserContext.setMemberChat(newChat);
             userrepo.save(newUserContext);
 
             return newUserContext;
@@ -287,6 +283,10 @@ public class SessionManager {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
         MemberChat chat = uc.getMemberChat();
+
+        if(uc.getActiveConversation().isPresent() == false) {
+
+        }
 
         // Mark last user input with as editAllowed
         chat.markLastInput();
@@ -400,7 +400,6 @@ public class SessionManager {
         m.header.fromId = new Long(hid);
 
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-        MemberChat mc = uc.getMemberChat();
 
         List<ConversationEntity> conversations = new ArrayList<>(uc.getConversations()); //We will add a new element to uc.conversationManager
         for(ConversationEntity c : conversations){
@@ -411,7 +410,7 @@ public class SessionManager {
             try {
                 final Class<?> conversationClass = Class.forName(c.getClassName());
                 final Conversation conversation = conversationFactory.createConversation(conversationClass);
-                conversation.receiveMessage(uc, mc, m);
+                conversation.receiveMessage(uc, m);
 
             } catch (ClassNotFoundException e) {
                 log.error("Could not load conversation from db!", e);

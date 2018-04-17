@@ -4,7 +4,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.ConversationFactory;
-import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.UserContextRepository;
@@ -103,7 +102,7 @@ public class SessionManagerTest {
 
     public UserContext makeTolvanssonUserContext() {
         val tolvanssonUserContext = new UserContext(TOLVANSSON_MEMBERID);
-        tolvanssonUserContext.setMemberChat(new MemberChat());
+
         tolvanssonUserContext.startConversation(mockConversation);
         return  tolvanssonUserContext;
     }

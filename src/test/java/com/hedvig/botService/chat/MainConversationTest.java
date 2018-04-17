@@ -1,6 +1,5 @@
 package com.hedvig.botService.chat;
 
-import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
@@ -28,9 +27,6 @@ public class MainConversationTest {
     ConversationFactory conversationFactory;
 
     @Mock
-    MemberChat memberChat;
-
-    @Mock
     ProductPricingService productPricingService;
 
     @Mock
@@ -44,7 +40,6 @@ public class MainConversationTest {
         testConversation = new MainConversation(productPricingService, conversationFactory, eventPublisher);
 
         uc = new UserContext(TOLVANSSON_MEMBER_ID);
-        uc.setMemberChat(memberChat);
     }
 
     @Test
@@ -55,7 +50,7 @@ public class MainConversationTest {
         uc.getOnBoardingData().setFirstName(TOLVANSSON_FIRSTNAME);
         uc.getOnBoardingData().setFamilyName(TOLVANSSON_LASTNAME);
 
-        testConversation.receiveMessage(uc, memberChat, m);
+        testConversation.receiveMessage(uc, m);
 
         then(eventPublisher).should().publishEvent(new RequestPhoneCallEvent(TOLVANSSON_MEMBER_ID, TOLVANSSON_PHONE_NUMBER , TOLVANSSON_FIRSTNAME, TOLVANSSON_LASTNAME));
     }
@@ -66,7 +61,7 @@ public class MainConversationTest {
         Message m = testConversation.getMessage(MainConversation.MESSAGE_MAIN_QUESTION);
         m.body.text = QUESTION;
 
-        testConversation.receiveMessage(uc, memberChat, m);
+        testConversation.receiveMessage(uc, m);
 
         then(eventPublisher).should().publishEvent(new QuestionAskedEvent(TOLVANSSON_MEMBER_ID, QUESTION));
 

@@ -1,7 +1,6 @@
 package com.hedvig.botService.chat;
 
 import com.google.common.collect.Lists;
-import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
@@ -137,12 +136,12 @@ public class ClaimsConversation extends Conversation {
     }
 
     @Override
-	public void receiveMessage(UserContext userContext, MemberChat memberChat, Message m) {
+	public void receiveMessage(UserContext userContext, Message m) {
 		log.info(m.toString());
 		
 		String nxtMsg = "";
 		
-		if(!validateReturnType(m,userContext, memberChat)){return;}
+		if(!validateReturnType(m,userContext)){return;}
 		
 		switch(m.id){
 		case "message.claims.audio":
@@ -180,7 +179,7 @@ public class ClaimsConversation extends Conversation {
            }
        }
        
-       completeRequest(nxtMsg,userContext, memberChat);
+       completeRequest(nxtMsg,userContext);
 		
 	}
 
@@ -223,24 +222,24 @@ public class ClaimsConversation extends Conversation {
     }
 
     @Override
-    public void recieveEvent(EventTypes e, String value, UserContext userContext, MemberChat memberChat){
+    public void recieveEvent(EventTypes e, String value, UserContext userContext){
 
         switch(e){
             // This is used to let Hedvig say multiple message after another
             case MESSAGE_FETCHED:
                 log.info("Message fetched:" + value);
                 switch(value){                
-                case MESSAGE_CLAIMS_START: completeRequest("message.claims.chat", userContext, memberChat); break;
-                case "message.claims.chat": completeRequest("message.claims.chat2", userContext, memberChat); break;
-                case "message.claims.chat2": completeRequest("message.claim.promise", userContext, memberChat); break;
-                case "message.claims.ok": completeRequest("message.claims.record", userContext, memberChat); break;
-                case "message.claims.record": completeRequest("message.claims.record2", userContext, memberChat); break;
-                case "message.claims.record2": completeRequest("message.claims.record3", userContext, memberChat); break;
-                case "message.claims.record3": completeRequest("message.claims.record4", userContext, memberChat); break;
-                case "message.claims.record4": completeRequest("message.claims.record5", userContext, memberChat); break;
-                case "message.claims.record5": completeRequest("message.claims.audio", userContext, memberChat); break;
-                case "message.claims.record.ok": completeRequest("message.claims.record.ok2", userContext, memberChat); break;
-                case "message.claims.record.ok2": completeRequest("message.claims.record.ok3", userContext, memberChat); break;
+                case MESSAGE_CLAIMS_START: completeRequest("message.claims.chat", userContext); break;
+                case "message.claims.chat": completeRequest("message.claims.chat2", userContext); break;
+                case "message.claims.chat2": completeRequest("message.claim.promise", userContext); break;
+                case "message.claims.ok": completeRequest("message.claims.record", userContext); break;
+                case "message.claims.record": completeRequest("message.claims.record2", userContext); break;
+                case "message.claims.record2": completeRequest("message.claims.record3", userContext); break;
+                case "message.claims.record3": completeRequest("message.claims.record4", userContext); break;
+                case "message.claims.record4": completeRequest("message.claims.record5", userContext); break;
+                case "message.claims.record5": completeRequest("message.claims.audio", userContext); break;
+                case "message.claims.record.ok": completeRequest("message.claims.record.ok2", userContext); break;
+                case "message.claims.record.ok2": completeRequest("message.claims.record.ok3", userContext); break;
                 }
                 break;
             default:

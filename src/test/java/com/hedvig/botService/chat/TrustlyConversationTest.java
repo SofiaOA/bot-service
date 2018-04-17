@@ -1,12 +1,10 @@
 package com.hedvig.botService.chat;
 
-import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.triggerService.TriggerService;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,9 +26,6 @@ public class TrustlyConversationTest {
     MemberService memberService;
 
     @Mock
-    ProductPricingService productPricingService;
-
-    @Mock
     TriggerService triggerService;
 
     @Mock
@@ -44,7 +39,6 @@ public class TrustlyConversationTest {
     @Before
     public void setup() {
         userContext = new UserContext(TOLVANSSON_MEMBER_ID);
-        userContext.setMemberChat(new MemberChat());
 
         testConversation = new TrustlyConversation(triggerService, factory, memberService);
     }
@@ -84,7 +78,7 @@ public class TrustlyConversationTest {
 
         given(triggerService.createTrustlyDirectDebitMandate(TOLVANSSON_SSN, TOLVANSSON_FIRSTNAME, TOLVANSSON_LASTNAME, TOLVANSSON_EMAIL, TOLVANSSON_MEMBER_ID)).willReturn(triggerUUID);
 
-        testConversation.receiveMessage(userContext, userContext.getMemberChat(), message);
+        testConversation.receiveMessage(userContext, message);
 
         assertThat(userContext.getMemberChat().chatHistory.size()).isEqualTo(2);
     }

@@ -2,7 +2,6 @@ package com.hedvig.botService.chat;
 
 import com.hedvig.botService.dataTypes.HedvigDataType;
 import com.hedvig.botService.dataTypes.TextInput;
-import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 import org.slf4j.Logger;
@@ -191,7 +190,7 @@ public abstract class Conversation {
 	}
 
 	// If the message has a preferred return type it is validated otherwise not
-	public boolean validateReturnType(Message m, UserContext userContext, MemberChat memberChat){
+	public boolean validateReturnType(Message m, UserContext userContext){
 
 		Message mCorr = getMessage(m.id);
 		
@@ -221,14 +220,14 @@ public abstract class Conversation {
 
 	// ------------------------------------------------------------------------------- //
 
-	public abstract void receiveMessage(UserContext userContext, MemberChat memberChat, Message m);
-	public void completeRequest(String nxtMsg, UserContext userContext, MemberChat memberChat) {
+	public abstract void receiveMessage(UserContext userContext, Message m);
+	public void completeRequest(String nxtMsg, UserContext userContext) {
 		if(getMessage(nxtMsg)!=null) {
 			addToChat(getMessage(nxtMsg), userContext);
 		}
 	}
 
-	public void recieveEvent(EventTypes e, String value, UserContext userContext, MemberChat memberChat) {}
+	public void recieveEvent(EventTypes e, String value, UserContext userContext) {}
 
 	public abstract void init(UserContext userContext);
 

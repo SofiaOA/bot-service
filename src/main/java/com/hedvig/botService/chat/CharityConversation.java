@@ -1,6 +1,5 @@
 package com.hedvig.botService.chat;
 
-import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
@@ -100,7 +99,7 @@ public class CharityConversation extends Conversation {
     }
 
     @Override
-    public void receiveMessage(UserContext userContext, MemberChat memberChat, Message m) {
+    public void receiveMessage(UserContext userContext, Message m) {
 
         String nxtMsg = MESSAGE_KONTRAKT_CHARITY;
         switch (getMessageId(m.id)) {
@@ -147,7 +146,7 @@ public class CharityConversation extends Conversation {
                 break;
         }
 
-        completeRequest(nxtMsg, userContext, memberChat);
+        completeRequest(nxtMsg, userContext);
     }
 
     private Optional<UUID> getCharityId(final String charity) {
@@ -162,7 +161,7 @@ public class CharityConversation extends Conversation {
     }
 
     @Override
-    public void recieveEvent(EventTypes e, String value, UserContext userContext, MemberChat memberChat){
+    public void recieveEvent(EventTypes e, String value, UserContext userContext){
 
         switch(e){
             // This is used to let Hedvig say multiple message after another
@@ -172,7 +171,7 @@ public class CharityConversation extends Conversation {
                 // New way of handeling relay messages
                 String relay = getRelay(value);
                 if(relay!=null){
-                    completeRequest(relay, userContext, memberChat);
+                    completeRequest(relay, userContext);
                 }
                 break;
             default:

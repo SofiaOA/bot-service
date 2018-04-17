@@ -151,13 +151,14 @@ public class UserContext implements Serializable {
     public UserContext(String memberId) {
         this.memberId = memberId;
         this.conversationManager = new ConversationManager(memberId);
+        this.memberChat = new MemberChat(memberId);
+        this.memberChat.userContext = this;
     }
     
     public UserContext() {
     }
 
     public void clearContext(){
-    	//this.userData.clear();
     	this.getOnBoardingData().clear();
 		this.conversationManager.conversations.clear();
     	this.memberChat.chatHistory.clear();

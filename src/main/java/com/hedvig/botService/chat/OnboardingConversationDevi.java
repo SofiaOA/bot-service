@@ -2,7 +2,6 @@ package com.hedvig.botService.chat;
 
 import com.google.common.collect.Lists;
 import com.hedvig.botService.dataTypes.*;
-import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.SignupCode;
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.UserContext;
@@ -813,7 +812,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     // ------------------------------------------------------------------------------- //
     @Override
-    public void recieveEvent(EventTypes e, String value, UserContext userContext, MemberChat memberChat){
+    public void recieveEvent(EventTypes e, String value, UserContext userContext){
 
         switch(e){
             // This is used to let Hedvig say multiple message after another
@@ -823,7 +822,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 // New way of handeling relay messages
                 String relay = getRelay(value);
                 if(relay!=null){
-                    completeRequest(relay, userContext, memberChat);
+                    completeRequest(relay, userContext);
                 }
                 if(value.equals(MESSAGE_FORSLAG)) {
                     completeOnboarding(userContext);
@@ -832,21 +831,21 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             case ANIMATION_COMPLETE:
                 switch(value){
                     case "animation.bike":
-                        completeRequest("message.bikedone", userContext, memberChat);
+                        completeRequest("message.bikedone", userContext);
                         break;
                 }
                 break;
             case MODAL_CLOSED:
                 switch(value){
                     case "quote":
-                        completeRequest("message.quote.close", userContext, memberChat);
+                        completeRequest("message.quote.close", userContext);
                         break;
                 }
                 break;
             case MISSING_DATA:
                 switch(value){
                     case "bisnode":
-                        completeRequest("message.missing.bisnode.data", userContext, memberChat);
+                        completeRequest("message.missing.bisnode.data", userContext);
                         break;
                 }
                 break;
@@ -860,12 +859,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     }
 
     @Override
-    public void receiveMessage(UserContext userContext, MemberChat memberChat, Message m) {
+    public void receiveMessage(UserContext userContext, Message m) {
         log.info("receiveMessage:" + m.toString());
 
         String nxtMsg = "";
 
-        if(!validateReturnType(m,userContext, memberChat)){return;}
+        if(!validateReturnType(m,userContext)){return;}
         
         // Lambda
         if(this.hasSelectItemCallback(m.id) && m.body.getClass().equals(MessageBodySingleSelect.class)) {
@@ -1255,7 +1254,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             }
         }
 
-        completeRequest(nxtMsg, userContext, memberChat);
+        completeRequest(nxtMsg, userContext);
 
     }
 
@@ -1306,7 +1305,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
      * Generate next chat message or ends conversation
      * */
     @Override
-    public void completeRequest(String nxtMsg, UserContext userContext, MemberChat memberChat){
+    public void completeRequest(String nxtMsg, UserContext userContext){
 
         switch(nxtMsg){
         	case "message.medlem":
@@ -1333,7 +1332,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 break;
         }
 
-        super.completeRequest(nxtMsg, userContext, memberChat);
+        super.completeRequest(nxtMsg, userContext);
     }
 
     @Override

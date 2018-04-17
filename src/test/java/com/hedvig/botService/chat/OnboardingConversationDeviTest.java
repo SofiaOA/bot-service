@@ -1,7 +1,6 @@
 package com.hedvig.botService.chat;
 
 
-import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
@@ -52,7 +51,6 @@ public class OnboardingConversationDeviTest {
     @Before
     public void setup() {
         userContext = new UserContext(TOLVANSSON_MEMBER_ID);
-        userContext.setMemberChat(new MemberChat());
 
         testConversation = new OnboardingConversationDevi(memberService, productPricingService, signupRepo, publisher, conversationFactory);
     }
@@ -66,7 +64,7 @@ public class OnboardingConversationDeviTest {
         Message m = testConversation.getMessage("message.uwlimit.housingsize");
         m.body.text = TOLVANSSON_PHONE_NUMBER;
 
-        testConversation.receiveMessage(userContext, userContext.getMemberChat(), m);
+        testConversation.receiveMessage(userContext, m);
 
         then(publisher).should().publishEvent(new UnderwritingLimitExcededEvent(
                 TOLVANSSON_MEMBER_ID,
@@ -86,7 +84,7 @@ public class OnboardingConversationDeviTest {
         Message m = testConversation.getMessage("message.uwlimit.householdsize");
         m.body.text = TOLVANSSON_PHONE_NUMBER;
 
-        testConversation.receiveMessage(userContext, userContext.getMemberChat(), m);
+        testConversation.receiveMessage(userContext, m);
 
         then(publisher).should().publishEvent(new UnderwritingLimitExcededEvent(
                 TOLVANSSON_MEMBER_ID,
@@ -105,7 +103,7 @@ public class OnboardingConversationDeviTest {
         Message m = testConversation.getMessage("message.frifraga");
         m.body.text = "I wonder if I can get a home insurance, even thouh my name is Tolvan?";
 
-        testConversation.receiveMessage(userContext, userContext.getMemberChat(), m);
+        testConversation.receiveMessage(userContext, m);
 
         then(publisher).should().publishEvent(new OnboardingQuestionAskedEvent(TOLVANSSON_MEMBER_ID,
                 m.body.text));
@@ -119,7 +117,7 @@ public class OnboardingConversationDeviTest {
 
         choice.get().selected = true;
 
-        testConversation.receiveMessage(userContext, userContext.getMemberChat(), m);
+        testConversation.receiveMessage(userContext, m);
         then(publisher).should().publishEvent(new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID));
     }
 
@@ -130,7 +128,7 @@ public class OnboardingConversationDeviTest {
 
         choice.get().selected = true;
 
-        testConversation.receiveMessage(userContext, userContext.getMemberChat(), m);
+        testConversation.receiveMessage(userContext, m);
         then(publisher).should(times(0)).publishEvent(new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID));
     }
 

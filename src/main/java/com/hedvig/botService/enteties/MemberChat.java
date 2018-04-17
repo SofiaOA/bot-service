@@ -48,6 +48,12 @@ public class MemberChat {
     	//new Exception().printStackTrace(System.out);
     }
 
+	public MemberChat(String memberId) {
+		log.info("Instantiating MemberChat for member:" + memberId);
+		this.memberId = memberId;
+		this.chatHistory = new ArrayList<>();
+	}
+
     /*
      * Removes (by marking them as deleted) all messages
      * */
@@ -112,12 +118,6 @@ public class MemberChat {
     	for(Message m : chatHistory){
     		if(!(m.header.fromId == Conversation.HEDVIG_USER_ID)){m.header.editAllowed = true; break;}
     	}
-    }
-    
-    public MemberChat(String memberId) {
-    	log.info("Instantiating MemberChat for member:" + memberId);
-        this.memberId = memberId;
-        this.chatHistory = new ArrayList<>();
     }
 
     public void addToHistory(Message m) {

@@ -1,6 +1,5 @@
 package com.hedvig.botService.chat;
 
-import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodyAudio;
@@ -50,7 +49,6 @@ public class ClaimsConversationTest {
 
         testConversation = new ClaimsConversation(eventPublisher, claimsService, productPricingService, conversationFactory);
         userContext = new UserContext(TOLVANSSON_MEMBER_ID);
-        userContext.setMemberChat(new MemberChat());
     }
 
 
@@ -59,7 +57,7 @@ public class ClaimsConversationTest {
         Message m = testConversation.getMessage("message.claims.audio");
         val body = (MessageBodyAudio) m.body;
         body.url = AUDIO_RECORDING_URL;
-        testConversation.receiveMessage(userContext, userContext.getMemberChat(), m);
+        testConversation.receiveMessage(userContext, m);
 
 
         then(eventPublisher).should().publishEvent(new ClaimAudioReceivedEvent(userContext.getMemberId()));
@@ -92,7 +90,7 @@ public class ClaimsConversationTest {
         Message m = testConversation.getMessage(ClaimsConversation.MESSAGE_CLAIM_CALLME);
         m.body.text = TOLVANSSON_PHONE_NUMBER;
 
-        testConversation.receiveMessage(userContext, userContext.getMemberChat(), m);
+        testConversation.receiveMessage(userContext, m);
 
         then(eventPublisher).should().publishEvent(new ClaimCallMeEvent(
                 userContext.getMemberId(),
@@ -109,7 +107,7 @@ public class ClaimsConversationTest {
         Message m = testConversation.getMessage(ClaimsConversation.MESSAGE_CLAIM_CALLME);
         m.body.text = TOLVANSSON_PHONE_NUMBER;
 
-        testConversation.receiveMessage(userContext, userContext.getMemberChat(), m);
+        testConversation.receiveMessage(userContext, m);
 
         then(eventPublisher).should().publishEvent(new ClaimCallMeEvent(userContext.getMemberId(), userContext.getOnBoardingData().getFirstName(), userContext.getOnBoardingData().getFamilyName(), m.body.text, false));
     }

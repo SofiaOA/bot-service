@@ -1,7 +1,6 @@
 package com.hedvig.botService.chat;
 
 import com.google.common.collect.Lists;
-import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
@@ -51,10 +50,10 @@ public class UpdateInformationConversation extends Conversation {
 	}
 
 	@Override
-	public void receiveMessage(UserContext userContext, MemberChat memberChat, Message m) {
+	public void receiveMessage(UserContext userContext, Message m) {
 		log.info(m.toString());
 		String nxtMsg = "";
-		if(!validateReturnType(m,userContext, memberChat)){return;}
+		if(!validateReturnType(m,userContext)){return;}
 		
 		switch(m.id){
 		case "message.info.update": 
@@ -91,12 +90,12 @@ public class UpdateInformationConversation extends Conversation {
        }
 
        addToChat(m, userContext);
-       completeRequest(nxtMsg, userContext, memberChat);
+       completeRequest(nxtMsg, userContext);
 		
 	}
 
     @Override
-    public void completeRequest(String nxtMsg, UserContext userContext, MemberChat memberChat){
+    public void completeRequest(String nxtMsg, UserContext userContext){
 
 		switch(nxtMsg){
 			case "message.info.complete":
@@ -106,7 +105,7 @@ public class UpdateInformationConversation extends Conversation {
 				break;
 			}
 
-			super.completeRequest(nxtMsg, userContext, memberChat);
+			super.completeRequest(nxtMsg, userContext);
 	}
 
 	public void init(UserContext userContext, String startMessage) {
