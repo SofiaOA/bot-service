@@ -269,11 +269,7 @@ public class SessionManager {
 	    	userrepo.saveAndFlush(uc);
         }
     }
-    
-    public void setInsuranceStatus(String hid, String status){
-    	productPricingclient.setInsuranceStatus(hid, status); 
-    }
-    
+
     public List<Message> getAllMessages(String hid) {
 
         /*
