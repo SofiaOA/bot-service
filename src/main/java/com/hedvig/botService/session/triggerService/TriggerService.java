@@ -68,7 +68,7 @@ public class TriggerService {
         }
 
         if(one.getUrl() == null) {
-            final DirectDebitResponse directDebitResponse = paymentService.registerTrustlyDirectDebit(one.getFirstName(), one.getLastName(), one.getSsn(), one.getEmail(), one.getMemberId(), triggerId);
+            final DirectDebitResponse directDebitResponse = paymentService.registerTrustlyDirectDebit(one.getFirstName(), one.getLastName(), one.getSsn(), one.getMemberId(), triggerId);
             one.setUrl(directDebitResponse.getUrl());
             one.setOrderId(directDebitResponse.getOrderId());
             repo.save(one);

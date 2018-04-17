@@ -110,7 +110,7 @@ public class TriggerServiceTest {
         DirectDebitMandateTrigger ddm = createDirectDebitMandateTrigger(triggerId, null, TOLVANSSON_MEMBERID);
         given(repo.findOne(triggerId)).willReturn(ddm);
 
-        given(pService.registerTrustlyDirectDebit(TOLVANSSON_FIRSTNAME, TOLVANSSON_LAST_NAME, TOLVANSSON_SSN, TOLVANSSON_EMAIL, TOLVANSSON_MEMBERID, triggerId)).willReturn(new DirectDebitResponse(TRIGGER_URL,ORDER_ID.toString()));
+        given(pService.registerTrustlyDirectDebit(TOLVANSSON_FIRSTNAME, TOLVANSSON_LAST_NAME, TOLVANSSON_SSN, TOLVANSSON_MEMBERID, triggerId)).willReturn(new DirectDebitResponse(TRIGGER_URL,ORDER_ID.toString()));
 
         //act
 
@@ -138,7 +138,7 @@ public class TriggerServiceTest {
 
         //assert
         assertThat(actualTriggerUrl).isEqualTo(TRIGGER_URL);
-        then(pService).should(never()).registerTrustlyDirectDebit(any(),any(),any(),any(),any(),any());
+        then(pService).should(never()).registerTrustlyDirectDebit(any(),any(),any(),any(),any());
     }
 
     @Test

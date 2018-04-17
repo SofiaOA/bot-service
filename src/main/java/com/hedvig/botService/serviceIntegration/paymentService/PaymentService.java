@@ -18,9 +18,9 @@ public class PaymentService {
     }
 
 
-    public DirectDebitResponse registerTrustlyDirectDebit(String firstName, String lastName, String ssn, String email, String memberId, UUID triggerId) {
+    public DirectDebitResponse registerTrustlyDirectDebit(String firstName, String lastName, String ssn, String memberId, UUID triggerId) {
 
-        DirectDebitRequest dto = new DirectDebitRequest(firstName, lastName, ssn, email, memberId, triggerId.toString());
+        DirectDebitRequest dto = new DirectDebitRequest(firstName, lastName, ssn, memberId, triggerId.toString());
 
         final ResponseEntity<DirectDebitResponse> urlResponseResponseEntity = this.client.registerDirectDebit(dto);
 

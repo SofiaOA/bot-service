@@ -1,6 +1,7 @@
 package com.hedvig.botService.serviceIntegration.memberService.dto;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum BankIdStatusType {
 

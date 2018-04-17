@@ -1,5 +1,6 @@
 package com.hedvig.botService.serviceIntegration.memberService;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedvig.botService.serviceIntegration.memberService.exceptions.BankIdError;
@@ -7,7 +8,6 @@ import com.hedvig.botService.serviceIntegration.memberService.exceptions.ErrorTy
 import com.hedvig.botService.serviceIntegration.memberService.dto.APIErrorDTO;
 import feign.Response;
 import feign.codec.ErrorDecoder;
-import org.codehaus.jackson.JsonParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class MemberServiceErrorDecoder implements ErrorDecoder {
                 APIErrorDTO error = mapper.readValue(response.body().asInputStream(), APIErrorDTO.class);
                 ErrorType errorType = ErrorType.valueOf(error.getCode());
                 return new BankIdError(errorType, error.getMessage());
-            } catch (IllegalArgumentException|JsonParseException|JsonMappingException ex) {
+            } catch (IllegalArgumentException|JsonParseException |JsonMappingException ex) {
                 log.error(String.format("Could not read APIError: %s", ex.getMessage()), ex);
             }
         } catch (IOException ex) {
