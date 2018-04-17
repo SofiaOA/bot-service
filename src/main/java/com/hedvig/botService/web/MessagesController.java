@@ -10,12 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.support.ByteArrayMultipartFileEditor;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,15 +31,7 @@ public class MessagesController {
 		this.sessionManager = sessions;
     }
 
-    protected void initBinder(HttpServletRequest request, ServletRequestDataBinder binder)
-		throws ServletException {
-	
-		// Convert multipart object to byte[]
-		binder.registerCustomEditor(byte[].class, new ByteArrayMultipartFileEditor());
-	
-	}
-
-    /*
+	/*
      * TODO: Change hedvig.token from optional to required
      * */
     @RequestMapping(path="/messages/{messageCount}")
