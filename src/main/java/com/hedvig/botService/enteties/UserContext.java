@@ -75,7 +75,7 @@ public class UserContext implements Serializable {
 	@Setter
 	@OneToMany(mappedBy = "userContext", cascade = CascadeType.ALL)
 	@MapKey(name="referenceToken")
-	private Map<String, BankIdSessionImpl> bankIdStatus;
+	private Map<String, BankIdSessionImpl> bankIdStatus = new HashMap<>();
 
 	/*
      * Lookup if there is a value for the key in the user context
@@ -126,20 +126,13 @@ public class UserContext implements Serializable {
      * */
 
     public void completeConversation(Conversation conversationClass) {
-		String conversationClassName = conversationClass.getClass().getName();
-
-		for(ConversationEntity c : this.conversationManager.conversations){
-            if(c.getClassName().equals(conversationClassName) && c.conversationStatus.equals(conversationStatus.ONGOING)){
-                c.conversationStatus=conversationStatus.COMPLETE;
-            }
-        }
-
+		this.conversationManager.completeConversation(conversationClass);
 	}
 
 	// Check if there is at least one conversation containing name 'Onboarding' with state COMPLETE
     public boolean hasCompletedOnboarding(){
-    	for(ConversationEntity c : this.conversationManager.conversations){
-    		if(c.getClassName().contains("Onboarding") && c.conversationStatus.equals(conversationStatus.COMPLETE)){
+    	for(ConversationEntity c : this.getConversations()){
+    		if(c.getClassName().contains("Onboarding") && c.conversationStatus == conversationStatus.COMPLETE){
     			return true;
 			}
     	}
@@ -160,7 +153,7 @@ public class UserContext implements Serializable {
 
     public void clearContext(){
     	this.getOnBoardingData().clear();
-		this.conversationManager.conversations.clear();
+		this.conversationManager.getConversations().clear();
     	this.memberChat.chatHistory.clear();
     }
 

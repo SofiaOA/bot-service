@@ -1,9 +1,11 @@
+
 package com.hedvig.botService.enteties;
 
 import com.hedvig.botService.chat.Conversation;
 import lombok.Getter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /*
  * Stores persistent properties for a Conversation
@@ -31,7 +33,19 @@ public class ConversationEntity {
     private String className;
 
     private String startMessage; // Optional starting point in conversation
-    
+
+	public ConversationEntity() {}
+
+	public ConversationEntity(ConversationManager conversationManager, String memberId, Class<? extends Conversation> conversationClass, String startMessage) {
+		this.className = conversationClass.getName();
+		this.memberId = memberId;
+		this.setConversationStatus(Conversation.conversationStatus.ONGOING);
+		this.conversationManager = conversationManager;
+		if(startMessage != null) {
+			this.setStartMessage(startMessage);
+		}
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -52,14 +66,6 @@ public class ConversationEntity {
 		return className;
 	}
 
-	public void setClassName(String className) {
-		this.className = className;
-	}
-
-	public void setMemberId(String memberId) {
-		this.memberId = memberId;
-	}
-
 	public String getStartMessage() {
 		return startMessage;
 	}
@@ -72,7 +78,13 @@ public class ConversationEntity {
 		return conversationManager;
 	}
 
-	public void setConversationManager(ConversationManager conversationManager) {
-		this.conversationManager = conversationManager;
+	boolean containsConversation(Conversation conversation) {
+		String conversationClassName = conversation.getClass().getName();
+		return Objects.equals(this.getClassName(), conversationClassName);
+	}
+
+	boolean containsConversation(Class<? extends Conversation> conversationClass) {
+		String conversationClassName = conversationClass.getName();
+		return Objects.equals(this.getClassName(), conversationClassName);
 	}
 }

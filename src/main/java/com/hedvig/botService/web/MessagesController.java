@@ -1,6 +1,5 @@
 package com.hedvig.botService.web;
 
-import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.AvatarDTO;
@@ -12,10 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,7 +30,7 @@ public class MessagesController {
 	/*
      * TODO: Change hedvig.token from optional to required
      * */
-    @RequestMapping(path="/messages/{messageCount}")
+    @GetMapping(path="/messages/{messageCount}")
     public Map<Integer, Message> messages(@PathVariable int messageCount, @RequestHeader(value="hedvig.token", required = false) String hid) {
     	
     	log.info("Getting " + messageCount + " messages for member:" + hid);
@@ -51,17 +47,22 @@ public class MessagesController {
     /*
      * TODO: Change hedvig.token from optional to required
      * */
-    @RequestMapping(path="/messages", produces = "application/json; charset=utf-8")
-    public Map<Integer, Message> allMessages(@RequestHeader(value="hedvig.token", required = false) String hid) {
+    @RequestMapping(path="/messages", produces = "application/json; charset=utf-8", method = RequestMethod.GET)
+    public Map<Integer, Message> allMessages(
+			@RequestHeader(value="hedvig.token", required = false) String hid,
+			@RequestParam(name = "intent", required = false, defaultValue = "onboarding") String intentParameter) {
     	
     	log.info("Getting all messages for member:" + hid);
 
+		SessionManager.Intent intent = Objects.equals(intentParameter, "login") ? SessionManager.Intent.LOGIN : SessionManager.Intent.ONBOARDING;
+
     	try {
-			return sessionManager.getAllMessages(hid).stream()
-					.sorted((x,y)->x.getTimestamp().compareTo(y.getTimestamp()))
+			LinkedHashMap<Integer, Message> collect = sessionManager.getAllMessages(hid, intent).stream()
+					.sorted((x, y) -> x.getTimestamp().compareTo(y.getTimestamp()))
 					.collect(Collectors.toMap(m -> m.getGlobalId(), Function.identity(),
 							(x, y) -> y, LinkedHashMap::new)
 					);
+			return collect;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -72,7 +73,7 @@ public class MessagesController {
     /*
      * TODO: Change hedvig.token from optional to required
      * */
-    @RequestMapping(path = "/response", method = RequestMethod.POST, produces = "application/json; charset=utf-8")
+    @PostMapping(path = "/response",  produces = "application/json; charset=utf-8")
     public ResponseEntity<?> create(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Response recieved from messageId: " + msg.globalId);
@@ -129,22 +130,23 @@ public class MessagesController {
     /*
      * Already member start
      * */
-    @RequestMapping(path = "/chat/login")
+    @PostMapping(path = "/chat/login")
     public ResponseEntity<?> chatLogin(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Chat login event from user: " + hid);
-     	sessionManager.startOnboardingConversation(hid, "message.start.login");
+     	sessionManager.startLogin(hid);
     	return ResponseEntity.noContent().build();
     }
     
     /*
      * Regular start
      * */
-    @RequestMapping(path = "/chat/start")
+    @PostMapping(path = "/chat/start")
     public ResponseEntity<?> chatStart(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Chat start event from user: " + hid);
-        sessionManager.startOnboardingConversation(hid, OnboardingConversationDevi.MESSAGE_WAITLIST_START);
+
+        sessionManager.startOnboarding(hid);
     	return ResponseEntity.noContent().build();
     }
     

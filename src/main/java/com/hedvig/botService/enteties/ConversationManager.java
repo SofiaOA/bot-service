@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /*
@@ -31,9 +32,9 @@ public class ConversationManager {
     private String memberId;
 
     @OneToMany(mappedBy="conversationManager", cascade = CascadeType.ALL, orphanRemoval=true)
-    public List<ConversationEntity> conversations;
+    private List<ConversationEntity> conversations;
 
-    @OneToOne()
+    @OneToOne(cascade = CascadeType.ALL)
     private ConversationEntity activeConversation;
 
     public String toString(){	
@@ -41,7 +42,6 @@ public class ConversationManager {
     }
     
     public ConversationManager() {
-    	//new Exception().printStackTrace(System.out);
         conversations = new ArrayList<>();
     }
 
@@ -65,8 +65,8 @@ public class ConversationManager {
     boolean startConversation(Class<? extends Conversation> conversationClass, String startMessage) {
 
         for(ConversationEntity c : conversations){
-            if(c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING)) {
-                if (c.getClassName().equals(conversationClass.getName())) {
+            if(c.getConversationStatus() == Conversation.conversationStatus.ONGOING) {
+                if (c.containsConversation(conversationClass)){
                     return false;
                 } else {
                     c.setConversationStatus(Conversation.conversationStatus.COMPLETE);
@@ -74,15 +74,7 @@ public class ConversationManager {
             }
         }
 
-
-
-        ConversationEntity conv = new ConversationEntity();
-        conv.setClassName(conversationClass.getName());
-        conv.setMemberId(getMemberId());
-        conv.setConversationStatus(Conversation.conversationStatus.ONGOING);
-        if(startMessage != null) {
-            conv.setStartMessage(startMessage);
-        }
+        ConversationEntity conv = new ConversationEntity(this, getMemberId(), conversationClass, startMessage);
 
         addConversationAndSetActive(conv);
 
@@ -101,8 +93,20 @@ public class ConversationManager {
     }
 
     private void addConversationAndSetActive(ConversationEntity c) {
-        c.setConversationManager(this);
         conversations.add(c);
         activeConversation = c;
+    }
+
+    void completeConversation(Conversation conversation) {
+        if(activeConversation == null) {
+            for (ConversationEntity c : getConversations()) {
+                if (c.containsConversation(conversation) && c.conversationStatus == Conversation.conversationStatus.ONGOING) {
+                    c.conversationStatus = Conversation.conversationStatus.COMPLETE;
+                }
+            }
+        }
+        else {
+            activeConversation.setConversationStatus(Conversation.conversationStatus.COMPLETE);
+        }
     }
 }

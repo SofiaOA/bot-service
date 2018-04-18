@@ -36,6 +36,11 @@ import java.util.List;
 @Transactional
 public class SessionManager {
 
+    public enum Intent {
+        LOGIN,
+        ONBOARDING
+    }
+
     private static Logger log = LoggerFactory.getLogger(SessionManager.class);
     private final UserContextRepository userrepo;
     private final MemberService memberService;
@@ -59,7 +64,7 @@ public class SessionManager {
 
     public List<Message> getMessages(int i, String hid) {
         log.info("Getting " + i + " messages for user:" + hid);
-        List<Message>  messages = getAllMessages(hid);
+        List<Message>  messages = getAllMessages(hid, null);
 
         return messages.subList(Math.max(messages.size() - i, 0), messages.size());
     }
@@ -154,17 +159,29 @@ public class SessionManager {
     /*
      * Kicks off onboarding conversation with either direct login or regular signup flow
      * */
-    public void startOnboardingConversation(String hid, String startMsg){
-    	
-    	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-    	uc.putUserData("{WEB_USER}", "FALSE");
+    public void startOnboarding(String hid){
+        startOnboardingConversation(hid, OnboardingConversationDevi.MESSAGE_WAITLIST_START);
+    }
 
-        Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);
-        uc.startConversation(onboardingConversation, startMsg);
+    public void startLogin(String hid) {
+        startOnboardingConversation(hid, OnboardingConversationDevi.MESSAGE_START_LOGIN);
+    }
+
+    private void startOnboardingConversation(String hid, String startMsg) {
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+
+        initChat(startMsg, uc);
 
         userrepo.saveAndFlush(uc);
     }
-    
+
+    private void initChat(String startMsg, UserContext uc) {
+        uc.putUserData("{WEB_USER}", "FALSE");
+
+        Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);
+        uc.startConversation(onboardingConversation, startMsg);
+    }
+
     /*
      * Create a new users chat and context
      * */
@@ -173,7 +190,6 @@ public class SessionManager {
         UserContext uc = userrepo.findByMemberId(hid).orElseGet(() -> {
             UserContext newUserContext = new UserContext(hid);
             userrepo.save(newUserContext);
-
             return newUserContext;
         });
 
@@ -270,7 +286,7 @@ public class SessionManager {
         }
     }
 
-    public List<Message> getAllMessages(String hid) {
+    public List<Message> getAllMessages(String hid, Intent intent) {
 
         /*
          * Find users chat and context. First time it is created
@@ -281,7 +297,11 @@ public class SessionManager {
         MemberChat chat = uc.getMemberChat();
 
         if(uc.getActiveConversation().isPresent() == false) {
-
+            if(intent == Intent.LOGIN) {
+                initChat(OnboardingConversationDevi.MESSAGE_START_LOGIN, uc);
+            } else {
+                initChat(OnboardingConversationDevi.MESSAGE_WAITLIST_START, uc);
+            }
         }
 
         // Mark last user input with as editAllowed

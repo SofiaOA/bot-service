@@ -67,6 +67,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public static final String MESSAGE_FORSLAGSTART = "message.forslagstart";
     public static final String MESSAGE_EMAIL = "message.email";
     public static final String MESSAGE_PRE_FORSLAGSTART = "message.pre.forslagstart";
+    public static final String MESSAGE_START_LOGIN = "message.start.login";
     /*
              * Need to be stateless. I.e no data beyond response scope
              * 
@@ -305,9 +306,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         addRelay("message.missing.bisnode.data","message.manuellnamn");
         
         
-        createMessage("message.start.login",
+        createMessage(MESSAGE_START_LOGIN,
                 new MessageBodyParagraph("Välkommen tillbaka! " + emoji_hug), 1500);
-        addRelay("message.start.login","message.bankid.start");
+        addRelay(MESSAGE_START_LOGIN,"message.bankid.start");
         
         createMessage("message.bankid.start",
                 new MessageBodySingleSelect("Bara att logga in så ser du din försäkring",
@@ -779,7 +780,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 	@Override
 	public void init(UserContext userContext, String startMessage) {
         log.info("Starting onboarding conversation with message:" + startMessage);
-        if(startMessage.equals("message.start.login")) {
+        if(startMessage.equals(MESSAGE_START_LOGIN)) {
             userContext.putUserData(LOGIN, "true");
         }
         startConversation(userContext, startMessage); // Id of first message

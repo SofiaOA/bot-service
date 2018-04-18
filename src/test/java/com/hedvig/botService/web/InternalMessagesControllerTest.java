@@ -47,8 +47,6 @@ public class InternalMessagesControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    InternalMessagesController controllerToTest;
-
     @Before
     public void setUp() {
 
