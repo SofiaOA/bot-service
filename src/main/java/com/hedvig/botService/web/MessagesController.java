@@ -52,7 +52,7 @@ public class MessagesController {
 			@RequestHeader(value="hedvig.token", required = false) String hid,
 			@RequestParam(name = "intent", required = false, defaultValue = "onboarding") String intentParameter) {
     	
-    	log.info("Getting all messages for member:" + hid);
+    	log.info(String.format("Getting all messages for member:%s with intent: %s", hid, intentParameter));
 
 		SessionManager.Intent intent = Objects.equals(intentParameter, "login") ? SessionManager.Intent.LOGIN : SessionManager.Intent.ONBOARDING;
 
