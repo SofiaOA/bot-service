@@ -1,5 +1,6 @@
 package com.hedvig.botService.serviceIntegration.claimsService;
 
+import com.hedvig.botService.security.InternalJwtToken;
 import com.hedvig.botService.serviceIntegration.claimsService.dto.StartClaimAudioDTO;
 import feign.FeignException;
 import lombok.val;
@@ -15,10 +16,12 @@ public class ClaimsService {
 
     private final Logger log = LoggerFactory.getLogger(ClaimsService.class);
     private final ClaimsServiceClient claimsClient;
+    private final InternalJwtToken jwtToken;
 
     @Autowired
-    public ClaimsService(ClaimsServiceClient claimsClient) {
+    public ClaimsService(ClaimsServiceClient claimsClient, InternalJwtToken jwtToken) {
         this.claimsClient = claimsClient;
+        this.jwtToken = jwtToken;
     }
 
 
@@ -26,7 +29,7 @@ public class ClaimsService {
         val dto = new StartClaimAudioDTO(memberId, LocalDateTime.now(), audioUrl);
 
         try {
-            claimsClient.createClaimFromAudio(dto);
+            claimsClient.createClaimFromAudio(dto, jwtToken.getInternalToken());
         }catch (FeignException ex) {
             log.error("Could not start claim at claim service", ex);
         }

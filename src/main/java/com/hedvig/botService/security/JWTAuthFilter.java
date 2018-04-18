@@ -78,7 +78,7 @@ public class JWTAuthFilter implements Filter {
 
         try {
             DecodedJWT jwt = JWT.decode(token);
-            if (jwt.getIssuer().equals("back-office") && request.getMethod().equals("GET")) {
+            if (jwt.getIssuer().equals("hedvig-internal")) {
                 internalVerifier.verify(token);
             } else {
                 googleVerifier.verify(token);
