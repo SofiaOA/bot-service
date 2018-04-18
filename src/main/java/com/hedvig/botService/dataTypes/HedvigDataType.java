@@ -1,5 +1,8 @@
 package com.hedvig.botService.dataTypes;
 
+import lombok.ToString;
+
+@ToString
 public abstract class HedvigDataType {
 
 	public String errorMessage;

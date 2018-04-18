@@ -11,12 +11,14 @@ import com.hedvig.botService.enteties.MemberChat;
 import com.hedvig.botService.enteties.UserContext;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 
 @Entity
+@ToString
 public class Message {
 
 	@Id

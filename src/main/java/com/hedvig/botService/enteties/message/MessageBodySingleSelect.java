@@ -3,6 +3,7 @@ package com.hedvig.botService.enteties.message;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.hedvig.botService.enteties.UserContext;
+import lombok.ToString;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ import java.util.function.Predicate;
 
 @Entity
 @DiscriminatorValue("singleSelect")
+@ToString
 public class MessageBodySingleSelect extends MessageBody {
 
 	public ArrayList<SelectItem> choices = new ArrayList<SelectItem>();

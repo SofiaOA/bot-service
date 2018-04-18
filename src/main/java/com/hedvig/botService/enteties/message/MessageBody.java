@@ -3,6 +3,7 @@ package com.hedvig.botService.enteties.message;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.hedvig.botService.enteties.UserContext;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -27,7 +28,7 @@ import javax.persistence.*;
 			@JsonSubTypes.Type(value = MessageBodyBankIdCollect.class, name = "bankid_collect"),
 	    	@JsonSubTypes.Type(value = MessageBodyPolling.class, name = "polling")
 	    })
-
+@ToString
 public class MessageBody {
 
 	@Id
@@ -43,7 +44,8 @@ public class MessageBody {
 	public Integer imageHeight;
 	
 	MessageBody(String text){this.text = text;}
-	MessageBody(){;}
+	MessageBody(){
+	}
 
 	public void render(UserContext userContext) {
 		this.text = userContext.replaceWithContext(this.text);

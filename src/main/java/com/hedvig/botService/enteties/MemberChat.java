@@ -3,6 +3,7 @@ package com.hedvig.botService.enteties;
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.enteties.message.Message;
 import lombok.Getter;
+import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,7 @@ import java.util.List;
  * */
 
 @Entity
+@ToString
 public class MemberChat {
 
 	private static Logger log = LoggerFactory.getLogger(MemberChat.class);

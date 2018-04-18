@@ -1,5 +1,6 @@
 package com.hedvig.botService.enteties.message;
 
+import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +9,7 @@ import javax.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("audio")
+@ToString
 public class MessageBodyAudio extends MessageBody {
 
 	public String url;
