@@ -22,10 +22,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+
+import static com.hedvig.botService.chat.OnboardingConversationDevi.LOGIN;
+import static com.hedvig.botService.chat.OnboardingConversationDevi.MESSAGE_START_LOGIN;
 
 /*
  * The session manager is the main controller class for the chat service. It contains all user sessions with chat histories, context etc
@@ -281,7 +281,12 @@ public class SessionManager {
 	    	uc.getOnBoardingData().setEmail(email);
 
             Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);
-	        uc.startConversation(onboardingConversation);
+	        if(Objects.equals("true", uc.getDataEntry(LOGIN)) == true) {
+                uc.startConversation(onboardingConversation, MESSAGE_START_LOGIN);
+            }else {
+                uc.startConversation(onboardingConversation);
+            }
+
 	    	userrepo.saveAndFlush(uc);
         }
     }
