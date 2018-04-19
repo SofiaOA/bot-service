@@ -1,0 +1,12 @@
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashAccessEncoder">
+        <fieldNames>
+            <requestHeaders>request_headers</requestHeaders>
+            <responseHeaders>response_headers</responseHeaders>
+        </fieldNames>
+            <lowerCaseHeaderNames>true</lowerCaseHeaderNames>
+        </encoder>
+    </appender>
+    <appender-ref ref="CONSOLE" />
+</configuration>
