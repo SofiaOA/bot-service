@@ -15,6 +15,8 @@ public interface MemberService {
 
     Optional<BankIdSignResponse> sign(String ssn, String userMessage, String memberId);
 
+    BankIdSignResponse signEx(String ssn, String userMessage, String memberId);
+
     void finalizeOnBoarding(String memberId, UserData data);
 
     BankIdCollectResponse collect(String referenceToken, String memberId);

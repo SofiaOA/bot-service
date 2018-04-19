@@ -54,6 +54,13 @@ public class MemberServiceFeign implements MemberService {
     }
 
     @Override
+    public BankIdSignResponse signEx(String ssn, String userMessage, String memberId) {
+        BankIdSignRequest request = new BankIdSignRequest(ssn, userMessage, memberId);
+        ResponseEntity<BankIdSignResponse> response = this.client.sign(request);
+        return response.getBody();
+    }
+
+    @Override
     public void finalizeOnBoarding(String memberId, UserData data) {
 
         FinalizeOnBoardingRequest req = new FinalizeOnBoardingRequest();
