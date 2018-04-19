@@ -323,6 +323,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     {
                         obd.setBankIdMessage("message.bankid.start");
                     }
+                    else if(m.getSelectedItem().value.equals(MESSAGE_WAITLIST_START)) {
+                        uc.putUserData(LOGIN, "false");
+                    }
 
                     return "";
                 }
