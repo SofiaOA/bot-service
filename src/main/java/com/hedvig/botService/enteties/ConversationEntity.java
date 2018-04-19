@@ -3,6 +3,7 @@ package com.hedvig.botService.enteties;
 
 import com.hedvig.botService.chat.Conversation;
 import lombok.Getter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -16,6 +17,7 @@ import java.util.Objects;
 		@Index(columnList = "id", name = "conversation_entity_id_idx"),
 		@Index(columnList = "conversation_manager_id", name= "conversation_entity_manager_id_idx")
 })
+@ToString(exclude = "conversationManager")
 public class ConversationEntity {
 
     @Id

@@ -1,6 +1,7 @@
 package com.hedvig.botService.enteties;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 @Entity
 @Data
+@ToString
 public class DirectDebitMandateTrigger implements Serializable {
 
     public enum TriggerStatus {

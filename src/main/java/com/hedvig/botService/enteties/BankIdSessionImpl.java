@@ -2,12 +2,14 @@ package com.hedvig.botService.enteties;
 
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdProgressStatus;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.Instant;
 
 @Entity
 @Data
+@ToString(exclude = "userContext")
 public class BankIdSessionImpl implements BankIdSession {
 
     private Boolean done;

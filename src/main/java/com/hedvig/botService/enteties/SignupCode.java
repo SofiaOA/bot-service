@@ -9,10 +9,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Entity
+@ToString
 public class SignupCode {
 
 	private static Logger log = LoggerFactory.getLogger(SignupCode.class);

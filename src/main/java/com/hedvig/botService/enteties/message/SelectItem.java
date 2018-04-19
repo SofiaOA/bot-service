@@ -5,6 +5,7 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.hedvig.botService.enteties.UserContext;
+import lombok.ToString;
 
 /*
  * A select item is a super type for everything one can put in a list of options
@@ -19,6 +20,7 @@ import com.hedvig.botService.enteties.UserContext;
 	        @JsonSubTypes.Type(value = SelectLink.class, name = "link"),
 			@JsonSubTypes.Type(value = SelectItemTrustly.class, name = "trustly")
 	    })
+@ToString
 public class SelectItem implements Serializable {
 
 	static final long serialVersionUID = 1L;

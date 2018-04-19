@@ -1,7 +1,9 @@
 package com.hedvig.botService.enteties.message;
 
 import com.hedvig.botService.enteties.UserContext;
+import lombok.ToString;
 
+@ToString
 public class SelectItemTrustly extends SelectItem {
 
     static final long serialVersionUID = 1L;

@@ -10,6 +10,7 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResp
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,7 @@ import java.util.regex.Pattern;
  * Contains all state information related to a member
  * */
 @Entity
+@ToString
 public class UserContext implements Serializable {
 
     public static final String TRUSTLY_TRIGGER_ID = "{TRUSTLY_TRIGGER_ID}";

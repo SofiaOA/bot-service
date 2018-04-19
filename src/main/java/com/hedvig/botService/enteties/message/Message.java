@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 import java.time.Instant;
 
 @Entity
-@ToString
+@ToString(exclude = "chat")
 public class Message {
 
 	@Id
@@ -59,10 +59,6 @@ public class Message {
 	
 	public Message(){
 		header = new MessageHeader();
-	}
-
-	public String toString(){
-		return "[globalId:" + globalId + " id:" + id + " header:" + header + " body("+body.getClass()+"):" + body + "]";
 	}
 
 

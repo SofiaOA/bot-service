@@ -2,6 +2,7 @@ package com.hedvig.botService.enteties;
 
 import com.hedvig.botService.chat.Conversation;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import java.util.Optional;
 //@Table(indexes = {
 //        @Index(columnList = "id", name = "conversation_manager_id_idx")
 //})
+@ToString
 public class ConversationManager {
 
 	private static Logger log = LoggerFactory.getLogger(ConversationManager.class);
@@ -36,10 +38,6 @@ public class ConversationManager {
 
     @OneToOne(cascade = CascadeType.ALL)
     private ConversationEntity activeConversation;
-
-    public String toString(){	
-    	return this.memberId + " " + this.conversations;
-    }
     
     public ConversationManager() {
         conversations = new ArrayList<>();

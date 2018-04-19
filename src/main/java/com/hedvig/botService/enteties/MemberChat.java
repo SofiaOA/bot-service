@@ -19,7 +19,7 @@ import java.util.List;
  * */
 
 @Entity
-@ToString
+@ToString(exclude = "userContext")
 public class MemberChat {
 
 	private static Logger log = LoggerFactory.getLogger(MemberChat.class);
@@ -37,13 +37,6 @@ public class MemberChat {
 
     @OneToOne()
 	public UserContext userContext;
-    
-    public String toString(){
-    	
-    	String mId = "";
-    	if(chatHistory != null)for(Message m : chatHistory){mId += (" (" + m.globalId + ":" + m.id + " d:" + m.deleted + ")");}
-    	return "id:" + this.id + " memberId:" + this.memberId + " #msgs:" + (chatHistory == null? null:chatHistory.size() + " [" + mId + "]");
-    }
     
     public MemberChat() {
     	chatHistory = new ArrayList<>();

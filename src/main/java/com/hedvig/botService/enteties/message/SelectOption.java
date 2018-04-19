@@ -1,5 +1,8 @@
 package com.hedvig.botService.enteties.message;
 
+import lombok.ToString;
+
+@ToString
 public class SelectOption extends SelectItem  {
 	static final long serialVersionUID = 1L;
 
