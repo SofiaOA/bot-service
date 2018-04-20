@@ -51,7 +51,7 @@ public class OnboardingController {
             BankIdCollectResponse collect = memberService.collect(body.getOrderRef(), hid);
             log.info("{}", collect);
 
-            String hint = "unkown";
+            String hint = "unknown";
             String status = "pending";
             switch (collect.getBankIdStatus()) {
 
@@ -79,7 +79,7 @@ public class OnboardingController {
             log.error("Got bankIderror {} response from member service with reference token: {}",
                     value("referenceToken", body.getOrderRef()), e.getErrorType());
 
-            String hint = "unkown";
+            String hint = "unknown";
             boolean clientFailure = false;
             switch(e.getErrorType()) {
                 case EXPIRED_TRANSACTION:
@@ -115,7 +115,7 @@ public class OnboardingController {
 
         }catch( FeignException ex) {
             log.error("Error collecting result from member-service ", ex);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BankIdCollectError("unkown", ex.getMessage()));
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BankIdCollectError("unknown", ex.getMessage()));
 
 
         }finally {
