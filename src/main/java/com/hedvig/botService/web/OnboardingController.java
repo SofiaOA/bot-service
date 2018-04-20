@@ -87,7 +87,7 @@ public class OnboardingController {
                     clientFailure = true;
                     break;
                 case CERTIFICATE_ERR:
-                    hint = "certificate_err";
+                    hint = "certificateErr";
                     clientFailure = true;
                     break;
                 case USER_CANCEL:
