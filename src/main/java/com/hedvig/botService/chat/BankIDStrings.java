@@ -18,13 +18,13 @@ public class BankIDStrings {
     public final static String emoji_thinking = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0xA4, (byte)0x94}, Charset.forName("UTF-8"));
 
 
-    public static final String expiredTransactionError = "Fel från bankID: \"BankID-appen svarar inte. Kontrollera att den är startad och att du har internetanslutning. Om du inte har något giltigt BankID kan du hämta ett hos din Bank. Försök sedan igen..\"" + emoji_mag;
+    public static final String expiredTransactionError = "Hmm, det verkar inte som att ditt BankID svarar. Testa igen!";
 
-    public static final String certificateError = "Fel från bankID: \"Det BankID du försöker använda är för gammalt eller spärrat. Använd ett annat BankID eller hämta ett nytt hos din internetbank.\"";
+    public static final String certificateError = "Det BankID du försöker använda är för gammalt eller spärrat. Hämta ett nytt genom din internetbank och testa sen igen!";
 
-    public static final String userCancel = "Fel från bankID: \"Åtgärden avbruten.\"";
+    public static final String userCancel = "Hmm, det verkar inte som att ditt BankID svarar. Testa igen!";
 
-    public static final String cancelled = "Fel från bankID: \"Åtgärden avbruten. Försök igen.\"";
+    public static final String cancelled = "Hmm, det verkar inte som att ditt BankID svarar. Testa igen!";
 
-    public static final String startFailed = "Fel från bankID: \"BankID-appen verkar inte finnas i din dator eller telefon. Installera den och hämta ett BankID hos din internetbank. Installera appen från install.bankid.com.\"";
+    public static final String startFailed = "Hmm. Det verkar inte som att du har någon BankID-app på din telefon. Ladda ner appen och hämta ett BankID från din internetbank, testa sen igen!";
 }

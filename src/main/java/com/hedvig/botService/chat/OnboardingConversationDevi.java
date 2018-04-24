@@ -342,10 +342,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
 
         createMessage("message.bankid.error",
-                new MessageBodyParagraph("Hmm, något blev fel vi försöker igen" + emoji_flushed_face), 1500);
+                new MessageBodyParagraph("Hmm, det verkar inte som att ditt BankID svarar. Testa igen!"), 1500);
 
         createMessage("message.bankid.start.manual.error",
-                new MessageBodyParagraph("Hmm nu blev något fel! Vi försöker igen \"" + emoji_flushed_face));
+                new MessageBodyParagraph("Hmm, det verkar inte som att ditt BankID svarar. Testa igen!"));
         addRelay("message.bankid.start.manual.error", "message.bankid.start.manual");
 
         createMessage("message.bankid.autostart.respond",
