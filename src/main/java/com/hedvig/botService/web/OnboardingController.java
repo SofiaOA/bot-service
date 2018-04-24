@@ -39,19 +39,40 @@ public class OnboardingController {
     @PostMapping("sign")
     public ResponseEntity<?> sign(@RequestHeader("hedvig.token") String hid) {
 
-        BankidStartResponse response = onboardingService.sign(hid);
-
-        return ResponseEntity.ok(response);
+        try {
+            BankidStartResponse response = onboardingService.sign(hid);
+            return ResponseEntity.ok(response);
+        }
+        catch(BankIdError e) {
+            String errorCode = "unknown";
+            switch (e.getErrorType()) {
+                case ALREADY_IN_PROGRESS:
+                    errorCode = "alreadyInProgress";
+                    break;
+                case INVALID_PARAMETERS:
+                    errorCode = "invalidParameters";
+                    break;
+                case INTERNAL_ERROR:
+                    errorCode = "internalError";
+                    break;
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BankIdCollectError(errorCode, e.getMessage()));
+        }
+        catch( FeignException ex) {
+            log.error("Error starting bankidSign with member-service ", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BankIdCollectError("unkown", ex.getMessage()));
+        }
     }
 
     @PostMapping("collect")
     public ResponseEntity<?> collect(@RequestHeader("hedvig.token") String hid, @Valid @RequestBody BankIdCollectRequest body) {
 
         try {
-            BankIdCollectResponse collect = memberService.collect(body.getOrderRef(), hid);
+            String orderRef = body.getOrderRef();
+            BankIdCollectResponse collect = onboardingService.collect(hid, orderRef);
             log.info("{}", collect);
 
-            String hint = "unkown";
+            String hint = "unknown";
             String status = "pending";
             switch (collect.getBankIdStatus()) {
 
@@ -79,7 +100,7 @@ public class OnboardingController {
             log.error("Got bankIderror {} response from member service with reference token: {}",
                     value("referenceToken", body.getOrderRef()), e.getErrorType());
 
-            String hint = "unkown";
+            String hint = "unknown";
             boolean clientFailure = false;
             switch(e.getErrorType()) {
                 case EXPIRED_TRANSACTION:
@@ -118,8 +139,7 @@ public class OnboardingController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BankIdCollectError("unkown", ex.getMessage()));
 
 
-        }finally {
-
         }
     }
+
 }

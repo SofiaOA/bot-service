@@ -12,9 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
-import java.time.Duration;
-import java.time.Instant;
-
 import static net.logstash.logback.argument.StructuredArguments.value;
 
 public class CollectService {
@@ -55,7 +52,7 @@ public class CollectService {
                                 BankIdProgressStatus.COMPLETE,
                                 referenceToken,
                                 null);
-            } else if(!allowedToCall(bankIdSession)) {
+            } else if(!bankIdSession.allowedToCall()) {
                 log.error("Not allowed to call bankId yet, less than 1s passed since last call: {}", value("referenceToken", referenceToken));
 
                 return
@@ -163,9 +160,4 @@ public class CollectService {
                 null);
     }
 
-    private boolean allowedToCall(BankIdSessionImpl bankIdSessionImpl) {
-        Instant now = Instant.now();
-        //log.debug("Last call time: {}, currentTime: {}", getLastCallTime(), now);
-        return Duration.between(bankIdSessionImpl.getLastCallTime(), now).toMillis() > 1000;
-    }
 }

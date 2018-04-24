@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.time.Duration;
 import java.time.Instant;
 
 @Entity
@@ -56,7 +57,6 @@ public class BankIdSessionImpl implements BankIdSession {
 
     private Integer errorCount = 0;
 
-
     public BankIdSessionImpl() {
     }
 
@@ -73,4 +73,8 @@ public class BankIdSessionImpl implements BankIdSession {
         this.lastStatus = bankIdStatus.name();
     }
 
+    public boolean allowedToCall() {
+        Instant now = Instant.now();
+        return Duration.between(getLastCallTime(), now).toMillis() > 300;
+    }
 }
