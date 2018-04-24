@@ -79,7 +79,7 @@ public class OnboardingService {
 
         if(collectResponse.getBankIdStatus() == BankIdProgressStatus.COMPLETE) {
             OnboardingConversationDevi conversation = (OnboardingConversationDevi) conversationFactory.createConversation(OnboardingConversationDevi.class);
-            conversation.userSign(uc);
+            conversation.memberSigned(collectResponse.getReferenceToken(), uc);
         }
 
         return collectResponse;
