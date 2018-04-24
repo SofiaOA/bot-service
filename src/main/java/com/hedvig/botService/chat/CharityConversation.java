@@ -43,7 +43,7 @@ public class CharityConversation extends Conversation {
         this.productPricingService = productPricingService;
 
         createChatMessage(MESSAGE_KONTRAKT_CHARITY,
-                new MessageBodySingleSelect("En grej till! \f"
+                new MessageBodySingleSelect("Tack! En grej till! \f"
                         +"Som Hedvig-medlem får du välja en välgörenhetsorganisation att stödja om det blir pengar över när alla skador har betalats",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption(SOS_BARNBYAR_NAME, SOSBARNBYAR_VALUE));
