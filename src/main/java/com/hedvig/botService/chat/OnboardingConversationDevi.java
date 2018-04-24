@@ -94,7 +94,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public final static String emoji_waving_hand = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x91, (byte)0x8B}, Charset.forName("UTF-8"));
     public final static String emoji_flushed_face = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0xB3}, Charset.forName("UTF-8"));
     public final static String emoji_thinking = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0xA4, (byte)0x94}, Charset.forName("UTF-8"));
-
+    public final static String emoji_sauropod = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0xA6, (byte)0x95}, Charset.forName("UTF-8"));
+    public final static String emoji_folded_hands = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x99, (byte)0x8F}, Charset.forName("UTF-8"));
+    
     private final SignupCodeRepository signupRepo;
     private final ConversationFactory conversationFactory;
 
@@ -118,7 +120,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
 
         createChatMessage(MESSAGE_WAITLIST_START,
-                new MessageBodySingleSelect("Hej! Jag heter Hedvig " + emoji_waving_hand +"\fJag har designat om försäkring från grunden för att göra det öppet och schysst!\fJag kommer ta fram ett försäkringsförslag till dig på nolltid",
+                new MessageBodySingleSelect("Hej! Jag heter Hedvig " + emoji_waving_hand +"\fJag har designat om försäkring från grunden, så att det är lätt att använda och känns schysst!\fJag tar fram ett försäkringsförslag till dig på nolltid",
                         Lists.newArrayList(
                                 new SelectOption("Låter bra!", MESSAGE_PRE_FORSLAGSTART),
                               new SelectOption("Jag är redan medlem", "message.bankid.start")
@@ -280,7 +282,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
 
         createMessage("message.lagenhet",
-                new MessageBodySingleSelect("Toppen! Har du BankID? I så fall kan vi hoppa över några frågor!",
+                new MessageBodySingleSelect(emoji_hand_ok+ " Har du BankID? I så fall kan vi hoppa över några frågor!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}",  null, false));
                             add(new SelectOption("Jag har inte BankID", "message.manuellnamn"));
@@ -340,10 +342,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
 
         createMessage("message.bankid.error",
-                new MessageBodyParagraph("Hmm, något blev fel vi försöker igen" + emoji_flushed_face), 1500);
+                new MessageBodyParagraph("Hmm, det verkar inte som att ditt BankID svarar. Testa igen!"), 1500);
 
         createMessage("message.bankid.start.manual.error",
-                new MessageBodyParagraph("Hmm nu blev något fel! Vi försöker igen \"" + emoji_flushed_face));
+                new MessageBodyParagraph("Hmm, det verkar inte som att ditt BankID svarar. Testa igen!"));
         addRelay("message.bankid.start.manual.error", "message.bankid.start.manual");
 
         createMessage("message.bankid.autostart.respond",
@@ -352,16 +354,15 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         createChatMessage(MESSAGE_HUS,
                 new MessageBodySingleSelect("Åh, typiskt! Just nu försäkrar jag bara lägenheter\f"
-                		+ "Men jag hör gärna av mig till dig så fort jag är viktiga nyheter om annat jag kan försäkra\f"
-                		+ "Jag skickar ingen spam. Lovar!",
+                		+ "Om du vill ge mig din mailadress så kan jag höra av mig när jag försäkrar annat också",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Skicka mig nyhetsbrev", MESSAGE_NYHETSBREV));
+                            add(new SelectOption("Okej!", MESSAGE_NYHETSBREV));
                             add(new SelectOption("Tack, men nej tack", "message.avslutok"));
 
                         }}
                 ));
 
-        createMessage(MESSAGE_NYHETSBREV, new MessageBodyText("Vad är din mailadress?"));
+        createMessage(MESSAGE_NYHETSBREV, new MessageBodyText("Topp! Vad är mailadressen?"));
         setExpectedReturnType(MESSAGE_NYHETSBREV, new EmailAdress());
         createMessage(MESSAGE_TIPSA, new MessageBodyText("Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmail till"));
         setExpectedReturnType(MESSAGE_TIPSA, new EmailAdress());
@@ -401,7 +402,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         createChatMessage("message.manuellnamn", new MessageBodyText("Inga problem! Då ställer jag bara några extra frågor nu\fMen om du vill bli medlem sen så måste du signera med BankID, bara så du vet!\fVad heter du i förnamn?"));
         
-        createMessage("message.manuellfamilyname", new MessageBodyText("Kul att ha dig här {NAME}! " + emoji_hug + " Vad heter du i efternamn?"));
+        createMessage("message.manuellfamilyname", new MessageBodyText("Kul att ha dig här {NAME}!  Vad heter du i efternamn?"));
         
         createMessage("message.manuellpersonnr", new MessageBodyNumber("Tack! Vad är ditt personnummer? (12 siffror)"));
         setExpectedReturnType("message.manuellpersonnr", new SSNSweden());
@@ -425,7 +426,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 ));
 
         createMessage("message.lghtyp",
-                new MessageBodySingleSelect("Okej! Hyr du eller äger du den?",
+                new MessageBodySingleSelect("Hoppas du trivs! Hyr du eller äger du den?",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectOption("Jag hyr den", ProductTypes.RENT.toString()));
                             add(new SelectOption("Jag äger den", ProductTypes.BRF.toString()));
@@ -441,7 +442,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 ));
 
 
-        createMessage("message.pers", new MessageBodyNumber("Hoppas du trivs! Bor du själv eller med andra? Fyll i hur många som bor i lägenheten"));
+        createMessage("message.pers", new MessageBodyNumber("Okej! Hur många bor i lägenheten?"));
         setExpectedReturnType("message.pers", new HouseholdMemberNumber());
 
         createMessage(MESSAGE_SAKERHET,
@@ -475,7 +476,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 ));
 
         createMessage(MESSAGE_FORSAKRINGIDAGJA,
-                new MessageBodySingleSelect("Klokt av dig att redan ha försäkring! Vilket försäkringsbolag har du?",
+                new MessageBodySingleSelect("Okej! Vilket försäkringsbolag har du? " + emoji_sauropod,
                         new ArrayList<SelectItem>(){{
                         	add(new SelectOption("If", "if"));
                             add(new SelectOption("Folksam", "Folksam"));
@@ -494,7 +495,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage(MESSAGE_ANNATBOLAG, new MessageBodyText("Okej, vilket försäkringsbolag har du?"),2000);
 
         createChatMessage(MESSAGE_BYTESINFO,
-                new MessageBodySingleSelect("Ja, ibland är det dags att prova något nytt. De kommer nog förstå\f"
+                new MessageBodySingleSelect("Då är det dags att prova något nytt. De kommer nog förstå!\f"
                 		+ "Om du blir medlem hos mig sköter jag bytet åt dig. Så när din gamla försäkring går ut, flyttas du automatiskt till din nya hos mig",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Jag förstår", MESSAGE_FORSLAG)); //Create product
@@ -515,13 +516,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         }}
                 ));
 
-        createMessage(MESSAGE_50K_LIMIT, new MessageBodySingleSelect("Äger du någon pryl som är värd över 50,000 kr? \uD83D\uDC8E\uD83C\uDFFA",
+        createMessage(MESSAGE_50K_LIMIT, new MessageBodySingleSelect("Äger du någon pryl som är värd över 50 000 kr? \uD83D\uDC8E\uD83C\uDFFA",
                 Lists.newArrayList(
                         new SelectOption("Ja", MESSAGE_50K_LIMIT_YES),
                         new SelectOption("Nej", MESSAGE_50K_LIMIT_NO)
                 )));
 
-        createChatMessage(MESSAGE_50K_LIMIT_YES, new MessageBodySingleSelect("All right! Anledningen att jag frågar är att drulleförsäkring ingår för alla prylar under 50,000 kr\fSka jag be en kollega höra av sig till dig efteråt för att ordna försäkring för dina dyrare prylar också?",
+        createChatMessage(MESSAGE_50K_LIMIT_YES, new MessageBodySingleSelect("All right! Anledningen att jag frågar är att drulleförsäkring ingår för alla prylar under 50 000 kr\fSka jag be en kollega höra av sig till dig efteråt för att ordna försäkring för dina dyrare prylar också?",
         Lists.newArrayList(
                 new SelectOption("Ja", MESSAGE_50K_LIMIT_YES_YES),
                 new SelectOption("Nej", MESSAGE_50K_LIMIT_YES_NO)
@@ -543,31 +544,31 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         addRelay(MESSAGE_50K_LIMIT_NO_1, MESSAGE_PHONENUMBER);
 
-        createMessage(MESSAGE_FORSLAG, new MessageBodyParagraph("Okej! Nu har jag allt för att ge dig ett förslag. Ska bara räkna lite..."),2000);
+        createMessage(MESSAGE_FORSLAG, new MessageBodyParagraph("Sådär, det var all info jag behövde! Tack " + emoji_folded_hands),2000);
 
         createMessage(MESSAGE_FORSLAG2,
-                new MessageBodySingleSelect("Sådärja!",
+                new MessageBodySingleSelect("Nu går vi igenom ditt förslag!",
                         Lists.newArrayList(
-                            SelectLink.toOffer("Visa mig förslaget", "message.forslag.dashboard"))
+                            SelectLink.toOffer("Okej " + emoji_thumbs_up, "message.forslag.dashboard"))
                 )
         );
         addRelay(MESSAGE_FORSLAG, MESSAGE_FORSLAG2);
 
         createChatMessage("message.tryggt",
                 new MessageBodySingleSelect(""
-                		+ "Jag har en trygghetspartner som är en av världens största återförsäkringskoncerner\fDe är där för mig, så jag alltid kan vara där för dig\fJag är självklart också auktoriserad av Finansinspektionen" + emoji_mag,
+                		+ "Självklart!\fHedvig är backat av en av världens största försäkringsbolag, så att du kan känna dig trygg i alla lägen\fDe är där för mig, så jag alltid kan vara där för dig\fJag är självklart också auktoriserad av Finansinspektionen " + emoji_mag,
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
-                            add(new SelectOption("Jag har en annan fråga", MESSAGE_FRIFRAGA));
+                            add(new SelectOption("Jag har en annan fråga", "message.quote.close"));
                         }}
                 ));
         
         createChatMessage("message.skydd",
                 new MessageBodySingleSelect(""
-                		+ "Med mig har du samma grundskydd som vanliga försäkringsbolag\fUtöver det ingår alltid drulle, alltså till exempel om du tappar din telefon i golvet och den går sönder, och ett bra reseskydd",
+                		+ "Såklart! Med mig har du samma grundskydd som en vanlig hemförsäkring\fUtöver det ingår alltid drulle, alltså till exempel om du tappar din telefon i golvet och den går sönder, och ett bra reseskydd",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
-                        	add(new SelectOption("Jag har en annan fråga", MESSAGE_FRIFRAGA));
+                        	add(new SelectOption("Jag har en annan fråga", "message.quote.close"));
                             //add(new SelectOption("Jag vill bli medlem", "message.forslag"));
                         }}
                 ));
@@ -597,10 +598,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 );
         
         createChatMessage("message.pris",
-                new MessageBodySingleSelect("Det är svårt att jämföra försäkringspriser, för alla försäkringar är lite olika. Men grundskyddet som jag ger är bredare än det du oftast får på annat håll\fSom Hedvigmedlem gör du dessutom skillnad för världen runtomkring dig, vilket du garanterat inte gör genom din gamla försäkring!",
+                new MessageBodySingleSelect("Det är knepigt att jämföra försäkringspriser, för alla försäkringar är lite olika.\fMen grundskyddet jag ger är väldigt brett utan att du behöver betala för krångliga tillägg\fSom Hedvigmedlem gör du dessutom skillnad för världen runtomkring dig, vilket du garanterat inte gör genom din gamla försäkring!",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
-                            add(new SelectOption("Jag har fler frågor", MESSAGE_FRIFRAGA));
+                            add(new SelectOption("Jag har fler frågor", "message.quote.close"));
 
                         }}
                 ));
@@ -716,7 +717,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage("message.avslutok",
                 new MessageBodySingleSelect("Okej! Trevligt att chattas, ha det fint och hoppas vi hörs igen!",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill starta om chatten", "message.activate.ok.a"));
+                            add(new SelectOption("Jag vill starta om chatten", MESSAGE_WAITLIST_START));
 
                         }}
                 ));
