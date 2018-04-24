@@ -1,10 +1,8 @@
 package com.hedvig.botService.web;
 
-import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.memberService.exceptions.BankIdError;
 import com.hedvig.botService.session.OnboardingService;
-import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.BankIdCollectError;
 import com.hedvig.botService.web.dto.BankIdCollectRequest;
 import com.hedvig.botService.web.dto.BankidCollectResponse;
