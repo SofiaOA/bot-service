@@ -559,7 +559,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 		+ "Självklart!\fHedvig är backat av en av världens största försäkringsbolag, så att du kan känna dig trygg i alla lägen\fDe är där för mig, så jag alltid kan vara där för dig\fJag är självklart också auktoriserad av Finansinspektionen " + emoji_mag,
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
-                            add(new SelectOption("Jag har en annan fråga", MESSAGE_FRIFRAGA));
+                            add(new SelectOption("Jag har en annan fråga", "message.quote.close"));
                         }}
                 ));
         
@@ -568,7 +568,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 		+ "Såklart! Med mig har du samma grundskydd som en vanlig hemförsäkring\fUtöver det ingår alltid drulle, alltså till exempel om du tappar din telefon i golvet och den går sönder, och ett bra reseskydd",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
-                        	add(new SelectOption("Jag har en annan fråga", MESSAGE_FRIFRAGA));
+                        	add(new SelectOption("Jag har en annan fråga", "message.quote.close"));
                             //add(new SelectOption("Jag vill bli medlem", "message.forslag"));
                         }}
                 ));
@@ -601,7 +601,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodySingleSelect("Det är knepigt att jämföra försäkringspriser, för alla försäkringar är lite olika.\fMen grundskyddet jag ger är väldigt brett utan att du behöver betala för krångliga tillägg\fSom Hedvigmedlem gör du dessutom skillnad för världen runtomkring dig, vilket du garanterat inte gör genom din gamla försäkring!",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectLink("Visa förslaget igen", "message.forslag.dashboard", "Offer", null, null, false  ));
-                            add(new SelectOption("Jag har fler frågor", MESSAGE_FRIFRAGA));
+                            add(new SelectOption("Jag har fler frågor", "message.quote.close"));
 
                         }}
                 ));
