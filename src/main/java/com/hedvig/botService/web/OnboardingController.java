@@ -26,14 +26,11 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 public class OnboardingController {
 
     final private OnboardingService onboardingService;
-    final private MemberService memberService;
     final private Logger log = LoggerFactory.getLogger(OnboardingController.class);
 
     @Autowired
-    public OnboardingController(SessionManager sessionManager, OnboardingService onboardingService, MemberService memberService) {
-
+    public OnboardingController(OnboardingService onboardingService) {
         this.onboardingService = onboardingService;
-        this.memberService = memberService;
     }
 
     @PostMapping("sign")
@@ -108,7 +105,7 @@ public class OnboardingController {
                     clientFailure = true;
                     break;
                 case CERTIFICATE_ERR:
-                    hint = "certificate_err";
+                    hint = "certificateErr";
                     clientFailure = true;
                     break;
                 case USER_CANCEL:
@@ -136,10 +133,9 @@ public class OnboardingController {
 
         }catch( FeignException ex) {
             log.error("Error collecting result from member-service ", ex);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BankIdCollectError("unkown", ex.getMessage()));
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BankIdCollectError("unknown", ex.getMessage()));
 
 
         }
     }
-
 }
