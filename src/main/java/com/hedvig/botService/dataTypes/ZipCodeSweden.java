@@ -21,7 +21,7 @@ public class ZipCodeSweden extends HedvigDataType {
 			this.errorMessage = "Nu blev något fel tror jag... Försök igen";
 		}	
 		matcher = pattern.matcher(input.trim());
-		this.errorMessage = input + " är inte en postadress jag känner till. Ange gärna igen tack!";
+		this.errorMessage = input + " är inte ett postnummer jag känner till. Ange gärna igen tack!";
 		return matcher.matches();
 
 	}
