@@ -1156,8 +1156,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 m.body.text = "Min email är " + trim2;
                 addToChat(m, userContext);
                 endConversation(userContext);
+                return;
                 //nxtMsg = MESSAGE_FORSAKRINGIDAG;
-                break;
             case MESSAGE_50K_LIMIT_YES:
                 nxtMsg = handle50KLimitAnswer(nxtMsg, userContext, (MessageBodySingleSelect)m.body);
                 break;
