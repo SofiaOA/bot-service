@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -39,6 +40,7 @@ public class OnboardingController {
             return ResponseEntity.ok(response);
         }
         catch(BankIdError e) {
+            log.info("Got BankIdError: {}, {} " + e.getErrorType().name(), e.getMessage());
             String errorCode = "unknown";
             switch (e.getErrorType()) {
                 case ALREADY_IN_PROGRESS:
@@ -55,6 +57,9 @@ public class OnboardingController {
         }
         catch( FeignException ex) {
             log.error("Error starting bankidSign with member-service ", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BankIdCollectError("unkown", ex.getMessage()));
+        }catch (Exception ex) {
+            log.error("Got exception: ", ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BankIdCollectError("unkown", ex.getMessage()));
         }
     }
@@ -129,11 +134,9 @@ public class OnboardingController {
             }
 
 
-        }catch( FeignException ex) {
+        }catch( Exception ex) {
             log.error("Error collecting result from member-service ", ex);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BankIdCollectError("unknown", ex.getMessage()));
-
-
         }
     }
 }
