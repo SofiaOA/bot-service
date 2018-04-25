@@ -462,8 +462,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodyNumber("Nu är vi snart klara! Vad är ditt telefonnummer?"));
         setExpectedReturnType(MESSAGE_PHONENUMBER, new TextInput());
 
+        
+        // ---------- Move to after sign.
         createMessage(MESSAGE_EMAIL,
-                new MessageBodyText("Tack! Vad har du för email?"));
+                new MessageBodyText("Nu behöver jag bara din mailadress så att jag kan skicka en bekräftelse"));
         setExpectedReturnType(MESSAGE_EMAIL, new EmailAdress());
 
         createMessage(MESSAGE_FORSAKRINGIDAG,
@@ -693,14 +695,17 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         setupBankidErrorHandlers("message.kontraktpop.startBankId", "message.kontrakt");
 
-        createChatMessage("message.kontraktklar",
+        createMessage("message.kontraktklar",new MessageBodyParagraph("Hurra! "+ emoji_tada + " Välkommen som medlem!"));
+        addRelay("message.kontraktklar", MESSAGE_EMAIL);
+        
+        /*createChatMessage("message.kontraktklar",
                 new MessageBodySingleSelect("Hurra! "+ emoji_tada + " Välkommen som medlem!"+
         "\fJag skickar en bekräftelse till din mail. Visst stämmer det att du har " + EMAIL + "?",
                         new ArrayList<SelectItem>() {{
                         	add(new SelectOption("Ja", "message.onboarding.end"));
                         	add(new SelectOption("Nej", "message.kontrakt.email"));
                         }}
-                ));
+                ));*/
         
         createMessage("message.kontrakt.email", new MessageBodyText("OK! Vad är din mailadress?"));
         setExpectedReturnType("message.kontrakt.email", new EmailAdress());
@@ -1142,16 +1147,17 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 userContext.putUserData("{PHONE_NUMBER}", trim);
                 m.body.text = "Mitt telefonnummer är " + trim;
                 addToChat(m, userContext);
-                nxtMsg = MESSAGE_EMAIL;
+                //nxtMsg = MESSAGE_EMAIL;
+                nxtMsg = MESSAGE_FORSAKRINGIDAG;
                 break;
             case MESSAGE_EMAIL:
                 String trim2 = m.body.text.trim();
                 userContext.putUserData("{EMAIL}", trim2);
                 m.body.text = "Min email är " + trim2;
                 addToChat(m, userContext);
-                nxtMsg = MESSAGE_FORSAKRINGIDAG;
+                endConversation(userContext);
+                //nxtMsg = MESSAGE_FORSAKRINGIDAG;
                 break;
-
             case MESSAGE_50K_LIMIT_YES:
                 nxtMsg = handle50KLimitAnswer(nxtMsg, userContext, (MessageBodySingleSelect)m.body);
                 break;
