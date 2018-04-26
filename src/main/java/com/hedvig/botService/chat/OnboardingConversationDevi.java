@@ -16,7 +16,7 @@ import com.hedvig.botService.session.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.session.events.RequestObjectInsuranceEvent;
 import com.hedvig.botService.session.events.SignedOnWaitlistEvent;
 import com.hedvig.botService.session.events.UnderwritingLimitExcededEvent;
-import lombok.val;
+import lombok.val; 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,7 +122,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
 
         createChatMessage(MESSAGE_WAITLIST_START,
-                new MessageBodySingleSelect("Hej! Jag heter Hedvig " + emoji_waving_hand +"\fJag har designat om försäkring från grunden, så att det är lätt att använda och känns schysst!\fJag tar fram ett försäkringsförslag till dig på nolltid",
+                new MessageBodySingleSelect("Hej! Jag heter Hedvig " + emoji_waving_hand +
+                		"\fJag har designat om försäkring från grunden, så att det är schysst och lätt att använda!\fJag tar fram ett försäkringsförslag till dig på nolltid",
                         Lists.newArrayList(
                                 new SelectOption("Låter bra!", MESSAGE_PRE_FORSLAGSTART),
                               new SelectOption("Jag är redan medlem", "message.bankid.start")
@@ -379,7 +380,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage(MESSAGE_NAGOTMER,
                 new MessageBodySingleSelect("Tack! Vill du hitta på något mer nu när vi har varandra på tråden?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Jag vill tipsa någon om dig", MESSAGE_TIPSA));
+                            //add(new SelectOption("Jag vill tipsa någon om dig", MESSAGE_TIPSA));
                             add(new SelectOption("Jag har en fråga", MESSAGE_FRIONBOARDINGFRAGA));
                             add(new SelectOption("Nej tack!", MESSAGE_AVSLUTOK));
 
