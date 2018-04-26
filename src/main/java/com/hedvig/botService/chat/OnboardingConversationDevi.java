@@ -68,6 +68,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public static final String MESSAGE_EMAIL = "message.email";
     public static final String MESSAGE_PRE_FORSLAGSTART = "message.pre.forslagstart";
     public static final String MESSAGE_START_LOGIN = "message.start.login";
+    public static final String MESSAGE_LAGENHET_PRE = "message.lagenhet.pre";
+    public static final String MESSAGE_LAGENHET = "message.lagenhet";
     /*
              * Need to be stateless. I.e no data beyond response scope
              * 
@@ -275,16 +277,16 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodySingleSelect(
                 		"Första frågan! Bor du i lägenhet eller eget hus?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Lägenhet", "message.lagenhet"));
+                            add(new SelectOption("Lägenhet", MESSAGE_LAGENHET_PRE));
                             add(new SelectOption("Hus", MESSAGE_HUS));
                         }}
                 ), "h_to_house");
 
 
-        createMessage("message.lagenhet", new MessageBodyParagraph(emoji_hand_ok));
-        addRelay("message.lagenhet","message.lagenhet.bankid");
+        createMessage(MESSAGE_LAGENHET_PRE, new MessageBodyParagraph(emoji_hand_ok));
+        addRelay(MESSAGE_LAGENHET_PRE, MESSAGE_LAGENHET);
         
-        createMessage("message.lagenhet.bankid",
+        createMessage(MESSAGE_LAGENHET,
                 new MessageBodySingleSelect("Har du BankID? I så fall kan vi hoppa över några frågor!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}",  null, false));
@@ -295,7 +297,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     UserData obd = uc.getOnBoardingData();
                     if(m.getSelectedItem().value.equals("message.bankid.autostart.respond"))
                     {
-                        obd.setBankIdMessage("message.lagenhet");
+                        obd.setBankIdMessage(MESSAGE_LAGENHET);
                     }
 
                     return "";
@@ -303,7 +305,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         );
 
 
-        setupBankidErrorHandlers("message.lagenhet");
+        setupBankidErrorHandlers(MESSAGE_LAGENHET);
 
         createMessage("message.missing.bisnode.data",
                 new MessageBodyParagraph("Jag hittade tyvärr inte dina uppgifter. Men...")
@@ -1324,7 +1326,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         switch(nxtMsg){
         	case "message.medlem":
             case "message.bankid.start":
-            case "message.lagenhet":
+            case MESSAGE_LAGENHET:
                 Optional<BankIdAuthResponse> authResponse = memberService.auth(userContext.getMemberId());
 
                 if(!authResponse.isPresent()) {
