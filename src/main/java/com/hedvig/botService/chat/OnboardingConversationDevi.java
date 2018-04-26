@@ -490,12 +490,23 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                             add(new SelectOption("Trygg-Hansa", "Trygg-Hansa"));
                             add(new SelectOption("Länsförsäkringar", "Länsförsäkringar"));
                             //add(new SelectOption("Moderna", "Moderna"));
-                            add(new SelectOption("Annat bolag", MESSAGE_ANNATBOLAG));
+                            add(new SelectOption("Annat bolag", "message.bolag.annat.expand"));
                             add(new SelectOption("Ingen aning", "message.bolag.vetej"));
 
                         }}
                 ));
 
+        createMessage("message.bolag.annat.expand",
+                new MessageBodySingleSelect("Okej! Är det något av dessa kanske?",
+                        new ArrayList<SelectItem>(){{
+                        	add(new SelectOption("Moderna", "Moderna"));
+                            add(new SelectOption("ICA", "ICA"));
+                            add(new SelectOption("Gjensidige", "Gjensidige"));
+                            add(new SelectOption("Vardia", "Vardia"));
+                            add(new SelectOption("Annat bolag", MESSAGE_ANNATBOLAG));
+                        }}
+                ));
+        
         createMessage("message.bolag.vetej",new MessageBodyParagraph("Inga problem, det kan vi ta senare"));
         addRelay("message.bolag.vetej", MESSAGE_FORSLAG);
 
