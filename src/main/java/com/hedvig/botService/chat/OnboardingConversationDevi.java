@@ -68,6 +68,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public static final String MESSAGE_EMAIL = "message.email";
     public static final String MESSAGE_PRE_FORSLAGSTART = "message.pre.forslagstart";
     public static final String MESSAGE_START_LOGIN = "message.start.login";
+    public static final String MESSAGE_LAGENHET_PRE = "message.lagenhet.pre";
+    public static final String MESSAGE_LAGENHET = "message.lagenhet";
     /*
              * Need to be stateless. I.e no data beyond response scope
              * 
@@ -275,14 +277,17 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodySingleSelect(
                 		"Första frågan! Bor du i lägenhet eller eget hus?",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Lägenhet", "message.lagenhet"));
+                            add(new SelectOption("Lägenhet", MESSAGE_LAGENHET_PRE));
                             add(new SelectOption("Hus", MESSAGE_HUS));
                         }}
                 ), "h_to_house");
 
 
-        createMessage("message.lagenhet",
-                new MessageBodySingleSelect(emoji_hand_ok+ " Har du BankID? I så fall kan vi hoppa över några frågor!",
+        createMessage(MESSAGE_LAGENHET_PRE, new MessageBodyParagraph(emoji_hand_ok));
+        addRelay(MESSAGE_LAGENHET_PRE, MESSAGE_LAGENHET);
+        
+        createMessage(MESSAGE_LAGENHET,
+                new MessageBodySingleSelect("Har du BankID? I så fall kan vi hoppa över några frågor!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}",  null, false));
                             add(new SelectOption("Jag har inte BankID", "message.manuellnamn"));
@@ -292,7 +297,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     UserData obd = uc.getOnBoardingData();
                     if(m.getSelectedItem().value.equals("message.bankid.autostart.respond"))
                     {
-                        obd.setBankIdMessage("message.lagenhet");
+                        obd.setBankIdMessage(MESSAGE_LAGENHET);
                     }
 
                     return "";
@@ -300,7 +305,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         );
 
 
-        setupBankidErrorHandlers("message.lagenhet");
+        setupBankidErrorHandlers(MESSAGE_LAGENHET);
 
         createMessage("message.missing.bisnode.data",
                 new MessageBodyParagraph("Jag hittade tyvärr inte dina uppgifter. Men...")
@@ -402,7 +407,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         createChatMessage("message.manuellnamn", new MessageBodyText("Inga problem! Då ställer jag bara några extra frågor nu\fMen om du vill bli medlem sen så måste du signera med BankID, bara så du vet!\fVad heter du i förnamn?"));
         
-        createMessage("message.manuellfamilyname", new MessageBodyText("Kul att ha dig här {NAME}!  Vad heter du i efternamn?"));
+        createMessage("message.manuellfamilyname", new MessageBodyText("Kul att ha dig här {NAME}! Vad heter du i efternamn?"));
         
         createMessage("message.manuellpersonnr", new MessageBodyNumber("Tack! Vad är ditt personnummer? (12 siffror)"));
         setExpectedReturnType("message.manuellpersonnr", new SSNSweden());
@@ -497,7 +502,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         createMessage(MESSAGE_ANNATBOLAG, new MessageBodyText("Okej, vilket försäkringsbolag har du?"),2000);
 
         createChatMessage(MESSAGE_BYTESINFO,
-                new MessageBodySingleSelect("Då är det dags att prova något nytt. De kommer nog förstå!\f"
+                new MessageBodySingleSelect("Ja, ibland är det dags att prova något nytt. De kommer nog förstå\f"
                 		+ "Om du blir medlem hos mig sköter jag bytet åt dig. Så när din gamla försäkring går ut, flyttas du automatiskt till din nya hos mig",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Jag förstår", MESSAGE_FORSLAG)); //Create product
@@ -540,13 +545,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         createMessage(MESSAGE_50K_LIMIT_NO, new MessageBodyParagraph("Vad bra! Då täcks alla dina prylar av drulleförsäkringen"), 2000);
 
-        createMessage(MESSAGE_50K_LIMIT_NO_1, new MessageBodyParagraph("Köper du någon dyrgrip i framtiden så fixar jag så klart det också!"), 2000);
+        createMessage(MESSAGE_50K_LIMIT_NO_1, new MessageBodyParagraph("Köper du någon dyr pryl i framtiden så fixar jag så klart det också!"), 2000);
 
         addRelay(MESSAGE_50K_LIMIT_NO, MESSAGE_50K_LIMIT_NO_1);
 
         addRelay(MESSAGE_50K_LIMIT_NO_1, MESSAGE_PHONENUMBER);
 
-        createMessage(MESSAGE_FORSLAG, new MessageBodyParagraph("Sådär, det var all info jag behövde! Tack " + emoji_folded_hands),2000);
+        createMessage(MESSAGE_FORSLAG, new MessageBodyParagraph("Sådär, det var all info jag behövde. Tack!"),2000);
 
         createMessage(MESSAGE_FORSLAG2,
                 new MessageBodySingleSelect("Nu går vi igenom ditt förslag!",
@@ -1321,7 +1326,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         switch(nxtMsg){
         	case "message.medlem":
             case "message.bankid.start":
-            case "message.lagenhet":
+            case MESSAGE_LAGENHET:
                 Optional<BankIdAuthResponse> authResponse = memberService.auth(userContext.getMemberId());
 
                 if(!authResponse.isPresent()) {
