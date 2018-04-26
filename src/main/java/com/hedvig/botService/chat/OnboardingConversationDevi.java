@@ -1212,6 +1212,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 addToChat(m, userContext);
                 break;
             case MESSAGE_FORSAKRINGIDAGJA:
+            case "message.bolag.annat.expand":
                 String comp = getValue((MessageBodySingleSelect)m.body);
                 if(!comp.startsWith("message.")){
 	                userContext.putUserData("{INSURANCE_COMPANY_TODAY}", comp);
