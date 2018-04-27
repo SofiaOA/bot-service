@@ -180,12 +180,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 }}));
 
         createMessage("message.notmember",
-                new MessageBodyText("Okej! Då tar jag fram ett försäkringsförslag till dig på nolltid"
+                new MessageBodyParagraph("Okej! Då tar jag fram ett försäkringsförslag till dig på nolltid"
                 ));
         addRelay("message.notmember","message.notmember.start");
         
         createMessage("message.notmember.start",
-                new MessageBodyText("Jag ställer några snabba frågor så att jag kan räkna ut ditt pris"
+                new MessageBodyParagraph("Jag ställer några snabba frågor så att jag kan räkna ut ditt pris"
                 ));
         addRelay("message.notmember",MESSAGE_FORSLAGSTART);
         
