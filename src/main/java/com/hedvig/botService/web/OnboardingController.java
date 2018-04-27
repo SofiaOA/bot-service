@@ -53,14 +53,14 @@ public class OnboardingController {
                     errorCode = "internalError";
                     break;
             }
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BankIdCollectError(errorCode, e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BankIdCollectError(errorCode, e.getMessage()));
         }
         catch( FeignException ex) {
             log.error("Error starting bankidSign with member-service ", ex);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BankIdCollectError("unkown", ex.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BankIdCollectError("unkown", ex.getMessage()));
         }catch (Exception ex) {
             log.error("Got exception: ", ex.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BankIdCollectError("unkown", ex.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BankIdCollectError("unkown", ex.getMessage()));
         }
     }
 
@@ -130,13 +130,13 @@ public class OnboardingController {
             if(clientFailure) {
                 return ResponseEntity.ok(new BankidCollectResponse(body.getOrderRef(), "failed", hint));
             } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BankIdCollectError(hint, e.getMessage()));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BankIdCollectError(hint, e.getMessage()));
             }
 
 
         }catch( Exception ex) {
             log.error("Error collecting result from member-service ", ex);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new BankIdCollectError("unknown", ex.getMessage()));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BankIdCollectError("unknown", ex.getMessage()));
         }
     }
 }
