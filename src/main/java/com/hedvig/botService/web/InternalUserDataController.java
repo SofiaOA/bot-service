@@ -31,7 +31,7 @@ public class InternalUserDataController {
         log.info("Get pushtoken for memberId:{}, is: {}", value("memberId", ""));
         String token = sessionManager.getPushToken(hid);
         if(token == null) {
-            ResponseEntity.ok("{\"token\":null}");
+            return  ResponseEntity.ok("{\"token\":null}");
         }
         return new ResponseEntity<String>(token ,HttpStatus.OK);
     }
