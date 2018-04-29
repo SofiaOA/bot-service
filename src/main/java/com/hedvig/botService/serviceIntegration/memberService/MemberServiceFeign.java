@@ -140,6 +140,11 @@ public class MemberServiceFeign implements MemberService {
         send( () -> this.client.selectCashback(memberId, charityId));
     }
 
+    @Override
+    public void updateEmail(String memberId, String email) {
+        send( () -> this.client.updateEmail(memberId, new UpdateEmailRequest(email)));
+    }
+
     private void send(Runnable supplier) {
         try {
             supplier.run();
