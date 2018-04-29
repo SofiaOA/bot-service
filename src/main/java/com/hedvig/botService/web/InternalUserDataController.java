@@ -27,9 +27,12 @@ public class InternalUserDataController {
     }
 
     @GetMapping(value = "{hid}/push-token", produces="application/json")
-    ResponseEntity<String> pushToken(@PathVariable String hid){
+    ResponseEntity<?> pushToken(@PathVariable String hid){
         log.info("Get pushtoken for memberId:{}, is: {}", value("memberId", ""));
         String token = sessionManager.getPushToken(hid);
+        if(token == null) {
+            ResponseEntity.ok("{\"token\":null}");
+        }
         return new ResponseEntity<String>(token ,HttpStatus.OK);
     }
 
