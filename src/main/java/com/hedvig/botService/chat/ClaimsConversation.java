@@ -49,8 +49,8 @@ public class ClaimsConversation extends Conversation {
 
         createMessage(MESSAGE_CLAIMS_START, new MessageBodyParagraph("Okej, det här löser vi på nolltid!"),2000);
 
-        createMessage(MESSAGE_CLAIMS_NOT_ACTIVE,
-                new MessageBodySingleSelect("Din försäkring har inte ännu flyttats till Hedvig, du har fortfarande bindningstid kvar hos ditt gamla försäkringsbolag. Så tills vidare skulle jag rekommendera dig att prata med dem. \fBehöver du stöd eller hjälp kan jag så klart be en av mina kollegor att ringa dig?",
+        createChatMessage(MESSAGE_CLAIMS_NOT_ACTIVE,
+                new MessageBodySingleSelect("Din försäkring har inte ännu flyttats till Hedvig, du har fortfarande bindningstid kvar hos ditt gamla försäkringsbolag. Så tills vidare skulle jag rekommendera dig att prata med dem.\fBehöver du stöd eller hjälp kan jag så klart be en av mina kollegor att ringa dig?",
                     Lists.newArrayList(
                         new SelectOption("Jag förstår", MESSAGE_CLAIMS_NOT_ACTIVE_OK),
                         new SelectOption("Ring mig", MESSAGE_CLAIMS_NOT_ACTIVE_CALL_ME))

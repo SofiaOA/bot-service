@@ -179,6 +179,16 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     add(new SelectOption("Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST));
                 }}));
 
+        createMessage("message.notmember",
+                new MessageBodyParagraph("Okej! Då tar jag fram ett försäkringsförslag till dig på nolltid"
+                ));
+        addRelay("message.notmember","message.notmember.start");
+        
+        createMessage("message.notmember.start",
+                new MessageBodyParagraph("Jag ställer några snabba frågor så att jag kan räkna ut ditt pris"
+                ));
+        addRelay("message.notmember",MESSAGE_FORSLAGSTART);
+        
         // Deprecated
         createChatMessage("message.waitlist.user.alreadyactive",
                 new MessageBodyText("Grattis! " + emoji_tada + " Nu kan du bli medlem hos Hedvig\fKolla din mail, där ska du ha fått en aktiveringkod som du ska ange här\fVi ses snart! " + emoji_smile
@@ -322,7 +332,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodySingleSelect("Bara att logga in så ser du din försäkring",
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}",  null, false));
-                            add(new SelectOption("Jag är inte medlem", MESSAGE_WAITLIST_START));
+                            add(new SelectOption("Jag är inte medlem", "message.notmember"));
                         }}
                 ),
                 (m, uc) -> {
@@ -673,7 +683,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
                         String signText;
                         if(ud.getCurrentInsurer() != null) {
-                            signText = "Jag har tagit del av förköpsinformation och villkor och bekräftar genom att signera att jag vill byta till Hedvig när min gamla försäkring går ut. Jag ger också  Hedvig fullmakt att byta försäkringen åt mig.";
+                            signText = "Jag har tagit del av förköpsinformation och villkor och bekräftar genom att signera att jag vill byta till Hedvig när min gamla försäkring går ut. Jag ger också Hedvig fullmakt att byta försäkringen åt mig.";
                         } else {
                             signText = "Jag har tagit del av förköpsinformation och villkor och bekräftar genom att signera att jag skaffar en försäkring hos Hedvig.";
                         }
