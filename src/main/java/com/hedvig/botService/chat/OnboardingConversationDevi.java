@@ -1182,7 +1182,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 String trim2 = m.body.text.trim();
                 userContext.putUserData("{EMAIL}", trim2);
                 m.body.text = "Min email är " + trim2;
-                memberService.updateEmail(userContext.getMemberId(), m.body.text.trim());
+                memberService.updateEmail(userContext.getMemberId(), trim2);
                 addToChat(m, userContext);
                 endConversation(userContext);
                 return;
