@@ -20,7 +20,7 @@ public interface MemberServiceClient {
     @RequestMapping(value = "/member/bankid/collect", method = RequestMethod.POST)
     ResponseEntity<BankIdCollectResponse> collect(@RequestHeader("hedvig.token") String memberId, @RequestParam("referenceToken") String referenceToken);
 
-    @RequestMapping(value = "/member/{memberId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/i/member/{memberId}", method = RequestMethod.GET)
     ResponseEntity<Member> profile(@PathVariable("memberId") String memberId);
 
     @RequestMapping(value = "/i/member/{memberId}/startOnboardingWithSSN")
