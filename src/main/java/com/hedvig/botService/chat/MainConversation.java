@@ -21,6 +21,7 @@ import java.util.Objects;
 public class MainConversation extends Conversation {
 
 	public static final String MESSAGE_HEDVIG_COM = "hedvig.com";
+	public static final String MESSAGE_HEDVIG_COM_CLAIMS = "hedvig.com.claims";
 	public static final String MESSAGE_QUESTION_RECIEVED = "message.question.recieved";
 	public static final String MESSAGE_MAIN_END = "message.main.end";
 	public static final String MESSAGE_MAIN_CALLME = "message.main.callme";
@@ -52,6 +53,14 @@ public class MainConversation extends Conversation {
 							new SelectOption("Ring mig!", MESSAGE_MAIN_CALLME),
 							new SelectOption("Jag har en fråga", MESSAGE_MAIN_QUESTION)
 				)));
+
+		createMessage(MESSAGE_HEDVIG_COM_CLAIMS,
+				new MessageBodySingleSelect("Är det något mer du vill ha hjälp med?",
+						Lists.newArrayList(
+								new SelectOption("Rapportera en skada", MESSAGE_MAIN_REPORT),
+								new SelectOption("Ring mig!", MESSAGE_MAIN_CALLME),
+								new SelectOption("Jag har en fråga", MESSAGE_MAIN_QUESTION)
+						)));
 		
 		createMessage(MESSAGE_QUESTION_RECIEVED,
 				new MessageBodySingleSelect("Tack {NAME}, jag återkommer så snart jag kan med svar på din fråga",
@@ -86,6 +95,7 @@ public class MainConversation extends Conversation {
 		if(!validateReturnType(m,userContext)){return;}
 		
 		switch(m.id){
+			case MESSAGE_HEDVIG_COM_CLAIMS:
 			case MESSAGE_HEDVIG_COM: {
 				SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
 				m.body.text = item.text;

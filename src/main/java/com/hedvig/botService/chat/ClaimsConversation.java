@@ -97,12 +97,10 @@ public class ClaimsConversation extends Conversation {
         createMessage("message.claims.record.ok2", new MessageBodyParagraph("Jag återkommer till dig om jag behöver något mer, eller för att meddela att jag kan betala ut ersättning direkt"),2000);
 //        createMessage("message.claims.record.ok3", new MessageBodyParagraph("Tack för att du delat med dig om det som hänt. Ta hand om dig så länge, så hörs vi snart!"),2000);
 
-        createMessage("message.claims.record.ok3",
-                new MessageBodySingleSelect("Tack för att du delat med dig om det som hänt. Ta hand om dig så länge, så hörs vi snart!",
-                        new ArrayList<SelectItem>() {{
-                        	add(new SelectLink("Hem", "onboarding.done", "Dashboard", null, null,  false));
-                        }}
-                ));
+        createMessage(
+                "message.claims.record.ok3",
+                new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
+                new MessageBodyText("Tack för att du delat med dig om det som hänt. Ta hand om dig så länge, så hörs vi snart!"));
 
 		createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 	}
@@ -239,12 +237,19 @@ public class ClaimsConversation extends Conversation {
                 case "message.claims.record4": completeRequest("message.claims.record5", userContext); break;
                 case "message.claims.record5": completeRequest("message.claims.audio", userContext); break;
                 case "message.claims.record.ok": completeRequest("message.claims.record.ok2", userContext); break;
-                case "message.claims.record.ok2": completeRequest("message.claims.record.ok3", userContext); break;
+                case "message.claims.record.ok2": completeConversation(userContext); break;
                 }
                 break;
             default:
                 break;
         }
+    }
+
+
+    private void completeConversation(UserContext uc) {
+        addToChat("message.claims.record.ok3", uc);
+        val conversation = conversationFactory.createConversation(TrustlyConversation.class);
+        uc.startConversation(conversation, "");
     }
 
 }
