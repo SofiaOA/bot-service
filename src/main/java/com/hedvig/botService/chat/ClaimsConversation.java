@@ -251,7 +251,7 @@ public class ClaimsConversation extends Conversation {
     private void completeConversation(UserContext uc) {
         addToChat("message.claims.record.ok3", uc);
         val conversation = conversationFactory.createConversation(TrustlyConversation.class);
-        uc.startConversation(conversation, "");
+        uc.startConversation(conversation, MainConversation.MESSAGE_HEDVIG_COM_CLAIMS);
     }
 
 }
