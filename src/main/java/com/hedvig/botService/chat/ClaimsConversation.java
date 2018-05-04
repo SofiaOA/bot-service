@@ -77,7 +77,9 @@ public class ClaimsConversation extends Conversation {
 		createMessage("message.claims.chat2", new MessageBodyParagraph("Först behöver du bara bekräfta detta"),2000);
 
         createMessage("message.claim.promise",
-                new MessageBodySingleSelect("Hedvigs hederslöfte\nJag förstår att Hedvig bygger på tillit. Jag lovar att berätta om händelsen precis som den var, och bara ta ut den ersättning jag har rätt till. Tar jag ut mer än så inser jag att det drabbar min valda välgörenhetsorganisation",        		
+                new MessageBodySingleSelect("Hedvigs hederslöfte\n\n"+
+                		"Jag förstår att Hedvig bygger på tillit. Jag lovar att berätta om händelsen precis som den var, och bara ta ut den ersättning jag har rätt till.\n\n"+
+                		"Tar jag ut mer än så inser jag att det drabbar min valda välgörenhetsorganisation",        		
                 //new MessageBodySingleSelect("HEDVIGS HEDERSLÖFTE\nJag vet att Hedvig bygger på tillit medlemmar emellan.\nJag lovar att berätta om händelsen precis som den var, och bara ta ut den ersättning jag har rätt till ur vår gemensamma medlemspott.",
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Jag lovar!", "message.claims.ok"));
