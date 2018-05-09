@@ -551,11 +551,16 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         new SelectOption("Nej", MESSAGE_50K_LIMIT_NO)
                 )));
 
-        createChatMessage(MESSAGE_50K_LIMIT_YES, new MessageBodySingleSelect("All right! Anledningen att jag frågar är att drulleförsäkring ingår för alla prylar under 50 000 kr\fSka jag be en kollega höra av sig till dig efteråt för att ordna försäkring för dina dyrare prylar också?",
+        createMessage(MESSAGE_50K_LIMIT_YES, new MessageBodySingleSelect("OK, om du skaffar Hedvig är det enkelt att lägga till försäkring för dina dyrare prylar efteråt!",
+                Lists.newArrayList(
+                        new SelectOption("Okej!", MESSAGE_50K_LIMIT_YES_YES)
+                )));
+        
+        /*createChatMessage(MESSAGE_50K_LIMIT_YES, new MessageBodySingleSelect("All right! Anledningen att jag frågar är att drulleförsäkring ingår för alla prylar under 50 000 kr\fSka jag be en kollega höra av sig till dig efteråt för att ordna försäkring för dina dyrare prylar också?",
         Lists.newArrayList(
                 new SelectOption("Ja", MESSAGE_50K_LIMIT_YES_YES),
                 new SelectOption("Nej", MESSAGE_50K_LIMIT_YES_NO)
-        )));
+        )));*/
 
         createMessage(MESSAGE_50K_LIMIT_YES_YES,
                 new MessageBodyParagraph("Det fixar jag!"), 1500);
@@ -1302,11 +1307,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     private String handle50KLimitAnswer(String nxtMsg, UserContext userContext, MessageBodySingleSelect body) {
         if(body.getSelectedItem().value.equalsIgnoreCase(MESSAGE_50K_LIMIT_YES_YES)) {
             userContext.putUserData("{50K_LIMIT}", "true");
-            eventPublisher.publishEvent(
+            /*eventPublisher.publishEvent(
                     new RequestObjectInsuranceEvent(
-                            userContext.getMemberId()));
+                            userContext.getMemberId()));*/
         }
-        return nxtMsg;
+        return MESSAGE_PHONENUMBER;
     }
 
     private void handleFriFraga(UserContext userContext, Message m) {
