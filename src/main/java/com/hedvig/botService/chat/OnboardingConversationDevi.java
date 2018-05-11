@@ -1187,6 +1187,14 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 return;
                 //nxtMsg = MESSAGE_FORSAKRINGIDAG;
             case MESSAGE_50K_LIMIT_YES:
+                MessageBodySingleSelect body1 = (MessageBodySingleSelect) m.body;
+                for (SelectItem o : body1.choices) {
+                    if(o.selected) {
+                        m.body.text = o.text;
+                        addToChat(m, userContext);
+                        nxtMsg = o.value;
+                    }
+                }
                 nxtMsg = handle50KLimitAnswer(nxtMsg, userContext, (MessageBodySingleSelect)m.body);
                 break;
             //case "message.bytesinfo":
