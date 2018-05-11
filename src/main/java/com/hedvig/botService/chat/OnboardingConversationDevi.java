@@ -551,9 +551,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         new SelectOption("Nej", MESSAGE_50K_LIMIT_NO)
                 )));
 
-        createMessage(MESSAGE_50K_LIMIT_YES, new MessageBodySingleSelect("OK, om du skaffar Hedvig är det enkelt att lägga till försäkring för dina dyrare prylar efteråt!",
+        createChatMessage(MESSAGE_50K_LIMIT_YES, new MessageBodySingleSelect("Okej!\fOm du skaffar Hedvig är det enkelt att lägga till försäkring för dina dyrare prylar efteråt",
                 Lists.newArrayList(
-                        new SelectOption("Okej!", MESSAGE_50K_LIMIT_YES_YES)
+                        new SelectOption("Jag förstår!", MESSAGE_50K_LIMIT_YES_YES)
                 )));
 
         createMessage(MESSAGE_50K_LIMIT_YES_YES,
@@ -1309,6 +1309,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     private String handle50KLimitAnswer(String nxtMsg, UserContext userContext, MessageBodySingleSelect body) {
         if(body.getSelectedItem().value.equalsIgnoreCase(MESSAGE_50K_LIMIT_YES_YES)) {
             userContext.putUserData("{50K_LIMIT}", "true");
+            eventPublisher.publishEvent(new RequestObjectInsuranceEvent(userContext.getMemberId()));
         }
         return MESSAGE_PHONENUMBER;
     }
