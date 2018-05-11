@@ -111,28 +111,6 @@ public class OnboardingConversationDeviTest {
     }
 
     @Test
-    public void SendNotificationEventOn_WhenMessge_50K_LIMIT_YES_withAnswer_MESSAGE_50K_LIMIT_YES_YES(){
-        Message m = testConversation.getMessage(OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES + ".2");
-        val choice = ((MessageBodySingleSelect)m.body).choices.stream().filter(x -> x.value.equalsIgnoreCase(MESSAGE_50K_LIMIT_YES_YES)).findFirst();
-
-        choice.get().selected = true;
-
-        testConversation.receiveMessage(userContext, m);
-        then(publisher).should().publishEvent(new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID));
-    }
-
-    @Test
-    public void DoNotSendNotificationEventOn_WhenMessge_50K_LIMIT_YES_withAnswer_MESSAGE_50K_LIMIT_YES_NO(){
-        Message m = testConversation.getMessage(OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES + ".2");
-        val choice = ((MessageBodySingleSelect)m.body).choices.stream().filter(x -> x.value.equalsIgnoreCase(MESSAGE_50K_LIMIT_YES_NO)).findFirst();
-
-        choice.get().selected = true;
-
-        testConversation.receiveMessage(userContext, m);
-        then(publisher).should(times(0)).publishEvent(new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID));
-    }
-
-    @Test
     public void ReturnFalse_WhenChat_IsBeforeHouseChoice() {
 
         val canAcceptAnswer = testConversation.canAcceptAnswerToQuestion(userContext);
