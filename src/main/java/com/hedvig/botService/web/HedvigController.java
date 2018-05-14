@@ -3,7 +3,9 @@ package com.hedvig.botService.web;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.SessionManager;
+import com.hedvig.botService.web.dto.AvatarDTO;
 import com.hedvig.botService.web.dto.CollectResponse;
+import com.hedvig.botService.web.dto.CounterDTO;
 import com.hedvig.botService.web.dto.SignupStatus;
 import com.hedvig.botService.web.dto.UpdateTypes;
 import org.slf4j.Logger;
@@ -14,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static net.logstash.logback.argument.StructuredArguments.value;
+
+import java.util.List;
 
 
 @RestController
@@ -40,6 +44,23 @@ public class HedvigController {
         return new ResponseEntity<>(ss,HttpStatus.OK);
     }
 
+    @PostMapping(path = "/deeplink")
+    public ResponseEntity<Void> deeplink(@RequestBody String link, @RequestHeader(value="hedvig.token") String hid) {
+    	log.info("Received deep link " + link + " for user " + hid);
+    	sessionManager.saveDeepLink(hid, link);       
+        return ResponseEntity.noContent().build();
+    }
+    
+    @PostMapping(path = "/counter")
+    public ResponseEntity<CounterDTO> counter(@RequestBody String externalToken) {
+    	log.info("Fetching waitlist position for externalToken:" + externalToken);
+    	
+        CounterDTO counter = new CounterDTO();
+        counter.number = 123;
+
+        return new ResponseEntity<CounterDTO>(counter,HttpStatus.OK);
+    }
+    
     @PostMapping("/push-token")
     ResponseEntity<Void> pushToken(@RequestBody String tokenJson, @RequestHeader(value="hedvig.token") String hid) {
         log.info("Push token for memberId:{}, is: {}", value("memberId", ""), tokenJson);
