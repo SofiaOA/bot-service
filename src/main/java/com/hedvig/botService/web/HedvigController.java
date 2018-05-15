@@ -5,7 +5,6 @@ import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingSer
 import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.AvatarDTO;
 import com.hedvig.botService.web.dto.CollectResponse;
-import com.hedvig.botService.web.dto.CounterDTO;
 import com.hedvig.botService.web.dto.SignupStatus;
 import com.hedvig.botService.web.dto.UpdateTypes;
 import org.slf4j.Logger;
@@ -50,17 +49,7 @@ public class HedvigController {
     	sessionManager.saveDeepLink(hid, link);       
         return ResponseEntity.noContent().build();
     }
-    
-    @PostMapping(path = "/counter")
-    public ResponseEntity<CounterDTO> counter(@RequestBody String externalToken) {
-    	log.info("Fetching waitlist position for externalToken:" + externalToken);
-    	
-        CounterDTO counter = new CounterDTO();
-        counter.number = 123;
 
-        return new ResponseEntity<CounterDTO>(counter,HttpStatus.OK);
-    }
-    
     @PostMapping("/push-token")
     ResponseEntity<Void> pushToken(@RequestBody String tokenJson, @RequestHeader(value="hedvig.token") String hid) {
         log.info("Push token for memberId:{}, is: {}", value("memberId", ""), tokenJson);
