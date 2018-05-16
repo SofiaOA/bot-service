@@ -422,22 +422,22 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         
         createMessage("message.manuellpersonnr", new MessageBodyNumber("Tack! Vad är ditt personnummer? (12 siffror)"));
         setExpectedReturnType("message.manuellpersonnr", new SSNSweden());
-        createMessage("message.varborduadress", new MessageBodyText("Vilken gatuadress bor du på?"));
+        createMessage("message.varborduadress", new MessageBodyText("Tack! Och vilken gatuadress bor du på?"));
         createMessage("message.varbordupostnr", new MessageBodyNumber("Vad är ditt postnummer?"));
         setExpectedReturnType("message.varbordupostnr", new ZipCodeSweden());
         
         createMessage("message.student",
-                new MessageBodySingleSelect("Okej! Jag ser att du är under 27. Är du kanske student? " + emoji_school_satchel,
+                new MessageBodySingleSelect("Tackar! Jag ser att du är under 27. Är du kanske student? " + emoji_school_satchel,
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ja", "message.studentja"));
-                            add(new SelectOption("Nej", MESSAGE_SAKERHET));
+                            add(new SelectOption("Nej", "message.lghtyp"));
                         }}
                 ));
 
         createMessage("message.studentja",
                 new MessageBodySingleSelect("Se där! Då fixar jag så att du får studentrabatt",
                         new ArrayList<SelectItem>() {{
-                            add(new SelectOption("Ok!", MESSAGE_SAKERHET));
+                            add(new SelectOption("Ok!", "message.lghtyp"));
                         }}
                 ));
 
@@ -462,7 +462,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         setExpectedReturnType("message.pers", new HouseholdMemberNumber());
 
         createMessage(MESSAGE_SAKERHET,
-                new MessageBodyMultipleSelect("Finns någon av de här säkerhetsgrejerna i lägenheten?",
+                new MessageBodyMultipleSelect("Tack! Finns någon av de här säkerhetsgrejerna i lägenheten?",
                         Lists.newArrayList(
                             new SelectOption("Brandvarnare", "safety.alarm"),
                             new SelectOption("Brandsläckare", "safety.extinguisher"),
@@ -494,7 +494,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 ));
 
         createMessage(MESSAGE_FORSAKRINGIDAGJA,
-                new MessageBodySingleSelect("Okej! Vilket försäkringsbolag har du?",
+                new MessageBodySingleSelect("Okej! Vilket försäkringsbolag har du? " + emoji_sauropod,
                         new ArrayList<SelectItem>(){{
                         	add(new SelectOption("If", "if"));
                             add(new SelectOption("Folksam", "Folksam"));
@@ -551,7 +551,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         new SelectOption("Nej", MESSAGE_50K_LIMIT_NO)
                 )));
 
-        createChatMessage(MESSAGE_50K_LIMIT_YES, new MessageBodySingleSelect("Okej!\fOm du skaffar Hedvig är det enkelt att lägga till en separat objektsförsäkring efteråt",
+        createChatMessage(MESSAGE_50K_LIMIT_YES, new MessageBodySingleSelect("Okej!\fOm du skaffar Hedvig är det enkelt att lägga till försäkring för dina dyrare prylar efteråt",
                 Lists.newArrayList(
                         new SelectOption("Jag förstår!", MESSAGE_50K_LIMIT_YES_YES)
                 )));
@@ -564,7 +564,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodyParagraph("Då skippar jag det " + emoji_thumbs_up), 2000);
         addRelay(MESSAGE_50K_LIMIT_YES_NO, MESSAGE_PHONENUMBER);
 
-        createMessage(MESSAGE_50K_LIMIT_NO, new MessageBodyParagraph("Vad bra! Då täcks dina prylar av drulleförsäkringen"), 2000);
+        createMessage(MESSAGE_50K_LIMIT_NO, new MessageBodyParagraph("Vad bra! Då täcks alla dina prylar av drulleförsäkringen"), 2000);
 
         createMessage(MESSAGE_50K_LIMIT_NO_1, new MessageBodyParagraph("Köper du någon dyr pryl i framtiden så fixar jag så klart det också!"), 2000);
 
@@ -1099,14 +1099,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 	nxtMsg = "message.uwlimit.householdsize";
                 	break;
                 }
-                
-                // Student discount logic
-                if(onBoardingData.getAge() > 0 && onBoardingData.getAge() < 27) {
-                    nxtMsg = "message.student";
-                } else {
-                	nxtMsg = MESSAGE_SAKERHET;
-                }
-                
+                nxtMsg = MESSAGE_SAKERHET;
                 break;
             case "message.kvadrat":
                 String kvm = m.body.text;
