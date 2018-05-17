@@ -1325,7 +1325,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     private String handle50KLimitAnswer(String nxtMsg, UserContext userContext, MessageBodySingleSelect body) {
         if(body.getSelectedItem().value.equalsIgnoreCase(MESSAGE_50K_LIMIT_YES_YES)) {
             userContext.putUserData("{50K_LIMIT}", "true");
-            eventPublisher.publishEvent(new RequestObjectInsuranceEvent(userContext.getMemberId()));
         }
         return MESSAGE_PHONENUMBER;
     }
@@ -1473,6 +1472,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             log.info("Onboarding complete");
             addToChat(getMessage("message.kontraktklar"), userContext);
             userContext.getOnBoardingData().setUserHasSigned(true);
+            if(userContext.getDataEntry("{50K_LIMIT}").equals("true")) {
+                eventPublisher.publishEvent(new RequestObjectInsuranceEvent(userContext.getMemberId()));
+            }
             //userContext.completeConversation(this);
         }
     }
