@@ -1138,12 +1138,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             case "message.manuellpersonnr":
                 onBoardingData.setSSN(m.body.text);
 
-                // Member service is reponsible for handling SSN->birth date conversion
+                // Member service is responsible for handling SSN->birth date conversion
                 try {
                 	memberService.startOnBoardingWithSSN(userContext.getMemberId(), m.body.text);
                     MemberProfile member = memberService.getProfile(userContext.getMemberId());
-                    userContext.fillMemberData(member);
-    
+                    onBoardingData.setBirthDate(member.getBirthDate());
                 }catch (Exception ex) {
                     log.error("Error loading memberProfile from memberService", ex);
                 }
