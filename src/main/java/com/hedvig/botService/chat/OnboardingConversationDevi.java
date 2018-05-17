@@ -431,10 +431,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new MessageBodySingleSelect("Okej! Jag ser att du är under 27. Är du kanske student? " + emoji_school_satchel,
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ja", "message.studentja"));
-                            add(new SelectOption("Nej", MESSAGE_SAKERHET));
+                            add(new SelectOption("Nej", "message.studentnej"));
                         }}
                 ));
 
+        createMessage("message.studentnej", new MessageBodyParagraph("Okej då vet jag"));
+        addRelay("message.studentnej",MESSAGE_SAKERHET);
+        
         createMessage("message.studentja",
                 new MessageBodySingleSelect("Se där! Då fixar jag så att du får studentrabatt",
                         new ArrayList<SelectItem>() {{
