@@ -1117,14 +1117,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 onBoardingData.setLivingSpace(Float.parseFloat(kvm));
                 m.body.text = kvm + " kvm";
                 addToChat(m, userContext);
+                
                 if(Integer.parseInt(kvm) > 250){
                 	nxtMsg = "message.uwlimit.housingsize";
                 	break;
-                }
-                if(onBoardingData.getAge() > 0 && onBoardingData.getAge() < 27) {
-                    nxtMsg = "message.student";
-                } else {
-                    nxtMsg = "message.lghtyp";
                 }
 
                 break;                             
