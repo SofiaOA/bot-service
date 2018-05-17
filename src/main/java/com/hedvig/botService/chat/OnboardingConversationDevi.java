@@ -7,6 +7,7 @@ import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
+import com.hedvig.botService.serviceIntegration.memberService.MemberProfile;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
@@ -1136,6 +1137,17 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 break;
             case "message.manuellpersonnr":
                 onBoardingData.setSSN(m.body.text);
+
+                // Member service is reponsible for handling SSN->birth date conversion
+                try {
+                	memberService.startOnBoardingWithSSN(userContext.getMemberId(), m.body.text);
+                    MemberProfile member = memberService.getProfile(userContext.getMemberId());
+                    userContext.fillMemberData(member);
+    
+                }catch (Exception ex) {
+                    log.error("Error loading memberProfile from memberService", ex);
+                }
+                
                 addToChat(m, userContext);
                 nxtMsg = "message.varborduadress";
                 break;
