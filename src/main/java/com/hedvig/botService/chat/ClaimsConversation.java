@@ -211,11 +211,14 @@ public class ClaimsConversation extends Conversation {
     }
 
     private String handleClaimNotActive(UserContext userContext, Message m) {
-        addToChat(m, userContext);
+
+
 
         MessageBodySingleSelect body = (MessageBodySingleSelect) m.body;
+        m.body.text = body.getSelectedItem().text;
+        addToChat(m, userContext);
 	    if(body.getSelectedItem().value.equals(MESSAGE_CLAIMS_NOT_ACTIVE_CALL_ME)) {
-            return MESSAGE_CLAIM_CALLME;
+	        return MESSAGE_CLAIM_CALLME;
         }
 
         userContext.completeConversation(this);
