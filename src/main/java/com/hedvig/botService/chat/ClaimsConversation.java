@@ -160,11 +160,11 @@ public class ClaimsConversation extends Conversation {
 
 		if(!validateReturnType(m,userContext)){return;}
 
-		switch(m.id){
-		case "message.claims.audio":
-            nxtMsg = handleAudioReceived(userContext, m);
+		switch(getMessageId(m.id)){
+			case "message.claims.audio":
+				nxtMsg = handleAudioReceived(userContext, m);
+				break;
 
-			break;
             case MESSAGE_CLAIM_CALLME:
                 userContext.putUserData("{PHONE}", m.body.text);
                 addToChat(m, userContext); // Response parsed to nice format
