@@ -1,8 +1,10 @@
 package com.hedvig.botService.chat;
 
+import com.google.common.collect.Iterables;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodyAudio;
+import com.hedvig.botService.enteties.message.MessageBodyParagraph;
 import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.events.ClaimAudioReceivedEvent;
@@ -71,7 +73,20 @@ public class ClaimsConversationTest {
 
         testConversation.init(userContext);
 
-        assertThat(userContext.getMemberChat().chatHistory.get(0).id).isEqualTo(ClaimsConversation.MESSAGE_CLAIMS_NOT_ACTIVE);
+        Message msg;
+        boolean messageIsParagraph;
+        int i = 0;
+        do{
+            msg = Iterables.getLast(userContext.getMemberChat().chatHistory);
+            messageIsParagraph = MessageBodyParagraph.class.isInstance(msg.body);
+            if(messageIsParagraph) {
+                testConversation.recieveEvent(Conversation.EventTypes.MESSAGE_FETCHED, msg.id, userContext);
+            }
+        }
+        while(messageIsParagraph && i++ < 20);
+
+        assertThat(msg.body).isNotInstanceOf(MessageBodyParagraph.class);
+        assertThat(msg.id).startsWith(ClaimsConversation.MESSAGE_CLAIMS_NOT_ACTIVE);
     }
 
     @Test
@@ -80,7 +95,7 @@ public class ClaimsConversationTest {
 
         testConversation.init(userContext);
 
-        assertThat(userContext.getMemberChat().chatHistory.get(0).id).isEqualTo(ClaimsConversation.MESSAGE_CLAIMS_START);
+        assertThat(userContext.getMemberChat().chatHistory.get(0).id).startsWith(ClaimsConversation.MESSAGE_CLAIMS_START);
     }
 
     @Test

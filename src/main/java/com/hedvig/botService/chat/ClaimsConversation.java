@@ -48,6 +48,7 @@ public class ClaimsConversation extends Conversation {
 
 
         createMessage(MESSAGE_CLAIMS_START, new MessageBodyParagraph("Okej, det här löser vi på nolltid!"),2000);
+        addRelay(MESSAGE_CLAIMS_START, "message.claims.chat");
 
         createChatMessage(MESSAGE_CLAIMS_NOT_ACTIVE,
                 new MessageBodySingleSelect("Din försäkring har inte ännu flyttats till Hedvig, du har fortfarande bindningstid kvar hos ditt gamla försäkringsbolag. Så tills vidare skulle jag rekommendera dig att prata med dem.\fBehöver du stöd eller hjälp kan jag så klart be en av mina kollegor att ringa dig?",
@@ -56,7 +57,7 @@ public class ClaimsConversation extends Conversation {
                         new SelectOption("Ring mig", MESSAGE_CLAIMS_NOT_ACTIVE_CALL_ME))
                 )
         );
-		
+
         createMessage("message.claim.menu",
                 new MessageBodySingleSelect("Är du i en krissituation just nu? Om det är akut så ser jag till att en kollega ringer upp dig",
                         new ArrayList<SelectItem>() {{
@@ -74,7 +75,10 @@ public class ClaimsConversation extends Conversation {
                 ));
 
 		createMessage("message.claims.chat", new MessageBodyParagraph("Du ska strax få berätta vad som hänt genom att spela in ett röstmeddelande"),2000);
+		addRelay("message.claims.chat", "message.claims.chat2");
+
 		createMessage("message.claims.chat2", new MessageBodyParagraph("Först behöver du bara bekräfta detta"),2000);
+		addRelay("message.claims.chat2", "message.claim.promise");
 
         createMessage("message.claim.promise",
                 new MessageBodySingleSelect("Hedvigs hederslöfte\n\n"+
@@ -87,17 +91,30 @@ public class ClaimsConversation extends Conversation {
                 ));
         
         createMessage("message.claims.ok", new MessageBodyParagraph("Tusen tack!"),2000);
+        addRelay("message.claims.ok", "message.claims.record");
+
         createMessage("message.claims.record", new MessageBodyParagraph("Berätta vad som har hänt genom att spela in ett röstmeddelande"),2000);
+        addRelay("message.claims.record", "message.claims.record2");
+
         createMessage("message.claims.record2", new MessageBodyParagraph("Ju mer detaljer du ger, desto snabbare hjälp kan jag ge. Så om du svarar på dessa frågor är vi en god bit på väg: "),2000);
+        addRelay("message.claims.record2", "message.claims.record3");
+
         createMessage("message.claims.record3", new MessageBodyParagraph("Vad har hänt?"),2000);
+        addRelay("message.claims.record3", "message.claims.record4");
+
         createMessage("message.claims.record4", new MessageBodyParagraph("Var och när hände det?"),2000);
+        addRelay("message.claims.record4", "message.claims.record5");
+
         createMessage("message.claims.record5", new MessageBodyParagraph("Vad eller vem drabbades?"),2000);
-        
+        addRelay("message.claims.record5", "message.claims.audio");
+
         createMessage("message.claims.audio", new MessageBodyAudio("Starta inspelning", "/claims/fileupload"),2000);
         
         createMessage("message.claims.record.ok", new MessageBodyParagraph("Tack! Det är allt jag behöver just nu"),2000);
+        addRelay("message.claims.record.ok", "message.claims.record.ok2");
+
         createMessage("message.claims.record.ok2", new MessageBodyParagraph("Jag återkommer till dig om jag behöver något mer, eller för att meddela att jag kan betala ut ersättning direkt"),2000);
-//        createMessage("message.claims.record.ok3", new MessageBodyParagraph("Tack för att du delat med dig om det som hänt. Ta hand om dig så länge, så hörs vi snart!"),2000);
+        addRelay("message.claims.record.ok2", "message.claims.record.ok3");
 
         createMessage(
                 "message.claims.record.ok3",
@@ -138,15 +155,15 @@ public class ClaimsConversation extends Conversation {
     @Override
 	public void receiveMessage(UserContext userContext, Message m) {
 		log.info(m.toString());
-		
+
 		String nxtMsg = "";
-		
+
 		if(!validateReturnType(m,userContext)){return;}
-		
+
 		switch(m.id){
 		case "message.claims.audio":
             nxtMsg = handleAudioReceived(userContext, m);
-			
+
 			break;
             case MESSAGE_CLAIM_CALLME:
                 userContext.putUserData("{PHONE}", m.body.text);
@@ -163,7 +180,7 @@ public class ClaimsConversation extends Conversation {
                 }
                 break;
 		}
-		
+
         /*
 	  * In a Single select, there is only one trigger event. Set default here to be a link to a new message
 	  */
@@ -180,7 +197,7 @@ public class ClaimsConversation extends Conversation {
        }
        
        completeRequest(nxtMsg,userContext);
-		
+
 	}
 
     private void sendCallMeEvent(UserContext userContext, Message m) {
@@ -228,18 +245,14 @@ public class ClaimsConversation extends Conversation {
             // This is used to let Hedvig say multiple message after another
             case MESSAGE_FETCHED:
                 log.info("Message fetched:" + value);
-                switch(value){                
-                case MESSAGE_CLAIMS_START: completeRequest("message.claims.chat", userContext); break;
-                case "message.claims.chat": completeRequest("message.claims.chat2", userContext); break;
-                case "message.claims.chat2": completeRequest("message.claim.promise", userContext); break;
-                case "message.claims.ok": completeRequest("message.claims.record", userContext); break;
-                case "message.claims.record": completeRequest("message.claims.record2", userContext); break;
-                case "message.claims.record2": completeRequest("message.claims.record3", userContext); break;
-                case "message.claims.record3": completeRequest("message.claims.record4", userContext); break;
-                case "message.claims.record4": completeRequest("message.claims.record5", userContext); break;
-                case "message.claims.record5": completeRequest("message.claims.audio", userContext); break;
-                case "message.claims.record.ok": completeRequest("message.claims.record.ok2", userContext); break;
-                case "message.claims.record.ok2": completeConversation(userContext); break;
+                if(value.equals("message.claims.record.ok2")) {
+                    completeConversation(userContext);
+                    return;
+                }
+
+                String relay = getRelay(value);
+                if(relay!=null){
+                    completeRequest(relay, userContext);
                 }
                 break;
             default:
