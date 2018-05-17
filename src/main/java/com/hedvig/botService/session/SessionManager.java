@@ -100,6 +100,12 @@ public class SessionManager {
         userrepo.saveAndFlush(uc);
     }
     
+    public void saveDeepLink(String hid, String link) {
+        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        uc.putUserData(link, "1");
+        userrepo.saveAndFlush(uc);
+    }
+    
     public String getPushToken(String hid) {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
         return uc.getDataEntry("PUSH-TOKEN");
