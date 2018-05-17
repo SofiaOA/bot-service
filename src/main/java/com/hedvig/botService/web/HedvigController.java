@@ -3,6 +3,7 @@ package com.hedvig.botService.web;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.SessionManager;
+import com.hedvig.botService.web.dto.AvatarDTO;
 import com.hedvig.botService.web.dto.CollectResponse;
 import com.hedvig.botService.web.dto.SignupStatus;
 import com.hedvig.botService.web.dto.UpdateTypes;
@@ -14,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static net.logstash.logback.argument.StructuredArguments.value;
+
+import java.util.List;
 
 
 @RestController
@@ -38,6 +41,13 @@ public class HedvigController {
         SignupStatus ss = sessionManager.getSignupQueuePosition(externalToken);
 
         return new ResponseEntity<>(ss,HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/deeplink")
+    public ResponseEntity<Void> deeplink(@RequestBody String link, @RequestHeader(value="hedvig.token") String hid) {
+    	log.info("Received deep link " + link + " for user " + hid);
+    	sessionManager.saveDeepLink(hid, link);       
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/push-token")
