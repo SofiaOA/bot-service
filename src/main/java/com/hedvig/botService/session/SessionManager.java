@@ -47,6 +47,7 @@ public class SessionManager {
     private final ProductPricingService productPricingclient;
     private final SignupCodeRepository signupRepo;
     private final ConversationFactory conversationFactory;
+    private final CampaignCodeRepository campaignRepo;
 
     public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
     
@@ -54,12 +55,18 @@ public class SessionManager {
     public Integer queuePos;
 	
     @Autowired
-    public SessionManager(UserContextRepository userrepo, MemberService memberService, ProductPricingService client, SignupCodeRepository signupRepo, ConversationFactory conversationFactory) {
+    public SessionManager(UserContextRepository userrepo, 
+    		MemberService memberService, 
+    		ProductPricingService client, 
+    		SignupCodeRepository signupRepo, 
+    		ConversationFactory conversationFactory,
+    		CampaignCodeRepository campaignRepo) {
         this.userrepo = userrepo;
         this.memberService = memberService;
         this.productPricingclient = client;
         this.signupRepo = signupRepo;
         this.conversationFactory = conversationFactory;
+        this.campaignRepo = campaignRepo;
     }
 
     public List<Message> getMessages(int i, String hid) {
@@ -100,10 +107,10 @@ public class SessionManager {
         userrepo.saveAndFlush(uc);
     }
     
-    public void saveDeepLink(String hid, String link) {
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
-        uc.putUserData(link, "1");
-        userrepo.saveAndFlush(uc);
+    public void saveCampaignCode(String hid, String key, String value) {
+    	log.info("Saving campaign code ["+ key +":"+ value +"] for user: " + hid);
+        CampaignCode cc = new CampaignCode(hid, key, value);
+        campaignRepo.saveAndFlush(cc);
     }
     
     public String getPushToken(String hid) {

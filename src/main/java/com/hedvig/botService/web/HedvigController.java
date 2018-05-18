@@ -43,10 +43,10 @@ public class HedvigController {
         return new ResponseEntity<>(ss,HttpStatus.OK);
     }
 
-    @PostMapping(path = "/deeplink")
-    public ResponseEntity<Void> deeplink(@RequestBody String link, @RequestHeader(value="hedvig.token") String hid) {
-    	log.info("Received deep link " + link + " for user " + hid);
-    	sessionManager.saveDeepLink(hid, link);       
+    @PostMapping(path = "/campaign")
+    public ResponseEntity<Void> campaign(@RequestBody String key, @RequestParam String value, @RequestHeader(value="hedvig.token") String hid) {
+    	log.info("Received campaign code [" + key + ":" + value + "] for user " + hid);
+    	sessionManager.saveCampaignCode(hid, key, value);     
         return ResponseEntity.noContent().build();
     }
 
