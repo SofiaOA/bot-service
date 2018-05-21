@@ -134,7 +134,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         createChatMessage("message.membernotfound",
                 new MessageBodySingleSelect("Hmm, det verkar som att du inte är medlem här hos mig ännu"
-                        +"\fMen jag tar gärna fram ett försäkringsförslag till dig, det är precis som allt anntat med mig superenkelt",
+                        +"\fMen jag tar gärna fram ett försäkringsförslag till dig, det är precis som allt annat med mig superenkelt",
                         Lists.newArrayList(
                             new SelectOption("Låter bra!", MESSAGE_PRE_FORSLAGSTART)
                         )
