@@ -6,6 +6,7 @@ import com.hedvig.botService.session.SessionManager;
 import com.hedvig.botService.web.dto.AvatarDTO;
 import com.hedvig.botService.web.dto.CollectResponse;
 import com.hedvig.botService.web.dto.SignupStatus;
+import com.hedvig.botService.web.dto.TrackingDTO;
 import com.hedvig.botService.web.dto.UpdateTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,10 +44,10 @@ public class HedvigController {
         return new ResponseEntity<>(ss,HttpStatus.OK);
     }
 
-    @PostMapping(path = "/campaign")
-    public ResponseEntity<Void> campaign(@RequestBody String key, @RequestParam String value, @RequestHeader(value="hedvig.token") String hid) {
-    	log.info("Received campaign code [" + key + ":" + value + "] for user " + hid);
-    	sessionManager.saveCampaignCode(hid, key, value);     
+    @PostMapping(path = "/register_campaign")
+    public ResponseEntity<Void> campaign(@RequestBody TrackingDTO tracker, @RequestParam String value, @RequestHeader(value="hedvig.token") String hid) {
+    	log.info("Received tracking information for user " + hid);
+    	sessionManager.saveTrackingInformation(hid, tracker);     
         return ResponseEntity.noContent().build();
     }
 

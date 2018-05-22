@@ -13,6 +13,7 @@ import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingSer
 import com.hedvig.botService.web.dto.AddMessageRequestDTO;
 import com.hedvig.botService.web.dto.BackOfficeAnswerDTO;
 import com.hedvig.botService.web.dto.SignupStatus;
+import com.hedvig.botService.web.dto.TrackingDTO;
 import com.hedvig.botService.web.dto.UpdateTypes;
 import lombok.val;
 import org.slf4j.Logger;
@@ -47,7 +48,7 @@ public class SessionManager {
     private final ProductPricingService productPricingclient;
     private final SignupCodeRepository signupRepo;
     private final ConversationFactory conversationFactory;
-    private final CampaignCodeRepository campaignRepo;
+    private final TrackingDataRespository trackerRepo;
 
     public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
     
@@ -60,13 +61,13 @@ public class SessionManager {
     		ProductPricingService client, 
     		SignupCodeRepository signupRepo, 
     		ConversationFactory conversationFactory,
-    		CampaignCodeRepository campaignRepo) {
+    		TrackingDataRespository campaignRepo) {
         this.userrepo = userrepo;
         this.memberService = memberService;
         this.productPricingclient = client;
         this.signupRepo = signupRepo;
         this.conversationFactory = conversationFactory;
-        this.campaignRepo = campaignRepo;
+        this.trackerRepo = campaignRepo;
     }
 
     public List<Message> getMessages(int i, String hid) {
@@ -107,10 +108,9 @@ public class SessionManager {
         userrepo.saveAndFlush(uc);
     }
     
-    public void saveCampaignCode(String hid, String key, String value) {
-    	log.info("Saving campaign code ["+ key +":"+ value +"] for user: " + hid);
-        CampaignCode cc = new CampaignCode(hid, key, value);
-        campaignRepo.saveAndFlush(cc);
+    public void saveTrackingInformation(String hid, TrackingDTO tracker) {
+        TrackingEntity cc = new TrackingEntity(hid, tracker);
+        trackerRepo.saveAndFlush(cc);
     }
     
     public String getPushToken(String hid) {
