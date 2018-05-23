@@ -13,6 +13,7 @@ import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingSer
 import com.hedvig.botService.web.dto.AddMessageRequestDTO;
 import com.hedvig.botService.web.dto.BackOfficeAnswerDTO;
 import com.hedvig.botService.web.dto.SignupStatus;
+import com.hedvig.botService.web.dto.TrackingDTO;
 import com.hedvig.botService.web.dto.UpdateTypes;
 import lombok.val;
 import org.slf4j.Logger;
@@ -45,8 +46,10 @@ public class SessionManager {
     private final UserContextRepository userrepo;
     private final MemberService memberService;
     private final ProductPricingService productPricingclient;
+
     private final SignupCodeRepository signupRepo;
     private final ConversationFactory conversationFactory;
+    private final TrackingDataRespository trackerRepo;
 
     public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
     
@@ -54,12 +57,18 @@ public class SessionManager {
     public Integer queuePos;
 	
     @Autowired
-    public SessionManager(UserContextRepository userrepo, MemberService memberService, ProductPricingService client, SignupCodeRepository signupRepo, ConversationFactory conversationFactory) {
+    public SessionManager(UserContextRepository userrepo, 
+    		MemberService memberService, 
+    		ProductPricingService client, 
+    		SignupCodeRepository signupRepo, 
+    		ConversationFactory conversationFactory,
+    		TrackingDataRespository trackerRepo) {
         this.userrepo = userrepo;
         this.memberService = memberService;
         this.productPricingclient = client;
         this.signupRepo = signupRepo;
         this.conversationFactory = conversationFactory;
+        this.trackerRepo = trackerRepo;
     }
 
     public List<Message> getMessages(int i, String hid) {
@@ -100,10 +109,9 @@ public class SessionManager {
         userrepo.saveAndFlush(uc);
     }
     
-    public void saveDeepLink(String hid, String link) {
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
-        uc.putUserData(link, "1");
-        userrepo.saveAndFlush(uc);
+    public void saveTrackingInformation(String hid, TrackingDTO tracker) {
+        TrackingEntity cc = new TrackingEntity(hid, tracker);
+        trackerRepo.saveAndFlush(cc);
     }
     
     public String getPushToken(String hid) {

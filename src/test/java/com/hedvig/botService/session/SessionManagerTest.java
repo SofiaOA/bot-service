@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
+import com.hedvig.botService.enteties.TrackingDataRespository;
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.UserContextRepository;
@@ -52,6 +53,9 @@ public class SessionManagerTest {
     SignupCodeRepository signupCodeRepository;
 
     @Mock
+    TrackingDataRespository campaignCodeRepository;
+    
+    @Mock
     ConversationFactory conversationFactory;
 
     @Mock
@@ -62,7 +66,8 @@ public class SessionManagerTest {
 
     @Before
     public void setUp() {
-        sessionManager = new SessionManager(userContextRepository, memberService, productPricingService, signupCodeRepository, conversationFactory);
+        sessionManager = new SessionManager(
+        		userContextRepository, memberService, productPricingService, signupCodeRepository, conversationFactory, campaignCodeRepository);
     }
 
     @Test
