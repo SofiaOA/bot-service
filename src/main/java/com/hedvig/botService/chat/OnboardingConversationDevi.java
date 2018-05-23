@@ -1472,7 +1472,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             log.info("Onboarding complete");
             addToChat(getMessage("message.kontraktklar"), userContext);
             userContext.getOnBoardingData().setUserHasSigned(true);
-            if(userContext.getDataEntry("{50K_LIMIT}").equals("true")) {
+            String dataEntry = userContext.getDataEntry("{50K_LIMIT}");
+            if(Objects.equals(dataEntry, "true")) {
                 eventPublisher.publishEvent(new RequestObjectInsuranceEvent(userContext.getMemberId()));
             }
             //userContext.completeConversation(this);

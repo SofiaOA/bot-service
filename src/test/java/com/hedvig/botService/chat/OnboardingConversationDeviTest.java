@@ -111,14 +111,29 @@ public class OnboardingConversationDeviTest {
     }
 
     @Test
-    public void SendNotificationEventOn_WhenMessge_50K_LIMIT_YES_withAnswer_MESSAGE_50K_LIMIT_YES_YES(){
+    public void DoNotSendNotificationEvent_WhenMessge_50K_LIMIT_YES_withAnswer_MESSAGE_50K_LIMIT_YES_YES(){
         Message m = testConversation.getMessage(OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES + ".2");
         val choice = ((MessageBodySingleSelect)m.body).choices.stream().filter(x -> x.value.equalsIgnoreCase(MESSAGE_50K_LIMIT_YES_YES)).findFirst();
 
         choice.get().selected = true;
 
         testConversation.receiveMessage(userContext, m);
-        then(publisher).should().publishEvent(new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID));
+        then(publisher).should(times(0)).publishEvent(new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID));
+    }
+
+    @Test
+    public void SendNotificationEvent_WhenMemberSignedIsCalled_withUserContextValue50K_LIMITeqTRUE() {
+        String referenceId = "53bb6e92-5cc7-11e8-8c3b-235d0786c76b";
+        userContext.putUserData("{50K_LIMIT}", "true");
+        testConversation.memberSigned(referenceId, userContext);
+        then(publisher).should(times(1)).publishEvent(new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID));
+    }
+
+    @Test
+    public void DoNothing_WhenMemberSignedIsCalled_withUserContextValue50K_LIMITeqNULL() {
+        String referenceId = "53bb6e92-5cc7-11e8-8c3b-235d0786c76b";
+        testConversation.memberSigned(referenceId, userContext);
+        then(publisher).should(times(0)).publishEvent(new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID));
     }
 
     @Test
