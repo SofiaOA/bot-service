@@ -1,16 +1,19 @@
 package com.hedvig.botService.enteties;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +48,12 @@ public class TrackingEntity {
     @Getter
     private String phoneNumber;
     
+	@NotNull
+	@Column(nullable = false)
+    @Getter
+    @Setter
+	private Instant timestamp;
+    
     
     public TrackingEntity(String memberId, TrackingDTO tracking){
     	this.memberId = memberId;
@@ -54,6 +63,7 @@ public class TrackingEntity {
     	this.phoneNumber = tracking.getPhoneNumber();
     	this.utmContent = tracking.getUtmContent();
     	this.utmTerm = tracking.getUtmTerm();
+    	this.timestamp = Instant.now();
     }
     
     @Getter
