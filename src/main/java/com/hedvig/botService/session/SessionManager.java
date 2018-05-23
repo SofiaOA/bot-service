@@ -62,13 +62,13 @@ public class SessionManager {
     		ProductPricingService client, 
     		SignupCodeRepository signupRepo, 
     		ConversationFactory conversationFactory,
-    		TrackingDataRespository campaignRepo) {
+    		TrackingDataRespository trackerRepo) {
         this.userrepo = userrepo;
         this.memberService = memberService;
         this.productPricingclient = client;
         this.signupRepo = signupRepo;
         this.conversationFactory = conversationFactory;
-        this.trackerRepo = campaignRepo;
+        this.trackerRepo = trackerRepo;
     }
 
     public List<Message> getMessages(int i, String hid) {
