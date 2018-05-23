@@ -45,7 +45,7 @@ public class HedvigController {
     }
 
     @PostMapping(path = "/register_campaign")
-    public ResponseEntity<Void> campaign(@RequestBody TrackingDTO tracker, @RequestParam String value, @RequestHeader(value="hedvig.token") String hid) {
+    public ResponseEntity<Void> campaign(@RequestBody TrackingDTO tracker, @RequestHeader(value="hedvig.token") String hid) {
     	log.info("Received tracking information for user " + hid);
     	sessionManager.saveTrackingInformation(hid, tracker);     
         return ResponseEntity.noContent().build();

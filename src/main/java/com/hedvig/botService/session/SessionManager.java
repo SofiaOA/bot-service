@@ -46,6 +46,7 @@ public class SessionManager {
     private final UserContextRepository userrepo;
     private final MemberService memberService;
     private final ProductPricingService productPricingclient;
+
     private final SignupCodeRepository signupRepo;
     private final ConversationFactory conversationFactory;
     private final TrackingDataRespository trackerRepo;
