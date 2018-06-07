@@ -88,7 +88,6 @@ public class MainConversation extends Conversation {
 
 	@Override
 	public void receiveMessage(UserContext userContext, Message m) {
-		log.info(m.toString());
 		
 		String nxtMsg = "";
 		

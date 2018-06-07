@@ -900,7 +900,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     @Override
     public void receiveMessage(UserContext userContext, Message m) {
-        log.info("receiveMessage:" + m.toString());
 
         String nxtMsg = "";
 

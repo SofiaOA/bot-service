@@ -154,7 +154,6 @@ public class ClaimsConversation extends Conversation {
 
     @Override
 	public void receiveMessage(UserContext userContext, Message m) {
-		log.info(m.toString());
 
 		String nxtMsg = "";
 

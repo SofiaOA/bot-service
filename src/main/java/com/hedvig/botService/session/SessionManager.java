@@ -1,5 +1,7 @@
 package com.hedvig.botService.session;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.hedvig.botService.chat.*;
 import com.hedvig.botService.chat.Conversation.EventTypes;
@@ -50,6 +52,7 @@ public class SessionManager {
     private final SignupCodeRepository signupRepo;
     private final ConversationFactory conversationFactory;
     private final TrackingDataRespository trackerRepo;
+    private final ObjectMapper objectMapper;
 
     public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
     
@@ -57,18 +60,19 @@ public class SessionManager {
     public Integer queuePos;
 	
     @Autowired
-    public SessionManager(UserContextRepository userrepo, 
-    		MemberService memberService, 
-    		ProductPricingService client, 
-    		SignupCodeRepository signupRepo, 
-    		ConversationFactory conversationFactory,
-    		TrackingDataRespository trackerRepo) {
+    public SessionManager(UserContextRepository userrepo,
+                          MemberService memberService,
+                          ProductPricingService client,
+                          SignupCodeRepository signupRepo,
+                          ConversationFactory conversationFactory,
+                          TrackingDataRespository trackerRepo, ObjectMapper objectMapper) {
         this.userrepo = userrepo;
         this.memberService = memberService;
         this.productPricingclient = client;
         this.signupRepo = signupRepo;
         this.conversationFactory = conversationFactory;
         this.trackerRepo = trackerRepo;
+        this.objectMapper = objectMapper;
     }
 
     public List<Message> getMessages(int i, String hid) {
@@ -430,7 +434,11 @@ public class SessionManager {
 
     public void receiveMessage(Message m, String hid) {
         log.info("Recieving messages from user:" + hid);
-        log.info(m.toString());
+        try {
+            log.info(objectMapper.writeValueAsString(m));
+        }catch (JsonProcessingException ex) {
+            log.error("Could not convert message to json in order to log: {}", m.toString());
+        }
 
         m.header.fromId = new Long(hid);
 
