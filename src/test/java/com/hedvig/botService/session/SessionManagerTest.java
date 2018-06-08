@@ -26,6 +26,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Optional;
 import java.util.UUID;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static com.hedvig.botService.chat.Conversation.HEDVIG_USER_ID;
 import static com.hedvig.botService.session.TriggerServiceTest.TOLVANSSON_MEMBERID;
@@ -66,6 +67,7 @@ public class SessionManagerTest {
 
     @Before
     public void setUp() {
+        val objectMapper = new ObjectMapper();
         sessionManager = new SessionManager(
         		userContextRepository, memberService, productPricingService, signupCodeRepository, conversationFactory, campaignCodeRepository, objectMapper);
     }
