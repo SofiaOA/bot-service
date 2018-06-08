@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Entity
 @DiscriminatorValue("singleSelect")
@@ -32,7 +33,14 @@ public class MessageBodySingleSelect extends MessageBody {
 				return o;
 			}
 		}
-		throw new RuntimeException("No item selected.");
+		throw new RuntimeException(String.format(
+			"No item selected for list: [%s]",
+			this.choices
+				.stream()
+				.map(SelectItem::toString)
+				.collect(Collectors.joining(","))
+			)
+		);
 	}
 
 	@Override
