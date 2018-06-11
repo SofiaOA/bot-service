@@ -66,7 +66,7 @@ public class MainConversation extends Conversation {
 				new MessageBodySingleSelect("Tack {NAME}, jag återkommer så snart jag kan med svar på din fråga",
 						Lists.newArrayList(
 							new SelectOption("Jag har en till fråga", MESSAGE_MAIN_QUESTION),
-							SelectLink.toDashboard("Hem", MESSAGE_MAIN_ONBOARDING_DONE)
+							SelectLink.toDashboard("Hem", MESSAGE_HEDVIG_COM)
 				)));
 		
         createMessage(MESSAGE_MAIN_END,
