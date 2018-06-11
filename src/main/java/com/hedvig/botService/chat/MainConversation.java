@@ -65,6 +65,7 @@ public class MainConversation extends Conversation {
 		createMessage(MESSAGE_QUESTION_RECIEVED,
 				new MessageBodySingleSelect("Tack {NAME}, jag återkommer så snart jag kan med svar på din fråga",
 						Lists.newArrayList(
+							new SelectOption("Jag har en till fråga", MESSAGE_MAIN_QUESTION),
 							SelectLink.toDashboard("Hem", MESSAGE_MAIN_ONBOARDING_DONE)
 				)));
 		
@@ -151,7 +152,6 @@ public class MainConversation extends Conversation {
 		addToChat(m, userContext); // Response parsed to nice format
 		eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), question));
 		nxtMsg = MESSAGE_QUESTION_RECIEVED;
-		userContext.completeConversation(this);
 		return nxtMsg;
 	}
 
