@@ -8,5 +8,11 @@ spring:
   cloud:
     kubernetes:
       enabled: false
+      config:
+        enabled: false
+      discovery:
+        enabled: false
+      ribbon:
+        enabled: false
   autoconfigure:
     exclude: org.springframework.cloud.kubernetes.KubernetesAutoConfiguration
