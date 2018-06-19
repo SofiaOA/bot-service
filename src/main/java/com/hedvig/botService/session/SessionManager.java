@@ -2,13 +2,11 @@ package com.hedvig.botService.session;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import com.hedvig.botService.chat.*;
 import com.hedvig.botService.chat.Conversation.EventTypes;
 import com.hedvig.botService.enteties.*;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
-import com.hedvig.botService.enteties.message.SelectItem;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
@@ -229,23 +227,16 @@ public class SessionManager {
 
     public boolean addAnswerFromHedvig(BackOfficeAnswerDTO backOfficeAnswer) {
         UserContext uc = userrepo.findByMemberId(backOfficeAnswer.getUserId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-        MemberChat mc = uc.getMemberChat();
 
-        Message msg = new Message();
+
         Conversation conversation = getActiveConversationOrStart(uc, MainConversation.class);
 
         if (!conversation.canAcceptAnswerToQuestion(uc)) {
             return false;
         }
 
-        List<SelectItem> selectionItems = conversation.getSelectItemsForAnswer(uc);
-        msg.body = new MessageBodySingleSelect(backOfficeAnswer.getMsg(), selectionItems);
-        msg.header.fromId = Conversation.HEDVIG_USER_ID;
-        msg.globalId = null;
-        msg.header.messageId = null;
-        msg.body.id = null;
-        msg.id = "message.answer";
-        mc.addToHistory(msg);
+        val msg = addBackOfficeMessage(uc, conversation, backOfficeAnswer.getMsg(), "message.answer");
+        uc.getMemberChat().addToHistory(msg);
 
         userrepo.saveAndFlush(uc);
         return true;
@@ -260,16 +251,22 @@ public class SessionManager {
             return false;
         }
 
-        Message msg = new Message();
-        msg.header.fromId = Conversation.HEDVIG_USER_ID;
-        val messageBody =  new MessageBodySingleSelect(backOfficeMessage.getMsg(), Lists.newArrayList());
-        messageBody.choices = Lists.newArrayList(activeConversation.getSelectItemsForAnswer(uc));
-        msg.body = messageBody;
-        msg.id = "message.bo.message";
-
+        val msg = addBackOfficeMessage(uc, activeConversation, backOfficeMessage.getMsg(), "message.bo.message");
         uc.getMemberChat().addToHistory(msg);
-
         return true;
+    }
+
+    public Message addBackOfficeMessage(UserContext uc, Conversation activeConversation, String message, String id) {
+        Message msg = new Message();
+        val selectionItems = activeConversation.getSelectItemsForAnswer(uc);
+        msg.body =  new MessageBodySingleSelect(message, selectionItems);
+        msg.header.fromId = Conversation.HEDVIG_USER_ID;
+        msg.globalId = null;
+        msg.header.messageId = null;
+        msg.body.id = null;
+        msg.id = id;
+
+        return msg;
     }
 
     private Conversation getActiveConversationOrStart(UserContext uc, Class<MainConversation> conversationToStart) {
