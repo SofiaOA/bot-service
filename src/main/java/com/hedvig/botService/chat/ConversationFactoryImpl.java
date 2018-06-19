@@ -71,6 +71,10 @@ public class ConversationFactoryImpl implements ConversationFactory {
             return new UpdateInformationConversation(memberService, productPricingService);
         }
 
+        if(conversationClass.equals(FreeChatConversation.class)) {
+            return new FreeChatConversation();
+        }
+
         return null;
     }
 

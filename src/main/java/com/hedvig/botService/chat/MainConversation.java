@@ -32,6 +32,7 @@ public class MainConversation extends Conversation {
 	public static final String MESSAGE_MAIN_ONBOARDING_DONE = "onboarding.done";
 	public static final String CONVERSATION_DONE = "conversation.done";
 	public static final String FORCE_TRUSTLY_CHOICE = "{FORCE_TRUSTLY_CHOICE}";
+	public static final String MESSAGE_MAIN_START_CHAT = "message.main.start.chat";
 
 	private static Logger log = LoggerFactory.getLogger(MainConversation.class);
 	private final ConversationFactory conversationFactory;
@@ -51,7 +52,8 @@ public class MainConversation extends Conversation {
 						Lists.newArrayList(
 							new SelectOption("Rapportera en skada", MESSAGE_MAIN_REPORT),
 							new SelectOption("Ring mig!", MESSAGE_MAIN_CALLME),
-							new SelectOption("Jag har en fråga", MESSAGE_MAIN_QUESTION)
+							new SelectOption("Jag har en fråga", MESSAGE_MAIN_QUESTION),
+							new SelectOption("Chatta!", MESSAGE_MAIN_START_CHAT)
 				)));
 
 		createMessage(MESSAGE_HEDVIG_COM_CLAIMS,
@@ -107,6 +109,12 @@ public class MainConversation extends Conversation {
 					userContext.completeConversation(this); // TODO: End conversation in better way
 					userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
 					userContext.putUserData(FORCE_TRUSTLY_CHOICE, "false");
+					return;
+				}
+				else if(Objects.equals(item.value, MESSAGE_MAIN_START_CHAT)) {
+					addToChat(m, userContext);
+					userContext.completeConversation(this); // TODO: End conversation in better way
+					userContext.startConversation(conversationFactory.createConversation(FreeChatConversation.class));
 					return;
 				}
 

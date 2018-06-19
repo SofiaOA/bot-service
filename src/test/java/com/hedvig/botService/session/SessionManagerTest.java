@@ -72,6 +72,7 @@ public class SessionManagerTest {
         		userContextRepository, memberService, productPricingService, signupCodeRepository, conversationFactory, campaignCodeRepository, objectMapper);
     }
 
+    //FIXME
     @Test
     public void givenConversationThatCanAcceptMessage_WhenAddMessageFromHedvig_ThenAddsMessageToHistory() {
 
@@ -97,6 +98,7 @@ public class SessionManagerTest {
         assertThat(((MessageBodySingleSelect)message.body).choices).containsExactly(SELECT_LINK);
     }
 
+    //FIXME
     @Test
     public void givenConversationThatCanAcceptMessage_WhenAddMessageFromHedvig_ThenReturnFalse() {
 
