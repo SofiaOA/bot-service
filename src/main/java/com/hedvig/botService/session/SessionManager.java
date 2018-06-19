@@ -148,10 +148,6 @@ public class SessionManager {
                     OnboardingConversationDevi onboardingConversation = (OnboardingConversationDevi) conversationFactory.createConversation(OnboardingConversationDevi.class);
 		        	onboardingConversation.recieveEvent(type, value, uc);
 					break;
-				case "com.hedvig.botService.chat.UpdateInformationConversation":
-				    UpdateInformationConversation infoConversation = new UpdateInformationConversation(memberService, productPricingclient);
-		            infoConversation.recieveEvent(type, value, uc);
-					break;
                 case "com.hedvig.botService.chat.CharityConversation":
                     Conversation conversation = conversationFactory.createConversation(CharityConversation.class);
                     conversation.recieveEvent(type, value, uc);
@@ -374,34 +370,6 @@ public class SessionManager {
         uc.startConversation(mainConversation);
 
         userrepo.saveAndFlush(uc);    	
-    }
-    
-    /*
-     * User wants to update some information
-     * */
-    public void updateInfo(String hid, UpdateTypes what){
-        log.info("Upate info request from user:" + hid);
- 
-        String startingMessage = "";
-        
-    	switch(what){
-    	case APARTMENT_INFORMATION: startingMessage = "message.info.update";
-    		break;
-    	case BANK_ACCOUNT: startingMessage = "message.info.update.payment";
-    		break;
-    	case FAMILY_MEMBERS: startingMessage = "message.info.update";
-    		break;
-    	case PERSONAL_INFORMATOIN: startingMessage = "message.info.update";
-    		break;
-    	case SAFETY_INCREASERS: startingMessage = "message.info.update.safety";
-			break;
-    	}
-    	
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-        UpdateInformationConversation infoConversation = new UpdateInformationConversation(memberService, productPricingclient);
-
-        uc.startConversation(infoConversation, startingMessage);
-        userrepo.saveAndFlush(uc);
     }
 
     public void quoteAccepted(String hid) {

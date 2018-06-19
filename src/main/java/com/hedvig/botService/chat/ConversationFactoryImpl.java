@@ -67,10 +67,6 @@ public class ConversationFactoryImpl implements ConversationFactory {
                 return new TrustlyConversation(triggerService, this, memberService);
         }
 
-        if(conversationClass.equals(UpdateInformationConversation.class)) {
-            return new UpdateInformationConversation(memberService, productPricingService);
-        }
-
         if(conversationClass.equals(FreeChatConversation.class)) {
             return new FreeChatConversation();
         }

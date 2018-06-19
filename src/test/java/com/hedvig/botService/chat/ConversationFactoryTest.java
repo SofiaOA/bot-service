@@ -54,8 +54,7 @@ public class ConversationFactoryTest {
                 ClaimsConversation.class,
                 CharityConversation.class,
                 MainConversation.class,
-                OnboardingConversationDevi.class,
-                UpdateInformationConversation.class});
+                OnboardingConversationDevi.class});
     }
 
     public ConversationFactoryTest(Class<?> conversationClass) {

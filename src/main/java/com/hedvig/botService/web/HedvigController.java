@@ -60,8 +60,7 @@ public class HedvigController {
     
     @PostMapping("initiateUpdate")
     ResponseEntity<String> initiateUpdate(@RequestParam UpdateTypes what, @RequestHeader(value="hedvig.token", required = false) String hid) {
-    	log.info("Member initiated update: ", what.name());
-        sessionManager.updateInfo(hid, what);
+    	log.error("Old client endpoint should be dead!!", what.name());
         return ResponseEntity.noContent().build();
     }
 
