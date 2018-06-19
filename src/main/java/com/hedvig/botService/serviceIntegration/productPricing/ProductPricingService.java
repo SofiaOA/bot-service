@@ -16,13 +16,13 @@ import java.util.List;
 @Component
 public class ProductPricingService {
 
-    private final ProductPricingClient client;
+    private final ProductPricingClient productPricingClient;
     private static Logger log = LoggerFactory.getLogger(ProductPricingService.class);
     
     @Autowired
-    ProductPricingService(ProductPricingClient client) {
+    ProductPricingService(ProductPricingClient productPricingClient) {
 
-        this.client = client;
+        this.productPricingClient = productPricingClient;
     }
 
     public String createProduct(String memberId, UserData data) {
@@ -78,24 +78,24 @@ public class ProductPricingService {
         address.setFloor(data.getFloor());
         request.setAddress(address);
 
-        Created result = this.client.createQuote(request).getBody();
+        Created result = this.productPricingClient.createQuote(request).getBody();
         return result.id;
     }
 
     public void quoteAccepted(String hid) {
-        this.client.quoteAccepted(hid);
+        this.productPricingClient.quoteAccepted(hid);
     }
 
     public void contractSigned(String memberId, String referenceToken) {
-        this.client.contractSigned(new ContractSignedRequest(memberId, referenceToken));
+        this.productPricingClient.contractSigned(new ContractSignedRequest(memberId, referenceToken));
     }
 
     public void setInsuranceStatus(String hid, String status) {
-        this.client.setInsuranceStatus(hid, status);
+        this.productPricingClient.setInsuranceStatus(hid, status);
     }
     
     public String getInsuranceStatus(String hid) {
-    	ResponseEntity<InsuranceStatusDTO> isd = this.client.getInsuranceStatus(hid);
+    	ResponseEntity<InsuranceStatusDTO> isd = this.productPricingClient.getInsuranceStatus(hid);
     	log.info("Getting insurance status:" + (isd==null?null:isd.getStatusCodeValue()));  	
     	if(isd!=null){
     		return isd.getBody().getInsuranceStatus();

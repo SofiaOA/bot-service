@@ -144,7 +144,6 @@ public class SessionManager {
 		            claimsConversation.recieveEvent(type, value, uc);
 					break;
 				case "com.hedvig.botService.chat.OnboardingConversationDevi":
-
                     OnboardingConversationDevi onboardingConversation = (OnboardingConversationDevi) conversationFactory.createConversation(OnboardingConversationDevi.class);
 		        	onboardingConversation.recieveEvent(type, value, uc);
 					break;
@@ -370,19 +369,6 @@ public class SessionManager {
         uc.startConversation(mainConversation);
 
         userrepo.saveAndFlush(uc);    	
-    }
-
-    public void quoteAccepted(String hid) {
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
-
-//        if(uc.hasOngoingConversation(conversationTypes.OnboardingConversationDevi.toString())){
-
-        OnboardingConversationDevi onboardingConversation = (OnboardingConversationDevi) conversationFactory.createConversation(OnboardingConversationDevi.class);
-        onboardingConversation.quoteAccepted(uc);
-//        }
-
-        userrepo.save(uc);
-
     }
 
     public void trustlyClosed(String hid) {

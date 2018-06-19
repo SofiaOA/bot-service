@@ -192,7 +192,7 @@ public class MainConversation extends Conversation {
 		val message = getMessage(MESSAGE_HEDVIG_COM);
 		val body = (MessageBodySingleSelect) message.body;
 		String forceTrustly = userContext.getDataEntry(FORCE_TRUSTLY_CHOICE);
-		if(forceTrustly != null && "true".equalsIgnoreCase(forceTrustly)) {
+		if("true".equalsIgnoreCase(forceTrustly)) {
             body.choices.add(new SelectOption("Koppla autogiro", MESSAGE_MAIN_START_TRUSTLY));
         }
 	}

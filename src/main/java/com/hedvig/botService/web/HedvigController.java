@@ -3,7 +3,6 @@ package com.hedvig.botService.web;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.session.SessionManager;
-import com.hedvig.botService.web.dto.AvatarDTO;
 import com.hedvig.botService.web.dto.CollectResponse;
 import com.hedvig.botService.web.dto.SignupStatus;
 import com.hedvig.botService.web.dto.TrackingDTO;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import static net.logstash.logback.argument.StructuredArguments.value;
 
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/hedvig")
@@ -26,13 +23,13 @@ public class HedvigController {
 
     private final Logger log = LoggerFactory.getLogger(HedvigController.class);
 	private final SessionManager sessionManager;
-    private final ProductPricingService service;
+    private final ProductPricingService productPricingService;
 
     @Autowired
-    public HedvigController(SessionManager sessions, ProductPricingService service)
+    public HedvigController(SessionManager sessions, ProductPricingService productPricingService)
 	{
 		this.sessionManager = sessions;
-        this.service = service;
+        this.productPricingService = productPricingService;
     }
     
     @PostMapping(path = "/waitlist")
@@ -67,12 +64,9 @@ public class HedvigController {
     @PostMapping("quoteAccepted")
     ResponseEntity<String> quoteAccepted(@RequestHeader(value="hedvig.token") String hid){
 
-        log.info("Quote accepted");
-        service.quoteAccepted(hid);
+        log.error("Endpoint not is use anymore");
 
-        this.sessionManager.quoteAccepted(hid);
-
-    	return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("trustlyClosed")
