@@ -1,6 +1,7 @@
 package com.hedvig.botService.session;
 
 import com.hedvig.botService.chat.ConversationFactory;
+import com.hedvig.botService.chat.FreeChatConversation;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.BankIdSessionImpl;
 import com.hedvig.botService.enteties.ResourceNotFoundException;
@@ -93,5 +94,17 @@ public class OnboardingService {
             signText = "Jag har tagit del av förköpsinformation och villkor och bekräftar genom att signera att jag skaffar en försäkring hos Hedvig.";
         }
         return signText;
+    }
+
+    public void offerClosed(String hid) {
+
+        val uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+
+        val activeConversation = uc.getActiveConversation().orElseThrow(() -> new RuntimeException("No active conversation."));
+
+        if (activeConversation.getClassName().equals(FreeChatConversation.class.getName()) == false) {
+            val conversation = conversationFactory.createConversation(FreeChatConversation.class);
+            uc.startConversation(conversation);
+        }
     }
 }

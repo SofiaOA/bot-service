@@ -125,4 +125,7 @@ public class MemberChat {
         this.chatHistory.add(m);
     }
 
+	public Message getLastMessage() {
+    	return chatHistory.get(chatHistory.size());
+    }
 }

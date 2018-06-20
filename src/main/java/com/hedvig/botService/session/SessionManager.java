@@ -128,33 +128,21 @@ public class SessionManager {
 
         EventTypes type = EventTypes.valueOf(eventtype);
 
-        for(ConversationEntity c : uc.getConversations()){
-        	
-        	// Only deliver messages to ongoing conversations
-        	if(!c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING))continue;
 
+        List<ConversationEntity> conversations = new ArrayList<>(uc.getConversations()); //We will add a new element to uc.conversationManager
+        for(ConversationEntity c : conversations){
 
-        	switch(c.getClassName()){
-				case "com.hedvig.botService.chat.MainConversation":
-				    Conversation mainConversation = conversationFactory.createConversation(MainConversation.class);
-		        	mainConversation.recieveEvent(type, value, uc);
-					break;
-				case "com.hedvig.botService.chat.ClaimsConversation":
-				    Conversation claimsConversation = conversationFactory.createConversation(ClaimsConversation.class);
-		            claimsConversation.recieveEvent(type, value, uc);
-					break;
-				case "com.hedvig.botService.chat.OnboardingConversationDevi":
-                    OnboardingConversationDevi onboardingConversation = (OnboardingConversationDevi) conversationFactory.createConversation(OnboardingConversationDevi.class);
-		        	onboardingConversation.recieveEvent(type, value, uc);
-					break;
-                case "com.hedvig.botService.chat.CharityConversation":
-                    Conversation conversation = conversationFactory.createConversation(CharityConversation.class);
-                    conversation.recieveEvent(type, value, uc);
-                    break;
-                case "com.hedvig.botService.chat.TrustlyConversation":
-                    Conversation trustlyConversation = conversationFactory.createConversation(TrustlyConversation.class);
-                    trustlyConversation.recieveEvent(type, value, uc);
-			}
+            // Only deliver messages to ongoing conversations
+            if(!c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING))continue;
+
+            try {
+                final Class<?> conversationClass = Class.forName(c.getClassName());
+                final Conversation conversation = conversationFactory.createConversation(conversationClass);
+                conversation.recieveEvent(type, value, uc);
+
+            } catch (ClassNotFoundException e) {
+                log.error("Could not load conversation from db!", e);
+            }
         }
 
         userrepo.saveAndFlush(uc);
@@ -251,7 +239,7 @@ public class SessionManager {
         return true;
     }
 
-    public Message addBackOfficeMessage(UserContext uc, Conversation activeConversation, String message, String id) {
+    private Message addBackOfficeMessage(UserContext uc, Conversation activeConversation, String message, String id) {
         Message msg = new Message();
         val selectionItems = activeConversation.getSelectItemsForAnswer(uc);
         msg.body =  new MessageBodySingleSelect(message, selectionItems);

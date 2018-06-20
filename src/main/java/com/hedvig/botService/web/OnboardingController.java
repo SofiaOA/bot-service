@@ -32,6 +32,14 @@ public class OnboardingController {
         this.onboardingService = onboardingService;
     }
 
+    @PostMapping("offerClosed")
+    public ResponseEntity<?> offerClosed(@RequestHeader("hedvig.token") String hid) {
+
+        onboardingService.offerClosed(hid);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("sign")
     public ResponseEntity<?> sign(@RequestHeader("hedvig.token") String hid) {
 
