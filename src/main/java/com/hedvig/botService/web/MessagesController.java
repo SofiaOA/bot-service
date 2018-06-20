@@ -65,7 +65,7 @@ public class MessagesController {
 			return collect;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Uncaught exception: {}", e.getMessage(), e);
 		}
     	return null;
     }

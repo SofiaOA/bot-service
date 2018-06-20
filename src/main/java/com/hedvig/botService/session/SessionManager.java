@@ -128,7 +128,8 @@ public class SessionManager {
 
         EventTypes type = EventTypes.valueOf(eventtype);
 
-        for(ConversationEntity c : uc.getConversations()){
+        ArrayList<ConversationEntity> conversations = new ArrayList<>(uc.getConversations());
+        for(ConversationEntity c : conversations){
         	
         	// Only deliver messages to ongoing conversations
         	if(!c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING))continue;
