@@ -35,13 +35,8 @@ public class MessagesController {
     	
     	log.info("Getting " + messageCount + " messages for member:" + hid);
 
-    	try {
-			return sessionManager.getMessages(messageCount, hid).stream().collect(Collectors.toMap( m -> m.getGlobalId(), Function.identity()));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	return null;
+
+		return sessionManager.getMessages(messageCount, hid).stream().collect(Collectors.toMap( m -> m.getGlobalId(), Function.identity()));
     }
     
     /*
@@ -56,18 +51,11 @@ public class MessagesController {
 
 		SessionManager.Intent intent = Objects.equals(intentParameter, "login") ? SessionManager.Intent.LOGIN : SessionManager.Intent.ONBOARDING;
 
-    	try {
-			LinkedHashMap<Integer, Message> collect = sessionManager.getAllMessages(hid, intent).stream()
-					.sorted((x, y) -> x.getTimestamp().compareTo(y.getTimestamp()))
-					.collect(Collectors.toMap(m -> m.getGlobalId(), Function.identity(),
-							(x, y) -> y, LinkedHashMap::new)
-					);
-			return collect;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	return null;
+
+		return sessionManager.getAllMessages(hid, intent).stream()
+				.collect(Collectors.toMap(Message::getGlobalId, Function.identity(),
+						(x, y) -> y, TreeMap::new)
+				);
     }
 
     /*
@@ -76,7 +64,7 @@ public class MessagesController {
     @PostMapping(path = "/response",  produces = "application/json; charset=utf-8")
     public ResponseEntity<?> create(@RequestBody Message msg, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Response recieved from messageId: " + msg.globalId);
+     	log.info("Response received from messageId: " + msg.globalId);
 
         msg.header.fromId = new Long(hid);
         
