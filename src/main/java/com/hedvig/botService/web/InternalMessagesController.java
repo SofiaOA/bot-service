@@ -2,7 +2,7 @@ package com.hedvig.botService.web;
 
 import com.hedvig.botService.enteties.MessageRepository;
 import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.session.SessionManager;
+import com.hedvig.botService.services.SessionManager;
 import com.hedvig.botService.web.dto.AddMessageRequestDTO;
 import com.hedvig.botService.web.dto.BackOfficeAnswerDTO;
 import com.hedvig.botService.web.dto.BackOfficeMessageDTO;

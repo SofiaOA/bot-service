@@ -2,7 +2,7 @@ package com.hedvig.botService.web;
 
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.session.SessionManager;
+import com.hedvig.botService.services.SessionManager;
 import com.hedvig.botService.web.dto.CollectResponse;
 import com.hedvig.botService.web.dto.SignupStatus;
 import com.hedvig.botService.web.dto.TrackingDTO;

@@ -1,4 +1,4 @@
-package com.hedvig.botService.session;
+package com.hedvig.botService.services;
 
 import com.hedvig.botService.chat.BankIdChat;
 import com.hedvig.botService.enteties.*;

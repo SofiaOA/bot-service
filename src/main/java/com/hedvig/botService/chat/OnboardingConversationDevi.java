@@ -13,10 +13,10 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResp
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
 import com.hedvig.botService.serviceIntegration.memberService.exceptions.ErrorType;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.session.events.OnboardingQuestionAskedEvent;
-import com.hedvig.botService.session.events.RequestObjectInsuranceEvent;
-import com.hedvig.botService.session.events.SignedOnWaitlistEvent;
-import com.hedvig.botService.session.events.UnderwritingLimitExcededEvent;
+import com.hedvig.botService.services.events.OnboardingQuestionAskedEvent;
+import com.hedvig.botService.services.events.RequestObjectInsuranceEvent;
+import com.hedvig.botService.services.events.SignedOnWaitlistEvent;
+import com.hedvig.botService.services.events.UnderwritingLimitExcededEvent;
 import lombok.val; 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

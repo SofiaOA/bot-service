@@ -1,7 +1,7 @@
-package com.hedvig.botService.session;
+package com.hedvig.botService.services;
 
 
-import com.hedvig.botService.session.events.*;
+import com.hedvig.botService.services.events.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

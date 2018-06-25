@@ -1,4 +1,4 @@
-package com.hedvig.botService.session.exceptions;
+package com.hedvig.botService.services.exceptions;
 
 public class UnathorizedException extends RuntimeException {
 

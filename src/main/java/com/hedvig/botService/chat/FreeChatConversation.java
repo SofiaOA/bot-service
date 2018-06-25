@@ -3,7 +3,6 @@ package com.hedvig.botService.chat;
 import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
-import lombok.val;
 
 import java.util.List;
 
@@ -12,10 +11,14 @@ public class FreeChatConversation extends Conversation {
     private static final String FREE_CHAT_START = "free.chat.start";
     private static final String FREE_CHAT_MESSAGE = "free.chat.message";
     public static final String FREE_CHAT_FROM_BO = "free.chat.from.bo";
+    public static final String FREE_CHAT_ONBOARDING_START = "free.chat.onboarding.start";
 
     public FreeChatConversation() {
         createMessage(FREE_CHAT_START,
                 new MessageBodyText("Hej {NAME}, vad har du för fråga?"));
+
+        createMessage(FREE_CHAT_ONBOARDING_START,
+                new MessageBodyText("Hade du någon fundering?"));
 
         createMessage(FREE_CHAT_MESSAGE,
                 new MessageBodyText(""));
@@ -47,12 +50,10 @@ public class FreeChatConversation extends Conversation {
         String nxtMsg = "";
 
         switch (m.id) {
-            case FREE_CHAT_START: {
-                addToChat(m, userContext);
-                nxtMsg = FREE_CHAT_MESSAGE;
-                break;
-            }
+            case FREE_CHAT_START:
+            case FREE_CHAT_ONBOARDING_START:
             case FREE_CHAT_MESSAGE: {
+                m.header.statusMessage = "Hedvig svarar inom 30m";
                 addToChat(m, userContext);
                 nxtMsg = FREE_CHAT_MESSAGE;
                 break;
@@ -75,6 +76,14 @@ public class FreeChatConversation extends Conversation {
         }
 
         completeRequest(nxtMsg, userContext);
+    }
+
+    @Override
+    void addToChat(Message m, UserContext userContext) {
+        m.header.statusMessage = "Hedvig svarar inom 1h";
+        m.header.showOfferScreen = !userContext.getOnBoardingData().getUserHasSigned();
+        m.header.ongoingClaim = false;
+        super.addToChat(m, userContext);
     }
 
     @Override

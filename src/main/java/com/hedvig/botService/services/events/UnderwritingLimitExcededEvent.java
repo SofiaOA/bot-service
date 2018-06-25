@@ -1,4 +1,4 @@
-package com.hedvig.botService.session.events;
+package com.hedvig.botService.services.events;
 
 import lombok.Value;
 

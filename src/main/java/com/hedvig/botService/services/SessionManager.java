@@ -1,9 +1,8 @@
-package com.hedvig.botService.session;
+package com.hedvig.botService.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedvig.botService.chat.*;
-import com.hedvig.botService.chat.Conversation.EventTypes;
 import com.hedvig.botService.enteties.*;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
@@ -14,7 +13,6 @@ import com.hedvig.botService.web.dto.AddMessageRequestDTO;
 import com.hedvig.botService.web.dto.BackOfficeAnswerDTO;
 import com.hedvig.botService.web.dto.SignupStatus;
 import com.hedvig.botService.web.dto.TrackingDTO;
-import com.hedvig.botService.web.dto.UpdateTypes;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +21,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import static com.hedvig.botService.chat.OnboardingConversationDevi.LOGIN;
 import static com.hedvig.botService.chat.OnboardingConversationDevi.MESSAGE_START_LOGIN;
 
 /*
- * The session manager is the main controller class for the chat service. It contains all user sessions with chat histories, context etc
+ * The services manager is the main controller class for the chat service. It contains all user sessions with chat histories, context etc
  * It is a singleton accessed through the request controller
  * */
 
@@ -46,6 +46,7 @@ public class SessionManager {
     private final UserContextRepository userrepo;
     private final MemberService memberService;
     private final ProductPricingService productPricingclient;
+    private final MessagesService messagesService;
 
     private final SignupCodeRepository signupRepo;
     private final ConversationFactory conversationFactory;
@@ -63,13 +64,16 @@ public class SessionManager {
                           ProductPricingService client,
                           SignupCodeRepository signupRepo,
                           ConversationFactory conversationFactory,
-                          TrackingDataRespository trackerRepo, ObjectMapper objectMapper) {
+                          TrackingDataRespository trackerRepo,
+                          MessagesService messagesService,
+                          ObjectMapper objectMapper) {
         this.userrepo = userrepo;
         this.memberService = memberService;
         this.productPricingclient = client;
         this.signupRepo = signupRepo;
         this.conversationFactory = conversationFactory;
         this.trackerRepo = trackerRepo;
+        this.messagesService = messagesService;
         this.objectMapper = objectMapper;
     }
 
@@ -108,12 +112,11 @@ public class SessionManager {
     public void savePushToken(String hid, String pushToken) {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
         uc.putUserData("PUSH-TOKEN", pushToken);
-        userrepo.saveAndFlush(uc);
     }
     
     public void saveTrackingInformation(String hid, TrackingDTO tracker) {
         TrackingEntity cc = new TrackingEntity(hid, tracker);
-        trackerRepo.saveAndFlush(cc);
+        trackerRepo.save(cc);
     }
     
     public String getPushToken(String hid) {
@@ -122,30 +125,11 @@ public class SessionManager {
     }
     
     
-    public void recieveEvent(String eventtype, String value, String hid){
+    public void receiveEvent(String eventType, String value, String hid){
 
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
-        EventTypes type = EventTypes.valueOf(eventtype);
-
-
-        List<ConversationEntity> conversations = new ArrayList<>(uc.getConversations()); //We will add a new element to uc.conversationManager
-        for(ConversationEntity c : conversations){
-
-            // Only deliver messages to ongoing conversations
-            if(!c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING))continue;
-
-            try {
-                final Class<?> conversationClass = Class.forName(c.getClassName());
-                final Conversation conversation = conversationFactory.createConversation(conversationClass);
-                conversation.recieveEvent(type, value, uc);
-
-            } catch (ClassNotFoundException e) {
-                log.error("Could not load conversation from db!", e);
-            }
-        }
-
-        userrepo.saveAndFlush(uc);
+        uc.receiveEvent(eventType, value, conversationFactory);
     }
 
     public BankIdCollectResponse collect(String hid, String referenceToken) {
@@ -155,31 +139,6 @@ public class SessionManager {
         return service.collect(hid, referenceToken, (BankIdChat) conversationFactory.createConversation(OnboardingConversationDevi.class));
     }
 
-    /*
-     * Kicks off onboarding conversation with either direct login or regular signup flow
-     * */
-    public void startOnboarding(String hid){
-        startOnboardingConversation(hid, OnboardingConversationDevi.MESSAGE_WAITLIST_START);
-    }
-
-    public void startLogin(String hid) {
-        startOnboardingConversation(hid, OnboardingConversationDevi.MESSAGE_START_LOGIN);
-    }
-
-    private void startOnboardingConversation(String hid, String startMsg) {
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-
-        initChat(startMsg, uc);
-
-        userrepo.saveAndFlush(uc);
-    }
-
-    private void initChat(String startMsg, UserContext uc) {
-        uc.putUserData("{WEB_USER}", "FALSE");
-
-        Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);
-        uc.startConversation(onboardingConversation, startMsg);
-    }
 
     /*
      * Create a new users chat and context
@@ -297,54 +256,13 @@ public class SessionManager {
 
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
-        MemberChat chat = uc.getMemberChat();
+        val messages =  uc.getMessages(intent, conversationFactory);
 
-        if(uc.getActiveConversation().isPresent() == false) {
-            if(intent == Intent.LOGIN) {
-                initChat(OnboardingConversationDevi.MESSAGE_START_LOGIN, uc);
-            } else {
-                initChat(OnboardingConversationDevi.MESSAGE_WAITLIST_START, uc);
-            }
-        }
+        userrepo.save(uc);
 
-        // Mark last user input with as editAllowed
-        chat.markLastInput();
-
-
-
-        // Check for deleted messages
-        ArrayList<Message> returnList = new ArrayList<Message>();
-        for(Message m : chat.chatHistory){
-        	if(m.deleted==null | !m.deleted){ // TODO:remove null test
-        		returnList.add(m); 
-        	}
-        }
-        
-        /*
-         * Sort in global Id order
-         * */
-    	Collections.sort(returnList, new Comparator<Message>(){
-      	     public int compare(Message m1, Message m2){
-      	         if(m1.globalId == m2.globalId)
-      	             return 0;
-      	         return m1.globalId < m2.globalId ? -1 : 1;
-      	     }
-      	});
-    	
-    	if(returnList.size() > 0){
-	    	Message lastMessage = returnList.get(returnList.size() - 1);
-	    	if(lastMessage!=null) {
-                recieveEvent("MESSAGE_FETCHED", lastMessage.id, hid);
-            }
-    	}else{
-    		log.info("No messages in chat....");
-    	}
-
-        userrepo.saveAndFlush(uc);
-
-        return returnList;
+        return messages;
     }
-    
+
     /*
      * Add the "what do you want to do today" message to the chat
      * */
@@ -383,26 +301,11 @@ public class SessionManager {
 
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
-        List<ConversationEntity> conversations = new ArrayList<>(uc.getConversations()); //We will add a new element to uc.conversationManager
-        for(ConversationEntity c : conversations){
-        	
-        	// Only deliver messages to ongoing conversations
-        	if(!c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING))continue;
+        uc.receiveMessage(m, conversationFactory);
 
-            try {
-                final Class<?> conversationClass = Class.forName(c.getClassName());
-                final Conversation conversation = conversationFactory.createConversation(conversationClass);
-                conversation.receiveMessage(uc, m);
-
-            } catch (ClassNotFoundException e) {
-                log.error("Could not load conversation from db!", e);
-            }
-        }
-
-        userrepo.saveAndFlush(uc);
     }
 
-	public Integer getWaitlistPosition(String email) {
+    public Integer getWaitlistPosition(String email) {
 		return null;
 	}
 }

@@ -5,7 +5,7 @@ import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.session.triggerService.TriggerService;
+import com.hedvig.botService.services.triggerService.TriggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

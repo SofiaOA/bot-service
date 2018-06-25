@@ -1,4 +1,4 @@
-package com.hedvig.botService.session.triggerService.dto;
+package com.hedvig.botService.services.triggerService.dto;
 
 import lombok.Value;
 

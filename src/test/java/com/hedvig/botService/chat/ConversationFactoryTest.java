@@ -5,7 +5,7 @@ import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.session.triggerService.TriggerService;
+import com.hedvig.botService.services.triggerService.TriggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

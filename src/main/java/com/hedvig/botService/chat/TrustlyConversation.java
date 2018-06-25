@@ -6,7 +6,7 @@ import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
-import com.hedvig.botService.session.triggerService.TriggerService;
+import com.hedvig.botService.services.triggerService.TriggerService;
 
 import java.util.ArrayList;
 import java.util.List;

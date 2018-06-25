@@ -1,4 +1,4 @@
-package com.hedvig.botService.session;
+package com.hedvig.botService.services;
 
 public class UnknownEventTypeException extends RuntimeException {
 

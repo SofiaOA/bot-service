@@ -1,6 +1,6 @@
-package com.hedvig.botService.session;
+package com.hedvig.botService.services;
 
-import com.hedvig.botService.session.events.*;
+import com.hedvig.botService.services.events.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.aws.messaging.core.NotificationMessagingTemplate;

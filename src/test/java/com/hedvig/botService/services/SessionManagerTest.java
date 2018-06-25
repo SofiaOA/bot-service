@@ -1,12 +1,13 @@
-package com.hedvig.botService.session;
+package com.hedvig.botService.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
-import com.hedvig.botService.enteties.TrackingDataRespository;
 import com.hedvig.botService.enteties.SignupCodeRepository;
+import com.hedvig.botService.enteties.TrackingDataRespository;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.UserContextRepository;
 import com.hedvig.botService.enteties.message.Message;
@@ -26,10 +27,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Optional;
 import java.util.UUID;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static com.hedvig.botService.chat.Conversation.HEDVIG_USER_ID;
-import static com.hedvig.botService.session.TriggerServiceTest.TOLVANSSON_MEMBERID;
+import static com.hedvig.botService.services.TriggerServiceTest.TOLVANSSON_MEMBERID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -62,6 +62,8 @@ public class SessionManagerTest {
     @Mock
     Conversation mockConversation;
 
+    @Mock MessagesService messagesService;
+
 
     SessionManager sessionManager;
 
@@ -69,7 +71,7 @@ public class SessionManagerTest {
     public void setUp() {
         val objectMapper = new ObjectMapper();
         sessionManager = new SessionManager(
-        		userContextRepository, memberService, productPricingService, signupCodeRepository, conversationFactory, campaignCodeRepository, objectMapper);
+        		userContextRepository, memberService, productPricingService, signupCodeRepository, conversationFactory, campaignCodeRepository, messagesService, objectMapper);
     }
 
     //FIXME

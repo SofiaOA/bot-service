@@ -2,25 +2,26 @@ package com.hedvig.botService.enteties;
 
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.Conversation.conversationStatus;
+import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.MemberProfile;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
+import com.hedvig.botService.services.SessionManager;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -250,6 +251,77 @@ public class UserContext implements Serializable {
 	public Optional<ConversationEntity> getActiveConversation() {
 
 		return conversationManager.getActiveConversation();
+	}
+
+    public void receiveEvent(String eventType, String value, ConversationFactory conversationFactory) {
+        Conversation.EventTypes type = Conversation.EventTypes.valueOf(eventType);
+
+
+        List<ConversationEntity> conversations = new ArrayList<>(getConversations()); //We will add a new element to uc.conversationManager
+        for(ConversationEntity c : conversations){
+
+            // Only deliver messages to ongoing conversations
+            if(!c.getConversationStatus().equals(conversationStatus.ONGOING))continue;
+
+            try {
+                final Class<?> conversationClass = Class.forName(c.getClassName());
+                final Conversation conversation = conversationFactory.createConversation(conversationClass);
+                conversation.recieveEvent(type, value, this);
+
+            } catch (ClassNotFoundException e) {
+                log.error("Could not load conversation from db!", e);
+            }
+        }
+    }
+
+	public void initChat(String startMsg, @NotNull ConversationFactory conversationFactory) {
+		putUserData("{WEB_USER}", "FALSE");
+
+		Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);
+		startConversation(onboardingConversation, startMsg);
+	}
+
+	public List<Message> getMessages(SessionManager.Intent intent, ConversationFactory conversationFactory) {
+		MemberChat chat = getMemberChat();
+
+		if(getActiveConversation().isPresent() == false) {
+			if(intent == SessionManager.Intent.LOGIN) {
+				initChat(OnboardingConversationDevi.MESSAGE_START_LOGIN, conversationFactory);
+			} else {
+				initChat(OnboardingConversationDevi.MESSAGE_WAITLIST_START, conversationFactory);
+			}
+		}
+
+		val returnList = chat.getMessages();
+
+		if(returnList.size() > 0){
+			Message lastMessage = returnList.get(0);
+			if(lastMessage!=null) {
+				receiveEvent("MESSAGE_FETCHED", lastMessage.id, conversationFactory);
+			}
+		}else{
+			log.info("No messages in chat....");
+		}
+
+		return returnList;
+	}
+
+	public void receiveMessage(Message m, ConversationFactory conversationFactory) {
+		List<ConversationEntity> conversations = new ArrayList<>(getConversations()); //We will add a new element to uc.conversationManager
+		for(ConversationEntity c : conversations){
+
+			// Only deliver messages to ongoing conversations
+			if(!c.getConversationStatus().equals(conversationStatus.ONGOING))continue;
+
+			try {
+				final Class<?> conversationClass = Class.forName(c.getClassName());
+				final Conversation conversation = conversationFactory.createConversation(conversationClass);
+				conversation.receiveMessage(this, m);
+
+			} catch (ClassNotFoundException e) {
+				log.error("Could not load conversation from db!", e);
+			}
+		}
 	}
 }
 

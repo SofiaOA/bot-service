@@ -1,4 +1,4 @@
-package com.hedvig.botService.session;
+package com.hedvig.botService.services;
 
 import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.FreeChatConversation;
@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.time.Instant;
+
+import static com.hedvig.botService.chat.FreeChatConversation.FREE_CHAT_ONBOARDING_START;
 
 @Service
 @Transactional
@@ -104,7 +106,7 @@ public class OnboardingService {
 
         if (activeConversation.getClassName().equals(FreeChatConversation.class.getName()) == false) {
             val conversation = conversationFactory.createConversation(FreeChatConversation.class);
-            uc.startConversation(conversation);
+            uc.startConversation(conversation, FREE_CHAT_ONBOARDING_START);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.hedvig.botService.session;
+package com.hedvig.botService.services;
 
 import com.hedvig.botService.enteties.DirectDebitMandateTrigger;
 import com.hedvig.botService.enteties.DirectDebitRepository;
@@ -6,9 +6,9 @@ import com.hedvig.botService.serviceIntegration.paymentService.PaymentService;
 import com.hedvig.botService.serviceIntegration.paymentService.dto.DirectDebitResponse;
 import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderInformation;
 import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderState;
-import com.hedvig.botService.session.exceptions.UnathorizedException;
-import com.hedvig.botService.session.triggerService.TriggerService;
-import com.hedvig.botService.session.triggerService.dto.CreateDirectDebitMandateDTO;
+import com.hedvig.botService.services.exceptions.UnathorizedException;
+import com.hedvig.botService.services.triggerService.TriggerService;
+import com.hedvig.botService.services.triggerService.dto.CreateDirectDebitMandateDTO;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

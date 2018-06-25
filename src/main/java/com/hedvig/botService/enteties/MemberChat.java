@@ -95,14 +95,12 @@ public class MemberChat {
     /*
      * Mark ONLY last input from user as editAllowed -> pen symbol in client
      * */
-    public void markLastInput(){
-    	Collections.sort(chatHistory, new Comparator<Message>(){
-   	     public int compare(Message m1, Message m2){
-   	         if(m1.globalId == m2.globalId)
-   	             return 0;
-   	         return m1.globalId > m2.globalId ? -1 : 1;
-   	     }
-    	});
+    private void markLastInput(){
+    	Collections.sort(chatHistory, (m1, m2) -> {
+            if(m1.globalId == m2.globalId)
+                return 0;
+            return m1.globalId > m2.globalId ? -1 : 1;
+        });
     	/*
     	 * If there is no input message to revert to yet then leave the chat as is
     	 * */
@@ -124,6 +122,21 @@ public class MemberChat {
         m.chat = this;
         this.chatHistory.add(m);
     }
+
+    public List<Message> getMessages() {
+		// Mark last user input with as editAllowed
+    	this.markLastInput();
+
+		// Check for deleted messages
+		ArrayList<Message> returnList = new ArrayList<>();
+		for(Message m : this.chatHistory){
+			if(m.deleted==null || !m.deleted){
+				returnList.add(m);
+			}
+		}
+
+		return returnList;
+	}
 
 	public Message getLastMessage() {
     	return chatHistory.get(chatHistory.size());

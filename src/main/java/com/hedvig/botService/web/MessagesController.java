@@ -1,9 +1,11 @@
 package com.hedvig.botService.web;
 
 import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.session.SessionManager;
+import com.hedvig.botService.services.SessionManager;
 import com.hedvig.botService.web.dto.AvatarDTO;
 import com.hedvig.botService.web.dto.EventDTO;
+import net.logstash.logback.marker.LogstashMarker;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static net.logstash.logback.marker.Markers.append;
 
 @RestController
 public class MessagesController {
@@ -47,7 +51,7 @@ public class MessagesController {
 			@RequestHeader(value="hedvig.token", required = false) String hid,
 			@RequestParam(name = "intent", required = false, defaultValue = "onboarding") String intentParameter) {
     	
-    	log.info(String.format("Getting all messages for member:%s with intent: %s", hid, intentParameter));
+    	log.error(markDeprecated(), String.format("Getting all messages for member:%s with intent: %s", hid, intentParameter));
 
 		SessionManager.Intent intent = Objects.equals(intentParameter, "login") ? SessionManager.Intent.LOGIN : SessionManager.Intent.ONBOARDING;
 
@@ -55,7 +59,12 @@ public class MessagesController {
 		return sessionManager.getAllMessages(hid, intent).stream()
 				.collect(Collectors.toMap(Message::getGlobalId, Function.identity(),
 						(x, y) -> y, TreeMap::new)
-				);
+				).descendingMap();
+    }
+
+    @NotNull
+    private LogstashMarker markDeprecated() {
+        return append("deprecated", "true");
     }
 
     /*
@@ -111,7 +120,7 @@ public class MessagesController {
     public ResponseEntity<?> eventRecieved(@RequestBody EventDTO e, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
      	log.info("Event {} received from member:", e.type, hid);
-        sessionManager.recieveEvent(e.type, e.value, hid);
+        sessionManager.receiveEvent(e.type, e.value, hid);
     	return ResponseEntity.noContent().build();
     }
     
@@ -121,8 +130,8 @@ public class MessagesController {
     @PostMapping(path = "/chat/login")
     public ResponseEntity<?> chatLogin(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Chat login event from user: " + hid);
-     	sessionManager.startLogin(hid);
+     	log.error(markDeprecated(), "Chat login event from user: " + hid);
+
     	return ResponseEntity.noContent().build();
     }
     
@@ -132,9 +141,8 @@ public class MessagesController {
     @PostMapping(path = "/chat/start")
     public ResponseEntity<?> chatStart(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Chat start event from user: " + hid);
+     	log.error(markDeprecated(), "Chat start event from user: " + hid);
 
-        sessionManager.startOnboarding(hid);
     	return ResponseEntity.noContent().build();
     }
     
