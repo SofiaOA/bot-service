@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /*
@@ -33,6 +31,7 @@ public class MemberChat {
 
     @OneToMany(mappedBy="chat", cascade = CascadeType.ALL, orphanRemoval=true) // TODO kolla att detta funkar
     @MapKey(name="timestamp")
+    @OrderBy("globalId DESC")
     public List<Message> chatHistory;
 
     @OneToOne()
@@ -55,52 +54,39 @@ public class MemberChat {
     public void reset(){
 
     	chatHistory.clear(); // TODO: Make non delete solutions
-    	return;
-    	
-    	/*
-    	for(Message m : chatHistory){
-    		log.info("Mark deleted:" + m.globalId + " " + m);
-    		m.deleted = true;
-    	}
-    	*/
-    	
     }
     
     /*
      * Removes (by marking them as deleted) all messages until the last point of user input
      * */
     public void revertLastInput(){
-    	Collections.sort(chatHistory, new Comparator<Message>(){
-    	     public int compare(Message m1, Message m2){
-    	         if(m1.globalId == m2.globalId)
-    	             return 0;
-    	         return m1.globalId > m2.globalId ? -1 : 1;
-    	     }
-    	});
-    	
+
     	/*
     	 * If there is no input message to revert to yet then leave the chat as is
     	 * */
     	boolean hasUserInput = false;
-    	for(Message m : chatHistory){if(!m.deleted && m.header.fromId != Conversation.HEDVIG_USER_ID){hasUserInput = true;break;}}
-    	if(!hasUserInput)return;
+    	for(Message m : chatHistory){
+    	    if(!m.deleted && m.header.fromId != Conversation.HEDVIG_USER_ID) {
+    	        hasUserInput = true;
+    	        break;
+    	    }
+    	}
+    	if(!hasUserInput) {
+    	    return;
+        }
     	
     	for(Message m : chatHistory){
     		m.deleted = true;
-    		if(!(m.header.fromId == Conversation.HEDVIG_USER_ID)){break;}
+    		if(!(m.header.fromId == Conversation.HEDVIG_USER_ID)) {
+    		    break;
+    		}
     	}
-    	
     }
     
     /*
      * Mark ONLY last input from user as editAllowed -> pen symbol in client
      * */
     private void markLastInput(){
-    	Collections.sort(chatHistory, (m1, m2) -> {
-            if(m1.globalId == m2.globalId)
-                return 0;
-            return m1.globalId > m2.globalId ? -1 : 1;
-        });
     	/*
     	 * If there is no input message to revert to yet then leave the chat as is
     	 * */
@@ -137,8 +123,4 @@ public class MemberChat {
 
 		return returnList;
 	}
-
-	public Message getLastMessage() {
-    	return chatHistory.get(chatHistory.size());
-    }
 }

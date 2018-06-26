@@ -156,7 +156,7 @@ public class UserContext implements Serializable {
     public void clearContext(){
     	this.getOnBoardingData().clear();
 		this.conversationManager.getConversations().clear();
-    	this.memberChat.chatHistory.clear();
+    	this.memberChat.reset();
     }
 
 	/*

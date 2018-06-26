@@ -8,7 +8,6 @@ import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
-import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.web.dto.AddMessageRequestDTO;
 import com.hedvig.botService.web.dto.BackOfficeAnswerDTO;
 import com.hedvig.botService.web.dto.TrackingDTO;
@@ -16,7 +15,6 @@ import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,37 +39,23 @@ public class SessionManager {
     }
 
     private static Logger log = LoggerFactory.getLogger(SessionManager.class);
-    private final UserContextRepository userrepo;
+    private final UserContextRepository userContextRepository;
     private final MemberService memberService;
-    private final ProductPricingService productPricingclient;
-    private final MessagesService messagesService;
 
-    private final SignupCodeRepository signupRepo;
     private final ConversationFactory conversationFactory;
     private final TrackingDataRespository trackerRepo;
     private final ObjectMapper objectMapper;
 
-    public enum conversationTypes {MainConversation, OnboardingConversationDevi, UpdateInformationConversation, ClaimsConversation}
-    
-    @Value("${hedvig.waitlist.length}")
-    public Integer queuePos;
-	
     @Autowired
-    public SessionManager(UserContextRepository userrepo,
+    public SessionManager(UserContextRepository userContextRepository,
                           MemberService memberService,
-                          ProductPricingService client,
-                          SignupCodeRepository signupRepo,
                           ConversationFactory conversationFactory,
                           TrackingDataRespository trackerRepo,
-                          MessagesService messagesService,
                           ObjectMapper objectMapper) {
-        this.userrepo = userrepo;
+        this.userContextRepository = userContextRepository;
         this.memberService = memberService;
-        this.productPricingclient = client;
-        this.signupRepo = signupRepo;
         this.conversationFactory = conversationFactory;
         this.trackerRepo = trackerRepo;
-        this.messagesService = messagesService;
         this.objectMapper = objectMapper;
     }
 
@@ -83,7 +67,7 @@ public class SessionManager {
     }
 
     public void savePushToken(String hid, String pushToken) {
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
         uc.putUserData("PUSH-TOKEN", pushToken);
     }
     
@@ -93,21 +77,21 @@ public class SessionManager {
     }
     
     public String getPushToken(String hid) {
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
         return uc.getDataEntry("PUSH-TOKEN");
     }
     
     
     public void receiveEvent(String eventType, String value, String hid){
 
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
         uc.receiveEvent(eventType, value, conversationFactory);
     }
 
     public BankIdCollectResponse collect(String hid, String referenceToken) {
 
-        CollectService service = new CollectService(userrepo, memberService);
+        CollectService service = new CollectService(userContextRepository, memberService);
 
         return service.collect(hid, referenceToken, (BankIdChat) conversationFactory.createConversation(OnboardingConversationDevi.class));
     }
@@ -118,30 +102,30 @@ public class SessionManager {
      * */
     public void init(String hid, String linkUri){
 
-        UserContext uc = userrepo.findByMemberId(hid).orElseGet(() -> {
+        UserContext uc = userContextRepository.findByMemberId(hid).orElseGet(() -> {
             UserContext newUserContext = new UserContext(hid);
-            userrepo.save(newUserContext);
+            userContextRepository.save(newUserContext);
             return newUserContext;
         });
 
         uc.putUserData("{LINK_URI}", linkUri);
 
 
-        userrepo.saveAndFlush(uc);
+        userContextRepository.saveAndFlush(uc);
     }
     
     /*
      * Mark all messages (incl) last input from user deleted
      * */
     public void editHistory(String hid){
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
     	MemberChat mc = uc.getMemberChat();
     	mc.revertLastInput();
-    	userrepo.saveAndFlush(uc);
+    	userContextRepository.saveAndFlush(uc);
     }
 
     public boolean addAnswerFromHedvig(BackOfficeAnswerDTO backOfficeAnswer) {
-        UserContext uc = userrepo.findByMemberId(backOfficeAnswer.getUserId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+        UserContext uc = userContextRepository.findByMemberId(backOfficeAnswer.getUserId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
 
         Conversation conversation = getActiveConversationOrStart(uc, MainConversation.class);
@@ -153,13 +137,13 @@ public class SessionManager {
         val msg = addBackOfficeMessage(uc, conversation, backOfficeAnswer.getMsg(), "message.answer");
         uc.getMemberChat().addToHistory(msg);
 
-        userrepo.saveAndFlush(uc);
+        userContextRepository.saveAndFlush(uc);
         return true;
     }
 
 
     public boolean addMessageFromHedvig(AddMessageRequestDTO backOfficeMessage) {
-        val uc = userrepo.findByMemberId(backOfficeMessage.getMemberId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+        val uc = userContextRepository.findByMemberId(backOfficeMessage.getMemberId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
         Conversation activeConversation = getActiveConversationOrStart(uc, MainConversation.class);
         if(activeConversation.canAcceptAnswerToQuestion(uc) == false) {
@@ -198,7 +182,7 @@ public class SessionManager {
      * Mark all messages (incl) last input from user deleted
      * */
     public void resetOnboardingChat(String hid){
-    	UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    	UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
         MemberChat mc = uc.getMemberChat();
         
         // Conversations can only be reset during onboarding
@@ -217,7 +201,7 @@ public class SessionManager {
                 uc.startConversation(onboardingConversation);
             }
 
-	    	userrepo.saveAndFlush(uc);
+	    	userContextRepository.saveAndFlush(uc);
         }
     }
 
@@ -227,11 +211,11 @@ public class SessionManager {
          * Find users chat and context. First time it is created
          * */
 
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
         val messages =  uc.getMessages(intent, conversationFactory);
 
-        userrepo.save(uc);
+        userContextRepository.save(uc);
 
         return messages;
     }
@@ -242,16 +226,16 @@ public class SessionManager {
     public void mainMenu(String hid){
         log.info("Main menu from user:" + hid);
  
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
         Conversation mainConversation = conversationFactory.createConversation(MainConversation.class);
         uc.startConversation(mainConversation);
 
-        userrepo.saveAndFlush(uc);    	
+        userContextRepository.saveAndFlush(uc);
     }
 
     public void trustlyClosed(String hid) {
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
 
 
 
@@ -259,7 +243,7 @@ public class SessionManager {
         tr.windowClosed(uc);
 
 
-        userrepo.save(uc);
+        userContextRepository.save(uc);
     }
 
     public void receiveMessage(Message m, String hid) {
@@ -272,7 +256,7 @@ public class SessionManager {
 
         m.header.fromId = new Long(hid);
 
-        UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
         uc.receiveMessage(m, conversationFactory);
 

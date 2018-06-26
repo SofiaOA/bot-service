@@ -71,7 +71,7 @@ public class SessionManagerTest {
     public void setUp() {
         val objectMapper = new ObjectMapper();
         sessionManager = new SessionManager(
-        		userContextRepository, memberService, productPricingService, signupCodeRepository, conversationFactory, campaignCodeRepository, messagesService, objectMapper);
+        		userContextRepository, memberService, conversationFactory, campaignCodeRepository, objectMapper);
     }
 
     //FIXME
