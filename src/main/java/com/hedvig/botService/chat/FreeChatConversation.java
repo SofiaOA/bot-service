@@ -2,10 +2,7 @@ package com.hedvig.botService.chat;
 
 import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
-import com.hedvig.botService.enteties.message.MessageBodyText;
-import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.enteties.message.*;
 
 import java.util.List;
 
@@ -17,14 +14,21 @@ public class FreeChatConversation extends Conversation {
     public static final String FREE_CHAT_ONBOARDING_START = "free.chat.onboarding.start";
 
     public FreeChatConversation() {
-        createMessage(FREE_CHAT_START,
+        createMessage(
+                FREE_CHAT_START,
+                new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
                 new MessageBodyText("Hej {NAME}, vad har du för fråga?"));
 
-        createMessage(FREE_CHAT_ONBOARDING_START,
+        createMessage(
+                FREE_CHAT_ONBOARDING_START,
+                new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
                 new MessageBodyText("Hade du någon fundering?"));
 
-        createMessage(FREE_CHAT_MESSAGE,
+        createMessage(
+                FREE_CHAT_MESSAGE,
+                new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
                 new MessageBodyText(""));
+
     }
 
     @Override
