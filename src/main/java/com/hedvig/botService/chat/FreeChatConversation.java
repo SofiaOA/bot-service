@@ -2,7 +2,10 @@ package com.hedvig.botService.chat;
 
 import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.*;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyText;
+import com.hedvig.botService.enteties.message.SelectItem;
 
 import java.util.List;
 
@@ -24,17 +27,6 @@ public class FreeChatConversation extends Conversation {
                 new MessageBodyText(""));
     }
 
-    public Message addMessage(final String message, UserContext uc) {
-        Message msg = new Message();
-
-        msg.body =  new MessageBodyText(message);
-        msg.header.fromId = Conversation.HEDVIG_USER_ID;
-        msg.id = FREE_CHAT_FROM_BO;
-        uc.getMemberChat().addToHistory(msg);
-
-        return msg;
-    }
-
     @Override
     public List<SelectItem> getSelectItemsForAnswer(UserContext uc) {
         return Lists.newArrayList();
@@ -42,7 +34,7 @@ public class FreeChatConversation extends Conversation {
 
     @Override
     public boolean canAcceptAnswerToQuestion(UserContext uc) {
-        return false;
+        return true;
     }
 
     @Override
@@ -76,6 +68,19 @@ public class FreeChatConversation extends Conversation {
         }
 
         completeRequest(nxtMsg, userContext);
+    }
+
+    @Override
+    protected Message createBackOfficeMessage(UserContext uc, String message, String id) {
+        Message msg = new Message();
+        msg.body =  new MessageBodyText(message);
+        msg.header.fromId = HEDVIG_USER_ID;
+        msg.globalId = null;
+        msg.header.messageId = null;
+        msg.body.id = null;
+        msg.id = id;
+
+        return msg;
     }
 
     @Override

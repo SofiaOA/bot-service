@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedvig.botService.chat.*;
 import com.hedvig.botService.enteties.*;
 import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.web.dto.AddMessageRequestDTO;
@@ -130,12 +129,8 @@ public class SessionManager {
 
         Conversation conversation = getActiveConversationOrStart(uc, MainConversation.class);
 
-        if (!conversation.canAcceptAnswerToQuestion(uc)) {
+        if (conversation.addMessageFromBackOffice(uc, backOfficeAnswer.getMsg(), "message.answer"))
             return false;
-        }
-
-        val msg = addBackOfficeMessage(uc, conversation, backOfficeAnswer.getMsg(), "message.answer");
-        uc.getMemberChat().addToHistory(msg);
 
         userContextRepository.saveAndFlush(uc);
         return true;
@@ -146,26 +141,7 @@ public class SessionManager {
         val uc = userContextRepository.findByMemberId(backOfficeMessage.getMemberId()).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
         Conversation activeConversation = getActiveConversationOrStart(uc, MainConversation.class);
-        if(activeConversation.canAcceptAnswerToQuestion(uc) == false) {
-            return false;
-        }
-
-        val msg = addBackOfficeMessage(uc, activeConversation, backOfficeMessage.getMsg(), "message.bo.message");
-        uc.getMemberChat().addToHistory(msg);
-        return true;
-    }
-
-    private Message addBackOfficeMessage(UserContext uc, Conversation activeConversation, String message, String id) {
-        Message msg = new Message();
-        val selectionItems = activeConversation.getSelectItemsForAnswer(uc);
-        msg.body =  new MessageBodySingleSelect(message, selectionItems);
-        msg.header.fromId = Conversation.HEDVIG_USER_ID;
-        msg.globalId = null;
-        msg.header.messageId = null;
-        msg.body.id = null;
-        msg.id = id;
-
-        return msg;
+        return activeConversation.addMessageFromBackOffice(uc, backOfficeMessage.getMsg(), "message.bo.message");
     }
 
     private Conversation getActiveConversationOrStart(UserContext uc, Class<MainConversation> conversationToStart) {

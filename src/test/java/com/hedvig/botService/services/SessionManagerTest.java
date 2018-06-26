@@ -22,6 +22,7 @@ import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -59,7 +60,7 @@ public class SessionManagerTest {
     @Mock
     ConversationFactory conversationFactory;
 
-    @Mock
+    @Mock(answer = Answers.CALLS_REAL_METHODS)
     Conversation mockConversation;
 
     @Mock MessagesService messagesService;
