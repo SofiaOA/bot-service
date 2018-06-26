@@ -129,7 +129,6 @@ public class MainConversation extends Conversation {
 			userContext.completeConversation(this); // TODO: End conversation in better way
 			break;
 		case MESSAGE_MAIN_QUESTION:
-			userContext.askedQuestion(MESSAGE_MAIN_QUESTION);
 			nxtMsg = handleQuestion(userContext, m);
 			break;
 		}

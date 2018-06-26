@@ -33,7 +33,6 @@ import java.util.regex.Pattern;
 public class UserContext implements Serializable {
 
     public static final String TRUSTLY_TRIGGER_ID = "{TRUSTLY_TRIGGER_ID}";
-	public static final String NEW_QUESTION_MESSAGE = "{NEW_QUESTION_MESSAGE}";
 
 	private static Logger log = LoggerFactory.getLogger(UserContext.class);
 	private static HashMap<String, String> requiredData = new HashMap<String, String>(){{
@@ -46,7 +45,7 @@ public class UserContext implements Serializable {
 		put("{SSN}", "T.ex har jag inte ditt personnummer?");
 		put("{NAME}", "T.ex vet jag inte vad heter... " + OnboardingConversationDevi.emoji_flushed_face + " ?");
 		put("{NR_PERSONS}", "Tex. hur många är ni i hushållet");
-		put("{SECURE_ITEMS_NO}", "T.ex skulle jag behöver veta hur många säkerhetsgrejer du har?"); // TODO: Redirect...
+		put("{SECURE_ITEMS_NO}", "T.ex skulle jag behöver veta hur många säkerhetsgrejer du har?");
 		}};
 			
     @Id
@@ -63,7 +62,7 @@ public class UserContext implements Serializable {
     @CollectionTable(name="user_data")
     @MapKeyColumn(name="key")
     @Column(name="value", length = 3000)
-    private Map<String, String> userData = new HashMap<String, String>();
+    private Map<String, String> userData = new HashMap<>();
 
 	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name="conversationManager_id")
@@ -96,7 +95,7 @@ public class UserContext implements Serializable {
     	userData.remove(key);
 	}
     
-    public List<ConversationEntity> getConversations(){
+    private List<ConversationEntity> getConversations(){
     	return this.conversationManager.getConversations();
     }
     
@@ -244,10 +243,6 @@ public class UserContext implements Serializable {
         getMemberChat().addToHistory(m);
     }
 
-	public void askedQuestion(String s) {
-		putUserData(NEW_QUESTION_MESSAGE, "message.frionboardingfraga");
-	}
-
 	public Optional<ConversationEntity> getActiveConversation() {
 
 		return conversationManager.getActiveConversation();
@@ -274,7 +269,7 @@ public class UserContext implements Serializable {
         }
     }
 
-	public void initChat(String startMsg, @NotNull ConversationFactory conversationFactory) {
+	private void initChat(String startMsg, @NotNull ConversationFactory conversationFactory) {
 		putUserData("{WEB_USER}", "FALSE");
 
 		Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);

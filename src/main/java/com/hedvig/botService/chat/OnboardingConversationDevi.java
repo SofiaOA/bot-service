@@ -1082,12 +1082,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 nxtMsg = MESSAGE_NAGOTMER;
                 break;
             case MESSAGE_FRIFRAGA:
-                userContext.askedQuestion(MESSAGE_FRIFRAGA);
                 handleFriFraga(userContext, m);
                 nxtMsg = "message.frifragatack";
                 break;
             case MESSAGE_FRIONBOARDINGFRAGA:
-                userContext.askedQuestion(MESSAGE_FRIONBOARDINGFRAGA);
                 handleFriFraga(userContext, m);
                 nxtMsg = "message.frionboardingfragatack";
                 break;

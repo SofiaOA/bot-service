@@ -11,7 +11,6 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectR
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.web.dto.AddMessageRequestDTO;
 import com.hedvig.botService.web.dto.BackOfficeAnswerDTO;
-import com.hedvig.botService.web.dto.SignupStatus;
 import com.hedvig.botService.web.dto.TrackingDTO;
 import lombok.val;
 import org.slf4j.Logger;
@@ -21,7 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -84,31 +82,6 @@ public class SessionManager {
         return messages.subList(Math.max(messages.size() - i, 0), messages.size());
     }
 
-    public SignupStatus getSignupQueuePosition(String externalToken){
-
-        ArrayList<SignupCode> scList = (ArrayList<SignupCode>) signupRepo.findAllByOrderByDateAsc();
-        int pos = 1;
-        SignupStatus ss = new SignupStatus();
-        
-        for(SignupCode sc : scList){
-        		log.debug(sc.code + " UUID:" + sc.externalToken + " email:" + sc.email + "(" + sc.date+"):" + (pos));
-        		if(sc.externalToken.toString().equals(externalToken)){
-        			if(!sc.active){
-        				ss.position = queuePos + pos;
-        				ss.status = SignupStatus.states.WAITLIST.toString();
-        				return ss;
-        			}else{
-        				ss.code = sc.code;
-        				ss.status = SignupStatus.states.ACCESS.toString();
-        				return ss;
-        			}
-        		}
-        		if(!sc.used)pos++;
-        }
-        ss.status = SignupStatus.states.NOT_FOUND.toString();
-        return ss;
-    }
-    
     public void savePushToken(String hid, String pushToken) {
         UserContext uc = userrepo.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
         uc.putUserData("PUSH-TOKEN", pushToken);
@@ -305,7 +278,4 @@ public class SessionManager {
 
     }
 
-    public Integer getWaitlistPosition(String email) {
-		return null;
-	}
 }

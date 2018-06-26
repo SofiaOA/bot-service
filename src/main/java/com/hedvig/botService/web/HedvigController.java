@@ -4,13 +4,10 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectR
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.services.SessionManager;
 import com.hedvig.botService.web.dto.CollectResponse;
-import com.hedvig.botService.web.dto.SignupStatus;
 import com.hedvig.botService.web.dto.TrackingDTO;
-import com.hedvig.botService.web.dto.UpdateTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,15 +28,6 @@ public class HedvigController {
 		this.sessionManager = sessions;
         this.productPricingService = productPricingService;
     }
-    
-    @PostMapping(path = "/waitlist")
-    public ResponseEntity<SignupStatus> waitlistPosition(@RequestBody String externalToken) {
-    	log.info("Fetching waitlist position for externalToken:" + externalToken);
-    	
-        SignupStatus ss = sessionManager.getSignupQueuePosition(externalToken);
-
-        return new ResponseEntity<>(ss,HttpStatus.OK);
-    }
 
     @PostMapping(path = "/register_campaign")
     public ResponseEntity<Void> campaign(@RequestBody TrackingDTO tracker, @RequestHeader(value="hedvig.token") String hid) {
@@ -52,20 +40,6 @@ public class HedvigController {
     ResponseEntity<Void> pushToken(@RequestBody String tokenJson, @RequestHeader(value="hedvig.token") String hid) {
         log.info("Push token for memberId:{}, is: {}", value("memberId", ""), tokenJson);
         sessionManager.savePushToken(hid, tokenJson);
-        return ResponseEntity.noContent().build();
-    }
-    
-    @PostMapping("initiateUpdate")
-    ResponseEntity<String> initiateUpdate(@RequestParam UpdateTypes what, @RequestHeader(value="hedvig.token", required = false) String hid) {
-    	log.error("Old client endpoint should be dead!!", what.name());
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("quoteAccepted")
-    ResponseEntity<String> quoteAccepted(@RequestHeader(value="hedvig.token") String hid){
-
-        log.error("Endpoint not is use anymore");
-
         return ResponseEntity.noContent().build();
     }
 
