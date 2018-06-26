@@ -22,8 +22,6 @@ public class MessageHeader {
 	public Long pollingInterval; // Frequency of next request
 
 	public String statusMessage = "";
-	public Boolean showOfferScreen = false;
-	public Boolean ongoingClaim = false;
 	
 	@Transient
 	public boolean editAllowed; // For client use to indicate if the last message is editable

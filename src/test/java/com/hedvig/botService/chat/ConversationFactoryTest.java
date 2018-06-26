@@ -45,6 +45,9 @@ public class ConversationFactoryTest {
     ApplicationEventPublisher applicationEventPublisher;
 
     @Mock
+    StatusBuilder statusBuilder;
+
+    @Mock
     Environment springEnvironment;
 
     @Parameterized.Parameters
@@ -69,7 +72,7 @@ public class ConversationFactoryTest {
 
     @Test
     public void test(){
-        ConversationFactory factory = new ConversationFactoryImpl(memberService, productPricingService, triggerService, signupCodeRepository, applicationEventPublisher, claimsService, springEnvironment, 0);
+        ConversationFactory factory = new ConversationFactoryImpl(memberService, productPricingService, triggerService, signupCodeRepository, applicationEventPublisher, claimsService, statusBuilder, 0);
 
         Conversation conversation = factory.createConversation(conversationClass);
 

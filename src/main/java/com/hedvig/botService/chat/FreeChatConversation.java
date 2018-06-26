@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 
+import java.time.Clock;
 import java.util.List;
 
 public class FreeChatConversation extends Conversation {
@@ -12,8 +13,10 @@ public class FreeChatConversation extends Conversation {
     private static final String FREE_CHAT_MESSAGE = "free.chat.message";
     public static final String FREE_CHAT_FROM_BO = "free.chat.from.bo";
     public static final String FREE_CHAT_ONBOARDING_START = "free.chat.onboarding.start";
+    private final StatusBuilder statusBuilder;
 
-    public FreeChatConversation() {
+    public FreeChatConversation(StatusBuilder statusBuilder) {
+        this.statusBuilder = statusBuilder;
         createMessage(
                 FREE_CHAT_START,
                 new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
@@ -48,8 +51,9 @@ public class FreeChatConversation extends Conversation {
         switch (m.id) {
             case FREE_CHAT_START:
             case FREE_CHAT_ONBOARDING_START:
+            case FREE_CHAT_FROM_BO:
             case FREE_CHAT_MESSAGE: {
-                m.header.statusMessage = "Hedvig svarar inom 30m";
+                m.header.statusMessage = statusBuilder.getStatusMessage(Clock.systemUTC());
                 addToChat(m, userContext);
                 nxtMsg = FREE_CHAT_MESSAGE;
                 break;
@@ -82,18 +86,11 @@ public class FreeChatConversation extends Conversation {
         msg.globalId = null;
         msg.header.messageId = null;
         msg.body.id = null;
-        msg.id = id;
+        msg.id = FREE_CHAT_FROM_BO;
 
         return msg;
     }
 
-    @Override
-    void addToChat(Message m, UserContext userContext) {
-        m.header.statusMessage = "Hedvig svarar inom 1h";
-        m.header.showOfferScreen = !userContext.getOnBoardingData().getUserHasSigned();
-        m.header.ongoingClaim = false;
-        super.addToChat(m, userContext);
-    }
 
     @Override
     public void init(UserContext userContext) {

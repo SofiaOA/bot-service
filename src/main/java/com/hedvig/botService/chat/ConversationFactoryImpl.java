@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,6 +21,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
     private final ApplicationEventPublisher eventPublisher;
     private final ClaimsService claimsService;
 
+    private final StatusBuilder statusBuilder;
     private Integer queuePos;
 
     public ConversationFactoryImpl(MemberService memberService,
@@ -30,7 +30,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
                                    SignupCodeRepository signupCodeRepository,
                                    ApplicationEventPublisher eventPublisher,
                                    ClaimsService claimsService,
-                                   Environment springEnvironment,
+                                   StatusBuilder statusBuilder,
                                    @Value("${hedvig.waitlist.length}") Integer queuePos) {
         this.memberService = memberService;
         this.productPricingService = productPricingService;
@@ -39,6 +39,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
         this.signupCodeRepository = signupCodeRepository;
         this.eventPublisher = eventPublisher;
         this.claimsService = claimsService;
+        this.statusBuilder = statusBuilder;
         this.queuePos = queuePos;
     }
 
@@ -68,7 +69,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
         }
 
         if(conversationClass.equals(FreeChatConversation.class)) {
-            return new FreeChatConversation();
+            return new FreeChatConversation(statusBuilder);
         }
 
         return null;
