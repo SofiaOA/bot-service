@@ -4,8 +4,8 @@ import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.session.events.QuestionAskedEvent;
-import com.hedvig.botService.session.events.RequestPhoneCallEvent;
+import com.hedvig.botService.services.events.QuestionAskedEvent;
+import com.hedvig.botService.services.events.RequestPhoneCallEvent;
 import lombok.val;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -32,6 +32,7 @@ public class MainConversation extends Conversation {
 	public static final String MESSAGE_MAIN_ONBOARDING_DONE = "onboarding.done";
 	public static final String CONVERSATION_DONE = "conversation.done";
 	public static final String FORCE_TRUSTLY_CHOICE = "{FORCE_TRUSTLY_CHOICE}";
+	public static final String MESSAGE_MAIN_START_CHAT = "message.main.start.chat";
 
 	private static Logger log = LoggerFactory.getLogger(MainConversation.class);
 	private final ConversationFactory conversationFactory;
@@ -121,7 +122,6 @@ public class MainConversation extends Conversation {
 			userContext.completeConversation(this); // TODO: End conversation in better way
 			break;
 		case MESSAGE_MAIN_QUESTION:
-			userContext.askedQuestion(MESSAGE_MAIN_QUESTION);
 			nxtMsg = handleQuestion(userContext, m);
 			break;
 		}
@@ -184,7 +184,7 @@ public class MainConversation extends Conversation {
 		val message = getMessage(MESSAGE_HEDVIG_COM);
 		val body = (MessageBodySingleSelect) message.body;
 		String forceTrustly = userContext.getDataEntry(FORCE_TRUSTLY_CHOICE);
-		if(forceTrustly != null && "true".equalsIgnoreCase(forceTrustly)) {
+		if("true".equalsIgnoreCase(forceTrustly)) {
             body.choices.add(new SelectOption("Koppla autogiro", MESSAGE_MAIN_START_TRUSTLY));
         }
 	}

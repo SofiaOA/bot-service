@@ -4,12 +4,11 @@ import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.session.triggerService.TriggerService;
+import com.hedvig.botService.services.triggerService.TriggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,6 +21,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
     private final ApplicationEventPublisher eventPublisher;
     private final ClaimsService claimsService;
 
+    private final StatusBuilder statusBuilder;
     private Integer queuePos;
 
     public ConversationFactoryImpl(MemberService memberService,
@@ -30,7 +30,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
                                    SignupCodeRepository signupCodeRepository,
                                    ApplicationEventPublisher eventPublisher,
                                    ClaimsService claimsService,
-                                   Environment springEnvironment,
+                                   StatusBuilder statusBuilder,
                                    @Value("${hedvig.waitlist.length}") Integer queuePos) {
         this.memberService = memberService;
         this.productPricingService = productPricingService;
@@ -39,6 +39,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
         this.signupCodeRepository = signupCodeRepository;
         this.eventPublisher = eventPublisher;
         this.claimsService = claimsService;
+        this.statusBuilder = statusBuilder;
         this.queuePos = queuePos;
     }
 
@@ -67,8 +68,8 @@ public class ConversationFactoryImpl implements ConversationFactory {
                 return new TrustlyConversation(triggerService, this, memberService);
         }
 
-        if(conversationClass.equals(UpdateInformationConversation.class)) {
-            return new UpdateInformationConversation(memberService, productPricingService);
+        if(conversationClass.equals(FreeChatConversation.class)) {
+            return new FreeChatConversation(statusBuilder);
         }
 
         return null;

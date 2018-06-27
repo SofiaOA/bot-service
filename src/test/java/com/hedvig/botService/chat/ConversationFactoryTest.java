@@ -5,7 +5,7 @@ import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.session.triggerService.TriggerService;
+import com.hedvig.botService.services.triggerService.TriggerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,6 +45,9 @@ public class ConversationFactoryTest {
     ApplicationEventPublisher applicationEventPublisher;
 
     @Mock
+    StatusBuilder statusBuilder;
+
+    @Mock
     Environment springEnvironment;
 
     @Parameterized.Parameters
@@ -54,8 +57,7 @@ public class ConversationFactoryTest {
                 ClaimsConversation.class,
                 CharityConversation.class,
                 MainConversation.class,
-                OnboardingConversationDevi.class,
-                UpdateInformationConversation.class});
+                OnboardingConversationDevi.class});
     }
 
     public ConversationFactoryTest(Class<?> conversationClass) {
@@ -70,7 +72,7 @@ public class ConversationFactoryTest {
 
     @Test
     public void test(){
-        ConversationFactory factory = new ConversationFactoryImpl(memberService, productPricingService, triggerService, signupCodeRepository, applicationEventPublisher, claimsService, springEnvironment, 0);
+        ConversationFactory factory = new ConversationFactoryImpl(memberService, productPricingService, triggerService, signupCodeRepository, applicationEventPublisher, claimsService, statusBuilder, 0);
 
         Conversation conversation = factory.createConversation(conversationClass);
 

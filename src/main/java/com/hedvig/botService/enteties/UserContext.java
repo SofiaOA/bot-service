@@ -1,26 +1,26 @@
 package com.hedvig.botService.enteties;
 
 import com.hedvig.botService.chat.Conversation;
-import com.hedvig.botService.chat.Conversation.conversationStatus;
+import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.MemberProfile;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
+import com.hedvig.botService.services.SessionManager;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +32,6 @@ import java.util.regex.Pattern;
 public class UserContext implements Serializable {
 
     public static final String TRUSTLY_TRIGGER_ID = "{TRUSTLY_TRIGGER_ID}";
-	public static final String NEW_QUESTION_MESSAGE = "{NEW_QUESTION_MESSAGE}";
 
 	private static Logger log = LoggerFactory.getLogger(UserContext.class);
 	private static HashMap<String, String> requiredData = new HashMap<String, String>(){{
@@ -45,7 +44,7 @@ public class UserContext implements Serializable {
 		put("{SSN}", "T.ex har jag inte ditt personnummer?");
 		put("{NAME}", "T.ex vet jag inte vad heter... " + OnboardingConversationDevi.emoji_flushed_face + " ?");
 		put("{NR_PERSONS}", "Tex. hur många är ni i hushållet");
-		put("{SECURE_ITEMS_NO}", "T.ex skulle jag behöver veta hur många säkerhetsgrejer du har?"); // TODO: Redirect...
+		put("{SECURE_ITEMS_NO}", "T.ex skulle jag behöver veta hur många säkerhetsgrejer du har?");
 		}};
 			
     @Id
@@ -62,11 +61,11 @@ public class UserContext implements Serializable {
     @CollectionTable(name="user_data")
     @MapKeyColumn(name="key")
     @Column(name="value", length = 3000)
-    private Map<String, String> userData = new HashMap<String, String>();
+    private Map<String, String> userData = new HashMap<>();
 
 	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name="conversationManager_id")
-    private ConversationManager conversationManager;
+    public ConversationManager conversationManager;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	@Getter
@@ -95,7 +94,7 @@ public class UserContext implements Serializable {
     	userData.remove(key);
 	}
     
-    public List<ConversationEntity> getConversations(){
+    private List<ConversationEntity> getConversations(){
     	return this.conversationManager.getConversations();
     }
     
@@ -131,16 +130,6 @@ public class UserContext implements Serializable {
 		this.conversationManager.completeConversation(conversationClass);
 	}
 
-	// Check if there is at least one conversation containing name 'Onboarding' with state COMPLETE
-    public boolean hasCompletedOnboarding(){
-    	for(ConversationEntity c : this.getConversations()){
-    		if(c.getClassName().contains("Onboarding") && c.conversationStatus == conversationStatus.COMPLETE){
-    			return true;
-			}
-    	}
-    	return false;
-    }
-    
     // ------------------------------------------------------ //
     
     public UserContext(String memberId) {
@@ -156,7 +145,7 @@ public class UserContext implements Serializable {
     public void clearContext(){
     	this.getOnBoardingData().clear();
 		this.conversationManager.getConversations().clear();
-    	this.memberChat.chatHistory.clear();
+    	this.memberChat.reset();
     }
 
 	/*
@@ -243,14 +232,43 @@ public class UserContext implements Serializable {
         getMemberChat().addToHistory(m);
     }
 
-	public void askedQuestion(String s) {
-		putUserData(NEW_QUESTION_MESSAGE, "message.frionboardingfraga");
-	}
-
 	public Optional<ConversationEntity> getActiveConversation() {
 
 		return conversationManager.getActiveConversation();
 	}
+
+    private void initChat(String startMsg, @NotNull ConversationFactory conversationFactory) {
+		putUserData("{WEB_USER}", "FALSE");
+
+		Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);
+		startConversation(onboardingConversation, startMsg);
+	}
+
+	public List<Message> getMessages(SessionManager.Intent intent, ConversationFactory conversationFactory) {
+		MemberChat chat = getMemberChat();
+
+		if(getActiveConversation().isPresent() == false) {
+			if(intent == SessionManager.Intent.LOGIN) {
+				initChat(OnboardingConversationDevi.MESSAGE_START_LOGIN, conversationFactory);
+			} else {
+				initChat(OnboardingConversationDevi.MESSAGE_WAITLIST_START, conversationFactory);
+			}
+		}
+
+		val returnList = chat.getMessages();
+
+		if(returnList.size() > 0){
+			Message lastMessage = returnList.get(0);
+			if(lastMessage!=null) {
+				conversationManager.receiveEvent("MESSAGE_FETCHED", lastMessage.id, conversationFactory, this);
+			}
+		}else{
+			log.info("No messages in chat....");
+		}
+
+		return returnList;
+	}
+
 }
 
 

@@ -2,7 +2,7 @@ package com.hedvig.botService.web;
 
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.memberService.exceptions.BankIdError;
-import com.hedvig.botService.session.OnboardingService;
+import com.hedvig.botService.services.OnboardingService;
 import com.hedvig.botService.web.dto.BankIdCollectError;
 import com.hedvig.botService.web.dto.BankIdCollectRequest;
 import com.hedvig.botService.web.dto.BankidCollectResponse;
@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -30,6 +29,14 @@ public class OnboardingController {
     @Autowired
     public OnboardingController(OnboardingService onboardingService) {
         this.onboardingService = onboardingService;
+    }
+
+    @PostMapping("offerClosed")
+    public ResponseEntity<?> offerClosed(@RequestHeader("hedvig.token") String hid) {
+
+        onboardingService.offerClosed(hid);
+
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("sign")

@@ -1,8 +1,8 @@
 package com.hedvig.botService.web;
 
 import com.hedvig.botService.BotServiceApplicationTests;
-import com.hedvig.botService.session.triggerService.TriggerService;
-import com.hedvig.botService.session.triggerService.dto.CreateDirectDebitMandateDTO;
+import com.hedvig.botService.services.triggerService.TriggerService;
+import com.hedvig.botService.services.triggerService.dto.CreateDirectDebitMandateDTO;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

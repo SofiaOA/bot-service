@@ -2,9 +2,9 @@ package com.hedvig.botService.web;
 
 import com.hedvig.botService.Profiles;
 import com.hedvig.botService.enteties.DirectDebitMandateTrigger;
-import com.hedvig.botService.session.triggerService.TriggerService;
-import com.hedvig.botService.session.exceptions.UnathorizedException;
-import com.hedvig.botService.session.triggerService.dto.CreateDirectDebitMandateDTO;
+import com.hedvig.botService.services.triggerService.TriggerService;
+import com.hedvig.botService.services.exceptions.UnathorizedException;
+import com.hedvig.botService.services.triggerService.dto.CreateDirectDebitMandateDTO;
 import com.hedvig.botService.web.dto.TriggerResponseDTO;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;

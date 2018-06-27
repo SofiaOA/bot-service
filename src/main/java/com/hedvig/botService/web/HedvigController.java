@@ -2,22 +2,16 @@ package com.hedvig.botService.web;
 
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.session.SessionManager;
-import com.hedvig.botService.web.dto.AvatarDTO;
+import com.hedvig.botService.services.SessionManager;
 import com.hedvig.botService.web.dto.CollectResponse;
-import com.hedvig.botService.web.dto.SignupStatus;
 import com.hedvig.botService.web.dto.TrackingDTO;
-import com.hedvig.botService.web.dto.UpdateTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static net.logstash.logback.argument.StructuredArguments.value;
-
-import java.util.List;
 
 
 @RestController
@@ -26,22 +20,13 @@ public class HedvigController {
 
     private final Logger log = LoggerFactory.getLogger(HedvigController.class);
 	private final SessionManager sessionManager;
-    private final ProductPricingService service;
+    private final ProductPricingService productPricingService;
 
     @Autowired
-    public HedvigController(SessionManager sessions, ProductPricingService service)
+    public HedvigController(SessionManager sessions, ProductPricingService productPricingService)
 	{
 		this.sessionManager = sessions;
-        this.service = service;
-    }
-    
-    @PostMapping(path = "/waitlist")
-    public ResponseEntity<SignupStatus> waitlistPosition(@RequestBody String externalToken) {
-    	log.info("Fetching waitlist position for externalToken:" + externalToken);
-    	
-        SignupStatus ss = sessionManager.getSignupQueuePosition(externalToken);
-
-        return new ResponseEntity<>(ss,HttpStatus.OK);
+        this.productPricingService = productPricingService;
     }
 
     @PostMapping(path = "/register_campaign")
@@ -56,24 +41,6 @@ public class HedvigController {
         log.info("Push token for memberId:{}, is: {}", value("memberId", ""), tokenJson);
         sessionManager.savePushToken(hid, tokenJson);
         return ResponseEntity.noContent().build();
-    }
-    
-    @PostMapping("initiateUpdate")
-    ResponseEntity<String> initiateUpdate(@RequestParam UpdateTypes what, @RequestHeader(value="hedvig.token", required = false) String hid) {
-    	log.info("Member initiated update: ", what.name());
-        sessionManager.updateInfo(hid, what);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("quoteAccepted")
-    ResponseEntity<String> quoteAccepted(@RequestHeader(value="hedvig.token") String hid){
-
-        log.info("Quote accepted");
-        service.quoteAccepted(hid);
-
-        this.sessionManager.quoteAccepted(hid);
-
-    	return ResponseEntity.noContent().build();
     }
 
     @PostMapping("trustlyClosed")

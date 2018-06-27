@@ -4,6 +4,7 @@ import com.hedvig.botService.dataTypes.HedvigDataType;
 import com.hedvig.botService.dataTypes.TextInput;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,7 @@ public abstract class Conversation {
 
 	public static final long  HEDVIG_USER_ID = 1; // The id hedvig uses to chat
 	private Map<String, SelectItemMessageCallback> callbacks = new TreeMap<>();
+
 
 
 
@@ -291,6 +293,29 @@ public abstract class Conversation {
 		// Connect all messages in relay chain
 		for(int i = 0; i< (msgs.size()-1); i++)addRelay(msgs.get(i), msgs.get(i+1));
 
+	}
+
+	public boolean addMessageFromBackOffice(UserContext uc, String message, String messageId) {
+		if (!this.canAcceptAnswerToQuestion(uc)) {
+			return false;
+		}
+
+		val msg = createBackOfficeMessage(uc, message, messageId);
+		uc.getMemberChat().addToHistory(msg);
+		return true;
+	}
+
+	protected Message createBackOfficeMessage(UserContext uc, String message, String id) {
+		Message msg = new Message();
+		val selectionItems = getSelectItemsForAnswer(uc);
+		msg.body =  new MessageBodySingleSelect(message, selectionItems);
+		msg.header.fromId = HEDVIG_USER_ID;
+		msg.globalId = null;
+		msg.header.messageId = null;
+		msg.body.id = null;
+		msg.id = id;
+
+		return msg;
 	}
 
 }
