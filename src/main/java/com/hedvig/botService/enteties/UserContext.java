@@ -1,7 +1,6 @@
 package com.hedvig.botService.enteties;
 
 import com.hedvig.botService.chat.Conversation;
-import com.hedvig.botService.chat.Conversation.conversationStatus;
 import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
 import com.hedvig.botService.enteties.message.Message;
@@ -66,7 +65,7 @@ public class UserContext implements Serializable {
 
 	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name="conversationManager_id")
-    private ConversationManager conversationManager;
+    public ConversationManager conversationManager;
 
 	@OneToOne(cascade = CascadeType.ALL)
 	@Getter
@@ -131,16 +130,6 @@ public class UserContext implements Serializable {
 		this.conversationManager.completeConversation(conversationClass);
 	}
 
-	// Check if there is at least one conversation containing name 'Onboarding' with state COMPLETE
-    public boolean hasCompletedOnboarding(){
-    	for(ConversationEntity c : this.getConversations()){
-    		if(c.getClassName().contains("Onboarding") && c.conversationStatus == conversationStatus.COMPLETE){
-    			return true;
-			}
-    	}
-    	return false;
-    }
-    
     // ------------------------------------------------------ //
     
     public UserContext(String memberId) {
@@ -248,28 +237,7 @@ public class UserContext implements Serializable {
 		return conversationManager.getActiveConversation();
 	}
 
-    public void receiveEvent(String eventType, String value, ConversationFactory conversationFactory) {
-        Conversation.EventTypes type = Conversation.EventTypes.valueOf(eventType);
-
-
-        List<ConversationEntity> conversations = new ArrayList<>(getConversations()); //We will add a new element to uc.conversationManager
-        for(ConversationEntity c : conversations){
-
-            // Only deliver messages to ongoing conversations
-            if(!c.getConversationStatus().equals(conversationStatus.ONGOING))continue;
-
-            try {
-                final Class<?> conversationClass = Class.forName(c.getClassName());
-                final Conversation conversation = conversationFactory.createConversation(conversationClass);
-                conversation.recieveEvent(type, value, this);
-
-            } catch (ClassNotFoundException e) {
-                log.error("Could not load conversation from db!", e);
-            }
-        }
-    }
-
-	private void initChat(String startMsg, @NotNull ConversationFactory conversationFactory) {
+    private void initChat(String startMsg, @NotNull ConversationFactory conversationFactory) {
 		putUserData("{WEB_USER}", "FALSE");
 
 		Conversation onboardingConversation = conversationFactory.createConversation(OnboardingConversationDevi.class);
@@ -292,7 +260,7 @@ public class UserContext implements Serializable {
 		if(returnList.size() > 0){
 			Message lastMessage = returnList.get(0);
 			if(lastMessage!=null) {
-				receiveEvent("MESSAGE_FETCHED", lastMessage.id, conversationFactory);
+				conversationManager.receiveEvent("MESSAGE_FETCHED", lastMessage.id, conversationFactory, this);
 			}
 		}else{
 			log.info("No messages in chat....");
@@ -301,23 +269,6 @@ public class UserContext implements Serializable {
 		return returnList;
 	}
 
-	public void receiveMessage(Message m, ConversationFactory conversationFactory) {
-		List<ConversationEntity> conversations = new ArrayList<>(getConversations()); //We will add a new element to uc.conversationManager
-		for(ConversationEntity c : conversations){
-
-			// Only deliver messages to ongoing conversations
-			if(!c.getConversationStatus().equals(conversationStatus.ONGOING))continue;
-
-			try {
-				final Class<?> conversationClass = Class.forName(c.getClassName());
-				final Conversation conversation = conversationFactory.createConversation(conversationClass);
-				conversation.receiveMessage(this, m);
-
-			} catch (ClassNotFoundException e) {
-				log.error("Could not load conversation from db!", e);
-			}
-		}
-	}
 }
 
 

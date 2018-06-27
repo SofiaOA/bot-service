@@ -1,16 +1,16 @@
 package com.hedvig.botService.enteties;
 
 import com.hedvig.botService.chat.Conversation;
+import com.hedvig.botService.chat.ConversationFactory;
+import com.hedvig.botService.enteties.message.Message;
 import lombok.Getter;
 import lombok.ToString;
-import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /*
@@ -105,6 +105,45 @@ public class ConversationManager {
         }
         else {
             activeConversation.setConversationStatus(Conversation.conversationStatus.COMPLETE);
+        }
+    }
+
+    public void receiveEvent(String eventType, String value, ConversationFactory conversationFactory, UserContext userContext) {
+        Conversation.EventTypes type = Conversation.EventTypes.valueOf(eventType);
+
+
+        List<ConversationEntity> conversations = new ArrayList<>(getConversations()); //We will add a new element to uc.conversationManager
+        for(ConversationEntity c : conversations){
+
+            // Only deliver messages to ongoing conversations
+            if(!c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING))continue;
+
+            try {
+                final Class<?> conversationClass = Class.forName(c.getClassName());
+                final Conversation conversation = conversationFactory.createConversation(conversationClass);
+                conversation.recieveEvent(type, value, userContext);
+
+            } catch (ClassNotFoundException e) {
+                log.error("Could not load conversation from db!", e);
+            }
+        }
+    }
+
+    public void receiveMessage(Message m, ConversationFactory conversationFactory, UserContext userContext) {
+List<ConversationEntity> conversations = new ArrayList<>(getConversations()); //We will add a new element to uc.conversationManager
+        for(ConversationEntity c : conversations){
+
+            // Only deliver messages to ongoing conversations
+            if(!c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING))continue;
+
+            try {
+                final Class<?> conversationClass = Class.forName(c.getClassName());
+                final Conversation conversation = conversationFactory.createConversation(conversationClass);
+                conversation.receiveMessage(userContext, m);
+
+            } catch (ClassNotFoundException e) {
+                log.error("Could not load conversation from db!", e);
+            }
         }
     }
 }

@@ -14,9 +14,18 @@ public class MessagesDTO {
         boolean showOfferScreen;
     }
 
+    @Value
+    public static class FABOption {
+        String text;
+        String triggerUrl;
+        boolean enabled;
+    }
+
     State state;
 
+
     List<Message> messages;
+    List<FABOption> fabOptions;
 }
 
 

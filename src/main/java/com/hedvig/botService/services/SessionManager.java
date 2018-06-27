@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedvig.botService.chat.*;
 import com.hedvig.botService.enteties.*;
 import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.web.dto.AddMessageRequestDTO;
@@ -41,6 +42,7 @@ public class SessionManager {
     private final UserContextRepository userContextRepository;
     private final MemberService memberService;
 
+    private final ClaimsService claimsService;
     private final ConversationFactory conversationFactory;
     private final TrackingDataRespository trackerRepo;
     private final ObjectMapper objectMapper;
@@ -48,11 +50,12 @@ public class SessionManager {
     @Autowired
     public SessionManager(UserContextRepository userContextRepository,
                           MemberService memberService,
-                          ConversationFactory conversationFactory,
+                          ClaimsService claimsService, ConversationFactory conversationFactory,
                           TrackingDataRespository trackerRepo,
                           ObjectMapper objectMapper) {
         this.userContextRepository = userContextRepository;
         this.memberService = memberService;
+        this.claimsService = claimsService;
         this.conversationFactory = conversationFactory;
         this.trackerRepo = trackerRepo;
         this.objectMapper = objectMapper;
@@ -85,7 +88,7 @@ public class SessionManager {
 
         UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
-        uc.receiveEvent(eventType, value, conversationFactory);
+        uc.conversationManager.receiveEvent(eventType, value, conversationFactory, uc);
     }
 
     public BankIdCollectResponse collect(String hid, String referenceToken) {
@@ -162,7 +165,10 @@ public class SessionManager {
         MemberChat mc = uc.getMemberChat();
         
         // Conversations can only be reset during onboarding
-        if(!uc.hasCompletedOnboarding()){
+
+        val data = uc.getOnBoardingData();
+
+        if(!data.getUserHasSigned()){
         	
         	String email = uc.getOnBoardingData().getEmail();
 	    	mc.reset(); // Clear chat
@@ -234,7 +240,15 @@ public class SessionManager {
 
         UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
-        uc.receiveMessage(m, conversationFactory);
+        uc.conversationManager.receiveMessage(m, conversationFactory, uc);
+
+    }
+
+    public void getFabActions(String hid) {
+
+        if(claimsService.getActiveClaims(hid) > 0) {
+
+        }
 
     }
 

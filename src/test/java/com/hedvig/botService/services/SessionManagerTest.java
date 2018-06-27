@@ -13,6 +13,7 @@ import com.hedvig.botService.enteties.UserContextRepository;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
 import com.hedvig.botService.enteties.message.SelectLink;
+import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdStatusType;
@@ -65,6 +66,9 @@ public class SessionManagerTest {
 
     @Mock MessagesService messagesService;
 
+    @Mock
+    ClaimsService claimsService;
+
 
     SessionManager sessionManager;
 
@@ -72,7 +76,7 @@ public class SessionManagerTest {
     public void setUp() {
         val objectMapper = new ObjectMapper();
         sessionManager = new SessionManager(
-        		userContextRepository, memberService, conversationFactory, campaignCodeRepository, objectMapper);
+        		userContextRepository, memberService, claimsService, conversationFactory, campaignCodeRepository, objectMapper);
     }
 
     //FIXME
