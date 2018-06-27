@@ -5,6 +5,7 @@ import com.hedvig.botService.enteties.ResourceNotFoundException;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.UserContextRepository;
 import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.web.v2.dto.MessagesDTO;
 import lombok.val;
 import org.slf4j.Logger;
@@ -21,10 +22,12 @@ public class MessagesService {
     private final static Logger log = LoggerFactory.getLogger(MessagesService.class);
     private final UserContextRepository userContextRepository;
     private final ConversationFactory conversationFactory;
+    private final ClaimsService claimsService;
 
-    public MessagesService(UserContextRepository userContextRepository, ConversationFactory conversationFactory) {
+    public MessagesService(UserContextRepository userContextRepository, ConversationFactory conversationFactory, ClaimsService claimsService) {
         this.userContextRepository = userContextRepository;
         this.conversationFactory = conversationFactory;
+        this.claimsService = claimsService;
     }
 
 
@@ -35,7 +38,7 @@ public class MessagesService {
         messages.sort(Comparator.comparing(Message::getGlobalId).reversed());
 
         val signed = uc.getOnBoardingData().getUserHasSigned();
-        val hasClaim = false;
+        val hasClaim = this.claimsService.getActiveClaims(hid) > 0;
 
         return new MessagesDTO(new MessagesDTO.State(hasClaim, signed == false), messages);
     }
