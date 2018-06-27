@@ -52,8 +52,7 @@ public class MainConversation extends Conversation {
 						Lists.newArrayList(
 							new SelectOption("Rapportera en skada", MESSAGE_MAIN_REPORT),
 							new SelectOption("Ring mig!", MESSAGE_MAIN_CALLME),
-							new SelectOption("Jag har en fråga", MESSAGE_MAIN_QUESTION),
-							new SelectOption("Chatta!", MESSAGE_MAIN_START_CHAT)
+							new SelectOption("Jag har en fråga", MESSAGE_MAIN_QUESTION)
 				)));
 
 		createMessage(MESSAGE_HEDVIG_COM_CLAIMS,
@@ -109,12 +108,6 @@ public class MainConversation extends Conversation {
 					userContext.completeConversation(this); // TODO: End conversation in better way
 					userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
 					userContext.putUserData(FORCE_TRUSTLY_CHOICE, "false");
-					return;
-				}
-				else if(Objects.equals(item.value, MESSAGE_MAIN_START_CHAT)) {
-					addToChat(m, userContext);
-					userContext.completeConversation(this); // TODO: End conversation in better way
-					userContext.startConversation(conversationFactory.createConversation(FreeChatConversation.class));
 					return;
 				}
 
