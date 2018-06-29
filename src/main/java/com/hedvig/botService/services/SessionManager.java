@@ -132,11 +132,7 @@ public class SessionManager {
 
         Conversation conversation = getActiveConversationOrStart(uc, MainConversation.class);
 
-        if (conversation.addMessageFromBackOffice(uc, backOfficeAnswer.getMsg(), "message.answer"))
-            return false;
-
-        userContextRepository.saveAndFlush(uc);
-        return true;
+        return conversation.addMessageFromBackOffice(uc, backOfficeAnswer.getMsg(), "message.answer");
     }
 
 
