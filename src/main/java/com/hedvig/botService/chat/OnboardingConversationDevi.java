@@ -1470,7 +1470,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             log.info("Onboarding complete");
             addToChat(getMessage("message.kontraktklar"), userContext);
             userContext.getOnBoardingData().setUserHasSigned(true);
-            userContext.putUserData(IN_OFFER, "false");
+            userContext.setInOfferState(false);
             String dataEntry = userContext.getDataEntry("{50K_LIMIT}");
             if(Objects.equals(dataEntry, "true")) {
                 eventPublisher.publishEvent(new RequestObjectInsuranceEvent(userContext.getMemberId()));

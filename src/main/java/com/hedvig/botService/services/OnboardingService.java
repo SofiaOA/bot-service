@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import java.time.Instant;
 
 import static com.hedvig.botService.chat.FreeChatConversation.FREE_CHAT_ONBOARDING_START;
-import static com.hedvig.botService.chat.OnboardingConversationDevi.IN_OFFER;
 
 @Service
 @Transactional
@@ -102,7 +101,7 @@ public class OnboardingService {
     public void offerClosed(String hid) {
 
         val uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-        uc.putUserData(IN_OFFER, "true");
+        uc.setInOfferState(true);
         val activeConversation = uc.getActiveConversation().orElseThrow(() -> new RuntimeException("No active conversation."));
 
         if (activeConversation.getClassName().equals(FreeChatConversation.class.getName()) == false) {

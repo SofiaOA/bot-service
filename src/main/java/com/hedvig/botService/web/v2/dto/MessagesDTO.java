@@ -12,6 +12,7 @@ public class MessagesDTO {
     public static class State {
         boolean ongoingClaim;
         boolean showOfferScreen;
+        boolean onboardingDone;
     }
 
     @Value

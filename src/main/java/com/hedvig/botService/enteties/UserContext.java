@@ -34,6 +34,7 @@ import static com.hedvig.botService.chat.OnboardingConversationDevi.IN_OFFER;
 public class UserContext implements Serializable {
 
     public static final String TRUSTLY_TRIGGER_ID = "{TRUSTLY_TRIGGER_ID}";
+	public static final String ONBOARDING_COMPLETE = "{ONBOARDING_COMPLETE}";
 
 	private static Logger log = LoggerFactory.getLogger(UserContext.class);
 	private static HashMap<String, String> requiredData = new HashMap<String, String>(){{
@@ -145,7 +146,7 @@ public class UserContext implements Serializable {
     }
 
     public void clearContext(){
-    	this.putUserData(IN_OFFER, "false");
+    	this.setInOfferState(false);
     	this.getOnBoardingData().clear();
 		this.conversationManager.getConversations().clear();
     	this.memberChat.reset();
@@ -272,6 +273,21 @@ public class UserContext implements Serializable {
 		return returnList;
 	}
 
+	public void setOnboardingComplete() {
+		putUserData(UserContext.ONBOARDING_COMPLETE, "true");
+	}
+
+	public boolean hasCompletedOnboarding(){
+    	return Objects.equals(getDataEntry(ONBOARDING_COMPLETE), "true");
+	}
+
+	public boolean inOfferState() {
+		return Objects.equals(getDataEntry(IN_OFFER), "true");
+	}
+
+	public void setInOfferState(boolean state) {
+		putUserData(IN_OFFER, Boolean.toString(state));
+	}
 }
 
 

@@ -115,7 +115,7 @@ public class CharityConversation extends Conversation {
                     addToChat(m, userContext);
 
                     userContext.putUserData("{CHARITY}", selectedItem.value);
-
+                    userContext.setOnboardingComplete();
 
                     val charityId = getCharityId(selectedItem.value);
                     if(charityId.isPresent()) {
@@ -130,6 +130,7 @@ public class CharityConversation extends Conversation {
                         }
                         else
                         {
+
                             nxtMsg = MESSAGE_KONTRAKT_CHARITY_TACK_END;
                             addToChat(nxtMsg, userContext);
                         }

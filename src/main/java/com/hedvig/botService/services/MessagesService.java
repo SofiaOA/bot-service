@@ -53,7 +53,7 @@ public class MessagesService {
 
         );
         return new MessagesDTO(
-                new MessagesDTO.State(hasClaim, Objects.equals(uc.getDataEntry(IN_OFFER), "true")),
+                new MessagesDTO.State(hasClaim, uc.inOfferState(), uc.hasCompletedOnboarding()),
                 messages,
                 options
         );
