@@ -21,7 +21,7 @@ public class MessageHeader {
 	public String avatarName; // Link to avatar animation to show over message
 	public Long pollingInterval; // Frequency of next request
 
-	public String statusMessage = "";
+	public String statusMessage = null;
 	
 	@Transient
 	public boolean editAllowed; // For client use to indicate if the last message is editable
