@@ -894,7 +894,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     }
 
     private void completeOnboarding(UserContext userContext) {
-        userContext.putUserData(IN_OFFER, "true");
         String productId = this.productPricingService.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
         userContext.getOnBoardingData().setProductId(productId);
         this.memberService.finalizeOnBoarding(userContext.getMemberId(), userContext.getOnBoardingData());
