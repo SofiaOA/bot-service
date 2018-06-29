@@ -1,6 +1,7 @@
 package com.hedvig.botService.services;
 
 import com.google.common.collect.Lists;
+import com.hedvig.botService.chat.CallMeConversation;
 import com.hedvig.botService.chat.ClaimsConversation;
 import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.FreeChatConversation;
@@ -68,7 +69,7 @@ public class MessagesService {
                 uc.startConversation(conversationFactory.createConversation(FreeChatConversation.class));
                 break;
             case CALL_ME:
-                uc.startConversation(conversationFactory.createConversation(FreeChatConversation.class));
+                uc.startConversation(conversationFactory.createConversation(CallMeConversation.class));
                 break;
             case REPORT_CLAIM:
                 uc.startConversation(conversationFactory.createConversation(ClaimsConversation.class));

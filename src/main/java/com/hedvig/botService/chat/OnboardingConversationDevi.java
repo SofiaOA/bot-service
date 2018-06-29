@@ -933,7 +933,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         }
         
         // ... and then the incomming message id
-        switch (getMessageId(m.id)) {
+        switch (m.getBaseMessageId()) {
             case MESSAGE_WAITLIST_START: {
                 val email = userContext.getDataEntry(EMAIL);
                 if (emailIsActivated(email)) {
@@ -1075,7 +1075,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             }
             case "message.uwlimit.housingsize":
             case "message.uwlimit.householdsize":
-                nxtMsg = handleUnderwritingLimitResponse(userContext, m, getMessageId(m.id));
+                nxtMsg = handleUnderwritingLimitResponse(userContext, m, m.getBaseMessageId());
                 break;
             case MESSAGE_TIPSA:
                 onBoardingData.setRecommendFriendEmail(m.body.text);

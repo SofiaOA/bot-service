@@ -159,7 +159,7 @@ public class ClaimsConversation extends Conversation {
 
 		if(!validateReturnType(m,userContext)){return;}
 
-		switch(getMessageId(m.id)){
+		switch(m.getBaseMessageId()){
 			case "message.claims.audio":
 				nxtMsg = handleAudioReceived(userContext, m);
 				break;

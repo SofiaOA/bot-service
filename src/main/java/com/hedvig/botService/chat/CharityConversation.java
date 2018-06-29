@@ -102,7 +102,7 @@ public class CharityConversation extends Conversation {
     public void receiveMessage(UserContext userContext, Message m) {
 
         String nxtMsg = MESSAGE_KONTRAKT_CHARITY;
-        switch (getMessageId(m.id)) {
+        switch (m.getBaseMessageId()) {
             case MESSAGE_CHARITY_UNKOWN_CHOICE:
             case MESSAGE_KONTRAKT_CHARITY_TELLMEMORE:
             case MESSAGE_KONTRAKT_CHARITY:

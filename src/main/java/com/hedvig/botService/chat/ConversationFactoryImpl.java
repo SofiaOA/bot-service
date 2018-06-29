@@ -72,6 +72,10 @@ public class ConversationFactoryImpl implements ConversationFactory {
             return new FreeChatConversation(statusBuilder);
         }
 
+        if(conversationClass.equals(CallMeConversation.class)) {
+            return new CallMeConversation(statusBuilder, eventPublisher);
+        }
+
         return null;
     }
 

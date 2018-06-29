@@ -44,7 +44,18 @@ public class Message {
     @Setter
 	private Instant timestamp;
 
-	public Integer getGlobalId() {
+    /**
+     * @return Message id without trailing numbers"
+     */
+	@JsonIgnore
+    public String getBaseMessageId(){
+        if(id.matches("^.+?\\d$")){
+            return id.substring(0, id.lastIndexOf("."));
+        }
+        return id;
+    }
+
+    public Integer getGlobalId() {
 		return globalId;
 	}
 
