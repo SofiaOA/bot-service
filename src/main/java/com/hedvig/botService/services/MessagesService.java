@@ -8,7 +8,6 @@ import com.hedvig.botService.chat.FreeChatConversation;
 import com.hedvig.botService.enteties.ResourceNotFoundException;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.UserContextRepository;
-import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.web.v2.dto.FABAction;
 import com.hedvig.botService.web.v2.dto.MessagesDTO;
@@ -18,8 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Comparator;
 
 @Component
 @Transactional
@@ -41,7 +38,6 @@ public class MessagesService {
         UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
         val messages = uc.getMessages(intent, conversationFactory);
-        messages.sort(Comparator.comparing(Message::getGlobalId).reversed());
 
         val signed = uc.getOnBoardingData().getUserHasSigned();
         val hasClaim = this.claimsService.getActiveClaims(hid) > 0;

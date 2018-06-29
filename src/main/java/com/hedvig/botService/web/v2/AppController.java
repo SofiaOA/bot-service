@@ -11,15 +11,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
-@RestController("messagesControllerV2")
+@RestController()
 @RequestMapping("/v2/app")
-public class MessagesController {
+public class AppController {
 
-    private static Logger log = LoggerFactory.getLogger(MessagesController.class);
+    private static Logger log = LoggerFactory.getLogger(AppController.class);
 
     private final MessagesService messagesService;
 
-    public MessagesController(MessagesService messagesService) {
+    public AppController(MessagesService messagesService) {
         this.messagesService = messagesService;
     }
 
