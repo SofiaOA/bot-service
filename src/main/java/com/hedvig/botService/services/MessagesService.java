@@ -18,6 +18,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
+import static com.hedvig.botService.chat.OnboardingConversationDevi.IN_OFFER;
+
 @Component
 @Transactional
 public class MessagesService {
@@ -39,7 +43,6 @@ public class MessagesService {
 
         val messages = uc.getMessages(intent, conversationFactory);
 
-        val signed = uc.getOnBoardingData().getUserHasSigned();
         val hasClaim = this.claimsService.getActiveClaims(hid) > 0;
 
         final String triggerUrl = "/v2/app/fabTrigger/%s";
@@ -50,7 +53,7 @@ public class MessagesService {
 
         );
         return new MessagesDTO(
-                new MessagesDTO.State(hasClaim, signed == false),
+                new MessagesDTO.State(hasClaim, Objects.equals(uc.getDataEntry(IN_OFFER), "true")),
                 messages,
                 options
         );

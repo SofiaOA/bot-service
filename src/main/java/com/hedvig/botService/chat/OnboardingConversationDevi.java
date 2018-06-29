@@ -71,6 +71,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public static final String MESSAGE_START_LOGIN = "message.start.login";
     public static final String MESSAGE_LAGENHET_PRE = "message.lagenhet.pre";
     public static final String MESSAGE_LAGENHET = "message.lagenhet";
+    public static final String IN_OFFER = "{IN_OFFER}";
     /*
              * Need to be stateless. I.e no data beyond response scope
              * 
@@ -893,6 +894,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     }
 
     private void completeOnboarding(UserContext userContext) {
+        userContext.putUserData(IN_OFFER, "true");
         String productId = this.productPricingService.createProduct(userContext.getMemberId(), userContext.getOnBoardingData());
         userContext.getOnBoardingData().setProductId(productId);
         this.memberService.finalizeOnBoarding(userContext.getMemberId(), userContext.getOnBoardingData());
@@ -1469,6 +1471,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             log.info("Onboarding complete");
             addToChat(getMessage("message.kontraktklar"), userContext);
             userContext.getOnBoardingData().setUserHasSigned(true);
+            userContext.putUserData(IN_OFFER, "false");
             String dataEntry = userContext.getDataEntry("{50K_LIMIT}");
             if(Objects.equals(dataEntry, "true")) {
                 eventPublisher.publishEvent(new RequestObjectInsuranceEvent(userContext.getMemberId()));
