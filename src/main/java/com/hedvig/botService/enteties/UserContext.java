@@ -24,6 +24,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.hedvig.botService.chat.OnboardingConversationDevi.IN_OFFER;
+
 /*
  * Contains all state information related to a member
  * */
@@ -143,6 +145,7 @@ public class UserContext implements Serializable {
     }
 
     public void clearContext(){
+    	this.putUserData(IN_OFFER, "false");
     	this.getOnBoardingData().clear();
 		this.conversationManager.getConversations().clear();
     	this.memberChat.reset();
