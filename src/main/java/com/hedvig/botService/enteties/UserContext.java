@@ -278,6 +278,10 @@ public class UserContext implements Serializable {
 	}
 
 	public boolean hasCompletedOnboarding(){
+    	val obj = getDataEntry(ONBOARDING_COMPLETE);
+    	if(obj == null) {
+            return getOnBoardingData().getUserHasSigned();
+        }
     	return Objects.equals(getDataEntry(ONBOARDING_COMPLETE), "true");
 	}
 
