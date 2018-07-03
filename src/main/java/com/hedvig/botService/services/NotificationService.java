@@ -33,7 +33,7 @@ public class NotificationService {
 
     @EventListener
     public void on(UnderwritingLimitExcededEvent event) {
-        final String message = String.format("Underwriting guideline, ring upp medlem: %s", event.getPhoneNumber());
+        final String message = String.format("Underwriting guideline för onboarding-medlem: %s, ring upp medlem på nummer: %s", event.getMemberId(), event.getPhoneNumber());
         sendNotification(message, "CallMe");
     }
 
