@@ -74,7 +74,7 @@
                         "thread": "%thread",
                         "logger": "%logger",
                         "message": "%message",
-                        "memberId": "${memberId:null}"
+                        "memberId": "%X{memberId}"
                         }
                     </pattern>
                 </pattern>
