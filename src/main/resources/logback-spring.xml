@@ -73,7 +73,8 @@
                         "service": "${springAppName:-}",
                         "thread": "%thread",
                         "logger": "%logger",
-                        "message": "%message"
+                        "message": "%message",
+                        "memberId": "${memberId:null}"
                         }
                     </pattern>
                 </pattern>
