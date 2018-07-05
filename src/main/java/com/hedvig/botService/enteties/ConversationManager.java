@@ -44,7 +44,7 @@ public class ConversationManager {
     }
 
     ConversationManager(String memberId) {
-    	log.info("Instantiating ConversationManager for member:" + memberId);
+    	log.info("Instantiating ConversationManager for member: " + memberId);
         this.memberId = memberId;
         this.conversations = new ArrayList<>();
     }

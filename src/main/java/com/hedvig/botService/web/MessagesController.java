@@ -33,7 +33,7 @@ public class MessagesController {
     @GetMapping(path="/messages/{messageCount}")
     public Map<Integer, Message> messages(@PathVariable int messageCount, @RequestHeader(value="hedvig.token", required = false) String hid) {
     	
-    	log.info("Getting " + messageCount + " messages for member:" + hid);
+    	log.info("Getting " + messageCount + " messages for member: " + hid);
 
 
 		return sessionManager.getMessages(messageCount, hid).stream().collect(Collectors.toMap( m -> m.getGlobalId(), Function.identity()));
@@ -110,7 +110,7 @@ public class MessagesController {
     @PostMapping(path = "/event")
     public ResponseEntity<?> eventRecieved(@RequestBody EventDTO e, @RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Event {} received from member:", e.type, hid);
+     	log.info("Event {} received from member: ", e.type, hid);
         sessionManager.receiveEvent(e.type, e.value, hid);
     	return ResponseEntity.noContent().build();
     }
@@ -120,7 +120,7 @@ public class MessagesController {
     @PostMapping(path = "/chat/reset")
     public ResponseEntity<?> resetChat(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Reset chat for member:" + hid);
+     	log.info("Reset chat for member: " + hid);
         sessionManager.resetOnboardingChat(hid);
 
     	return ResponseEntity.noContent().build();
@@ -129,7 +129,7 @@ public class MessagesController {
     @PostMapping("/chat/main")
     public ResponseEntity<?> mainMenue(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Putting main message in chat for member:" + hid);
+     	log.info("Putting main message in chat for member: " + hid);
         sessionManager.mainMenu(hid);
 
     	return ResponseEntity.noContent().build();
@@ -138,7 +138,7 @@ public class MessagesController {
     @PostMapping(path = "/chat/edit")
     public ResponseEntity<?> editChat(@RequestHeader(value="hedvig.token", required = false) String hid) {
 
-     	log.info("Edit chat for member:" + hid);
+     	log.info("Edit chat for member: " + hid);
         sessionManager.editHistory(hid);
 
     	return ResponseEntity.noContent().build();

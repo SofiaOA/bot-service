@@ -819,7 +819,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
 	@Override
 	public void init(UserContext userContext, String startMessage) {
-        log.info("Starting onboarding conversation with message:" + startMessage);
+        log.info("Starting onboarding conversation with message: " + startMessage);
         if(startMessage.equals(MESSAGE_START_LOGIN)) {
             userContext.putUserData(LOGIN, "true");
         }
@@ -858,7 +858,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         switch(e){
             // This is used to let Hedvig say multiple message after another
             case MESSAGE_FETCHED:
-                log.info("Message fetched:" + value);
+                log.info("Message fetched: " + value);
                 
                 // New way of handeling relay messages
                 String relay = getRelay(value);
@@ -1549,7 +1549,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     }
     
     private SignupCode createSignupCode(String email){
-    	log.debug("Generate signup code for email:" + email);
+    	log.debug("Generate signup code for email: " + email);
         SignupCode sc = signupRepo.findByEmail(email).orElseGet(() -> {
         	SignupCode newCode = new SignupCode(email);
             signupRepo.save(newCode);
@@ -1571,7 +1571,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         int pos = 1;
         for(SignupCode sc : scList){
         	if(!sc.used){
-        		log.debug(sc.code + "|" + sc.email + "(" + sc.date+"):" + (pos));
+        		log.debug(sc.code + "|" + sc.email + "(" + sc.date+"): " + (pos));
         		if(sc.email.equals(email)){
         			return queuePos + pos;
         		}

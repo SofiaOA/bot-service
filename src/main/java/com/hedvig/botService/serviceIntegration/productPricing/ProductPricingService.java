@@ -96,7 +96,7 @@ public class ProductPricingService {
     
     public String getInsuranceStatus(String hid) {
     	ResponseEntity<InsuranceStatusDTO> isd = this.productPricingClient.getInsuranceStatus(hid);
-    	log.info("Getting insurance status:" + (isd==null?null:isd.getStatusCodeValue()));  	
+    	log.info("Getting insurance status: " + (isd==null?null:isd.getStatusCodeValue()));  	
     	if(isd!=null){
     		return isd.getBody().getInsuranceStatus();
     	}

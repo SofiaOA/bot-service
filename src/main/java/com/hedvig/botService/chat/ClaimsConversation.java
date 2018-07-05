@@ -125,7 +125,7 @@ public class ClaimsConversation extends Conversation {
 	}
 
 	public void init(UserContext userContext, String startMessage){
-		log.info("Starting claims conversation for user:" + userContext.getMemberId());
+		log.info("Starting claims conversation for user: " + userContext.getMemberId());
 		Message m = getMessage(startMessage);
 		m.header.fromId = HEDVIG_USER_ID;//new Long(userContext.getMemberId());
 		addToChat(m, userContext);
@@ -228,7 +228,7 @@ public class ClaimsConversation extends Conversation {
     private String handleAudioReceived(UserContext userContext, Message m) {
         String nxtMsg;
         String audioUrl = ((MessageBodyAudio) m.body).url;
-        log.info("Audio recieved with m.body.text:" + m.body.text + " and URL:" + audioUrl);
+        log.info("Audio recieved with m.body.text: " + m.body.text + " and URL: " + audioUrl);
         m.body.text = "Inspelning klar";
 
         claimsService.createClaimFromAudio(userContext.getMemberId(), audioUrl);
@@ -246,7 +246,7 @@ public class ClaimsConversation extends Conversation {
         switch(e){
             // This is used to let Hedvig say multiple message after another
             case MESSAGE_FETCHED:
-                log.info("Message fetched:" + value);
+                log.info("Message fetched: " + value);
                 if(value.equals("message.claims.record.ok2")) {
                     completeConversation(userContext);
                     return;

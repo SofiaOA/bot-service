@@ -43,7 +43,7 @@ public class MemberChat {
     }
 
     public MemberChat(String memberId) {
-        log.info("Instantiating MemberChat for member:" + memberId);
+        log.info("Instantiating MemberChat for member: " + memberId);
         this.memberId = memberId;
         this.chatHistory = new ArrayList<>();
     }
@@ -108,7 +108,7 @@ public class MemberChat {
     }
 
     public void addToHistory(Message m) {
-        log.info("MemberChat.addToHistory(Message: " + m + " ," + "chat:" + this);
+        log.info("MemberChat.addToHistory(Message: " + m + " ," + "chat: " + this);
         Instant time = Instant.now();
         m.deleted = false;
         m.setTimestamp(time);

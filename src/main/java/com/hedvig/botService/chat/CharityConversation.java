@@ -167,7 +167,7 @@ public class CharityConversation extends Conversation {
         switch(e){
             // This is used to let Hedvig say multiple message after another
             case MESSAGE_FETCHED:
-                log.info("Message fetched:" + value);
+                log.info("Message fetched: " + value);
 
                 // New way of handeling relay messages
                 String relay = getRelay(value);

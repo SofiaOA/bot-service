@@ -23,7 +23,7 @@ public class EmailAdress extends HedvigDataType {
 	
 	@Override
 	public boolean validate(String input) {
-		log.debug("Validating email adress:" + input);
+		log.debug("Validating email adress: " + input);
 		matcher = pattern.matcher(input);
 		this.errorMessage = this.errorMessage.replace("{INPUT}", input);
 		return matcher.matches();

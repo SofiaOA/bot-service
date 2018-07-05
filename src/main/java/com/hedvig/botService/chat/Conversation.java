@@ -34,7 +34,7 @@ public abstract class Conversation {
 
 	public Message getMessage(String key){
 		Message m = messageList.get(key);
-		if(m==null)log.info("Message not found with id:" + key);
+		if(m==null)log.info("Message not found with id: " + key);
 		return m;
 	}
 
@@ -57,7 +57,7 @@ public abstract class Conversation {
 
 	void addToChat(Message m, UserContext userContext) {
 		m.render(userContext);
-		log.info("Putting message:" + m.id + " content:" + m.body.text);
+		log.info("Putting message: " + m.id + " content: " + m.body.text);
 		userContext.addToHistory(m);
 	}
 
@@ -154,7 +154,7 @@ public abstract class Conversation {
 	}
 
 	void startConversation(UserContext userContext, String startId){
-		log.info("Starting conversation with message:" + startId);
+		log.info("Starting conversation with message: " + startId);
 		addToChat(messageList.get(startId), userContext);
 	}
 
@@ -184,10 +184,10 @@ public abstract class Conversation {
 
 	public void setExpectedReturnType(String messageId, HedvigDataType type){
 		if(getMessage(messageId)!=null){
-			log.debug("Setting the expected return typ for message:" + messageId + " to " + type.getClass().getName());
+			log.debug("Setting the expected return typ for message: " + messageId + " to " + type.getClass().getName());
 			getMessage(messageId).expectedType = type;
 		}else{
-			log.error("ERROR: ------------> Message not found:" + messageId);
+			log.error("ERROR: ------------> Message not found: " + messageId);
 		}
 	}
 

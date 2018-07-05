@@ -36,7 +36,7 @@ public class MemberServiceErrorDecoder implements ErrorDecoder {
                 log.error(String.format("Could not read APIError: %s", ex.getMessage()), ex);
             }
         } catch (IOException ex) {
-            log.error(String.format("IO error when decoding memberServiceError:", ex.getMessage()), ex);
+            log.error(String.format("IO error when decoding memberServiceError: ", ex.getMessage()), ex);
         }
         return errorStatus(methodKey, response);
     }

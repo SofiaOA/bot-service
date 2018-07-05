@@ -62,14 +62,14 @@ public class SessionManager {
     }
 
     public List<Message> getMessages(int i, String hid) {
-        log.info("Getting " + i + " messages for user:" + hid);
+        log.info("Getting " + i + " messages for user: " + hid);
         List<Message>  messages = getAllMessages(hid, null);
 
         return messages.subList(Math.max(messages.size() - i, 0), messages.size());
     }
 
     public void savePushToken(String hid, String pushToken) {
-        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user: " + hid));
         uc.putUserData("PUSH-TOKEN", pushToken);
     }
     
@@ -79,7 +79,7 @@ public class SessionManager {
     }
     
     public String getPushToken(String hid) {
-        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user: " + hid));
         return uc.getDataEntry("PUSH-TOKEN");
     }
     
@@ -203,7 +203,7 @@ public class SessionManager {
      * Add the "what do you want to do today" message to the chat
      * */
     public void mainMenu(String hid){
-        log.info("Main menu from user:" + hid);
+        log.info("Main menu from user: " + hid);
  
         UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
@@ -214,7 +214,7 @@ public class SessionManager {
     }
 
     public void trustlyClosed(String hid) {
-        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user:" + hid));
+        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext for user: " + hid));
 
 
 
@@ -226,7 +226,7 @@ public class SessionManager {
     }
 
     public void receiveMessage(Message m, String hid) {
-        log.info("Recieving messages from user:" + hid);
+        log.info("Recieving messages from user: " + hid);
         try {
             log.info(objectMapper.writeValueAsString(m));
         }catch (JsonProcessingException ex) {

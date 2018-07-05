@@ -89,7 +89,7 @@ public class UserContext implements Serializable {
     }
 
     public void putUserData(String key, String value){
-    	log.info("Adding ("+key+":"+value+") to user context:" + this.getMemberId());
+    	log.info("Adding ("+key+": "+value+") to user context: " + this.getMemberId());
     	userData.put(key, value);
     }
 
@@ -109,7 +109,7 @@ public class UserContext implements Serializable {
      * */
 
     public void startConversation(Conversation c){
-    	log.info("Starting conversation of type:" + c.getClass().getName() + " for user:" + getMemberId());
+    	log.info("Starting conversation of type: " + c.getClass().getName() + " for user: " + getMemberId());
 
 		if(conversationManager.startConversation(c.getClass())){
 			c.init(this);
@@ -117,7 +117,7 @@ public class UserContext implements Serializable {
     }
     
     public void startConversation(Conversation c, String startMessage){
-    	log.info("Starting conversation of type:" + c.getClass().getName() + " for user:" + getMemberId() + " with message:" + startMessage);
+    	log.info("Starting conversation of type: " + c.getClass().getName() + " for user: " + getMemberId() + " with message: " + startMessage);
 
 		if(conversationManager.startConversation(c.getClass(), startMessage)){
 			c.init(this, startMessage);

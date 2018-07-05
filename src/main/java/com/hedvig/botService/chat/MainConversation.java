@@ -211,7 +211,7 @@ public class MainConversation extends Conversation {
 
 	@Override
 	public void init(UserContext userContext, String startMessage) {
-    	log.info("Starting main conversation with message:" + startMessage);
+    	log.info("Starting main conversation with message: " + startMessage);
         addTrustlyButton(userContext);
     	startConversation(userContext, MESSAGE_HEDVIG_COM); // Id of first message
 	}
