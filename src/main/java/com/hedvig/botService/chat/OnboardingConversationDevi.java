@@ -1420,11 +1420,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     @Override
     void addToChat(Message m, UserContext userContext) {
-        if(m.body.getClass() == MessageBodySingleSelect.class) {
-            MessageBodySingleSelect mss = (MessageBodySingleSelect) m.body;
-
-        }
-
         super.addToChat(m,userContext);
     }
 
