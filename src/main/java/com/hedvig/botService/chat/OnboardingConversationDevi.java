@@ -1464,13 +1464,20 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         if(!singed) {
             log.info("Onboarding complete");
 
+            log.info("Will try to reflag onboarding conversation as active");
             val maybeActiveConversation = userContext.getActiveConversation();
             if (maybeActiveConversation.isPresent()) {
+                log.info("An active conversation was found");
                 val activeConversation = maybeActiveConversation.get();
                 if (activeConversation.containsConversation(FreeChatConversation.class)) {
+                    log.info("FreeChatConversation was active, reflagging");
                     activeConversation.setConversationStatus(conversationStatus.COMPLETE);
                     userContext.setActiveConversation(this);
+                } else {
+                    log.info("FreeChatConversation was not active, will not reflag");
                 }
+            } else {
+                log.info("No active conversation was found");
             }
 
             addToChat(getMessage("message.kontraktklar"), userContext);
