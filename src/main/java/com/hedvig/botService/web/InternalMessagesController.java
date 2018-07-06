@@ -67,7 +67,6 @@ public class InternalMessagesController {
 
         return messages.stream()
                 .map(m -> new BackOfficeMessageDTO(m, m.chat.getMemberId()))
-                .filter(m -> !m.msg.body.text.equals(""))
                 .collect(Collectors.toList());
     }
 
