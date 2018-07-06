@@ -78,9 +78,6 @@ public abstract class Conversation {
 		messageList.put(m.id, m);
 	}
 
-
-
-
 	protected void setMessageCallback(String id, SelectItemMessageCallback callback) {
 		this.callbacks.put(id, callback);
 	}

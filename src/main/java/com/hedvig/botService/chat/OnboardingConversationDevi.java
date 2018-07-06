@@ -1473,6 +1473,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     log.info("FreeChatConversation was active, reflagging");
                     activeConversation.setConversationStatus(conversationStatus.COMPLETE);
                     userContext.setActiveConversation(this);
+
+                    // Duct tape to shift onboarding conversation back into the correct state
+                    val onboardingConversation = userContext.getActiveConversation().orElseThrow(() -> new RuntimeException("active conversation is for some reason not onboarding chat anymore"));
+                    onboardingConversation.conversationStatus = conversationStatus.ONGOING;
+
                 } else {
                     log.info("FreeChatConversation was not active, will not reflag");
                 }
