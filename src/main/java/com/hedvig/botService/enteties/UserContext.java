@@ -97,11 +97,6 @@ public class UserContext implements Serializable {
     	userData.remove(key);
 	}
     
-    private List<ConversationEntity> getConversations(){
-    	return this.conversationManager.getConversations();
-    }
-    
-    
     // ------------ Conversation functions ------------------------------- //
     
     /*
@@ -131,6 +126,10 @@ public class UserContext implements Serializable {
 
     public void completeConversation(Conversation conversationClass) {
 		this.conversationManager.completeConversation(conversationClass);
+	}
+
+	public void setActiveConversation(Conversation conversationClass) {
+		this.conversationManager.setActiveConversation(conversationClass);
 	}
 
     // ------------------------------------------------------ //

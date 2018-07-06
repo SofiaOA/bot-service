@@ -5,6 +5,7 @@ import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.enteties.message.Message;
 import lombok.Getter;
 import lombok.ToString;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +13,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /*
  * All timestamp information is set from here
@@ -88,6 +90,17 @@ public class ConversationManager {
         }
 
         return Optional.of(activeConversation);
+    }
+
+    void setActiveConversation(Conversation conversationClass) {
+        List<ConversationEntity> potentialConversations = conversations
+            .stream()
+            .filter(c -> c.containsConversation(conversationClass.getClass()))
+            .collect(Collectors.toList());
+        if (potentialConversations.size() != 1) {
+            throw new RuntimeException(String.format("Invalid invariant, more than one occurrence of conversation: %s", conversationClass.getClass().toString()));
+        }
+        activeConversation = potentialConversations.get(0);
     }
 
     private void addConversationAndSetActive(ConversationEntity c) {

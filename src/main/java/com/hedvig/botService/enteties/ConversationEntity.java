@@ -80,12 +80,12 @@ public class ConversationEntity {
 		return conversationManager;
 	}
 
-	boolean containsConversation(Conversation conversation) {
+	public boolean containsConversation(Conversation conversation) {
 		String conversationClassName = conversation.getClass().getName();
 		return Objects.equals(this.getClassName(), conversationClassName);
 	}
 
-	boolean containsConversation(Class<? extends Conversation> conversationClass) {
+	public boolean containsConversation(Class<? extends Conversation> conversationClass) {
 		String conversationClassName = conversationClass.getName();
 		return Objects.equals(this.getClassName(), conversationClassName);
 	}
