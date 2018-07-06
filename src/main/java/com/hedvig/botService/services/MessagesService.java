@@ -18,10 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
-
-import static com.hedvig.botService.chat.OnboardingConversationDevi.IN_OFFER;
-
 @Component
 @Transactional
 public class MessagesService {
