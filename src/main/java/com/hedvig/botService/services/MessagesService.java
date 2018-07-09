@@ -43,7 +43,7 @@ public class MessagesService {
 
         final String triggerUrl = "/v2/app/fabTrigger/%s";
         val options = Lists.newArrayList(
-                new MessagesDTO.FABOption("Anmäl en skada", String.format(triggerUrl, FABAction.REPORT_CLAIM.name()), false),
+                new MessagesDTO.FABOption("Anmäl en skada", String.format(triggerUrl, FABAction.REPORT_CLAIM.name()), true),
                 new MessagesDTO.FABOption("Prata med Hedvig", String.format(triggerUrl, FABAction.CHAT.name()), true),
                 new MessagesDTO.FABOption("Det är kris! Ring mig", String.format(triggerUrl, FABAction.CALL_ME.name()), true)
 

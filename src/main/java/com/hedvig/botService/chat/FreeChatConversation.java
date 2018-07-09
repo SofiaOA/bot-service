@@ -3,6 +3,9 @@ package com.hedvig.botService.chat;
 import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
+import com.hedvig.botService.services.events.OnboardingQuestionAskedEvent;
+
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.Clock;
 import java.util.List;
@@ -14,9 +17,11 @@ public class FreeChatConversation extends Conversation {
     public static final String FREE_CHAT_FROM_BO = "free.chat.from.bo";
     public static final String FREE_CHAT_ONBOARDING_START = "free.chat.onboarding.start";
     private final StatusBuilder statusBuilder;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public FreeChatConversation(StatusBuilder statusBuilder) {
+    public FreeChatConversation(StatusBuilder statusBuilder, ApplicationEventPublisher eventPublisher) {
         this.statusBuilder = statusBuilder;
+        this.eventPublisher = eventPublisher;
         createMessage(
                 FREE_CHAT_START,
                 new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
@@ -54,6 +59,7 @@ public class FreeChatConversation extends Conversation {
             case FREE_CHAT_FROM_BO:
             case FREE_CHAT_MESSAGE: {
                 m.header.statusMessage = statusBuilder.getStatusMessage(Clock.systemUTC());
+                eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(), m.body.text));
                 addToChat(m, userContext);
                 nxtMsg = FREE_CHAT_MESSAGE;
                 break;
