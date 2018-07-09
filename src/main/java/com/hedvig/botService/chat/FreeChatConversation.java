@@ -3,8 +3,10 @@ package com.hedvig.botService.chat;
 import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.*;
+import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.services.events.OnboardingQuestionAskedEvent;
 
+import com.hedvig.botService.services.events.QuestionAskedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.Clock;
@@ -18,10 +20,14 @@ public class FreeChatConversation extends Conversation {
     public static final String FREE_CHAT_ONBOARDING_START = "free.chat.onboarding.start";
     private final StatusBuilder statusBuilder;
     private final ApplicationEventPublisher eventPublisher;
+    private final ProductPricingService productPricingService;
 
-    public FreeChatConversation(StatusBuilder statusBuilder, ApplicationEventPublisher eventPublisher) {
+
+    public FreeChatConversation(StatusBuilder statusBuilder, ApplicationEventPublisher eventPublisher, ProductPricingService productPricingService) {
         this.statusBuilder = statusBuilder;
         this.eventPublisher = eventPublisher;
+        this.productPricingService = productPricingService;
+
         createMessage(
                 FREE_CHAT_START,
                 new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
@@ -53,13 +59,20 @@ public class FreeChatConversation extends Conversation {
     public void receiveMessage(UserContext userContext, Message m) {
         String nxtMsg = "";
 
+
+
         switch (m.id) {
             case FREE_CHAT_START:
             case FREE_CHAT_ONBOARDING_START:
             case FREE_CHAT_FROM_BO:
             case FREE_CHAT_MESSAGE: {
                 m.header.statusMessage = statusBuilder.getStatusMessage(Clock.systemUTC());
-                eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(), m.body.text));
+                if ( productPricingService.isMemberInsuranceActive(userContext.getMemberId()) ) {
+                    eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), m.body.text));
+                }
+                else {
+                    eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(), m.body.text));
+                }
                 addToChat(m, userContext);
                 nxtMsg = FREE_CHAT_MESSAGE;
                 break;
