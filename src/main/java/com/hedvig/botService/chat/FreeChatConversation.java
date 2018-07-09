@@ -31,7 +31,7 @@ public class FreeChatConversation extends Conversation {
         createMessage(
                 FREE_CHAT_START,
                 new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
-                new MessageBodyText("Hej {NAME}, vad har du för fråga?"));
+                new MessageBodyText("Hej {NAME}! Hur kan jag hjälpa dig idag?"));
 
         createMessage(
                 FREE_CHAT_ONBOARDING_START,
