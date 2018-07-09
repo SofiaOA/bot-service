@@ -67,7 +67,7 @@ public class FreeChatConversation extends Conversation {
             case FREE_CHAT_FROM_BO:
             case FREE_CHAT_MESSAGE: {
                 m.header.statusMessage = statusBuilder.getStatusMessage(Clock.systemUTC());
-                if ( productPricingService.isMemberInsuranceActive(userContext.getMemberId()) ) {
+                if (productPricingService.getInsuranceStatus(userContext.getMemberId()) != null) {
                     eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), m.body.text));
                 }
                 else {
