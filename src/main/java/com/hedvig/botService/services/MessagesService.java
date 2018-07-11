@@ -5,6 +5,7 @@ import com.hedvig.botService.chat.CallMeConversation;
 import com.hedvig.botService.chat.ClaimsConversation;
 import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.FreeChatConversation;
+import com.hedvig.botService.chat.TrustlyConversation;
 import com.hedvig.botService.enteties.ResourceNotFoundException;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.UserContextRepository;
@@ -21,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Transactional
 public class MessagesService {
+    public static final String FORCE_TRUSTLY_CHOICE = "{FORCE_TRUSTLY_CHOICE}";
+    public static final String triggerUrl = "/v2/app/fabTrigger/%s";
 
     private final static Logger log = LoggerFactory.getLogger(MessagesService.class);
     private final UserContextRepository userContextRepository;
@@ -41,13 +44,16 @@ public class MessagesService {
 
         Boolean hasClaim = this.claimsService.getActiveClaims(hid) > 0;
 
-        final String triggerUrl = "/v2/app/fabTrigger/%s";
         val options = Lists.newArrayList(
-                new MessagesDTO.FABOption("Anmäl en skada", String.format(triggerUrl, FABAction.REPORT_CLAIM.name()), !hasClaim),
-                new MessagesDTO.FABOption("Prata med Hedvig", String.format(triggerUrl, FABAction.CHAT.name()), true),
-                new MessagesDTO.FABOption("Det är kris! Ring mig", String.format(triggerUrl, FABAction.CALL_ME.name()), true)
+                new MessagesDTO.FABOption("Anmäl en skada", createFabTriggerUrl(FABAction.REPORT_CLAIM), !hasClaim),
+                new MessagesDTO.FABOption("Prata med Hedvig", createFabTriggerUrl(FABAction.CHAT), true),
+                new MessagesDTO.FABOption("Det är kris! Ring mig", createFabTriggerUrl(FABAction.CALL_ME), true)
 
         );
+        val forceTrustly = uc.getDataEntry(FORCE_TRUSTLY_CHOICE);
+        if ("true".equalsIgnoreCase(forceTrustly)) {
+            options.add(0, new MessagesDTO.FABOption("Koppla autogiro", createFabTriggerUrl(FABAction.TRUSTLY), true));
+        }
         return new MessagesDTO(
                 new MessagesDTO.State(hasClaim, uc.inOfferState(), uc.hasCompletedOnboarding()),
                 messages,
@@ -69,8 +75,14 @@ public class MessagesService {
             case REPORT_CLAIM:
                 uc.startConversation(conversationFactory.createConversation(ClaimsConversation.class));
                 break;
+            case TRUSTLY:
+                uc.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
         }
 
         return ResponseEntity.accepted().build();
+    }
+
+    private String createFabTriggerUrl(FABAction action) {
+        return String.format(triggerUrl, action.name());
     }
 }
