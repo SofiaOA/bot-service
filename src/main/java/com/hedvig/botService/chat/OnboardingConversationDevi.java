@@ -125,7 +125,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         createChatMessage(MESSAGE_WAITLIST_START,
                 new MessageBodySingleSelect("Hej! Jag heter Hedvig " + emoji_waving_hand +
-                		"\fJag har designat om försäkring från grunden, så att det är schysst och lätt att använda!\fJag tar fram ett försäkringsförslag till dig på nolltid",
+                		"\fJag har designat om försäkring från grunden, så att det är schysst och lätt att använda!\fFör att kunna ta fram ett prisförslag behöver jag veta lite mer om dig och hur du bor\fDu binder inte upp dig på något genom att gå vidare, och om du undrar något längs vägen är det bara att fråga!",
                         Lists.newArrayList(
                                 new SelectOption("Låter bra!", MESSAGE_PRE_FORSLAGSTART),
                               new SelectOption("Jag är redan medlem", "message.bankid.start")
@@ -300,7 +300,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         addRelay(MESSAGE_LAGENHET_PRE, MESSAGE_LAGENHET);
         
         createMessage(MESSAGE_LAGENHET,
-                new MessageBodySingleSelect("Har du BankID? I så fall kan vi hoppa över några frågor!",
+                new MessageBodySingleSelect("Har du BankID? I så fall kan vi hoppa över några frågor så du får se ditt prisförslag snabbare!",
                         new ArrayList<SelectItem>() {{
                             add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null, "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}",  null, false));
                             add(new SelectOption("Jag har inte BankID", "message.manuellnamn"));
