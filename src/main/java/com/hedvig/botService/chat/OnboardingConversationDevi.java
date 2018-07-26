@@ -550,7 +550,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                         }}
                 ));
 
-        createMessage(MESSAGE_50K_LIMIT, new MessageBodySingleSelect("Äger du någon pryl som är värd över 50 000 kr? \uD83D\uDC8E\uD83C\uDFFA",
+        createMessage(MESSAGE_50K_LIMIT, new MessageBodySingleSelect("Äger du något som du tar med dig utanför hemmet som är värt över 50 000 kr? \uD83D\uDC8E\uD83C\uDFFA",
                 Lists.newArrayList(
                         new SelectOption("Ja", MESSAGE_50K_LIMIT_YES),
                         new SelectOption("Nej", MESSAGE_50K_LIMIT_NO)
