@@ -31,6 +31,8 @@ public class UserData {
     public static final String IS_STUDENT = "{STUDENT}";
     public static final String BANK_ID_MESSAGE = "{BANK_ID_MESSAGE}";
     public static final String FLOOR = "{FLOOR}";
+    public static final String STUDENT_POLICY_ELIGIBILITY = "{STUDENT_POLICY_ELIGIBILITY}";
+    public static final String TWENTYFIVE_THOUSAND_LIMIT = "{25K_LIMIT}";
     private final UserContext ctx;
 
     public UserData(UserContext ctx) {
@@ -259,6 +261,18 @@ public class UserData {
             return Integer.parseInt(ctx.getDataEntry(FLOOR));
         }catch (Exception ex){
             return 0;
+        }
+    }
+
+    public void setStudentPolicyEligibility(Boolean eligible) {
+        ctx.putUserData(STUDENT_POLICY_ELIGIBILITY, Boolean.toString(eligible));
+    }
+
+    public Boolean getStudentPolicyEligibility() {
+        try {
+            return Boolean.parseBoolean(ctx.getDataEntry(STUDENT_POLICY_ELIGIBILITY));
+        } catch (Exception e) {
+            return false;
         }
     }
 }

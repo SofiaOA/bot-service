@@ -82,7 +82,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     private final MemberService memberService;
     private final ProductPricingService productPricingService;
 
-    public static enum ProductTypes {BRF, RENT, RENT_BRF, SUBLET_RENTAL, SUBLET_BRF, STUDENT, LODGER};
+    public static enum ProductTypes {BRF, RENT, RENT_BRF, SUBLET_RENTAL, SUBLET_BRF, STUDENT_BRF, STUDENT_RENT, LODGER};
 
 
     public final static String emoji_smile = new String(new byte[]{(byte)0xF0, (byte)0x9F, (byte)0x98, (byte)0x81}, Charset.forName("UTF-8"));
@@ -429,7 +429,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         setExpectedReturnType("message.varbordupostnr", new ZipCodeSweden());
         
         createMessage("message.student",
-                new MessageBodySingleSelect("Okej! Jag ser att du är under 27. Är du kanske student? " + emoji_school_satchel,
+                new MessageBodySingleSelect("Okej! Jag ser att du är under 30. Är du kanske student? " + emoji_school_satchel,
                         new ArrayList<SelectItem>() {{
                             add(new SelectOption("Ja", "message.studentja"));
                             add(new SelectOption("Nej", "message.studentnej"));
@@ -775,6 +775,29 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 
+        // Student policy-related messages 
+
+        createMessage("message.student.limit.both", new MessageBodyText("TODO ALEX: Fix this copy! :)"));
+        addRelay("message.student.limit.both", MESSAGE_SAKERHET);
+
+        createMessage("message.student.limit.persons", new MessageBodyText("Ah! Om ni hade varit max två så hade ni fått vårt studentpris. Men oroa dig inte, jag fixar ett riktigt bra pris till er ändå!"));
+        addRelay("message.student.limit.persons", MESSAGE_SAKERHET);
+
+        createMessage("message.student.limit.livingspace", new MessageBodyText("Ah! Om lägenheten bara hade varit på 50 kvadrat eller mindre så vi kunnat ge ett studentpris. Men oroa dig inte, jag fixar ett riktigt bra pris ändå!"));
+        addRelay("message.student.limit.livingspace", MESSAGE_SAKERHET);
+
+        createMessage("message.student.eligible.brf", new MessageBodyText("Grymt! Då betalar du bara 99kr per månad!"));
+        addRelay("message.student.eligible.brf", MESSAGE_SAKERHET);
+
+        createMessage("message.student.eligible.rent", new MessageBodyText("Grymt! Då betalar du bara 79kr per månad!"));
+        addRelay("message.student.eligible.rent", MESSAGE_SAKERHET);
+
+        createMessage("message.student.25klimit", new MessageBodySingleSelect("Äger du någon pryl som är värd över 25 000 kr? \uD83D\uDC8E\uD83C\uDFFA",
+                Lists.newArrayList(
+                        new SelectOption("Ja", MESSAGE_50K_LIMIT_YES),
+                        new SelectOption("Nej", MESSAGE_50K_LIMIT_NO)
+                )));
+
     }
 
     private void setupBankidErrorHandlers(String messageId) {
@@ -969,13 +992,45 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 	            nxtMsg = "message.pers";
 	            break;
 	        }
-            case "message.student":
+            case "message.student": {
                 SelectItem sitem2 = ((MessageBodySingleSelect)m.body).getSelectedItem();
                 if (sitem2.value.equals("message.studentja")) {
                     log.info("Student detected...");
-                	userContext.putUserData("{STUDENT}", "1");
+                    userContext.putUserData("{STUDENT}", "1");
+                    UserData obd = userContext.getOnBoardingData();
+                    val personsInHousehold = obd.getPersonsInHouseHold();
+                    val livingSpace = obd.getLivingSpace();
+                    if (personsInHousehold > 2 && livingSpace > 50) {
+                        userContext.putUserData(UserData.STUDENT_POLICY_ELIGIBILITY, "false");
+                        nxtMsg = "message.student.limit.both";
+                        break;
+                    }
+                    if (personsInHousehold > 2) {
+                        userContext.putUserData(UserData.STUDENT_POLICY_ELIGIBILITY, "false");
+                        nxtMsg = "message.student.limit.persons";
+                        break;
+                    }
+                    if (livingSpace > 50) {
+                        userContext.putUserData(UserData.STUDENT_POLICY_ELIGIBILITY, "false");
+                        nxtMsg = "message.student.limit.livingspace";
+                        break;
+                    }
+                    userContext.putUserData(UserData.STUDENT_POLICY_ELIGIBILITY, "true");
+                    val houseType = obd.getHouseType();
+                    if (houseType == ProductTypes.BRF.toString()) {
+                        userContext.putUserData(UserData.HOUSE, ProductTypes.STUDENT_BRF.toString());
+                        nxtMsg = "message.student.eligible.brf";
+                        break;
+                    }
+
+                    if (houseType == ProductTypes.RENT.toString()) {
+                        userContext.putUserData(UserData.HOUSE, ProductTypes.STUDENT_RENT.toString());
+                        nxtMsg = "message.student.eligible.rent";
+                        break;
+                    }
                 }
                 break;
+            }
 
             case "message.audiotest":
             case "message.phototest":
@@ -1103,7 +1158,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 }
                 
                 // Student discount logic
-                if(onBoardingData.getAge() > 0 && onBoardingData.getAge() < 27) {
+                if(onBoardingData.getAge() > 0 && onBoardingData.getAge() < 30) {
                     nxtMsg = "message.student";
                 } else {
                 	nxtMsg = MESSAGE_SAKERHET;
@@ -1168,7 +1223,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 addToChat(m, userContext);
                 nxtMsg = "message.kontrakt";
                 break;
-            case MESSAGE_SAKERHET:
+            case MESSAGE_SAKERHET: {
                 MessageBodyMultipleSelect body = (MessageBodyMultipleSelect)m.body;
 
                 if(body.getNoSelectedOptions() == 0) {
@@ -1181,8 +1236,14 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                     }
                 }
                 addToChat(m, userContext);
+                UserData userData = userContext.getOnBoardingData();
+                if (userData.getStudentPolicyEligibility() == true) {
+                    nxtMsg = "message.student.25klimit";
+                    break;
+                }
                 nxtMsg = MESSAGE_50K_LIMIT;
                 break;
+            }
             case MESSAGE_PHONENUMBER:
                 String trim = m.body.text.trim();
                 userContext.putUserData("{PHONE_NUMBER}", trim);
@@ -1322,6 +1383,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     private String handle50KLimitAnswer(String nxtMsg, UserContext userContext, MessageBodySingleSelect body) {
         if(body.getSelectedItem().value.equalsIgnoreCase(MESSAGE_50K_LIMIT_YES_YES)) {
+            UserData userData = userContext.getOnBoardingData();
+            if (userData.getStudentPolicyEligibility() == true) {
+                userContext.putUserData(UserData.TWENTYFIVE_THOUSAND_LIMIT, "true");
+            }
             userContext.putUserData("{50K_LIMIT}", "true");
         }
         return MESSAGE_PHONENUMBER;
@@ -1459,9 +1524,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     @Override
     public void memberSigned(String referenceId, UserContext userContext) {
-        Boolean singed = userContext.getOnBoardingData().getUserHasSigned();
+        Boolean signed = userContext.getOnBoardingData().getUserHasSigned();
 
-        if(!singed) {
+        if(!signed) {
             log.info("Onboarding complete");
 
             log.info("Will try to reflag onboarding conversation as active");
