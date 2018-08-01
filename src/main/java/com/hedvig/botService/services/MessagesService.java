@@ -76,8 +76,9 @@ public class MessagesService {
                 uc.startConversation(conversationFactory.createConversation(ClaimsConversation.class));
                 break;
             case TRUSTLY:
-                uc.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
-        }
+        uc.startConversation(
+            conversationFactory.createConversation( TrustlyConversation.class), TrustlyConversation.FORCED_START);
+    }
 
         return ResponseEntity.accepted().build();
     }

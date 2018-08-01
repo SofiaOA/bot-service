@@ -10,6 +10,7 @@ import com.hedvig.botService.services.triggerService.TriggerService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class TrustlyConversation extends Conversation {
@@ -18,6 +19,8 @@ public class TrustlyConversation extends Conversation {
     public static final String TRUSTLY_POLL = "trustly.poll";
     private static final String CANCEL = "trustly.cancel";
     private static final String COMPLETE = "trustly.complete";
+    public static final String FORCED_START = "forced.start";
+    public static final String TRUSTLY_FORCED_START = "{TRUSTLTY_FORCED_START}";
     private final TriggerService triggerService;
     private final MemberService memberService;
 
@@ -31,21 +34,28 @@ public class TrustlyConversation extends Conversation {
         createChatMessage(START,
                 new MessageBodySingleSelect("Fantastiskt! Nu är allt klart, jag ska bara sätta upp din betalning \fDet ska vara smidigt såklart, så jag använder digitalt autogiro genom Trustly\fInga pengar dras såklart förrän försäkringen börjar gälla!",
                         new ArrayList<SelectItem>(){{
-                            add(new SelectItemTrustly("Välj bankkonto", "trustly.poll"));
+                            add(new SelectItemTrustly("Välj bankkonto", "trustly.noop"));
+                        }}
+                ));
+
+        createChatMessage(FORCED_START,
+                new MessageBodySingleSelect("Då är det dags att sätta upp din betalning \fDet ska vara smidigt såklart, så jag använder digitalt autogiro genom Trustly\fInga pengar dras såklart förrän försäkringen börjar gälla!",
+                        new ArrayList<SelectItem>(){{
+                            add(new SelectItemTrustly("Välj bankkonto", "trustly.noop"));
                         }}
                 ));
 
         createChatMessage(TRUSTLY_POLL,
                 new MessageBodySingleSelect("Om du hellre vill så kan vi vänta med att sätta upp betalningen!\fDå hör jag av mig till dig lite innan din försäkring aktiveras",
                         new ArrayList<SelectItem>(){{
-                            add(new SelectItemTrustly("Vi gör klart det nu", "trustly.poll"));
+                            add(new SelectItemTrustly("Vi gör klart det nu", "trustly.noop"));
                             add(SelectLink.toDashboard("Vi gör det senare, ta mig till appen!", "end"));
                         }}));
 
         createMessage(CANCEL,
                 new MessageBodySingleSelect("Oj, nu verkar det som att något gick lite fel med betalningsregistreringen. Vi testar igen!",
                         new ArrayList<SelectItem>(){{
-                            add(new SelectItemTrustly("Välj bankkonto", "trustly.poll"));
+                            add(new SelectItemTrustly("Välj bankkonto", "trustly.noop"));
                         }}));
 
         createMessage(COMPLETE,
@@ -76,7 +86,11 @@ public class TrustlyConversation extends Conversation {
 
         switch (m.id) {
             case START:
+                userContext.putUserData(TRUSTLY_FORCED_START, "false");
                 //endConversation(userContext);
+                return;
+            case FORCED_START:
+                userContext.putUserData(TRUSTLY_FORCED_START, "true");
                 return;
             case TRUSTLY_POLL:
                 return;
@@ -93,8 +107,9 @@ public class TrustlyConversation extends Conversation {
 
     private void endConversation(UserContext userContext) {
         userContext.completeConversation(this);
-
-        sendOnboardingCompleteEmail(userContext);
+        if(Objects.equals("false", userContext.getDataEntry(TRUSTLY_FORCED_START))) {
+            sendOnboardingCompleteEmail(userContext);
+        }
     }
 
     private void sendOnboardingCompleteEmail(UserContext userContext) {
