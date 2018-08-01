@@ -80,7 +80,7 @@ public class ClaimsConversationTest {
             msg = Iterables.getLast(userContext.getMemberChat().chatHistory);
             messageIsParagraph = MessageBodyParagraph.class.isInstance(msg.body);
             if(messageIsParagraph) {
-                testConversation.recieveEvent(Conversation.EventTypes.MESSAGE_FETCHED, msg.id, userContext);
+                testConversation.receiveEvent(Conversation.EventTypes.MESSAGE_FETCHED, msg.id, userContext);
             }
         }
         while(messageIsParagraph && i++ < 20);
