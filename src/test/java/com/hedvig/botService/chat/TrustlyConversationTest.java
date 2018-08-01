@@ -1,23 +1,26 @@
 package com.hedvig.botService.chat;
 
+import static com.hedvig.botService.chat.TrustlyConversation.START;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_EMAIL;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_FIRSTNAME;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_LASTNAME;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_MEMBER_ID;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_SSN;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.services.triggerService.TriggerService;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.UUID;
-
-import static com.hedvig.botService.chat.TrustlyConversation.START;
-import static com.hedvig.botService.testHelpers.TestData.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TrustlyConversationTest {
@@ -80,7 +83,7 @@ public class TrustlyConversationTest {
 
         testConversation.receiveMessage(userContext, message);
 
-        assertThat(userContext.getMemberChat().chatHistory.size()).isEqualTo(2);
+        assertThat(userContext.getMemberChat().chatHistory.size()).isEqualTo(1);
     }
 
 }
