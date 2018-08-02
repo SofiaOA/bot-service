@@ -71,6 +71,15 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     public static final String MESSAGE_START_LOGIN = "message.start.login";
     public static final String MESSAGE_LAGENHET_PRE = "message.lagenhet.pre";
     public static final String MESSAGE_LAGENHET = "message.lagenhet";
+
+    public static final String MESSAGE_STUDENT_LIMIT_BOTH = "message.student.limit.both";
+    public static final String MESSAGE_STUDENT_LIMIT_PERSONS = "message.student.limit.persons";
+    public static final String MESSAGE_STUDENT_LIMIT_LIVING_SPACE = "message.student.limit.livingspace";
+    public static final String MESSAGE_STUDENT_ELIGIBLE_BRF = "message.student.eligible.brf";
+    public static final String MESSAGE_STUDENT_ELIGIBLE_RENT = "message.student.eligible.rent";
+    public static final String MESSAGE_STUDENT_25K_LIMIT = "message.student.25klimit";
+
+
     public static final String IN_OFFER = "{IN_OFFER}";
     /*
      * Need to be stateless. I.e no data beyond response scope
@@ -864,27 +873,27 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         // Student policy-related messages
 
-        createMessage("message.student.limit.both",
+        createMessage(MESSAGE_STUDENT_LIMIT_BOTH,
                 new MessageBodySingleSelect("TODO ALEX: Fix this copy! :)",
                         Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
 
-        createMessage("message.student.limit.persons", new MessageBodySingleSelect(
+        createMessage(MESSAGE_STUDENT_LIMIT_PERSONS, new MessageBodySingleSelect(
                 "Ah! Om ni hade varit max två så hade ni fått vårt studentpris. Men oroa dig inte, jag fixar ett riktigt bra pris till er ändå!",
                 Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
 
-        createMessage("message.student.limit.livingspace", new MessageBodySingleSelect(
+        createMessage(MESSAGE_STUDENT_LIMIT_LIVING_SPACE, new MessageBodySingleSelect(
                 "Ah! Om lägenheten bara hade varit på 50 kvadrat eller mindre så vi kunnat ge ett studentpris. Men oroa dig inte, jag fixar ett riktigt bra pris ändå!",
                 Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
 
-        createMessage("message.student.eligible.brf",
+        createMessage(MESSAGE_STUDENT_ELIGIBLE_BRF,
                 new MessageBodySingleSelect("Grymt! Då betalar du bara 99 kr per månad!",
                         Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
 
-        createMessage("message.student.eligible.rent",
+        createMessage(MESSAGE_STUDENT_ELIGIBLE_RENT,
                 new MessageBodySingleSelect("Grymt! Då betalar du bara 79 kr per månad!",
                         Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
 
-        createChatMessage("message.student.25klimit", new MessageBodySingleSelect(
+        createChatMessage(MESSAGE_STUDENT_25K_LIMIT, new MessageBodySingleSelect(
                 "Okej! Dina prylar som du har hemma skyddas upp till 200 000 kr 🏺🖼️\f"
                         + "Men äger du något som du tar med dig utanför hemmet som är värt över 25 000 kr? 💍⌚",
                 Lists.newArrayList(new SelectOption("Ja", MESSAGE_50K_LIMIT_YES),
