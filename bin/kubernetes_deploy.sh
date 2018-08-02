@@ -6,4 +6,4 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s htt
 chmod +x ./kubectl
 chmod +x ~/.kube/heptio-authenticator-aws
 
-./kubectl set image deployment/bot-service bot-service=$REMOTE_IMAGE_URL:$TRAVIS_BUILD_NUMBER
+./kubectl set image deployment/bot-service bot-service=$REMOTE_IMAGE_URL:${TRAVIS_COMMIT}
