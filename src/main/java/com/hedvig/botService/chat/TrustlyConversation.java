@@ -105,7 +105,7 @@ public class TrustlyConversation extends Conversation {
       }
     }
 
-    switch (m.id) {
+    switch (m.getBaseMessageId()) {
       case START:
         userContext.putUserData(UserContext.TRUSTLY_FORCED_START, "false");
         // endConversation(userContext);
