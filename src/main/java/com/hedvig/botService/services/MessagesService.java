@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Transactional
 public class MessagesService {
-    public static final String FORCE_TRUSTLY_CHOICE = "{FORCE_TRUSTLY_CHOICE}";
     public static final String triggerUrl = "/v2/app/fabTrigger/%s";
 
     private final static Logger log = LoggerFactory.getLogger(MessagesService.class);
@@ -50,7 +49,7 @@ public class MessagesService {
                 new MessagesDTO.FABOption("Det är kris! Ring mig", createFabTriggerUrl(FABAction.CALL_ME), true)
 
         );
-        val forceTrustly = uc.getDataEntry(FORCE_TRUSTLY_CHOICE);
+        val forceTrustly = uc.getDataEntry(UserContext.FORCE_TRUSTLY_CHOICE);
         if ("true".equalsIgnoreCase(forceTrustly)) {
             options.add(0, new MessagesDTO.FABOption("Koppla autogiro", createFabTriggerUrl(FABAction.TRUSTLY), true));
         }
