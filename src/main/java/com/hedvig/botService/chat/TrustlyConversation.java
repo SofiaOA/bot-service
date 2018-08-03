@@ -129,6 +129,7 @@ public class TrustlyConversation extends Conversation {
   private void handleTrustlyPollResponse(MessageBodySingleSelect body, UserContext userContext) {
     if (body.getSelectedItem().value.equals("end")) {
       userContext.putUserData(FORCE_TRUSTLY_CHOICE, "true");
+      addToChat(FORCED_START, userContext);
     }
   }
 
