@@ -1,5 +1,7 @@
 package com.hedvig.botService.enteties;
 
+import static com.hedvig.botService.chat.OnboardingConversationDevi.IN_OFFER;
+
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
@@ -9,6 +11,30 @@ import com.hedvig.botService.serviceIntegration.memberService.MemberProfile;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
 import com.hedvig.botService.services.SessionManager;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapKey;
+import javax.persistence.MapKeyColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Version;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,15 +42,6 @@ import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.persistence.*;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.hedvig.botService.chat.OnboardingConversationDevi.IN_OFFER;
 
 /*
  * Contains all state information related to a member
@@ -35,6 +52,8 @@ public class UserContext implements Serializable {
 
     public static final String TRUSTLY_TRIGGER_ID = "{TRUSTLY_TRIGGER_ID}";
 	public static final String ONBOARDING_COMPLETE = "{ONBOARDING_COMPLETE}";
+	public static final String FORCE_TRUSTLY_CHOICE = "{FORCE_TRUSTLY_CHOICE}";
+	public static final String TRUSTLY_FORCED_START = "{TRUSTLY_FORCED_START}";
 
 	private static Logger log = LoggerFactory.getLogger(UserContext.class);
 	private static HashMap<String, String> requiredData = new HashMap<String, String>(){{

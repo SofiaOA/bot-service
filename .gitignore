@@ -35,3 +35,4 @@ application-development.yml
 .settings
 .vscode
 .sts4-cache
+.factorypath

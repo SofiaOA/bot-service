@@ -31,7 +31,6 @@ public class MainConversation extends Conversation {
 	public static final String MESSAGE_MAIN_REPORT = "message.main.report";
 	public static final String MESSAGE_MAIN_ONBOARDING_DONE = "onboarding.done";
 	public static final String CONVERSATION_DONE = "conversation.done";
-	public static final String FORCE_TRUSTLY_CHOICE = "{FORCE_TRUSTLY_CHOICE}";
 	public static final String MESSAGE_MAIN_START_CHAT = "message.main.start.chat";
 
 	private static Logger log = LoggerFactory.getLogger(MainConversation.class);
@@ -107,7 +106,7 @@ public class MainConversation extends Conversation {
 					addToChat(m, userContext);
 					userContext.completeConversation(this); // TODO: End conversation in better way
 					userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
-					userContext.putUserData(FORCE_TRUSTLY_CHOICE, "false");
+					userContext.putUserData(UserContext.FORCE_TRUSTLY_CHOICE, "false");
 					return;
 				}
 
@@ -183,7 +182,7 @@ public class MainConversation extends Conversation {
 	public void addTrustlyButton(UserContext userContext) {
 		val message = getMessage(MESSAGE_HEDVIG_COM);
 		val body = (MessageBodySingleSelect) message.body;
-		String forceTrustly = userContext.getDataEntry(FORCE_TRUSTLY_CHOICE);
+		String forceTrustly = userContext.getDataEntry(UserContext.FORCE_TRUSTLY_CHOICE);
 		if("true".equalsIgnoreCase(forceTrustly)) {
             body.choices.add(new SelectOption("Koppla autogiro", MESSAGE_MAIN_START_TRUSTLY));
         }

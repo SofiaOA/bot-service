@@ -241,7 +241,7 @@ public class ClaimsConversation extends Conversation {
     }
 
     @Override
-    public void recieveEvent(EventTypes e, String value, UserContext userContext){
+    public void receiveEvent(EventTypes e, String value, UserContext userContext){
 
         switch(e){
             // This is used to let Hedvig say multiple message after another
