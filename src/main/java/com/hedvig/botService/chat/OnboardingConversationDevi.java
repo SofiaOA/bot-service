@@ -874,23 +874,23 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         // Student policy-related messages
 
         createMessage(MESSAGE_STUDENT_LIMIT_BOTH,
-                new MessageBodySingleSelect("TODO ALEX: Fix this copy! :)",
+                new MessageBodySingleSelect("Se där! Studentpriset gäller tyvärr för max två personer i lägenheter som är max 50 kvadrat. Men oroa dig inte, jag fixar ett riktigt bra pris till er ändå!✌️\fDessutom får ni fetare skydd än det som gäller för studenterbjudandet 🙌",
                         Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
 
         createMessage(MESSAGE_STUDENT_LIMIT_PERSONS, new MessageBodySingleSelect(
-                "Ah! Om ni hade varit max två så hade ni fått vårt studentpris. Men oroa dig inte, jag fixar ett riktigt bra pris till er ändå!",
+                "Se där! Studentpriset gäller dessväre för max två personer men oroa er inte, jag fixar ett riktigt bra pris till er ändå!✌️\fDessutom får ni fetare skydd än det som gäller för studenterbjudandet 🙌",
                 Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
 
         createMessage(MESSAGE_STUDENT_LIMIT_LIVING_SPACE, new MessageBodySingleSelect(
-                "Ah! Om lägenheten bara hade varit på 50 kvadrat eller mindre så vi kunnat ge ett studentpris. Men oroa dig inte, jag fixar ett riktigt bra pris ändå!",
+                "Se där! Studentpriset gäller dessväre till max 50 kvadrat men oroa er inte, jag fixar ett riktigt bra pris till er ändå!✌️\fDessutom får ni fetare skydd än det som gäller för studenterbjudandet 🙌",
                 Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
 
         createMessage(MESSAGE_STUDENT_ELIGIBLE_BRF,
-                new MessageBodySingleSelect("Grymt! Då betalar du bara 99 kr per månad!",
+                new MessageBodySingleSelect("Grymt! Då får du vårt fantastiska studentpris och betalar bara 99kr per månad! 🙌",
                         Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
 
         createMessage(MESSAGE_STUDENT_ELIGIBLE_RENT,
-                new MessageBodySingleSelect("Grymt! Då betalar du bara 79 kr per månad!",
+                new MessageBodySingleSelect("Grymt! Då får du vårt fantastiska studentpris och betalar bara 79kr per månad! 🙌",
                         Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
 
         createChatMessage(MESSAGE_STUDENT_25K_LIMIT, new MessageBodySingleSelect(
