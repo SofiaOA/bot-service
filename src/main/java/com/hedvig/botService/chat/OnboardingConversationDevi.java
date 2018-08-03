@@ -74,7 +74,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     public static final String MESSAGE_STUDENT_LIMIT_BOTH = "message.student.limit.both";
     public static final String MESSAGE_STUDENT_LIMIT_PERSONS = "message.student.limit.persons";
-    public static final String MESSAGE_STUDENT_LIMIT_LIVING_SPACE = "message.student.limit.livingspace";
+    public static final String MESSAGE_STUDENT_LIMIT_LIVING_SPACE =
+            "message.student.limit.livingspace";
     public static final String MESSAGE_STUDENT_ELIGIBLE_BRF = "message.student.eligible.brf";
     public static final String MESSAGE_STUDENT_ELIGIBLE_RENT = "message.student.eligible.rent";
     public static final String MESSAGE_STUDENT_25K_LIMIT = "message.student.25klimit";
@@ -873,25 +874,34 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         // Student policy-related messages
 
-        createMessage(MESSAGE_STUDENT_LIMIT_BOTH,
-                new MessageBodySingleSelect("Se där! Studentpriset gäller tyvärr för max två personer i lägenheter som är max 50 kvadrat. Men oroa dig inte, jag fixar ett riktigt bra pris till er ändå!✌️\fDessutom får ni fetare skydd än det som gäller för studenterbjudandet 🙌",
-                        Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
+        createMessage(MESSAGE_STUDENT_LIMIT_BOTH, new MessageBodySingleSelect(
+                "Se där! Studentpriset gäller tyvärr för max två personer i lägenheter som är max 50 kvadrat. Men oroa dig inte, jag fixar ett riktigt bra pris till er ändå!✌️\f"
+                        + "Dessutom får ni fetare skydd än det som gäller för studenterbjudandet 🙌",
+                Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET),
+                        new SelectOption("Berätta mer", "message.student.limit.tellmemore"))));
 
         createMessage(MESSAGE_STUDENT_LIMIT_PERSONS, new MessageBodySingleSelect(
                 "Se där! Studentpriset gäller dessväre för max två personer men oroa er inte, jag fixar ett riktigt bra pris till er ändå!✌️\fDessutom får ni fetare skydd än det som gäller för studenterbjudandet 🙌",
-                Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
+                Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET),
+                        new SelectOption("Berätta mer", "message.student.limit.tellmemore"))));
 
         createMessage(MESSAGE_STUDENT_LIMIT_LIVING_SPACE, new MessageBodySingleSelect(
                 "Se där! Studentpriset gäller dessväre till max 50 kvadrat men oroa er inte, jag fixar ett riktigt bra pris till er ändå!✌️\fDessutom får ni fetare skydd än det som gäller för studenterbjudandet 🙌",
+                Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET),
+                        new SelectOption("Berätta mer", "message.student.limit.tellmemore"))));
+
+        createChatMessage("message.student.limit.tellmemore", new MessageBodySingleSelect(
+                "Absolut! Genom att har några extra restriktioner på hur många som bor i lägenheten och hur stor den är har vi kunnat ta fram en studentförsäkring som passar de flesta studenter – till ett riktigt bra pris!\f"
+                        + "För de som faller något utanför så erbjuder vi vår vanliga grymma Hedvig hemförsäkring. Den kostar lite mer, men då får du också större försäkringsbelopp och högre drulle.",
+                Lists.newArrayList(new SelectOption("Okej!", MESSAGE_SAKERHET))));
+
+        createMessage(MESSAGE_STUDENT_ELIGIBLE_BRF, new MessageBodySingleSelect(
+                "Grymt! Då får du vårt fantastiska studentpris och betalar bara 99kr per månad! 🙌",
                 Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
 
-        createMessage(MESSAGE_STUDENT_ELIGIBLE_BRF,
-                new MessageBodySingleSelect("Grymt! Då får du vårt fantastiska studentpris och betalar bara 99kr per månad! 🙌",
-                        Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
-
-        createMessage(MESSAGE_STUDENT_ELIGIBLE_RENT,
-                new MessageBodySingleSelect("Grymt! Då får du vårt fantastiska studentpris och betalar bara 79kr per månad! 🙌",
-                        Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
+        createMessage(MESSAGE_STUDENT_ELIGIBLE_RENT, new MessageBodySingleSelect(
+                "Grymt! Då får du vårt fantastiska studentpris och betalar bara 79kr per månad! 🙌",
+                Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
 
         createChatMessage(MESSAGE_STUDENT_25K_LIMIT, new MessageBodySingleSelect(
                 "Okej! Dina prylar som du har hemma skyddas upp till 200 000 kr 🏺🖼️\f"
