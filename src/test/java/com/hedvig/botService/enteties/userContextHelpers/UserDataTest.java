@@ -11,15 +11,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(MockitoJUnitRunner.class)
 public class UserDataTest {
 
-    @Test
-    public void testsetAddressCity(){
-        UserContext context = new UserContext();
+  @Test
+  public void testsetAddressCity() {
+    UserContext context = new UserContext();
 
-        UserData ud = context.getOnBoardingData();
+    UserData ud = context.getOnBoardingData();
 
-        ud.setAddressCity("Sollefteå");
+    ud.setAddressCity("Sollefteå");
 
-        assertThat(ud.getAddressCity()).isEqualTo("Sollefteå");
-    }
-
+    assertThat(ud.getAddressCity()).isEqualTo("Sollefteå");
+  }
 }

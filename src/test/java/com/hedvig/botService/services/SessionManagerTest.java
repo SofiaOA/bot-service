@@ -37,136 +37,144 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class SessionManagerTest {
 
-    public static final String MESSAGE = "Heh hej";
-    public static final SelectLink SELECT_LINK = SelectLink.toOffer("Offer", "offer");
-    @Mock
-    UserContextRepository userContextRepository;
+  public static final String MESSAGE = "Heh hej";
+  public static final SelectLink SELECT_LINK = SelectLink.toOffer("Offer", "offer");
+  @Mock UserContextRepository userContextRepository;
 
-    @Mock
-    MemberService memberService;
+  @Mock MemberService memberService;
 
-    @Mock
-    ProductPricingService productPricingService;
+  @Mock ProductPricingService productPricingService;
 
-    @Mock
-    SignupCodeRepository signupCodeRepository;
+  @Mock SignupCodeRepository signupCodeRepository;
 
-    @Mock
-    TrackingDataRespository campaignCodeRepository;
-    
-    @Mock
-    ConversationFactory conversationFactory;
+  @Mock TrackingDataRespository campaignCodeRepository;
 
-    @Mock(answer = Answers.CALLS_REAL_METHODS)
-    Conversation mockConversation;
+  @Mock ConversationFactory conversationFactory;
 
-    @Mock MessagesService messagesService;
+  @Mock(answer = Answers.CALLS_REAL_METHODS)
+  Conversation mockConversation;
 
-    @Mock
-    ClaimsService claimsService;
+  @Mock MessagesService messagesService;
 
+  @Mock ClaimsService claimsService;
 
-    SessionManager sessionManager;
+  SessionManager sessionManager;
 
-    @Before
-    public void setUp() {
-        val objectMapper = new ObjectMapper();
-        sessionManager = new SessionManager(
-        		userContextRepository, memberService, claimsService, conversationFactory, campaignCodeRepository, objectMapper);
-    }
+  @Before
+  public void setUp() {
+    val objectMapper = new ObjectMapper();
+    sessionManager =
+        new SessionManager(
+            userContextRepository,
+            memberService,
+            claimsService,
+            conversationFactory,
+            campaignCodeRepository,
+            objectMapper);
+  }
 
-    //FIXME
-    @Test
-    public void givenConversationThatCanAcceptMessage_WhenAddMessageFromHedvig_ThenAddsMessageToHistory() {
+  // FIXME
+  @Test
+  public void
+      givenConversationThatCanAcceptMessage_WhenAddMessageFromHedvig_ThenAddsMessageToHistory() {
 
-        val tolvanssonUserContext = makeTolvanssonUserContext();
-        startMockConversation(tolvanssonUserContext);
+    val tolvanssonUserContext = makeTolvanssonUserContext();
+    startMockConversation(tolvanssonUserContext);
 
-        when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID)).thenReturn(Optional.of(tolvanssonUserContext));
-        when(conversationFactory.createConversation(anyString())).thenReturn(mockConversation);
+    when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID))
+        .thenReturn(Optional.of(tolvanssonUserContext));
+    when(conversationFactory.createConversation(anyString())).thenReturn(mockConversation);
 
-        when(mockConversation.canAcceptAnswerToQuestion(tolvanssonUserContext)).thenReturn(true);
-        when(mockConversation.getSelectItemsForAnswer(tolvanssonUserContext)).thenReturn(Lists.newArrayList(SELECT_LINK));
+    when(mockConversation.canAcceptAnswerToQuestion(tolvanssonUserContext)).thenReturn(true);
+    when(mockConversation.getSelectItemsForAnswer(tolvanssonUserContext))
+        .thenReturn(Lists.newArrayList(SELECT_LINK));
 
-        AddMessageRequestDTO requestDTO = new AddMessageRequestDTO(TOLVANSSON_MEMBERID, MESSAGE);
+    AddMessageRequestDTO requestDTO = new AddMessageRequestDTO(TOLVANSSON_MEMBERID, MESSAGE);
 
-        val messageCouldBeAdded = sessionManager.addMessageFromHedvig(requestDTO);
+    val messageCouldBeAdded = sessionManager.addMessageFromHedvig(requestDTO);
 
-        assertThat(messageCouldBeAdded).isTrue();
+    assertThat(messageCouldBeAdded).isTrue();
 
-        Message message = Iterables.getLast(tolvanssonUserContext.getMemberChat().chatHistory);
-        assertThat(message.body.text).isEqualTo(MESSAGE);
-        assertThat(message.id).isEqualTo("message.bo.message");
-        assertThat(message.header.fromId).isEqualTo(HEDVIG_USER_ID);
-        assertThat(((MessageBodySingleSelect)message.body).choices).containsExactly(SELECT_LINK);
-    }
+    Message message = Iterables.getLast(tolvanssonUserContext.getMemberChat().chatHistory);
+    assertThat(message.body.text).isEqualTo(MESSAGE);
+    assertThat(message.id).isEqualTo("message.bo.message");
+    assertThat(message.header.fromId).isEqualTo(HEDVIG_USER_ID);
+    assertThat(((MessageBodySingleSelect) message.body).choices).containsExactly(SELECT_LINK);
+  }
 
-    //FIXME
-    @Test
-    public void givenConversationThatCanAcceptMessage_WhenAddMessageFromHedvig_ThenReturnFalse() {
+  // FIXME
+  @Test
+  public void givenConversationThatCanAcceptMessage_WhenAddMessageFromHedvig_ThenReturnFalse() {
 
-        val tolvanssonUserContext = makeTolvanssonUserContext();
-        startMockConversation(tolvanssonUserContext);
+    val tolvanssonUserContext = makeTolvanssonUserContext();
+    startMockConversation(tolvanssonUserContext);
 
-        when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID)).thenReturn(Optional.of(tolvanssonUserContext));
-        when(mockConversation.canAcceptAnswerToQuestion(tolvanssonUserContext)).thenReturn(false);
-        when(conversationFactory.createConversation(anyString())).thenReturn(mockConversation);
+    when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID))
+        .thenReturn(Optional.of(tolvanssonUserContext));
+    when(mockConversation.canAcceptAnswerToQuestion(tolvanssonUserContext)).thenReturn(false);
+    when(conversationFactory.createConversation(anyString())).thenReturn(mockConversation);
 
-        AddMessageRequestDTO requestDTO = new AddMessageRequestDTO(TOLVANSSON_MEMBERID, MESSAGE);
+    AddMessageRequestDTO requestDTO = new AddMessageRequestDTO(TOLVANSSON_MEMBERID, MESSAGE);
 
-        val messageCouldBeAdded = sessionManager.addMessageFromHedvig(requestDTO);
+    val messageCouldBeAdded = sessionManager.addMessageFromHedvig(requestDTO);
 
-        assertThat(messageCouldBeAdded).isFalse();
-    }
+    assertThat(messageCouldBeAdded).isFalse();
+  }
 
-    @Test
-    public void givenNoExistingConversation_whenGetAllMessages_thenOnboardingConversationIsStarted() {
+  @Test
+  public void givenNoExistingConversation_whenGetAllMessages_thenOnboardingConversationIsStarted() {
 
-        val tolvanssonUserContext = makeTolvanssonUserContext();
+    val tolvanssonUserContext = makeTolvanssonUserContext();
 
-        when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID)).thenReturn(Optional.of(tolvanssonUserContext));
-        when(conversationFactory.createConversation(any(Class.class))).thenReturn(makeOnboardingConversation());
+    when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID))
+        .thenReturn(Optional.of(tolvanssonUserContext));
+    when(conversationFactory.createConversation(any(Class.class)))
+        .thenReturn(makeOnboardingConversation());
 
-        val messages = sessionManager.getAllMessages(TOLVANSSON_MEMBERID, null);
+    val messages = sessionManager.getAllMessages(TOLVANSSON_MEMBERID, null);
 
-        assertThat(Iterables.getLast(messages)).hasFieldOrPropertyWithValue("id", "message.onboardingstart");
-        assertThat(tolvanssonUserContext.getActiveConversation().get()).isNotNull();
-    }
+    assertThat(Iterables.getLast(messages))
+        .hasFieldOrPropertyWithValue("id", "message.onboardingstart");
+    assertThat(tolvanssonUserContext.getActiveConversation().get()).isNotNull();
+  }
 
-    @Test
-    public void givenNoExistingConversation_whenGetAllMessagesWithIntentLOGIN_thenOnboardingConversationIsStarted() {
+  @Test
+  public void
+      givenNoExistingConversation_whenGetAllMessagesWithIntentLOGIN_thenOnboardingConversationIsStarted() {
 
-        val tolvanssonUserContext = makeTolvanssonUserContext();
+    val tolvanssonUserContext = makeTolvanssonUserContext();
 
-        when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID)).thenReturn(Optional.of(tolvanssonUserContext));
-        when(conversationFactory.createConversation(any(Class.class))).thenReturn(makeOnboardingConversation());
-        when(memberService.auth(TOLVANSSON_MEMBERID)).thenReturn(Optional.of(makeBankIdResponse()));
+    when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID))
+        .thenReturn(Optional.of(tolvanssonUserContext));
+    when(conversationFactory.createConversation(any(Class.class)))
+        .thenReturn(makeOnboardingConversation());
+    when(memberService.auth(TOLVANSSON_MEMBERID)).thenReturn(Optional.of(makeBankIdResponse()));
 
-        val messages = sessionManager.getAllMessages(TOLVANSSON_MEMBERID, SessionManager.Intent.LOGIN);
+    val messages = sessionManager.getAllMessages(TOLVANSSON_MEMBERID, SessionManager.Intent.LOGIN);
 
-        assertThat(Iterables.getLast(messages)).hasFieldOrPropertyWithValue("id", "message.start.login");
-    }
+    assertThat(Iterables.getLast(messages))
+        .hasFieldOrPropertyWithValue("id", "message.start.login");
+  }
 
-    private OnboardingConversationDevi makeOnboardingConversation() {
-        return new OnboardingConversationDevi(memberService, productPricingService, null, null, null);
-    }
+  private OnboardingConversationDevi makeOnboardingConversation() {
+    return new OnboardingConversationDevi(memberService, productPricingService, null, null, null);
+  }
 
-    private BankIdAuthResponse makeBankIdResponse() {
-        return new BankIdAuthResponse(BankIdStatusType.STARTED, UUID.randomUUID().toString(), UUID.randomUUID().toString());
-    }
+  private BankIdAuthResponse makeBankIdResponse() {
+    return new BankIdAuthResponse(
+        BankIdStatusType.STARTED, UUID.randomUUID().toString(), UUID.randomUUID().toString());
+  }
 
-    private UserContext makeTolvanssonUserContext() {
-        val tolvanssonUserContext = new UserContext(TOLVANSSON_MEMBERID);
+  private UserContext makeTolvanssonUserContext() {
+    val tolvanssonUserContext = new UserContext(TOLVANSSON_MEMBERID);
 
-        return  tolvanssonUserContext;
-    }
+    return tolvanssonUserContext;
+  }
 
-    private void startMockConversation(UserContext tolvanssonUserContext) {
-        tolvanssonUserContext.startConversation(mockConversation);
-    }
-
+  private void startMockConversation(UserContext tolvanssonUserContext) {
+    tolvanssonUserContext.startConversation(mockConversation);
+  }
 }

@@ -25,34 +25,29 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = MessagesController.class)
 @ContextConfiguration(classes = BotServiceApplicationTests.class)
 public class MessagesControllerTest {
 
-    @MockBean
-    SessionManager sessionManager;
+  @MockBean SessionManager sessionManager;
 
-    @Autowired
-    MockMvc mockMvc;
+  @Autowired MockMvc mockMvc;
 
-    @Autowired
-    ObjectMapper objectMapper;
+  @Autowired ObjectMapper objectMapper;
 
-    @Test
-    public void allMessages() throws Exception {
-        when(sessionManager.getAllMessages(contains(TOLVANSSON_MEMBERID), any())).thenReturn(Lists.newArrayList());
+  @Test
+  public void allMessages() throws Exception {
+    when(sessionManager.getAllMessages(contains(TOLVANSSON_MEMBERID), any()))
+        .thenReturn(Lists.newArrayList());
 
+    ResultActions resultActions =
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/messages")
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .header("hedvig.token", TOLVANSSON_MEMBERID));
 
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/messages").
-                accept(MediaType.APPLICATION_JSON_UTF8).
-                header("hedvig.token", TOLVANSSON_MEMBERID)
-        );
-
-        resultActions.andExpect(status().is2xxSuccessful()).andExpect(jsonPath("$").isEmpty());
-
-    }
-
+    resultActions.andExpect(status().is2xxSuccessful()).andExpect(jsonPath("$").isEmpty());
+  }
 }

@@ -20,33 +20,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = TriggerController.class)
-@ContextConfiguration(classes=BotServiceApplicationTests.class)
+@ContextConfiguration(classes = BotServiceApplicationTests.class)
 @ActiveProfiles("production")
 public class TiggerControllerTestProduction {
 
-    @Autowired
-    MockMvc mockMvc;
+  @Autowired MockMvc mockMvc;
 
-    @MockBean
-    TriggerService triggerService;
+  @MockBean TriggerService triggerService;
 
-    @Test
-    public void createDDM_returns404_WHEN_environmentEQProduction() throws Exception {
+  @Test
+  public void createDDM_returns404_WHEN_environmentEQProduction() throws Exception {
 
-        CreateDirectDebitMandateDTO createDirectDebitMandateDTO = new CreateDirectDebitMandateDTO(
-                TOLVANSSON_SSN,
-                TOLVANSSON_FIRSTNAME,
-                TOLVANSSON_LASTNAME,
-                TOLVANSSON_EMAIL
-        );
+    CreateDirectDebitMandateDTO createDirectDebitMandateDTO =
+        new CreateDirectDebitMandateDTO(
+            TOLVANSSON_SSN, TOLVANSSON_FIRSTNAME, TOLVANSSON_LASTNAME, TOLVANSSON_EMAIL);
 
-        mockMvc.perform(
-                post("/hedvig/trigger/_/createDDM").
-                        header("hedvig.token", TOLVANSSON_MEMBER_ID).
-                        accept(MediaType.APPLICATION_JSON_UTF8).
-                        contentType(MediaType.APPLICATION_JSON_UTF8).
-                        content(toJson(createDirectDebitMandateDTO))).
-                andExpect(status().isNotFound());
-    }
-
+    mockMvc
+        .perform(
+            post("/hedvig/trigger/_/createDDM")
+                .header("hedvig.token", TOLVANSSON_MEMBER_ID)
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(toJson(createDirectDebitMandateDTO)))
+        .andExpect(status().isNotFound());
+  }
 }

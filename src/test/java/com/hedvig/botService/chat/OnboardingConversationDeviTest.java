@@ -1,6 +1,5 @@
 package com.hedvig.botService.chat;
 
-
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
@@ -24,134 +23,146 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class OnboardingConversationDeviTest {
 
-    @Mock
-    private MemberService memberService;
+  @Mock private MemberService memberService;
 
+  @Mock private ProductPricingService productPricingService;
 
-    @Mock
-    private ProductPricingService productPricingService;
+  @Mock private SignupCodeRepository signupRepo;
 
-    @Mock
-    private SignupCodeRepository signupRepo;
+  @Mock private ApplicationEventPublisher publisher;
 
-    @Mock
-    private ApplicationEventPublisher publisher;
+  @Mock private ConversationFactory conversationFactory;
 
-    @Mock
-    private ConversationFactory conversationFactory;
+  private UserContext userContext;
+  private OnboardingConversationDevi testConversation;
 
-    private UserContext userContext;
-    private OnboardingConversationDevi testConversation;
+  @Before
+  public void setup() {
+    userContext = new UserContext(TOLVANSSON_MEMBER_ID);
 
-    @Before
-    public void setup() {
-        userContext = new UserContext(TOLVANSSON_MEMBER_ID);
+    testConversation =
+        new OnboardingConversationDevi(
+            memberService, productPricingService, signupRepo, publisher, conversationFactory);
+  }
 
-        testConversation = new OnboardingConversationDevi(memberService, productPricingService, signupRepo, publisher, conversationFactory);
-    }
+  @Test
+  public void SendNotificationEventOn_HouseingUnderWritingLimit() {
 
-    @Test
-    public void SendNotificationEventOn_HouseingUnderWritingLimit(){
+    addLastnameToContext(userContext, TOLVANSSON_FIRSTNAME);
+    addFirstnametoContext(userContext, TOLVANSSON_LASTNAME);
 
-        addLastnameToContext(userContext, TOLVANSSON_FIRSTNAME);
-        addFirstnametoContext(userContext, TOLVANSSON_LASTNAME);
+    Message m = testConversation.getMessage("message.uwlimit.housingsize");
+    m.body.text = TOLVANSSON_PHONE_NUMBER;
 
-        Message m = testConversation.getMessage("message.uwlimit.housingsize");
-        m.body.text = TOLVANSSON_PHONE_NUMBER;
+    testConversation.receiveMessage(userContext, m);
 
-        testConversation.receiveMessage(userContext, m);
-
-        then(publisher).should().publishEvent(new UnderwritingLimitExcededEvent(
+    then(publisher)
+        .should()
+        .publishEvent(
+            new UnderwritingLimitExcededEvent(
                 TOLVANSSON_MEMBER_ID,
                 TOLVANSSON_PHONE_NUMBER,
                 TOLVANSSON_FIRSTNAME,
                 TOLVANSSON_LASTNAME,
                 UnderwritingLimitExcededEvent.UnderwritingType.HouseingSize));
+  }
 
-    }
+  @Test
+  public void SendNotificationEventOn_HousholdUnderWritingLimit() {
 
-    @Test
-    public void SendNotificationEventOn_HousholdUnderWritingLimit(){
+    addLastnameToContext(userContext, TOLVANSSON_FIRSTNAME);
+    addFirstnametoContext(userContext, TOLVANSSON_LASTNAME);
 
-        addLastnameToContext(userContext, TOLVANSSON_FIRSTNAME);
-        addFirstnametoContext(userContext, TOLVANSSON_LASTNAME);
+    Message m = testConversation.getMessage("message.uwlimit.householdsize");
+    m.body.text = TOLVANSSON_PHONE_NUMBER;
 
-        Message m = testConversation.getMessage("message.uwlimit.householdsize");
-        m.body.text = TOLVANSSON_PHONE_NUMBER;
+    testConversation.receiveMessage(userContext, m);
 
-        testConversation.receiveMessage(userContext, m);
-
-        then(publisher).should().publishEvent(new UnderwritingLimitExcededEvent(
+    then(publisher)
+        .should()
+        .publishEvent(
+            new UnderwritingLimitExcededEvent(
                 TOLVANSSON_MEMBER_ID,
                 TOLVANSSON_PHONE_NUMBER,
                 TOLVANSSON_FIRSTNAME,
                 TOLVANSSON_LASTNAME,
                 UnderwritingLimitExcededEvent.UnderwritingType.HouseholdSize));
+  }
 
-    }
+  @Test
+  public void SendNotificationEventOn_FriFraga() {
+    addLastnameToContext(userContext, TOLVANSSON_LASTNAME);
+    addFirstnametoContext(userContext, TOLVANSSON_FIRSTNAME);
 
-    @Test
-    public void SendNotificationEventOn_FriFraga(){
-        addLastnameToContext(userContext, TOLVANSSON_LASTNAME);
-        addFirstnametoContext(userContext, TOLVANSSON_FIRSTNAME);
+    Message m = testConversation.getMessage("message.frifraga");
+    m.body.text = "I wonder if I can get a home insurance, even thouh my name is Tolvan?";
 
-        Message m = testConversation.getMessage("message.frifraga");
-        m.body.text = "I wonder if I can get a home insurance, even thouh my name is Tolvan?";
+    testConversation.receiveMessage(userContext, m);
 
-        testConversation.receiveMessage(userContext, m);
+    then(publisher)
+        .should()
+        .publishEvent(new OnboardingQuestionAskedEvent(TOLVANSSON_MEMBER_ID, m.body.text));
+  }
 
-        then(publisher).should().publishEvent(new OnboardingQuestionAskedEvent(TOLVANSSON_MEMBER_ID,
-                m.body.text));
+  @Test
+  public void
+      DoNotSendNotificationEvent_WhenMessge_50K_LIMIT_YES_withAnswer_MESSAGE_50K_LIMIT_YES_YES() {
+    Message m =
+        testConversation.getMessage(OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES + ".2");
+    val choice =
+        ((MessageBodySingleSelect) m.body)
+            .choices
+            .stream()
+            .filter(x -> x.value.equalsIgnoreCase(MESSAGE_50K_LIMIT_YES_YES))
+            .findFirst();
 
-    }
+    choice.get().selected = true;
 
-    @Test
-    public void DoNotSendNotificationEvent_WhenMessge_50K_LIMIT_YES_withAnswer_MESSAGE_50K_LIMIT_YES_YES(){
-        Message m = testConversation.getMessage(OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES + ".2");
-        val choice = ((MessageBodySingleSelect)m.body).choices.stream().filter(x -> x.value.equalsIgnoreCase(MESSAGE_50K_LIMIT_YES_YES)).findFirst();
+    testConversation.receiveMessage(userContext, m);
+    then(publisher)
+        .should(times(0))
+        .publishEvent(new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID));
+  }
 
-        choice.get().selected = true;
+  @Test
+  public void SendNotificationEvent_WhenMemberSignedIsCalled_withUserContextValue50K_LIMITeqTRUE() {
+    String referenceId = "53bb6e92-5cc7-11e8-8c3b-235d0786c76b";
+    userContext.putUserData("{50K_LIMIT}", "true");
+    testConversation.memberSigned(referenceId, userContext);
+    then(publisher)
+        .should(times(1))
+        .publishEvent(new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID));
+  }
 
-        testConversation.receiveMessage(userContext, m);
-        then(publisher).should(times(0)).publishEvent(new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID));
-    }
+  @Test
+  public void DoNothing_WhenMemberSignedIsCalled_withUserContextValue50K_LIMITeqNULL() {
+    String referenceId = "53bb6e92-5cc7-11e8-8c3b-235d0786c76b";
+    testConversation.memberSigned(referenceId, userContext);
+    then(publisher)
+        .should(times(0))
+        .publishEvent(new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID));
+  }
 
-    @Test
-    public void SendNotificationEvent_WhenMemberSignedIsCalled_withUserContextValue50K_LIMITeqTRUE() {
-        String referenceId = "53bb6e92-5cc7-11e8-8c3b-235d0786c76b";
-        userContext.putUserData("{50K_LIMIT}", "true");
-        testConversation.memberSigned(referenceId, userContext);
-        then(publisher).should(times(1)).publishEvent(new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID));
-    }
+  @Test
+  public void ReturnFalse_WhenChat_IsBeforeHouseChoice() {
 
-    @Test
-    public void DoNothing_WhenMemberSignedIsCalled_withUserContextValue50K_LIMITeqNULL() {
-        String referenceId = "53bb6e92-5cc7-11e8-8c3b-235d0786c76b";
-        testConversation.memberSigned(referenceId, userContext);
-        then(publisher).should(times(0)).publishEvent(new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID));
-    }
+    val canAcceptAnswer = testConversation.canAcceptAnswerToQuestion(userContext);
 
-    @Test
-    public void ReturnFalse_WhenChat_IsBeforeHouseChoice() {
+    assertThat(canAcceptAnswer).isEqualTo(false);
+  }
 
-        val canAcceptAnswer = testConversation.canAcceptAnswerToQuestion(userContext);
+  @Test
+  public void ReturnTrue_WhenUserContext_ContainsHouseChoice() {
 
-        assertThat(canAcceptAnswer).isEqualTo(false);
-    }
+    userContext
+        .getOnBoardingData()
+        .setHouseType(OnboardingConversationDevi.ProductTypes.BRF.toString());
 
+    val canAcceptAnswer = testConversation.canAcceptAnswerToQuestion(userContext);
 
-    @Test
-    public void ReturnTrue_WhenUserContext_ContainsHouseChoice() {
-
-        userContext.getOnBoardingData().setHouseType(OnboardingConversationDevi.ProductTypes.BRF.toString());
-
-        val canAcceptAnswer = testConversation.canAcceptAnswerToQuestion(userContext);
-
-        assertThat(canAcceptAnswer).isEqualTo(true);
-    }
-
+    assertThat(canAcceptAnswer).isEqualTo(true);
+  }
 }

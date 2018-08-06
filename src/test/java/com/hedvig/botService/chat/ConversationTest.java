@@ -17,67 +17,65 @@ import static org.mockito.BDDMockito.then;
 @RunWith(MockitoJUnitRunner.class)
 public class ConversationTest {
 
-    public static final String TESTMESSAGE_ID = "testmessage";
+  public static final String TESTMESSAGE_ID = "testmessage";
 
-    @Mock(answer = Answers.CALLS_REAL_METHODS)
-    Conversation sut;
+  @Mock(answer = Answers.CALLS_REAL_METHODS)
+  Conversation sut;
 
-    UserContext uc;
+  UserContext uc;
 
-    @Spy
-    MemberChat mc;
+  @Spy MemberChat mc;
 
-    @Before
-    public void setup() {
-        uc = new UserContext();
-        uc.setMemberChat(mc);
-    }
+  @Before
+  public void setup() {
+    uc = new UserContext();
+    uc.setMemberChat(mc);
+  }
 
+  @Captor ArgumentCaptor<Message> messageCaptor;
 
+  @Test
+  public void addToChat_renders_selectLink() throws Exception {
+    // Arrange
+    uc.putUserData("{TEST}", "localhost");
 
-    @Captor
-    ArgumentCaptor<Message> messageCaptor;
+    Message m =
+        createSingleSelectMessage(
+            "En förklarande text",
+            new SelectLink(
+                "Länk text",
+                "selected.value",
+                null,
+                "bankid:///{TEST}/text",
+                "http://{TEST}/text",
+                false));
 
+    // ACT
+    sut.addToChat(m, uc);
 
-    @Test
-    public void addToChat_renders_selectLink() throws Exception {
-        //Arrange
-        uc.putUserData("{TEST}", "localhost");
+    // Assert
+    then(mc).should().addToHistory(messageCaptor.capture());
+    MessageBodySingleSelect body = (MessageBodySingleSelect) messageCaptor.getValue().body;
 
-        Message m = createSingleSelectMessage("En förklarande text",
-                new SelectLink("Länk text", "selected.value", null, "bankid:///{TEST}/text", "http://{TEST}/text", false));
+    SelectLink link = (SelectLink) body.choices.get(0);
+    assertThat(link.appUrl).isEqualTo("bankid:///localhost/text");
+    assertThat(link.webUrl).isEqualTo("http://localhost/text");
+  }
 
-        //ACT
-        sut.addToChat(m, uc);
+  @Test
+  public void addToChat_renders_message() throws Exception {
+    // Arrange
+    uc.putUserData("{REPLACE_THIS}", "kort");
 
-        //Assert
-        then(mc).should().addToHistory(messageCaptor.capture());
-        MessageBodySingleSelect body = (MessageBodySingleSelect) messageCaptor.getValue().body;
+    Message m = createTextMessage("En förklarande {REPLACE_THIS} text");
 
-        SelectLink link = (SelectLink) body.choices.get(0);
-        assertThat(link.appUrl).isEqualTo("bankid:///localhost/text");
-        assertThat(link.webUrl).isEqualTo("http://localhost/text");
+    // ACT
+    sut.addToChat(m, uc);
 
-    }
+    // Assert
+    then(mc).should().addToHistory(messageCaptor.capture());
+    MessageBody body = messageCaptor.getValue().body;
 
-    @Test
-    public void addToChat_renders_message() throws Exception {
-        //Arrange
-        uc.putUserData("{REPLACE_THIS}", "kort");
-
-        Message m = createTextMessage("En förklarande {REPLACE_THIS} text");
-
-        //ACT
-        sut.addToChat(m, uc);
-
-        //Assert
-        then(mc).should().addToHistory(messageCaptor.capture());
-        MessageBody body =  messageCaptor.getValue().body;
-
-        assertThat(body.text).isEqualTo("En förklarande kort text");
-
-    }
-
-
-
+    assertThat(body.text).isEqualTo("En förklarande kort text");
+  }
 }

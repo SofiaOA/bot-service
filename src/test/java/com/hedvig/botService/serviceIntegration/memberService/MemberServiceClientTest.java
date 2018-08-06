@@ -31,96 +31,99 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes=BotServiceApplicationTests.class)
+@ContextConfiguration(classes = BotServiceApplicationTests.class)
 @AutoConfigureWireMock(port = 4777)
-@TestPropertySource(properties = {
-        "hedvig.member-service.url=localhost:4777"
-
-}, locations = "/application-test.yml")
+@TestPropertySource(
+    properties = {"hedvig.member-service.url=localhost:4777"},
+    locations = "/application-test.yml")
 @EnableFeignClients
 public class MemberServiceClientTest {
 
-    @Value("${wiremock.server.port}")
-    String port;
+  @Value("${wiremock.server.port}")
+  String port;
 
-    //@Autowired
-    //RestTemplate template;
+  // @Autowired
+  // RestTemplate template;
 
-    ObjectMapper objectMapper;
+  ObjectMapper objectMapper;
 
-    @Autowired
-    MemberServiceClient feignClient;
+  @Autowired MemberServiceClient feignClient;
 
-    @Autowired
-    ObjectFactory<HttpMessageConverters> feignEncoder;
+  @Autowired ObjectFactory<HttpMessageConverters> feignEncoder;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+  @Rule public ExpectedException thrown = ExpectedException.none();
 
-    @Before
-    public void setup(){
-         /*feignClient = Feign.builder().
-                 contract(new SpringMvcContract()).
-                 errorDecoder(new MemberServiceErrorDecoder(objectMapper)).
-                 encoder(new SpringEncoder(feignEncoder)).
-                 decoder(new SpringDecoder(feignEncoder)).
-                 target(MemberServiceClient.class, "http://localhost:4777"); */
-         objectMapper = new ObjectMapper();
-    }
+  @Before
+  public void setup() {
+    /*feignClient = Feign.builder().
+    contract(new SpringMvcContract()).
+    errorDecoder(new MemberServiceErrorDecoder(objectMapper)).
+    encoder(new SpringEncoder(feignEncoder)).
+    decoder(new SpringDecoder(feignEncoder)).
+    target(MemberServiceClient.class, "http://localhost:4777"); */
+    objectMapper = new ObjectMapper();
+  }
 
-    @Test
-    public void auth() throws Exception {
+  @Test
+  public void auth() throws Exception {
 
-        BankIdAuthResponse response = new BankIdAuthResponse(BankIdStatusType.COMPLETE, "", "");
-        stubFor(post(urlEqualTo("/member/bankid/auth")).willReturn(aResponse().withHeader("Content-Type", "application/json").withBody(objectMapper.writeValueAsString(response))));
+    BankIdAuthResponse response = new BankIdAuthResponse(BankIdStatusType.COMPLETE, "", "");
+    stubFor(
+        post(urlEqualTo("/member/bankid/auth"))
+            .willReturn(
+                aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withBody(objectMapper.writeValueAsString(response))));
 
-        //MemberServiceImpl impl = new MemberServiceImpl(template);
-        //impl.setMemberServiceLocation("localhost:4777");
-        ResponseEntity<BankIdAuthResponse> adadad = feignClient.auth(new BankIdAuthRequest("",""));
-        assertThat(adadad.getBody()).isEqualTo(response);
-    }
+    // MemberServiceImpl impl = new MemberServiceImpl(template);
+    // impl.setMemberServiceLocation("localhost:4777");
+    ResponseEntity<BankIdAuthResponse> adadad = feignClient.auth(new BankIdAuthRequest("", ""));
+    assertThat(adadad.getBody()).isEqualTo(response);
+  }
 
-    @Test()
-    public void bankIdError() throws Exception {
+  @Test()
+  public void bankIdError() throws Exception {
 
-        APIErrorDTO response = new APIErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR, BankIdStatusType.COMPLETE.name(), "");
-        stubFor(post(urlEqualTo("/member/bankid/auth")).
-                willReturn(aResponse().
-                        withHeader("Content-Type", "application/json").
-                        withStatus(500)
-                        .withBody(objectMapper.writeValueAsString(response))));
+    APIErrorDTO response =
+        new APIErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR, BankIdStatusType.COMPLETE.name(), "");
+    stubFor(
+        post(urlEqualTo("/member/bankid/auth"))
+            .willReturn(
+                aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withStatus(500)
+                    .withBody(objectMapper.writeValueAsString(response))));
 
-        thrown.expect(FeignException.class);
-        feignClient.auth(new BankIdAuthRequest("", ""));
-    }
-    
-    @Test()
-    public void bankIdError404() throws Exception {
+    thrown.expect(FeignException.class);
+    feignClient.auth(new BankIdAuthRequest("", ""));
+  }
 
-        stubFor(post(urlEqualTo("/member/bankid/auth")).
-                willReturn(aResponse().
-                        withHeader("Content-Type", "application/json").
-                        withStatus(404)
-                        .withBody("")));
+  @Test()
+  public void bankIdError404() throws Exception {
 
-        thrown.expect(FeignException.class);
-        feignClient.auth(new BankIdAuthRequest("", ""));
-    }
+    stubFor(
+        post(urlEqualTo("/member/bankid/auth"))
+            .willReturn(
+                aResponse()
+                    .withHeader("Content-Type", "application/json")
+                    .withStatus(404)
+                    .withBody("")));
 
-    @Test()
-    public void bankIdErrorConnectionResetByPeer() throws Exception {
+    thrown.expect(FeignException.class);
+    feignClient.auth(new BankIdAuthRequest("", ""));
+  }
 
-        stubFor(post(urlEqualTo("/member/bankid/auth")).
-                willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER)));
+  @Test()
+  public void bankIdErrorConnectionResetByPeer() throws Exception {
 
+    stubFor(
+        post(urlEqualTo("/member/bankid/auth"))
+            .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER)));
 
-        thrown.expect(RetryableException.class);
-        feignClient.auth(new BankIdAuthRequest("", ""));
-
-    }
-
+    thrown.expect(RetryableException.class);
+    feignClient.auth(new BankIdAuthRequest("", ""));
+  }
 }

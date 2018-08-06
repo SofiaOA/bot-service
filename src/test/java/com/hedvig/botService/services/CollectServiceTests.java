@@ -31,335 +31,361 @@ import static org.mockito.Mockito.*;
 @RunWith(SpringRunner.class)
 public class CollectServiceTests {
 
-    @MockBean
-    private
-    MemberService memberService;
+  @MockBean private MemberService memberService;
 
-    @MockBean
-    private
-    UserContextRepository userContextRepository;
+  @MockBean private UserContextRepository userContextRepository;
 
-    @MockBean
-    private
-    BankIdChat chat;
+  @MockBean private BankIdChat chat;
 
-    @After
-    public void reset_mocks() {
-        Mockito.reset(userContextRepository);
-        Mockito.reset(memberService);
-        Mockito.reset(chat);
-    }
+  @After
+  public void reset_mocks() {
+    Mockito.reset(userContextRepository);
+    Mockito.reset(memberService);
+    Mockito.reset(chat);
+  }
 
-    @Test
-    public void testCollectError() {
+  @Test
+  public void testCollectError() {
 
-        final String memberId = "1234";
-        final String referenceToken = "referenceToken";
+    final String memberId = "1234";
+    final String referenceToken = "referenceToken";
 
-        BankIdSessionImpl bankIdSessionImpl = new BankIdSessionImpl();
-        bankIdSessionImpl.setLastCallTime(Instant.now());
-        bankIdSessionImpl.setCollectionType(BankIdSessionImpl.CollectionType.AUTH);
+    BankIdSessionImpl bankIdSessionImpl = new BankIdSessionImpl();
+    bankIdSessionImpl.setLastCallTime(Instant.now());
+    bankIdSessionImpl.setCollectionType(BankIdSessionImpl.CollectionType.AUTH);
 
-        UserContext userContext = new UserContext();
-        userContext.setBankIdStatus(new HashMap<String, BankIdSessionImpl>(){{
-          put(referenceToken, bankIdSessionImpl);
-        }});
-
-        when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
-
-        BankIdCollectResponse response = new BankIdCollectResponse(BankIdProgressStatus.OUTSTANDING_TRANSACTION,  referenceToken, null);
-        when(memberService.collect(referenceToken, memberId)).thenReturn(response);
-
-
-        CollectService sut = new CollectService(userContextRepository, memberService);
-        BankIdCollectResponse actual = sut.collect(memberId, referenceToken, null);
-
-        BankIdCollectResponse expected = new BankIdCollectResponse(BankIdProgressStatus.OUTSTANDING_TRANSACTION, null, null);
-
-        assertThat(actual).isEqualTo(expected);
-
-    }
-
-    @Test
-    public void collect_Should_callBankIdGenericErrorANDReturnComplete_WHEN_userContextHasNoActiveBankIDSession() {
-        final String memberId = "1234";
-        final String referenceToken = "referenceToken";
-
-        UserContext userContext = new UserContext();
-        userContext.setBankIdStatus(new HashMap<>());
-
-        when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
-
-        CollectService sut = new CollectService(userContextRepository, memberService);
-        BankIdCollectResponse actual = sut.collect(memberId, referenceToken, chat);
-
-        verify(chat, times(1)).bankIdAuthGeneralCollectError(userContext);
-        assertThat(actual.getBankIdStatus()).isEqualTo(BankIdProgressStatus.COMPLETE);
-    }
-
-    @Test
-    public void collect_Should_ReturnComplete_WHEN_BankIDSessionISDone() {
-        final String memberId = "1234";
-        final String referenceToken = "referenceToken";
-
-        UserContext userContext = new UserContext();
-        userContext.setBankIdStatus(new HashMap<>());
-        userContext.startBankIdAuth(new BankIdAuthResponse(BankIdStatusType.COMPLETE, "", referenceToken));
-        userContext.getBankIdCollectStatus(referenceToken).setDone();
-
-        when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
-
-        CollectService sut = new CollectService(userContextRepository, memberService);
-        BankIdCollectResponse actual = sut.collect(memberId, referenceToken, chat);
-
-        assertThat(actual.getBankIdStatus()).isEqualTo(BankIdProgressStatus.COMPLETE);
-    }
-
-    @Test
-    public void collect_Should_ReturnOutstandinTransaction_WHEN_CollectResponseIsOutstandingTransaction() {
-        final String memberId = "1234";
-        final String referenceToken = "referenceToken";
-
-        UserContext userContext = new UserContext();
-        userContext.setBankIdStatus(new HashMap<>());
-        userContext.startBankIdAuth(new BankIdAuthResponse(BankIdStatusType.STARTED, "", referenceToken));
-        userContext.getBankIdCollectStatus(referenceToken).setLastCallTime(Instant.now().minusSeconds(3));
-
-        when(userContextRepository.findByMemberId(memberId))
-                .thenReturn(Optional.of(userContext));
-
-        when(memberService.collect(referenceToken, memberId)).
-                thenReturn(new BankIdCollectResponse(BankIdProgressStatus.OUTSTANDING_TRANSACTION, referenceToken, null));
-
-        CollectService sut = new CollectService(userContextRepository, memberService);
-        BankIdCollectResponse actual = sut.collect(memberId, referenceToken, chat);
-
-        assertThat(actual.getBankIdStatus()).isEqualTo(BankIdProgressStatus.OUTSTANDING_TRANSACTION);
-    }
-
-    @Test
-    public void collect_CollectResponseIsComplete() {
-        final String memberId = "1234";
-        final String referenceToken = "referenceToken";
-
-        //Arrange
-        UserContext userContext = new UserContext();
-        startAuth(userContext, referenceToken);
-        when(userContextRepository.findByMemberId(memberId))
-                .thenReturn(Optional.of(userContext));
-        when(memberService.collect(referenceToken, memberId)).
-                thenReturn(new BankIdCollectResponse(BankIdProgressStatus.COMPLETE, referenceToken, memberId));
-        when(memberService.getProfile(memberId)).
-                thenReturn(newFakeMember(memberId));
-        //Act
-        CollectService sut = new CollectService(userContextRepository, memberService);
-        BankIdCollectResponse actual = sut.collect(memberId, referenceToken, chat);
-
-        //Assert
-        assertThat(actual.getBankIdStatus()).isEqualTo(BankIdProgressStatus.COMPLETE);
-        verify(chat, times(1)).bankIdAuthComplete(userContext);
-        assertThat(userContext.getBankIdCollectStatus(referenceToken).getDone()).isTrue();
-        assertThat(userContext.getBankIdCollectStatus(referenceToken).getLastStatus()).isEqualTo("COMPLETE");
-    }
-
-    @Test
-    public void collect_CollectResponseIs_NOClient() {
-        final String memberId = "1234";
-        final String referenceToken = "referenceToken";
-
-        //Arrange
-        UserContext userContext = new UserContext();
-        startAuth(userContext, referenceToken);
-        when(userContextRepository.findByMemberId(memberId))
-                .thenReturn(Optional.of(userContext));
-        when(memberService.collect(referenceToken, memberId)).
-                thenReturn(new BankIdCollectResponse(BankIdProgressStatus.NO_CLIENT, referenceToken, memberId));
-
-        //Act
-        CollectService sut = new CollectService(userContextRepository, memberService);BankIdCollectResponse actual = sut.collect(memberId, referenceToken, chat);
-
-        //Assert
-        assertThat(actual.getBankIdStatus()).isEqualTo(BankIdProgressStatus.NO_CLIENT);
-        verify(chat, times(1)).noClient(userContext);
-        //assertThat(userContext.getBankIdCollectStatus(referenceToken).getDone()).isFalse();
-        assertThat(userContext.getBankIdCollectStatus(referenceToken).getLastStatus()).isEqualTo("NO_CLIENT");
-    }
-
-    @Test
-    public void collect_memberServiceGetProfile_throwsException() {
-        final String memberId = "1234";
-        final String referenceToken = "referenceToken";
-
-        //Arrange
-        UserContext userContext = new UserContext();
-        startAuth(userContext, referenceToken);
-        when(userContextRepository.findByMemberId(memberId))
-                .thenReturn(Optional.of(userContext));
-        when(memberService.collect(referenceToken, memberId)).
-                thenReturn(new BankIdCollectResponse(BankIdProgressStatus.COMPLETE, referenceToken, memberId));
-        when(memberService.getProfile(memberId)).
-                thenThrow(new RestClientException("adsad"));
-        //Act
-        CollectService sut = new CollectService(userContextRepository, memberService);
-        BankIdCollectResponse actual = sut.collect(memberId, referenceToken, chat);
-
-        //Assert
-        assertThat(actual.getBankIdStatus()).isEqualTo(BankIdProgressStatus.COMPLETE);
-        verify(chat, times(1)).couldNotLoadMemberProfile(userContext);
-        assertThat(userContext.getBankIdCollectStatus(referenceToken).getDone()).isTrue();
-        assertThat(userContext.getBankIdCollectStatus(referenceToken).getLastStatus()).isEqualTo("COMPLETE");
-    }
-
-    private void startAuth(UserContext userContext, String referenceToken) {
-        if(userContext.getBankIdStatus() == null)
-            userContext.setBankIdStatus(new HashMap<>());
-
-        userContext.startBankIdAuth(new BankIdAuthResponse(BankIdStatusType.STARTED, "", referenceToken));
-        userContext.getBankIdCollectStatus(referenceToken).setLastCallTime(Instant.now().minusSeconds(3));
-    }
-
-    private MemberProfile newFakeMember(String memberId) {
-
-        MemberAddress address = new MemberAddress("Street",
-                "City",
-                "13345", "1111", 1);
-
-        return new MemberProfile(
-            memberId,
-            "",
-            "FirstName",
-            "LastName",
-            Optional.of(address),
-            "seomtji@gmail.com",
-            "0070334251",
-            "se",
-                LocalDate.parse("1990-12-12")
-        );
-    }
-
-
-    @Test
-    public void responseStatusIsCOMPLETE_AfterMany_Errors() {
-
-        final String memberId = "1234";
-        final String referenceToken = "referenceToken";
-
-
-        BankIdSessionImpl bankIdSessionImpl = new BankIdSessionImpl();
-        bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
-        bankIdSessionImpl.setCollectionType(BankIdSessionImpl.CollectionType.AUTH);
-        bankIdSessionImpl.setLastStatus("OUTSTANDING_TRANSACTION");
-
-        UserContext userContext = new UserContext();
-        userContext.setBankIdStatus(new HashMap<String, BankIdSessionImpl>(){{
+    UserContext userContext = new UserContext();
+    userContext.setBankIdStatus(
+        new HashMap<String, BankIdSessionImpl>() {
+          {
             put(referenceToken, bankIdSessionImpl);
-        }});
+          }
+        });
 
-        when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
+    when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
 
+    BankIdCollectResponse response =
+        new BankIdCollectResponse(
+            BankIdProgressStatus.OUTSTANDING_TRANSACTION, referenceToken, null);
+    when(memberService.collect(referenceToken, memberId)).thenReturn(response);
 
-        FeignException ex = FeignException.errorStatus("collect",
-                feign.Response.builder().status(500).headers(new HashMap<>()).body("".getBytes()).build());
-        when(memberService.collect(referenceToken, memberId)).thenThrow(ex);
+    CollectService sut = new CollectService(userContextRepository, memberService);
+    BankIdCollectResponse actual = sut.collect(memberId, referenceToken, null);
 
-        CollectService service = new CollectService(userContextRepository, memberService);
+    BankIdCollectResponse expected =
+        new BankIdCollectResponse(BankIdProgressStatus.OUTSTANDING_TRANSACTION, null, null);
 
-        //ACT
+    assertThat(actual).isEqualTo(expected);
+  }
 
-        assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus()).isEqualTo(BankIdProgressStatus.OUTSTANDING_TRANSACTION);
-        bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
-        assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus()).isEqualTo(BankIdProgressStatus.OUTSTANDING_TRANSACTION);
-        bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
-        assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus()).isEqualTo(BankIdProgressStatus.OUTSTANDING_TRANSACTION);
-        bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
-        assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus()).isEqualTo(BankIdProgressStatus.COMPLETE);
+  @Test
+  public void
+      collect_Should_callBankIdGenericErrorANDReturnComplete_WHEN_userContextHasNoActiveBankIDSession() {
+    final String memberId = "1234";
+    final String referenceToken = "referenceToken";
 
-        //VERIFY
+    UserContext userContext = new UserContext();
+    userContext.setBankIdStatus(new HashMap<>());
 
-        verify(chat, times(1)).bankIdAuthGeneralCollectError(userContext);
+    when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
 
-    }
+    CollectService sut = new CollectService(userContextRepository, memberService);
+    BankIdCollectResponse actual = sut.collect(memberId, referenceToken, chat);
 
-    @Test
-    public void responseStatusIsCOMPLETE_AfterMany_SignComplete() {
+    verify(chat, times(1)).bankIdAuthGeneralCollectError(userContext);
+    assertThat(actual.getBankIdStatus()).isEqualTo(BankIdProgressStatus.COMPLETE);
+  }
 
-        final String memberId = "1234";
-        final String referenceToken = "referenceToken";
+  @Test
+  public void collect_Should_ReturnComplete_WHEN_BankIDSessionISDone() {
+    final String memberId = "1234";
+    final String referenceToken = "referenceToken";
 
+    UserContext userContext = new UserContext();
+    userContext.setBankIdStatus(new HashMap<>());
+    userContext.startBankIdAuth(
+        new BankIdAuthResponse(BankIdStatusType.COMPLETE, "", referenceToken));
+    userContext.getBankIdCollectStatus(referenceToken).setDone();
 
-        BankIdSessionImpl bankIdSessionImpl = new BankIdSessionImpl();
-        bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
-        bankIdSessionImpl.setCollectionType(BankIdSessionImpl.CollectionType.SIGN);
-        bankIdSessionImpl.setLastStatus("OUTSTANDING_TRANSACTION");
+    when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
 
-        UserContext userContext = new UserContext();
-        userContext.setBankIdStatus(new HashMap<String, BankIdSessionImpl>(){{
+    CollectService sut = new CollectService(userContextRepository, memberService);
+    BankIdCollectResponse actual = sut.collect(memberId, referenceToken, chat);
+
+    assertThat(actual.getBankIdStatus()).isEqualTo(BankIdProgressStatus.COMPLETE);
+  }
+
+  @Test
+  public void
+      collect_Should_ReturnOutstandinTransaction_WHEN_CollectResponseIsOutstandingTransaction() {
+    final String memberId = "1234";
+    final String referenceToken = "referenceToken";
+
+    UserContext userContext = new UserContext();
+    userContext.setBankIdStatus(new HashMap<>());
+    userContext.startBankIdAuth(
+        new BankIdAuthResponse(BankIdStatusType.STARTED, "", referenceToken));
+    userContext
+        .getBankIdCollectStatus(referenceToken)
+        .setLastCallTime(Instant.now().minusSeconds(3));
+
+    when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
+
+    when(memberService.collect(referenceToken, memberId))
+        .thenReturn(
+            new BankIdCollectResponse(
+                BankIdProgressStatus.OUTSTANDING_TRANSACTION, referenceToken, null));
+
+    CollectService sut = new CollectService(userContextRepository, memberService);
+    BankIdCollectResponse actual = sut.collect(memberId, referenceToken, chat);
+
+    assertThat(actual.getBankIdStatus()).isEqualTo(BankIdProgressStatus.OUTSTANDING_TRANSACTION);
+  }
+
+  @Test
+  public void collect_CollectResponseIsComplete() {
+    final String memberId = "1234";
+    final String referenceToken = "referenceToken";
+
+    // Arrange
+    UserContext userContext = new UserContext();
+    startAuth(userContext, referenceToken);
+    when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
+    when(memberService.collect(referenceToken, memberId))
+        .thenReturn(
+            new BankIdCollectResponse(BankIdProgressStatus.COMPLETE, referenceToken, memberId));
+    when(memberService.getProfile(memberId)).thenReturn(newFakeMember(memberId));
+    // Act
+    CollectService sut = new CollectService(userContextRepository, memberService);
+    BankIdCollectResponse actual = sut.collect(memberId, referenceToken, chat);
+
+    // Assert
+    assertThat(actual.getBankIdStatus()).isEqualTo(BankIdProgressStatus.COMPLETE);
+    verify(chat, times(1)).bankIdAuthComplete(userContext);
+    assertThat(userContext.getBankIdCollectStatus(referenceToken).getDone()).isTrue();
+    assertThat(userContext.getBankIdCollectStatus(referenceToken).getLastStatus())
+        .isEqualTo("COMPLETE");
+  }
+
+  @Test
+  public void collect_CollectResponseIs_NOClient() {
+    final String memberId = "1234";
+    final String referenceToken = "referenceToken";
+
+    // Arrange
+    UserContext userContext = new UserContext();
+    startAuth(userContext, referenceToken);
+    when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
+    when(memberService.collect(referenceToken, memberId))
+        .thenReturn(
+            new BankIdCollectResponse(BankIdProgressStatus.NO_CLIENT, referenceToken, memberId));
+
+    // Act
+    CollectService sut = new CollectService(userContextRepository, memberService);
+    BankIdCollectResponse actual = sut.collect(memberId, referenceToken, chat);
+
+    // Assert
+    assertThat(actual.getBankIdStatus()).isEqualTo(BankIdProgressStatus.NO_CLIENT);
+    verify(chat, times(1)).noClient(userContext);
+    // assertThat(userContext.getBankIdCollectStatus(referenceToken).getDone()).isFalse();
+    assertThat(userContext.getBankIdCollectStatus(referenceToken).getLastStatus())
+        .isEqualTo("NO_CLIENT");
+  }
+
+  @Test
+  public void collect_memberServiceGetProfile_throwsException() {
+    final String memberId = "1234";
+    final String referenceToken = "referenceToken";
+
+    // Arrange
+    UserContext userContext = new UserContext();
+    startAuth(userContext, referenceToken);
+    when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
+    when(memberService.collect(referenceToken, memberId))
+        .thenReturn(
+            new BankIdCollectResponse(BankIdProgressStatus.COMPLETE, referenceToken, memberId));
+    when(memberService.getProfile(memberId)).thenThrow(new RestClientException("adsad"));
+    // Act
+    CollectService sut = new CollectService(userContextRepository, memberService);
+    BankIdCollectResponse actual = sut.collect(memberId, referenceToken, chat);
+
+    // Assert
+    assertThat(actual.getBankIdStatus()).isEqualTo(BankIdProgressStatus.COMPLETE);
+    verify(chat, times(1)).couldNotLoadMemberProfile(userContext);
+    assertThat(userContext.getBankIdCollectStatus(referenceToken).getDone()).isTrue();
+    assertThat(userContext.getBankIdCollectStatus(referenceToken).getLastStatus())
+        .isEqualTo("COMPLETE");
+  }
+
+  private void startAuth(UserContext userContext, String referenceToken) {
+    if (userContext.getBankIdStatus() == null) userContext.setBankIdStatus(new HashMap<>());
+
+    userContext.startBankIdAuth(
+        new BankIdAuthResponse(BankIdStatusType.STARTED, "", referenceToken));
+    userContext
+        .getBankIdCollectStatus(referenceToken)
+        .setLastCallTime(Instant.now().minusSeconds(3));
+  }
+
+  private MemberProfile newFakeMember(String memberId) {
+
+    MemberAddress address = new MemberAddress("Street", "City", "13345", "1111", 1);
+
+    return new MemberProfile(
+        memberId,
+        "",
+        "FirstName",
+        "LastName",
+        Optional.of(address),
+        "seomtji@gmail.com",
+        "0070334251",
+        "se",
+        LocalDate.parse("1990-12-12"));
+  }
+
+  @Test
+  public void responseStatusIsCOMPLETE_AfterMany_Errors() {
+
+    final String memberId = "1234";
+    final String referenceToken = "referenceToken";
+
+    BankIdSessionImpl bankIdSessionImpl = new BankIdSessionImpl();
+    bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
+    bankIdSessionImpl.setCollectionType(BankIdSessionImpl.CollectionType.AUTH);
+    bankIdSessionImpl.setLastStatus("OUTSTANDING_TRANSACTION");
+
+    UserContext userContext = new UserContext();
+    userContext.setBankIdStatus(
+        new HashMap<String, BankIdSessionImpl>() {
+          {
             put(referenceToken, bankIdSessionImpl);
-        }});
+          }
+        });
 
-        when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
+    when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
 
+    FeignException ex =
+        FeignException.errorStatus(
+            "collect",
+            feign.Response.builder()
+                .status(500)
+                .headers(new HashMap<>())
+                .body("".getBytes())
+                .build());
+    when(memberService.collect(referenceToken, memberId)).thenThrow(ex);
 
-        BankIdCollectResponse response = new BankIdCollectResponse(BankIdProgressStatus.COMPLETE,  referenceToken, null);
-        when(memberService.collect(referenceToken, memberId)).thenReturn(response);
+    CollectService service = new CollectService(userContextRepository, memberService);
 
-        CollectService service = new CollectService(userContextRepository, memberService);
+    // ACT
 
-        BankIdCollectResponse expected = new BankIdCollectResponse(BankIdProgressStatus.COMPLETE, referenceToken, null);
+    assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus())
+        .isEqualTo(BankIdProgressStatus.OUTSTANDING_TRANSACTION);
+    bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
+    assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus())
+        .isEqualTo(BankIdProgressStatus.OUTSTANDING_TRANSACTION);
+    bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
+    assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus())
+        .isEqualTo(BankIdProgressStatus.OUTSTANDING_TRANSACTION);
+    bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
+    assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus())
+        .isEqualTo(BankIdProgressStatus.COMPLETE);
 
-        //ACT
+    // VERIFY
 
-        assertThat(service.collect(memberId, referenceToken, chat)).isEqualTo(expected);
+    verify(chat, times(1)).bankIdAuthGeneralCollectError(userContext);
+  }
 
-        //VERIFY
+  @Test
+  public void responseStatusIsCOMPLETE_AfterMany_SignComplete() {
 
-        verify(chat, times(1)).memberSigned(referenceToken, userContext);
+    final String memberId = "1234";
+    final String referenceToken = "referenceToken";
 
-    }
+    BankIdSessionImpl bankIdSessionImpl = new BankIdSessionImpl();
+    bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
+    bankIdSessionImpl.setCollectionType(BankIdSessionImpl.CollectionType.SIGN);
+    bankIdSessionImpl.setLastStatus("OUTSTANDING_TRANSACTION");
 
-
-    @Test
-    public void responseStatusIsCOMPLETE_AfterMany_SignError() {
-
-        final String memberId = "1234";
-        final String referenceToken = "referenceToken";
-
-
-        BankIdSessionImpl bankIdSessionImpl = new BankIdSessionImpl();
-        bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
-        bankIdSessionImpl.setCollectionType(BankIdSessionImpl.CollectionType.SIGN);
-        bankIdSessionImpl.setLastStatus("OUTSTANDING_TRANSACTION");
-
-        UserContext userContext = new UserContext();
-        userContext.setBankIdStatus(new HashMap<String, BankIdSessionImpl>(){{
+    UserContext userContext = new UserContext();
+    userContext.setBankIdStatus(
+        new HashMap<String, BankIdSessionImpl>() {
+          {
             put(referenceToken, bankIdSessionImpl);
-        }});
+          }
+        });
 
-        when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
+    when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
 
-        FeignException ex = FeignException.errorStatus("collect",
-                feign.Response.builder().status(500).headers(new HashMap<>()).body("".getBytes()).build());
-        when(memberService.collect(referenceToken, memberId)).thenThrow(ex);
+    BankIdCollectResponse response =
+        new BankIdCollectResponse(BankIdProgressStatus.COMPLETE, referenceToken, null);
+    when(memberService.collect(referenceToken, memberId)).thenReturn(response);
 
-        CollectService service = new CollectService(userContextRepository, memberService);
+    CollectService service = new CollectService(userContextRepository, memberService);
 
+    BankIdCollectResponse expected =
+        new BankIdCollectResponse(BankIdProgressStatus.COMPLETE, referenceToken, null);
 
-        //ACT
+    // ACT
 
-        assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus()).isEqualTo(BankIdProgressStatus.OUTSTANDING_TRANSACTION);
-        bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
-        assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus()).isEqualTo(BankIdProgressStatus.OUTSTANDING_TRANSACTION);
-        bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
-        assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus()).isEqualTo(BankIdProgressStatus.OUTSTANDING_TRANSACTION);
-        bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
-        assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus()).isEqualTo(BankIdProgressStatus.COMPLETE);
-        bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
-        assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus()).isEqualTo(BankIdProgressStatus.COMPLETE);
+    assertThat(service.collect(memberId, referenceToken, chat)).isEqualTo(expected);
 
-        //VERIFY
+    // VERIFY
 
-        verify(chat, times(1)).bankIdSignError(userContext);
+    verify(chat, times(1)).memberSigned(referenceToken, userContext);
+  }
 
-    }
+  @Test
+  public void responseStatusIsCOMPLETE_AfterMany_SignError() {
 
+    final String memberId = "1234";
+    final String referenceToken = "referenceToken";
+
+    BankIdSessionImpl bankIdSessionImpl = new BankIdSessionImpl();
+    bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
+    bankIdSessionImpl.setCollectionType(BankIdSessionImpl.CollectionType.SIGN);
+    bankIdSessionImpl.setLastStatus("OUTSTANDING_TRANSACTION");
+
+    UserContext userContext = new UserContext();
+    userContext.setBankIdStatus(
+        new HashMap<String, BankIdSessionImpl>() {
+          {
+            put(referenceToken, bankIdSessionImpl);
+          }
+        });
+
+    when(userContextRepository.findByMemberId(memberId)).thenReturn(Optional.of(userContext));
+
+    FeignException ex =
+        FeignException.errorStatus(
+            "collect",
+            feign.Response.builder()
+                .status(500)
+                .headers(new HashMap<>())
+                .body("".getBytes())
+                .build());
+    when(memberService.collect(referenceToken, memberId)).thenThrow(ex);
+
+    CollectService service = new CollectService(userContextRepository, memberService);
+
+    // ACT
+
+    assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus())
+        .isEqualTo(BankIdProgressStatus.OUTSTANDING_TRANSACTION);
+    bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
+    assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus())
+        .isEqualTo(BankIdProgressStatus.OUTSTANDING_TRANSACTION);
+    bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
+    assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus())
+        .isEqualTo(BankIdProgressStatus.OUTSTANDING_TRANSACTION);
+    bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
+    assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus())
+        .isEqualTo(BankIdProgressStatus.COMPLETE);
+    bankIdSessionImpl.setLastCallTime(Instant.now().minusSeconds(2));
+    assertThat(service.collect(memberId, referenceToken, chat).getBankIdStatus())
+        .isEqualTo(BankIdProgressStatus.COMPLETE);
+
+    // VERIFY
+
+    verify(chat, times(1)).bankIdSignError(userContext);
+  }
 }

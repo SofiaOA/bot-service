@@ -25,106 +25,111 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class ClaimsConversationTest {
 
-    public static final String AUDIO_RECORDING_URL = "https://someS3.com/someUUID";
-    @Mock
-    private
-    ApplicationEventPublisher eventPublisher;
+  public static final String AUDIO_RECORDING_URL = "https://someS3.com/someUUID";
+  @Mock private ApplicationEventPublisher eventPublisher;
 
-    @Mock
-    private ClaimsService claimsService;
+  @Mock private ClaimsService claimsService;
 
-    @Mock
-    private ProductPricingService productPricingService;
+  @Mock private ProductPricingService productPricingService;
 
-    @Mock
-    private ConversationFactory conversationFactory;
+  @Mock private ConversationFactory conversationFactory;
 
-    private ClaimsConversation testConversation;
-    private UserContext userContext;
+  private ClaimsConversation testConversation;
+  private UserContext userContext;
 
-    @Before
-    public void setUp() {
+  @Before
+  public void setUp() {
 
-        testConversation = new ClaimsConversation(eventPublisher, claimsService, productPricingService, conversationFactory);
-        userContext = new UserContext(TOLVANSSON_MEMBER_ID);
-    }
+    testConversation =
+        new ClaimsConversation(
+            eventPublisher, claimsService, productPricingService, conversationFactory);
+    userContext = new UserContext(TOLVANSSON_MEMBER_ID);
+  }
 
+  @Test
+  public void AudioReceived_SendsClaimAudioReceivedEvent_AndCreatesClaimInClaimsService() {
+    Message m = testConversation.getMessage("message.claims.audio");
+    val body = (MessageBodyAudio) m.body;
+    body.url = AUDIO_RECORDING_URL;
+    testConversation.receiveMessage(userContext, m);
 
-    @Test
-    public void AudioReceived_SendsClaimAudioReceivedEvent_AndCreatesClaimInClaimsService() {
-        Message m = testConversation.getMessage("message.claims.audio");
-        val body = (MessageBodyAudio) m.body;
-        body.url = AUDIO_RECORDING_URL;
-        testConversation.receiveMessage(userContext, m);
+    then(eventPublisher)
+        .should()
+        .publishEvent(new ClaimAudioReceivedEvent(userContext.getMemberId()));
+    then(claimsService).should().createClaimFromAudio(anyString(), eq(AUDIO_RECORDING_URL));
+  }
 
+  @Test
+  public void init_WhenMemberInsuranceIsInactive_StartsNotActiveFlow() {
+    when(productPricingService.isMemberInsuranceActive(TOLVANSSON_MEMBER_ID)).thenReturn(false);
 
-        then(eventPublisher).should().publishEvent(new ClaimAudioReceivedEvent(userContext.getMemberId()));
-        then(claimsService).should().createClaimFromAudio(anyString(), eq(AUDIO_RECORDING_URL));
-    }
+    testConversation.init(userContext);
 
+    Message msg;
+    boolean messageIsParagraph;
+    int i = 0;
+    do {
+      msg = Iterables.getLast(userContext.getMemberChat().chatHistory);
+      messageIsParagraph = MessageBodyParagraph.class.isInstance(msg.body);
+      if (messageIsParagraph) {
+        testConversation.receiveEvent(Conversation.EventTypes.MESSAGE_FETCHED, msg.id, userContext);
+      }
+    } while (messageIsParagraph && i++ < 20);
 
-    @Test
-    public void init_WhenMemberInsuranceIsInactive_StartsNotActiveFlow() {
-        when(productPricingService.isMemberInsuranceActive(TOLVANSSON_MEMBER_ID)).thenReturn(false);
+    assertThat(msg.body).isNotInstanceOf(MessageBodyParagraph.class);
+    assertThat(msg.id).startsWith(ClaimsConversation.MESSAGE_CLAIMS_NOT_ACTIVE);
+  }
 
-        testConversation.init(userContext);
+  @Test
+  public void init_WhenMemberInsuranceIsActive_StartsClaimFlow() {
+    when(productPricingService.isMemberInsuranceActive(TOLVANSSON_MEMBER_ID)).thenReturn(true);
 
-        Message msg;
-        boolean messageIsParagraph;
-        int i = 0;
-        do{
-            msg = Iterables.getLast(userContext.getMemberChat().chatHistory);
-            messageIsParagraph = MessageBodyParagraph.class.isInstance(msg.body);
-            if(messageIsParagraph) {
-                testConversation.receiveEvent(Conversation.EventTypes.MESSAGE_FETCHED, msg.id, userContext);
-            }
-        }
-        while(messageIsParagraph && i++ < 20);
+    testConversation.init(userContext);
 
-        assertThat(msg.body).isNotInstanceOf(MessageBodyParagraph.class);
-        assertThat(msg.id).startsWith(ClaimsConversation.MESSAGE_CLAIMS_NOT_ACTIVE);
-    }
+    assertThat(userContext.getMemberChat().chatHistory.get(0).id)
+        .startsWith(ClaimsConversation.MESSAGE_CLAIMS_START);
+  }
 
-    @Test
-    public void init_WhenMemberInsuranceIsActive_StartsClaimFlow() {
-        when(productPricingService.isMemberInsuranceActive(TOLVANSSON_MEMBER_ID)).thenReturn(true);
+  @Test
+  public void callMe_WhenMemberInsuranceIsActive_SendsClaimCallMeEventActiveTrue() {
+    when(productPricingService.isMemberInsuranceActive(TOLVANSSON_MEMBER_ID)).thenReturn(true);
 
-        testConversation.init(userContext);
+    Message m = testConversation.getMessage(ClaimsConversation.MESSAGE_CLAIM_CALLME);
+    m.body.text = TOLVANSSON_PHONE_NUMBER;
 
-        assertThat(userContext.getMemberChat().chatHistory.get(0).id).startsWith(ClaimsConversation.MESSAGE_CLAIMS_START);
-    }
+    testConversation.receiveMessage(userContext, m);
 
-    @Test
-    public void callMe_WhenMemberInsuranceIsActive_SendsClaimCallMeEventActiveTrue()  {
-        when(productPricingService.isMemberInsuranceActive(TOLVANSSON_MEMBER_ID)).thenReturn(true);
-
-        Message m = testConversation.getMessage(ClaimsConversation.MESSAGE_CLAIM_CALLME);
-        m.body.text = TOLVANSSON_PHONE_NUMBER;
-
-        testConversation.receiveMessage(userContext, m);
-
-        then(eventPublisher).should().publishEvent(new ClaimCallMeEvent(
+    then(eventPublisher)
+        .should()
+        .publishEvent(
+            new ClaimCallMeEvent(
                 userContext.getMemberId(),
                 userContext.getOnBoardingData().getFirstName(),
                 userContext.getOnBoardingData().getFamilyName(),
                 m.body.text,
                 true));
-    }
+  }
 
-    @Test
-    public void callMe_WhenMemberInsuranceIsInactive_SendsClaimCallMeEventActiveFalse()  {
-        when(productPricingService.isMemberInsuranceActive(TOLVANSSON_MEMBER_ID)).thenReturn(false);
+  @Test
+  public void callMe_WhenMemberInsuranceIsInactive_SendsClaimCallMeEventActiveFalse() {
+    when(productPricingService.isMemberInsuranceActive(TOLVANSSON_MEMBER_ID)).thenReturn(false);
 
-        Message m = testConversation.getMessage(ClaimsConversation.MESSAGE_CLAIM_CALLME);
-        m.body.text = TOLVANSSON_PHONE_NUMBER;
+    Message m = testConversation.getMessage(ClaimsConversation.MESSAGE_CLAIM_CALLME);
+    m.body.text = TOLVANSSON_PHONE_NUMBER;
 
-        testConversation.receiveMessage(userContext, m);
+    testConversation.receiveMessage(userContext, m);
 
-        then(eventPublisher).should().publishEvent(new ClaimCallMeEvent(userContext.getMemberId(), userContext.getOnBoardingData().getFirstName(), userContext.getOnBoardingData().getFamilyName(), m.body.text, false));
-    }
-
+    then(eventPublisher)
+        .should()
+        .publishEvent(
+            new ClaimCallMeEvent(
+                userContext.getMemberId(),
+                userContext.getOnBoardingData().getFirstName(),
+                userContext.getOnBoardingData().getFamilyName(),
+                m.body.text,
+                false));
+  }
 }

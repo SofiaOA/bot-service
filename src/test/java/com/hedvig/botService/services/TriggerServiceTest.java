@@ -27,198 +27,214 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class TriggerServiceTest {
 
-    public static final String TOLVANSSON_SSN = "19121212-1221";
-    public static final String TOLVANSSON_FIRSTNAME = "Tolvan";
-    public static final String TOLVANSSON_LAST_NAME = "Tolvansson";
-    public static final String TOLVANSSON_EMAIL = "tolvan@tolvansson.se";
-    public static final String TOLVANSSON_MEMBERID = "1337";
-    public static final String TRIGGER_URL = "http://localhost:8080";
-    public static final UUID ORDER_ID = UUID.randomUUID();
-    public static final UUID TRIGGER_ID = UUID.randomUUID();
-    public static final String IFRAME_URL = "https://trustly.com/iframeURL";
-    @Mock
-    DirectDebitRepository repo;
+  public static final String TOLVANSSON_SSN = "19121212-1221";
+  public static final String TOLVANSSON_FIRSTNAME = "Tolvan";
+  public static final String TOLVANSSON_LAST_NAME = "Tolvansson";
+  public static final String TOLVANSSON_EMAIL = "tolvan@tolvansson.se";
+  public static final String TOLVANSSON_MEMBERID = "1337";
+  public static final String TRIGGER_URL = "http://localhost:8080";
+  public static final UUID ORDER_ID = UUID.randomUUID();
+  public static final UUID TRIGGER_ID = UUID.randomUUID();
+  public static final String IFRAME_URL = "https://trustly.com/iframeURL";
+  @Mock DirectDebitRepository repo;
 
-    @Mock
-    PaymentService pService;
+  @Mock PaymentService pService;
 
-    private TriggerService sut;
+  private TriggerService sut;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+  @Rule public ExpectedException thrown = ExpectedException.none();
 
-    private UUID generatedTriggerId;
-    ;
+  private UUID generatedTriggerId;;
 
-    @Before
-    public void setUp(){
+  @Before
+  public void setUp() {
 
-        sut = new TriggerService(repo, pService);
+    sut = new TriggerService(repo, pService);
 
-        given(repo.save(any(DirectDebitMandateTrigger.class))).will(x -> {
-            x.getArgumentAt(0, DirectDebitMandateTrigger.class).setId(generatedTriggerId);
-            return x;
-        });
-    }
+    given(repo.save(any(DirectDebitMandateTrigger.class)))
+        .will(
+            x -> {
+              x.getArgumentAt(0, DirectDebitMandateTrigger.class).setId(generatedTriggerId);
+              return x;
+            });
+  }
 
-    @Test
-    public void createDirecteDebitMandate_returns_triggerUUID(){
-        //arrange
+  @Test
+  public void createDirecteDebitMandate_returns_triggerUUID() {
+    // arrange
 
-        generatedTriggerId = UUID.randomUUID();
+    generatedTriggerId = UUID.randomUUID();
 
-        CreateDirectDebitMandateDTO requestData =
-                directDebitMandateRequest(TOLVANSSON_SSN, TOLVANSSON_FIRSTNAME, TOLVANSSON_LAST_NAME, TOLVANSSON_EMAIL);
+    CreateDirectDebitMandateDTO requestData =
+        directDebitMandateRequest(
+            TOLVANSSON_SSN, TOLVANSSON_FIRSTNAME, TOLVANSSON_LAST_NAME, TOLVANSSON_EMAIL);
 
+    // act
+    UUID triggerId = sut.createTrustlyDirectDebitMandate(requestData, TOLVANSSON_MEMBERID);
 
-        //act
-        UUID triggerId = sut.createTrustlyDirectDebitMandate(requestData, TOLVANSSON_MEMBERID);
+    // assert
+    assertThat(triggerId).isNotNull();
+  }
 
-        //assert
-        assertThat(triggerId).isNotNull();
-    }
+  @Test
+  public void createDirectDebitmandate_saves_DirectDebitMandate() {
+    // arrange
+    generatedTriggerId = UUID.randomUUID();
 
-    @Test
-    public void createDirectDebitmandate_saves_DirectDebitMandate(){
-        //arrange
-        generatedTriggerId = UUID.randomUUID();
+    CreateDirectDebitMandateDTO requestData =
+        directDebitMandateRequest(
+            TOLVANSSON_SSN, TOLVANSSON_FIRSTNAME, TOLVANSSON_LAST_NAME, TOLVANSSON_EMAIL);
 
-        CreateDirectDebitMandateDTO requestData =
-                directDebitMandateRequest(TOLVANSSON_SSN, TOLVANSSON_FIRSTNAME, TOLVANSSON_LAST_NAME, TOLVANSSON_EMAIL);
+    // act
 
-        //act
+    final UUID triggerURL = sut.createTrustlyDirectDebitMandate(requestData, TOLVANSSON_MEMBERID);
 
-        final UUID triggerURL = sut.createTrustlyDirectDebitMandate(requestData, TOLVANSSON_MEMBERID);
+    // assert
 
-        //assert
+    assertThat(triggerURL).isEqualByComparingTo(generatedTriggerId);
+  }
 
-        assertThat(triggerURL).isEqualByComparingTo(generatedTriggerId);
-    }
+  @Captor ArgumentCaptor<DirectDebitMandateTrigger> mandateCaptor;
 
-    @Captor
-    ArgumentCaptor<DirectDebitMandateTrigger> mandateCaptor;
+  @Test
+  public void getTriggerUrl_willCall_paymentService() {
+    // arrange
+    UUID triggerId = UUID.randomUUID();
 
-    @Test
-    public void getTriggerUrl_willCall_paymentService() {
-        //arrange
-        UUID triggerId = UUID.randomUUID();
+    DirectDebitMandateTrigger ddm =
+        createDirectDebitMandateTrigger(triggerId, null, TOLVANSSON_MEMBERID);
+    given(repo.findOne(triggerId)).willReturn(ddm);
 
-        DirectDebitMandateTrigger ddm = createDirectDebitMandateTrigger(triggerId, null, TOLVANSSON_MEMBERID);
-        given(repo.findOne(triggerId)).willReturn(ddm);
+    given(
+            pService.registerTrustlyDirectDebit(
+                TOLVANSSON_FIRSTNAME,
+                TOLVANSSON_LAST_NAME,
+                TOLVANSSON_SSN,
+                TOLVANSSON_MEMBERID,
+                triggerId))
+        .willReturn(new DirectDebitResponse(TRIGGER_URL, ORDER_ID.toString()));
 
-        given(pService.registerTrustlyDirectDebit(TOLVANSSON_FIRSTNAME, TOLVANSSON_LAST_NAME, TOLVANSSON_SSN, TOLVANSSON_MEMBERID, triggerId)).willReturn(new DirectDebitResponse(TRIGGER_URL,ORDER_ID.toString()));
+    // act
 
-        //act
+    final String actualTriggerUrl = sut.getTriggerUrl(triggerId, TOLVANSSON_MEMBERID);
 
-        final String actualTriggerUrl = sut.getTriggerUrl(triggerId, TOLVANSSON_MEMBERID);
+    // assert
+    assertThat(actualTriggerUrl).isEqualTo(TRIGGER_URL);
+    then(repo).should().save(mandateCaptor.capture());
+    assertThat(mandateCaptor.getValue().getUrl()).isEqualTo(TRIGGER_URL);
+    assertThat(mandateCaptor.getValue().getOrderId()).isEqualTo(ORDER_ID.toString());
+  }
 
-        //assert
-        assertThat(actualTriggerUrl).isEqualTo(TRIGGER_URL);
-        then(repo).should().save(mandateCaptor.capture());
-        assertThat(mandateCaptor.getValue().getUrl()).isEqualTo(TRIGGER_URL);
-        assertThat(mandateCaptor.getValue().getOrderId()).isEqualTo(ORDER_ID.toString());
+  @Test
+  public void getTriggerUrl_willNotCall_paymentService_WhenTriggerHasURL() {
 
-    }
+    // arrange
+    UUID triggerId = UUID.randomUUID();
+    DirectDebitMandateTrigger ddm =
+        createDirectDebitMandateTrigger(triggerId, TRIGGER_URL, TOLVANSSON_MEMBERID);
 
-    @Test
-    public void getTriggerUrl_willNotCall_paymentService_WhenTriggerHasURL() {
+    given(repo.findOne(triggerId)).willReturn(ddm);
 
-        //arrange
-        UUID triggerId = UUID.randomUUID();
-        DirectDebitMandateTrigger ddm = createDirectDebitMandateTrigger(triggerId, TRIGGER_URL, TOLVANSSON_MEMBERID);
+    // act
+    final String actualTriggerUrl = sut.getTriggerUrl(triggerId, TOLVANSSON_MEMBERID);
 
-        given(repo.findOne(triggerId)).willReturn(ddm);
+    // assert
+    assertThat(actualTriggerUrl).isEqualTo(TRIGGER_URL);
+    then(pService).should(never()).registerTrustlyDirectDebit(any(), any(), any(), any(), any());
+  }
 
-        //act
-        final String actualTriggerUrl = sut.getTriggerUrl(triggerId, TOLVANSSON_MEMBERID);
+  @Test
+  public void getTriggerUrl_willThrow_UnathorizedException_if_memberIdDoesNotMatch() {
+    // arrange
 
-        //assert
-        assertThat(actualTriggerUrl).isEqualTo(TRIGGER_URL);
-        then(pService).should(never()).registerTrustlyDirectDebit(any(),any(),any(),any(),any());
-    }
+    DirectDebitMandateTrigger ddm =
+        createDirectDebitMandateTrigger(TRIGGER_ID, TRIGGER_URL, TOLVANSSON_MEMBERID);
+    given(repo.findOne(TRIGGER_ID)).willReturn(ddm);
 
-    @Test
-    public void getTriggerUrl_willThrow_UnathorizedException_if_memberIdDoesNotMatch() {
-        //arrange
+    // act
+    thrown.expect(UnathorizedException.class);
+    sut.getTriggerUrl(TRIGGER_ID, "1338");
 
-        DirectDebitMandateTrigger ddm = createDirectDebitMandateTrigger(TRIGGER_ID, TRIGGER_URL, TOLVANSSON_MEMBERID);
-        given(repo.findOne(TRIGGER_ID)).willReturn(ddm);
+    // assert
 
-        //act
-        thrown.expect(UnathorizedException.class);
-        sut.getTriggerUrl(TRIGGER_ID, "1338");
+  }
 
-        //assert
+  @Test
+  public void
+      GIVEN_directDebitTriggerWithStatusNull_THEN_getTrustlyOrderInformation_WILL_callPaymentService() {
 
-    }
+    DirectDebitMandateTrigger ddm =
+        createDirectDebitMandateTrigger(TRIGGER_ID, TRIGGER_URL, TOLVANSSON_MEMBERID);
+    given(repo.findOne(TRIGGER_ID)).willReturn(ddm);
 
-    @Test
-    public void GIVEN_directDebitTriggerWithStatusNull_THEN_getTrustlyOrderInformation_WILL_callPaymentService() {
+    getTrustlyOrderInformationWillReturnGiven(OrderState.COMPLETE, ddm.getOrderId());
 
-        DirectDebitMandateTrigger ddm = createDirectDebitMandateTrigger(TRIGGER_ID, TRIGGER_URL, TOLVANSSON_MEMBERID);
-        given(repo.findOne(TRIGGER_ID)).willReturn(ddm);
+    final DirectDebitMandateTrigger.TriggerStatus trustlyOrderInformation =
+        sut.getTrustlyOrderInformation(TRIGGER_ID.toString());
 
-        getTrustlyOrderInformationWillReturnGiven(OrderState.COMPLETE, ddm.getOrderId());
+    assertThat(trustlyOrderInformation).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.SUCCESS);
+    assertThat(ddm.getStatus()).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.SUCCESS);
+  }
 
-        final DirectDebitMandateTrigger.TriggerStatus trustlyOrderInformation = sut.getTrustlyOrderInformation(TRIGGER_ID.toString());
+  public void getTrustlyOrderInformationWillReturnGiven(OrderState returns, String given) {
+    given(this.pService.getTrustlyOrderInformation(given))
+        .willReturn(new OrderInformation(ORDER_ID, IFRAME_URL, returns));
+  }
 
-        assertThat(trustlyOrderInformation).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.SUCCESS);
-        assertThat(ddm.getStatus()).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.SUCCESS);
-    }
+  @Test
+  public void
+      GIVEN_directDebitTriggerWithStatusCOMPLETE_THEN_getTrustlyOrderInformation_WILL_NotCallPaymentService() {
 
-    public void getTrustlyOrderInformationWillReturnGiven(OrderState returns, String given) {
-        given(this.pService.getTrustlyOrderInformation(given)).willReturn(new OrderInformation(ORDER_ID, IFRAME_URL, returns));
-    }
+    DirectDebitMandateTrigger ddm =
+        createDirectDebitMandateTrigger(TRIGGER_ID, TRIGGER_URL, TOLVANSSON_MEMBERID);
 
-    @Test
-    public void GIVEN_directDebitTriggerWithStatusCOMPLETE_THEN_getTrustlyOrderInformation_WILL_NotCallPaymentService() {
+    given(repo.findOne(TRIGGER_ID)).willReturn(ddm);
+    getTrustlyOrderInformationWillReturnGiven(OrderState.CANCELED, ddm.getOrderId());
 
-        DirectDebitMandateTrigger ddm = createDirectDebitMandateTrigger(TRIGGER_ID, TRIGGER_URL, TOLVANSSON_MEMBERID);
+    final DirectDebitMandateTrigger.TriggerStatus trustlyOrderInformation =
+        sut.getTrustlyOrderInformation(TRIGGER_ID.toString());
 
-        given(repo.findOne(TRIGGER_ID)).willReturn(ddm);
-        getTrustlyOrderInformationWillReturnGiven(OrderState.CANCELED, ddm.getOrderId());
+    assertThat(trustlyOrderInformation).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.FAILED);
+    assertThat(ddm.getStatus()).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.FAILED);
+  }
 
-        final DirectDebitMandateTrigger.TriggerStatus trustlyOrderInformation = sut.getTrustlyOrderInformation(TRIGGER_ID.toString());
+  @Test
+  public void
+      GIVEN_getTrustlyOrderInformationCONFIRMED_THEN_directdebittriggerStatus_WILL_EQ_IN_PROGRESS() {
 
-        assertThat(trustlyOrderInformation).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.FAILED);
-        assertThat(ddm.getStatus()).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.FAILED);
-    }
+    DirectDebitMandateTrigger ddm =
+        createDirectDebitMandateTrigger(TRIGGER_ID, TRIGGER_URL, TOLVANSSON_MEMBERID);
 
-    @Test
-    public void GIVEN_getTrustlyOrderInformationCONFIRMED_THEN_directdebittriggerStatus_WILL_EQ_IN_PROGRESS() {
+    given(repo.findOne(TRIGGER_ID)).willReturn(ddm);
+    getTrustlyOrderInformationWillReturnGiven(OrderState.CONFIRMED, ddm.getOrderId());
 
-        DirectDebitMandateTrigger ddm = createDirectDebitMandateTrigger(TRIGGER_ID, TRIGGER_URL, TOLVANSSON_MEMBERID);
+    final DirectDebitMandateTrigger.TriggerStatus trustlyOrderInformation =
+        sut.getTrustlyOrderInformation(TRIGGER_ID.toString());
 
+    assertThat(trustlyOrderInformation)
+        .isEqualTo(DirectDebitMandateTrigger.TriggerStatus.IN_PROGRESS);
+    assertThat(ddm.getStatus()).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.IN_PROGRESS);
+  }
 
-        given(repo.findOne(TRIGGER_ID)).willReturn(ddm);
-        getTrustlyOrderInformationWillReturnGiven(OrderState.CONFIRMED, ddm.getOrderId());
+  private CreateDirectDebitMandateDTO directDebitMandateRequest(
+      String ssn, String firstName, String lastName, String email) {
+    return new CreateDirectDebitMandateDTO(ssn, firstName, lastName, email);
+  }
 
-        final DirectDebitMandateTrigger.TriggerStatus trustlyOrderInformation = sut.getTrustlyOrderInformation(TRIGGER_ID.toString());
-
-        assertThat(trustlyOrderInformation).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.IN_PROGRESS);
-        assertThat(ddm.getStatus()).isEqualTo(DirectDebitMandateTrigger.TriggerStatus.IN_PROGRESS);
-    }
-
-
-    private CreateDirectDebitMandateDTO directDebitMandateRequest(String ssn, String firstName, String lastName, String email) {
-        return new CreateDirectDebitMandateDTO(ssn, firstName, lastName, email);
-    }
-
-    private DirectDebitMandateTrigger createDirectDebitMandateTrigger(UUID triggerId, String triggerUrl, String tolvanssonMemberid) {
-        DirectDebitMandateTrigger ddm = new DirectDebitMandateTrigger();
-        ddm.setId(triggerId);
-        ddm.setSsn(TOLVANSSON_SSN);
-        ddm.setFirstName(TOLVANSSON_FIRSTNAME);
-        ddm.setLastName(TOLVANSSON_LAST_NAME);
-        ddm.setEmail(TOLVANSSON_EMAIL);
-        ddm.setUrl(triggerUrl);
-        ddm.setMemberId(tolvanssonMemberid);
-        ddm.setOrderId(ORDER_ID.toString());
-        return ddm;
-    }
-
+  private DirectDebitMandateTrigger createDirectDebitMandateTrigger(
+      UUID triggerId, String triggerUrl, String tolvanssonMemberid) {
+    DirectDebitMandateTrigger ddm = new DirectDebitMandateTrigger();
+    ddm.setId(triggerId);
+    ddm.setSsn(TOLVANSSON_SSN);
+    ddm.setFirstName(TOLVANSSON_FIRSTNAME);
+    ddm.setLastName(TOLVANSSON_LAST_NAME);
+    ddm.setEmail(TOLVANSSON_EMAIL);
+    ddm.setUrl(triggerUrl);
+    ddm.setMemberId(tolvanssonMemberid);
+    ddm.setOrderId(ORDER_ID.toString());
+    return ddm;
+  }
 }

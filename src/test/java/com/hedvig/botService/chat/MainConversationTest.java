@@ -19,53 +19,56 @@ import static org.mockito.BDDMockito.then;
 @RunWith(MockitoJUnitRunner.class)
 public class MainConversationTest {
 
-    public static final String QUESTION = "A short but sweet question";
-    @Mock
-    ApplicationEventPublisher eventPublisher;
+  public static final String QUESTION = "A short but sweet question";
+  @Mock ApplicationEventPublisher eventPublisher;
 
-    @Mock
-    ConversationFactory conversationFactory;
+  @Mock ConversationFactory conversationFactory;
 
-    @Mock
-    ProductPricingService productPricingService;
+  @Mock ProductPricingService productPricingService;
 
-    @Mock
-    Environment springEnvironment;
+  @Mock Environment springEnvironment;
 
-    MainConversation testConversation;
-    UserContext uc;
+  MainConversation testConversation;
+  UserContext uc;
 
-    @Before
-    public void setup() {
-        testConversation = new MainConversation(productPricingService, conversationFactory, eventPublisher);
+  @Before
+  public void setup() {
+    testConversation =
+        new MainConversation(productPricingService, conversationFactory, eventPublisher);
 
-        uc = new UserContext(TOLVANSSON_MEMBER_ID);
-    }
+    uc = new UserContext(TOLVANSSON_MEMBER_ID);
+  }
 
-    @Test
-    public void recieveMessage() throws Exception {
-        Message m = testConversation.getMessage(MainConversation.MESSAGE_MAIN_CALLME);
-        m.body.text = TOLVANSSON_PHONE_NUMBER;
+  @Test
+  public void recieveMessage() throws Exception {
+    Message m = testConversation.getMessage(MainConversation.MESSAGE_MAIN_CALLME);
+    m.body.text = TOLVANSSON_PHONE_NUMBER;
 
-        uc.getOnBoardingData().setFirstName(TOLVANSSON_FIRSTNAME);
-        uc.getOnBoardingData().setFamilyName(TOLVANSSON_LASTNAME);
+    uc.getOnBoardingData().setFirstName(TOLVANSSON_FIRSTNAME);
+    uc.getOnBoardingData().setFamilyName(TOLVANSSON_LASTNAME);
 
-        testConversation.receiveMessage(uc, m);
+    testConversation.receiveMessage(uc, m);
 
-        then(eventPublisher).should().publishEvent(new RequestPhoneCallEvent(TOLVANSSON_MEMBER_ID, TOLVANSSON_PHONE_NUMBER , TOLVANSSON_FIRSTNAME, TOLVANSSON_LASTNAME));
-    }
+    then(eventPublisher)
+        .should()
+        .publishEvent(
+            new RequestPhoneCallEvent(
+                TOLVANSSON_MEMBER_ID,
+                TOLVANSSON_PHONE_NUMBER,
+                TOLVANSSON_FIRSTNAME,
+                TOLVANSSON_LASTNAME));
+  }
 
-    @Test
-    public void GIVEN_MessageQuestion_SHOULD_sendQuestionAskedEvent() {
+  @Test
+  public void GIVEN_MessageQuestion_SHOULD_sendQuestionAskedEvent() {
 
-        Message m = testConversation.getMessage(MainConversation.MESSAGE_MAIN_QUESTION);
-        m.body.text = QUESTION;
+    Message m = testConversation.getMessage(MainConversation.MESSAGE_MAIN_QUESTION);
+    m.body.text = QUESTION;
 
-        testConversation.receiveMessage(uc, m);
+    testConversation.receiveMessage(uc, m);
 
-        then(eventPublisher).should().publishEvent(new QuestionAskedEvent(TOLVANSSON_MEMBER_ID, QUESTION));
-
-
-    }
-
+    then(eventPublisher)
+        .should()
+        .publishEvent(new QuestionAskedEvent(TOLVANSSON_MEMBER_ID, QUESTION));
+  }
 }

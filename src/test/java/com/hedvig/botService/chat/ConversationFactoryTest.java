@@ -1,6 +1,5 @@
 package com.hedvig.botService.chat;
 
-
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
@@ -24,59 +23,62 @@ import static org.mockito.BDDMockito.given;
 @RunWith(Parameterized.class)
 public class ConversationFactoryTest {
 
-    private final Class<?> conversationClass;
+  private final Class<?> conversationClass;
 
-    @Mock
-    private MemberService memberService;
+  @Mock private MemberService memberService;
 
-    @Mock
-    private ProductPricingService productPricingService;
+  @Mock private ProductPricingService productPricingService;
 
-    @Mock
-    ClaimsService claimsService;
+  @Mock ClaimsService claimsService;
 
-    @Mock
-    SignupCodeRepository signupCodeRepository;
+  @Mock SignupCodeRepository signupCodeRepository;
 
-    @Mock
-    private TriggerService triggerService;
+  @Mock private TriggerService triggerService;
 
-    @Mock
-    ApplicationEventPublisher applicationEventPublisher;
+  @Mock ApplicationEventPublisher applicationEventPublisher;
 
-    @Mock
-    StatusBuilder statusBuilder;
+  @Mock StatusBuilder statusBuilder;
 
-    @Mock
-    Environment springEnvironment;
+  @Mock Environment springEnvironment;
 
-    @Parameterized.Parameters
-    public static Collection<Object> data() {
-        return Arrays.asList(new Object[] {
-                TrustlyConversation.class,
-                ClaimsConversation.class,
-                CharityConversation.class,
-                MainConversation.class,
-                OnboardingConversationDevi.class});
-    }
+  @Parameterized.Parameters
+  public static Collection<Object> data() {
+    return Arrays.asList(
+        new Object[] {
+          TrustlyConversation.class,
+          ClaimsConversation.class,
+          CharityConversation.class,
+          MainConversation.class,
+          OnboardingConversationDevi.class
+        });
+  }
 
-    public ConversationFactoryTest(Class<?> conversationClass) {
-        this.conversationClass = conversationClass;
-    }
+  public ConversationFactoryTest(Class<?> conversationClass) {
+    this.conversationClass = conversationClass;
+  }
 
-    @Before
-    public void setUp() {
-        springEnvironment = Mockito.mock(Environment.class);
-        given(springEnvironment.acceptsProfiles("development")).willReturn(true);
-    }
+  @Before
+  public void setUp() {
+    springEnvironment = Mockito.mock(Environment.class);
+    given(springEnvironment.acceptsProfiles("development")).willReturn(true);
+  }
 
-    @Test
-    public void test(){
-        ConversationFactory factory = new ConversationFactoryImpl(memberService, productPricingService, triggerService, signupCodeRepository, applicationEventPublisher, claimsService, statusBuilder, 0);
+  @Test
+  public void test() {
+    ConversationFactory factory =
+        new ConversationFactoryImpl(
+            memberService,
+            productPricingService,
+            triggerService,
+            signupCodeRepository,
+            applicationEventPublisher,
+            claimsService,
+            statusBuilder,
+            0);
 
-        Conversation conversation = factory.createConversation(conversationClass);
+    Conversation conversation = factory.createConversation(conversationClass);
 
-        assertThat(conversation).isNotNull();
-        assertThat(conversation).isInstanceOf(conversationClass);
-    }
+    assertThat(conversation).isNotNull();
+    assertThat(conversation).isInstanceOf(conversationClass);
+  }
 }

@@ -25,60 +25,56 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 @ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = InternalMessagesController.class)
 @ContextConfiguration(classes = BotServiceApplicationTests.class)
 public class InternalMessagesControllerTest {
 
-    @MockBean
-    private SessionManager sessionManager;
+  @MockBean private SessionManager sessionManager;
 
-    @MockBean
-    private MessageRepository messageRepository;
+  @MockBean private MessageRepository messageRepository;
 
-    @Autowired
-    MockMvc mockMvc;
+  @Autowired MockMvc mockMvc;
 
-    @Autowired
-    ObjectMapper objectMapper;
+  @Autowired ObjectMapper objectMapper;
 
-    @Before
-    public void setUp() {
+  @Before
+  public void setUp() {}
 
-    }
+  @Test
+  public void givenConversationThatCanAcceptMessage_whenAddingMessage_shouldReturn204()
+      throws Exception {
 
-    @Test
-    public void givenConversationThatCanAcceptMessage_whenAddingMessage_shouldReturn204() throws Exception {
+    when(sessionManager.addMessageFromHedvig(any())).thenReturn(true);
 
-        when(sessionManager.addMessageFromHedvig(any())).thenReturn(true);
+    ResultActions perform =
+        mockMvc.perform(
+            post("/_/messages/addmessage")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .content(
+                    objectMapper.writeValueAsBytes(
+                        new AddMessageRequestDTO(TOLVANSSON_MEMBERID, "Hejsan!"))));
 
-        ResultActions perform = mockMvc.perform(
-                post("/_/messages/addmessage").
-                        contentType(MediaType.APPLICATION_JSON).
-                        accept(MediaType.APPLICATION_JSON_UTF8).
-                        content(objectMapper.writeValueAsBytes(new AddMessageRequestDTO(TOLVANSSON_MEMBERID, "Hejsan!"))));
+    perform.andExpect(status().isNoContent());
+  }
 
-        perform.andExpect(status().isNoContent());
+  @Test
+  public void givenConversationThatCanNotAcceptMessage_whenAddingMessage_shouldReturn204()
+      throws Exception {
 
+    when(sessionManager.addMessageFromHedvig(any())).thenReturn(false);
 
-    }
+    ResultActions perform =
+        mockMvc.perform(
+            post("/_/messages/addmessage")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON_UTF8)
+                .content(
+                    objectMapper.writeValueAsBytes(
+                        new AddMessageRequestDTO(TOLVANSSON_MEMBERID, "Hejsan!"))));
 
-    @Test
-    public void givenConversationThatCanNotAcceptMessage_whenAddingMessage_shouldReturn204() throws Exception {
-
-        when(sessionManager.addMessageFromHedvig(any())).thenReturn(false);
-
-        ResultActions perform = mockMvc.perform(
-                post("/_/messages/addmessage").
-                        contentType(MediaType.APPLICATION_JSON).
-                        accept(MediaType.APPLICATION_JSON_UTF8).
-                        content(objectMapper.writeValueAsBytes(new AddMessageRequestDTO(TOLVANSSON_MEMBERID, "Hejsan!"))));
-
-        perform.andExpect(status().isForbidden());
-
-
-    }
-
+    perform.andExpect(status().isForbidden());
+  }
 }

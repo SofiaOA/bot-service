@@ -22,54 +22,50 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = HedvigController.class)
-@ContextConfiguration(classes=BotServiceApplicationTests.class)
+@ContextConfiguration(classes = BotServiceApplicationTests.class)
 @ActiveProfiles("test")
 public class HedvigControllerTest {
 
-    @MockBean
-    private
-    SessionManager sessionManager;
+  @MockBean private SessionManager sessionManager;
 
-    @MockBean
-    ProductPricingService productPricingService;
+  @MockBean ProductPricingService productPricingService;
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @Test
-    public void collect() throws Exception {
-        final String referenceToken = "someReferenceToken";
-        final String memberId = "1337";
+  @Test
+  public void collect() throws Exception {
+    final String referenceToken = "someReferenceToken";
+    final String memberId = "1337";
 
-        BankIdCollectResponse mockedCollectResponse = new BankIdCollectResponse(BankIdProgressStatus.COMPLETE, referenceToken, memberId);
+    BankIdCollectResponse mockedCollectResponse =
+        new BankIdCollectResponse(BankIdProgressStatus.COMPLETE, referenceToken, memberId);
 
-        when(sessionManager.collect(memberId, referenceToken)).thenReturn(mockedCollectResponse);
+    when(sessionManager.collect(memberId, referenceToken)).thenReturn(mockedCollectResponse);
 
-        mockMvc
-                .perform(
-                        post("/hedvig/collect")
-                        .param("referenceToken", referenceToken)
-                        .header("hedvig.token", memberId))
-                .andExpect(jsonPath("$.bankIdStatus").value("COMPLETE"));
+    mockMvc
+        .perform(
+            post("/hedvig/collect")
+                .param("referenceToken", referenceToken)
+                .header("hedvig.token", memberId))
+        .andExpect(jsonPath("$.bankIdStatus").value("COMPLETE"));
+  }
 
-    }
+  @Test
+  public void collect_newMemberID_returns_hedvigId_header() throws Exception {
+    final String referenceToken = "someReferenceToken";
+    final String requestMemberId = "1337";
+    final String responseMemberId = "1338";
+    BankIdCollectResponse mockedCollectResponse =
+        new BankIdCollectResponse(BankIdProgressStatus.COMPLETE, referenceToken, responseMemberId);
 
-    @Test
-    public void collect_newMemberID_returns_hedvigId_header() throws Exception {
-        final String referenceToken = "someReferenceToken";
-        final String requestMemberId = "1337";
-        final String responseMemberId = "1338";
-        BankIdCollectResponse mockedCollectResponse = new BankIdCollectResponse(BankIdProgressStatus.COMPLETE, referenceToken, responseMemberId);
+    when(sessionManager.collect(requestMemberId, referenceToken)).thenReturn(mockedCollectResponse);
 
-        when(sessionManager.collect(requestMemberId, referenceToken)).thenReturn(mockedCollectResponse);
-
-        mockMvc
-                .perform(
-                        post("/hedvig/collect")
-                                .param("referenceToken", referenceToken)
-                                .header("hedvig.token", requestMemberId))
-                .andExpect(jsonPath("$.bankIdStatus").value("COMPLETE"))
-                .andExpect(header().string("Hedvig.Id", responseMemberId));
-    }
-
+    mockMvc
+        .perform(
+            post("/hedvig/collect")
+                .param("referenceToken", referenceToken)
+                .header("hedvig.token", requestMemberId))
+        .andExpect(jsonPath("$.bankIdStatus").value("COMPLETE"))
+        .andExpect(header().string("Hedvig.Id", responseMemberId));
+  }
 }
