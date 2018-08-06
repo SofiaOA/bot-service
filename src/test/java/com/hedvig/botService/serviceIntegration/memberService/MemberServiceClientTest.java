@@ -1,5 +1,11 @@
 package com.hedvig.botService.serviceIntegration.memberService;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.http.Fault;
 import com.hedvig.botService.BotServiceApplicationTests;
@@ -28,9 +34,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.assertj.core.api.Assertions.assertThat;
-
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -42,19 +45,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @EnableFeignClients
 public class MemberServiceClientTest {
 
-  @Value("${wiremock.server.port}")
-  String port;
+  @Rule public ExpectedException thrown = ExpectedException.none();
 
   // @Autowired
   // RestTemplate template;
-
+  @Value("${wiremock.server.port}")
+  String port;
   ObjectMapper objectMapper;
-
   @Autowired MemberServiceClient feignClient;
-
   @Autowired ObjectFactory<HttpMessageConverters> feignEncoder;
-
-  @Rule public ExpectedException thrown = ExpectedException.none();
 
   @Before
   public void setup() {
@@ -121,7 +120,7 @@ public class MemberServiceClientTest {
 
     stubFor(
         post(urlEqualTo("/member/bankid/auth"))
-            .willReturn(aResponse().withFault(Fault.CONNECTION_RESET_BY_PEER)));
+            .willReturn(aResponse().withFault(Fault.RANDOM_DATA_THEN_CLOSE)));
 
     thrown.expect(RetryableException.class);
     feignClient.auth(new BankIdAuthRequest("", ""));
