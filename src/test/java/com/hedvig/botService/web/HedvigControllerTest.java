@@ -26,10 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class HedvigControllerTest {
 
-  @MockBean private SessionManager sessionManager;
-
   @MockBean ProductPricingService productPricingService;
-
+  @MockBean private SessionManager sessionManager;
   @Autowired private MockMvc mockMvc;
 
   @Test

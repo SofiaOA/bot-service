@@ -31,13 +31,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = BotServiceApplicationTests.class)
 public class InternalMessagesControllerTest {
 
-  @MockBean private SessionManager sessionManager;
-
-  @MockBean private MessageRepository messageRepository;
-
   @Autowired MockMvc mockMvc;
-
   @Autowired ObjectMapper objectMapper;
+  @MockBean private SessionManager sessionManager;
+  @MockBean private MessageRepository messageRepository;
 
   @Before
   public void setUp() {}

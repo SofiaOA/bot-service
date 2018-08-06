@@ -30,16 +30,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class TrustlyConversationTest {
 
-  @Mock MemberService memberService;
-
-  @Mock TriggerService triggerService;
-
-  @Mock ConversationFactory factory;
-
-  private UserContext userContext;
-
-  private TrustlyConversation testConversation;
   public static final UUID TRIGGER_UUID = UUID.randomUUID();
+  @Mock MemberService memberService;
+  @Mock TriggerService triggerService;
+  @Mock ConversationFactory factory;
+  private UserContext userContext;
+  private TrustlyConversation testConversation;
 
   @Before
   public void setup() {

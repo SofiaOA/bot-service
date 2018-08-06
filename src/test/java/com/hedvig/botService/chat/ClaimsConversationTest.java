@@ -1,5 +1,13 @@
 package com.hedvig.botService.chat;
 
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_MEMBER_ID;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_PHONE_NUMBER;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.Iterables;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
@@ -16,14 +24,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.context.ApplicationEventPublisher;
-
-import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_MEMBER_ID;
-import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_PHONE_NUMBER;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ClaimsConversationTest {
@@ -50,7 +50,7 @@ public class ClaimsConversationTest {
   }
 
   @Test
-  public void AudioReceived_SendsClaimAudioReceivedEvent_AndCreatesClaimInClaimsService() {
+  public void AudioReceived_SendsClaimAudioReceivedEvent_AndCreatesClaimInClaimsService2() {
     Message m = testConversation.getMessage("message.claims.audio");
     val body = (MessageBodyAudio) m.body;
     body.url = AUDIO_RECORDING_URL;
@@ -60,6 +60,16 @@ public class ClaimsConversationTest {
         .should()
         .publishEvent(new ClaimAudioReceivedEvent(userContext.getMemberId()));
     then(claimsService).should().createClaimFromAudio(anyString(), eq(AUDIO_RECORDING_URL));
+  }
+
+  @Test
+  public void AudioReceived_SendsClaimAudioReceivedEvent_AndCreatesClaimInClaimsService() {
+    Message m = testConversation.getMessage("message.claims.audio");
+    val body = (MessageBodyAudio) m.body;
+    body.url = AUDIO_RECORDING_URL;
+    testConversation.receiveMessage(userContext, m);
+
+    assertThat(Iterables.getFirst(userContext.getMemberChat().getMessages(),null)).hasFieldOrPropertyWithValue("id", "claims.trustly.start");
   }
 
   @Test

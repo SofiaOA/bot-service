@@ -24,22 +24,18 @@ import static org.mockito.BDDMockito.given;
 public class ConversationFactoryTest {
 
   private final Class<?> conversationClass;
-
-  @Mock private MemberService memberService;
-
-  @Mock private ProductPricingService productPricingService;
-
   @Mock ClaimsService claimsService;
-
   @Mock SignupCodeRepository signupCodeRepository;
-
+  @Mock ApplicationEventPublisher applicationEventPublisher;
+  @Mock StatusBuilder statusBuilder;
+  @Mock Environment springEnvironment;
+  @Mock private MemberService memberService;
+  @Mock private ProductPricingService productPricingService;
   @Mock private TriggerService triggerService;
 
-  @Mock ApplicationEventPublisher applicationEventPublisher;
-
-  @Mock StatusBuilder statusBuilder;
-
-  @Mock Environment springEnvironment;
+  public ConversationFactoryTest(Class<?> conversationClass) {
+    this.conversationClass = conversationClass;
+  }
 
   @Parameterized.Parameters
   public static Collection<Object> data() {
@@ -51,10 +47,6 @@ public class ConversationFactoryTest {
           MainConversation.class,
           OnboardingConversationDevi.class
         });
-  }
-
-  public ConversationFactoryTest(Class<?> conversationClass) {
-    this.conversationClass = conversationClass;
   }
 
   @Before

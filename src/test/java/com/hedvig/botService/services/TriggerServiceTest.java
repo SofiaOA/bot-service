@@ -39,15 +39,12 @@ public class TriggerServiceTest {
   public static final UUID ORDER_ID = UUID.randomUUID();
   public static final UUID TRIGGER_ID = UUID.randomUUID();
   public static final String IFRAME_URL = "https://trustly.com/iframeURL";
-  @Mock DirectDebitRepository repo;
-
-  @Mock PaymentService pService;
-
-  private TriggerService sut;
-
   @Rule public ExpectedException thrown = ExpectedException.none();
-
-  private UUID generatedTriggerId;;
+  @Mock DirectDebitRepository repo;
+  @Mock PaymentService pService;
+  @Captor ArgumentCaptor<DirectDebitMandateTrigger> mandateCaptor;
+  private TriggerService sut;;
+private UUID generatedTriggerId;
 
   @Before
   public void setUp() {
@@ -96,8 +93,6 @@ public class TriggerServiceTest {
 
     assertThat(triggerURL).isEqualByComparingTo(generatedTriggerId);
   }
-
-  @Captor ArgumentCaptor<DirectDebitMandateTrigger> mandateCaptor;
 
   @Test
   public void getTriggerUrl_willCall_paymentService() {

@@ -25,14 +25,13 @@ public class ConversationTest {
   UserContext uc;
 
   @Spy MemberChat mc;
+  @Captor ArgumentCaptor<Message> messageCaptor;
 
   @Before
   public void setup() {
     uc = new UserContext();
     uc.setMemberChat(mc);
   }
-
-  @Captor ArgumentCaptor<Message> messageCaptor;
 
   @Test
   public void addToChat_renders_selectLink() throws Exception {
