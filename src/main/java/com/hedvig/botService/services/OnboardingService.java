@@ -29,84 +29,104 @@ import static com.hedvig.botService.chat.FreeChatConversation.FREE_CHAT_ONBOARDI
 @Transactional
 public class OnboardingService {
 
-    final private Logger log = LoggerFactory.getLogger(OnboardingService.class);
-    final private MemberService memberService;
-    final private UserContextRepository userContextRepository;
-    final private ConversationFactory conversationFactory;
+  private final Logger log = LoggerFactory.getLogger(OnboardingService.class);
+  private final MemberService memberService;
+  private final UserContextRepository userContextRepository;
+  private final ConversationFactory conversationFactory;
 
-    public OnboardingService(MemberService memberService, UserContextRepository userContextRepository, ConversationFactory conversationFactory) {
-        this.memberService = memberService;
-        this.userContextRepository = userContextRepository;
-        this.conversationFactory = conversationFactory;
+  public OnboardingService(
+      MemberService memberService,
+      UserContextRepository userContextRepository,
+      ConversationFactory conversationFactory) {
+    this.memberService = memberService;
+    this.userContextRepository = userContextRepository;
+    this.conversationFactory = conversationFactory;
+  }
+
+  public BankidStartResponse sign(String hid) {
+    UserContext uc =
+        userContextRepository
+            .findByMemberId(hid)
+            .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+
+    UserData ud = uc.getOnBoardingData();
+
+    String signText = createUserSignText(ud);
+    val signData = memberService.signEx(ud.getSSN(), signText, hid);
+
+    uc.startBankIdSign(signData);
+
+    userContextRepository.saveAndFlush(uc);
+
+    return new BankidStartResponse(signData.getAutoStartToken(), signData.getReferenceToken());
+  }
+
+  public BankIdCollectResponse collect(@RequestHeader("hedvig.token") String hid, String orderRef) {
+    UserContext uc =
+        userContextRepository
+            .findByMemberId(hid)
+            .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+
+    BankIdSessionImpl bankIdCollectStatus = uc.getBankIdCollectStatus(orderRef);
+
+    if (bankIdCollectStatus == null) {
+      throw new BankIdError(ErrorType.INVALID_PARAMETERS, "Could not find order reference");
     }
 
-    public BankidStartResponse sign(String hid) {
-        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-
-        UserData ud = uc.getOnBoardingData();
-
-        String signText = createUserSignText(ud);
-        val signData = memberService.signEx(ud.getSSN(), signText, hid);
-
-        uc.startBankIdSign(signData);
-
-        userContextRepository.saveAndFlush(uc);
-
-        return new BankidStartResponse(signData.getAutoStartToken(), signData.getReferenceToken());
+    if (bankIdCollectStatus.allowedToCall() == false) {
+      return new BankIdCollectResponse(
+          BankIdProgressStatus.OUTSTANDING_TRANSACTION,
+          bankIdCollectStatus.getReferenceToken(),
+          null);
     }
 
-    public BankIdCollectResponse collect(@RequestHeader("hedvig.token") String hid, String orderRef) {
-        UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    val collectResponse = this.memberService.collect(orderRef, hid);
 
-        BankIdSessionImpl bankIdCollectStatus = uc.getBankIdCollectStatus(orderRef);
+    log.info(
+        "BankIdStatus after collect:{}, memberId:{}, lastCollectionStatus: {}",
+        collectResponse.getBankIdStatus().name(),
+        hid,
+        bankIdCollectStatus.getLastStatus());
 
-        if(bankIdCollectStatus == null) {
-            throw new BankIdError(ErrorType.INVALID_PARAMETERS, "Could not find order reference");
-        }
+    bankIdCollectStatus.setLastCallTime(Instant.now());
+    bankIdCollectStatus.setLastStatus(collectResponse.getBankIdStatus().name());
 
-        if(bankIdCollectStatus.allowedToCall() == false) {
-            return new BankIdCollectResponse(BankIdProgressStatus.OUTSTANDING_TRANSACTION, bankIdCollectStatus.getReferenceToken(), null);
-        }
-
-
-        val collectResponse = this.memberService.collect(orderRef, hid);
-
-        log.info(
-                "BankIdStatus after collect:{}, memberId:{}, lastCollectionStatus: {}",
-                collectResponse.getBankIdStatus().name(),
-                hid,
-                bankIdCollectStatus.getLastStatus());
-
-        bankIdCollectStatus.setLastCallTime(Instant.now());
-        bankIdCollectStatus.setLastStatus(collectResponse.getBankIdStatus().name());
-
-        if(collectResponse.getBankIdStatus() == BankIdProgressStatus.COMPLETE) {
-            OnboardingConversationDevi conversation = (OnboardingConversationDevi) conversationFactory.createConversation(OnboardingConversationDevi.class);
-            conversation.memberSigned(collectResponse.getReferenceToken(), uc);
-        }
-
-        return collectResponse;
+    if (collectResponse.getBankIdStatus() == BankIdProgressStatus.COMPLETE) {
+      OnboardingConversationDevi conversation =
+          (OnboardingConversationDevi)
+              conversationFactory.createConversation(OnboardingConversationDevi.class);
+      conversation.memberSigned(collectResponse.getReferenceToken(), uc);
     }
 
-    private String createUserSignText(UserData ud) {
-        String signText;
-        if(ud.getCurrentInsurer() != null) {
-            signText = "Jag har tagit del av förköpsinformation och villkor och bekräftar genom att signera att jag vill byta till Hedvig när min gamla försäkring går ut. Jag ger också  Hedvig fullmakt att byta försäkringen åt mig.";
-        } else {
-            signText = "Jag har tagit del av förköpsinformation och villkor och bekräftar genom att signera att jag skaffar en försäkring hos Hedvig.";
-        }
-        return signText;
+    return collectResponse;
+  }
+
+  private String createUserSignText(UserData ud) {
+    String signText;
+    if (ud.getCurrentInsurer() != null) {
+      signText =
+          "Jag har tagit del av förköpsinformation och villkor och bekräftar genom att signera att jag vill byta till Hedvig när min gamla försäkring går ut. Jag ger också  Hedvig fullmakt att byta försäkringen åt mig.";
+    } else {
+      signText =
+          "Jag har tagit del av förköpsinformation och villkor och bekräftar genom att signera att jag skaffar en försäkring hos Hedvig.";
     }
+    return signText;
+  }
 
-    public void offerClosed(String hid) {
+  public void offerClosed(String hid) {
 
-        val uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-        uc.setInOfferState(true);
-        val activeConversation = uc.getActiveConversation().orElseThrow(() -> new RuntimeException("No active conversation."));
+    val uc =
+        userContextRepository
+            .findByMemberId(hid)
+            .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    uc.setInOfferState(true);
+    val activeConversation =
+        uc.getActiveConversation()
+            .orElseThrow(() -> new RuntimeException("No active conversation."));
 
-        if (activeConversation.getClassName().equals(FreeChatConversation.class.getName()) == false) {
-            val conversation = conversationFactory.createConversation(FreeChatConversation.class);
-            uc.startConversation(conversation, FREE_CHAT_ONBOARDING_START);
-        }
+    if (activeConversation.getClassName().equals(FreeChatConversation.class.getName()) == false) {
+      val conversation = conversationFactory.createConversation(FreeChatConversation.class);
+      uc.startConversation(conversation, FREE_CHAT_ONBOARDING_START);
     }
+  }
 }

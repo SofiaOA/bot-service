@@ -7,8 +7,8 @@ import java.time.Instant;
 @Value
 public class MemberAuthedEvent {
 
-    private String eventId;
-    private Long memberId;
-    private Instant createdAt;
-    private Member member;
+  private String eventId;
+  private Long memberId;
+  private Instant createdAt;
+  private Member member;
 }

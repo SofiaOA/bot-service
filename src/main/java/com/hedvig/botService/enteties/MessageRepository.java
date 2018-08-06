@@ -12,7 +12,6 @@ import java.util.List;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Integer> {
 
-    @Query("select m from Message m where m.timestamp >= :timestamp")
-    List<Message> findFromTimestamp(@Param("timestamp") Instant timestamp);
-
+  @Query("select m from Message m where m.timestamp >= :timestamp")
+  List<Message> findFromTimestamp(@Param("timestamp") Instant timestamp);
 }

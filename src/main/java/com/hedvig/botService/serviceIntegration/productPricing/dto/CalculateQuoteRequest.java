@@ -8,20 +8,20 @@ import java.util.List;
 @Data
 public class CalculateQuoteRequest {
 
-    private String memberId;
-    private String ssn;
-    private String firstName;
-    private String lastName;
-    private LocalDate birthDate;
+  private String memberId;
+  private String ssn;
+  private String firstName;
+  private String lastName;
+  private LocalDate birthDate;
 
-    private Boolean student;
-    
-    private Address address;
+  private Boolean student;
 
-    private Float livingSpace;
-    private String houseType;
-    private String currentInsurer;
-    private int personsInHouseHold;
+  private Address address;
 
-    private List<SafetyIncreaserType> safetyIncreasers;
+  private Float livingSpace;
+  private String houseType;
+  private String currentInsurer;
+  private int personsInHouseHold;
+
+  private List<SafetyIncreaserType> safetyIncreasers;
 }

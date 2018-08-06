@@ -4,9 +4,9 @@ import lombok.Value;
 
 @Value
 public class ClaimCallMeEvent {
-    String memberId;
-    String firstName;
-    String familyName;
-    String phoneNumber;
-    boolean insuranceActive;
+  String memberId;
+  String firstName;
+  String familyName;
+  String phoneNumber;
+  boolean insuranceActive;
 }

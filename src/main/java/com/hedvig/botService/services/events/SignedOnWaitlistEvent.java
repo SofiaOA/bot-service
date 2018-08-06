@@ -4,5 +4,5 @@ import lombok.Value;
 
 @Value
 public class SignedOnWaitlistEvent {
-    String email;
+  String email;
 }

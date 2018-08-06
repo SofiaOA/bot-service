@@ -12,12 +12,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
-@FeignClient(value = "payment-service", url ="${hedvig.payment-service.url:payment-service}")
+@FeignClient(value = "payment-service", url = "${hedvig.payment-service.url:payment-service}")
 public interface PaymentServiceClient {
 
-    @RequestMapping(value = "/_/trustlyOrder/registerDirectDebit", method = POST, produces = "application/json")
-    ResponseEntity<DirectDebitResponse> registerDirectDebit(@RequestBody DirectDebitRequest requestBody);
+  @RequestMapping(
+      value = "/_/trustlyOrder/registerDirectDebit",
+      method = POST,
+      produces = "application/json")
+  ResponseEntity<DirectDebitResponse> registerDirectDebit(
+      @RequestBody DirectDebitRequest requestBody);
 
-    @RequestMapping(value = "/_/trustlyOrder/{orderId}", method = GET)
-    ResponseEntity<OrderInformation> orderInformation(@PathVariable("orderId") String orderId);
+  @RequestMapping(value = "/_/trustlyOrder/{orderId}", method = GET)
+  ResponseEntity<OrderInformation> orderInformation(@PathVariable("orderId") String orderId);
 }

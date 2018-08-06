@@ -9,31 +9,31 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MemberService {
-    Optional<BankIdAuthResponse> auth(String memberId);
+  Optional<BankIdAuthResponse> auth(String memberId);
 
-    Optional<BankIdAuthResponse> auth(String ssn, String memberId);
+  Optional<BankIdAuthResponse> auth(String ssn, String memberId);
 
-    Optional<BankIdSignResponse> sign(String ssn, String userMessage, String memberId);
+  Optional<BankIdSignResponse> sign(String ssn, String userMessage, String memberId);
 
-    BankIdSignResponse signEx(String ssn, String userMessage, String memberId);
+  BankIdSignResponse signEx(String ssn, String userMessage, String memberId);
 
-    void finalizeOnBoarding(String memberId, UserData data);
+  void finalizeOnBoarding(String memberId, UserData data);
 
-    BankIdCollectResponse collect(String referenceToken, String memberId);
+  BankIdCollectResponse collect(String referenceToken, String memberId);
 
-    MemberProfile convertToFakeUser(String memberId);
+  MemberProfile convertToFakeUser(String memberId);
 
-    MemberProfile getProfile(String hid);
+  MemberProfile getProfile(String hid);
 
-    void startOnBoardingWithSSN(String memberId, String ssn);
+  void startOnBoardingWithSSN(String memberId, String ssn);
 
-    void sendSignupMail(String email, UUID uuid);
+  void sendSignupMail(String email, UUID uuid);
 
-    void sendOnboardedActiveLater(String email, String name, String memberId);
+  void sendOnboardedActiveLater(String email, String name, String memberId);
 
-    void sendOnboardedActiveToday(String email, String name);
+  void sendOnboardedActiveToday(String email, String name);
 
-    void selectCashback(String memberId, UUID charityId);
+  void selectCashback(String memberId, UUID charityId);
 
-    void updateEmail(String memberId, String email);
+  void updateEmail(String memberId, String email);
 }

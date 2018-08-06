@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class BankidStartResponse {
-    String autoStartToken;
-    String orderRef;
+  String autoStartToken;
+  String orderRef;
 }

@@ -12,11 +12,15 @@ import javax.persistence.Entity;
 @ToString
 public class MessageBodyAudio extends MessageBody {
 
-	public String url;
-	private static Logger log = LoggerFactory.getLogger(MessageBodyAudio.class);
-    public MessageBodyAudio(String content, String url) {
-    	super(content);
-    	this.url = url;
-	}
-    MessageBodyAudio(){log.info("Instansiating MessageBodyAudio");}
+  public String url;
+  private static Logger log = LoggerFactory.getLogger(MessageBodyAudio.class);
+
+  public MessageBodyAudio(String content, String url) {
+    super(content);
+    this.url = url;
+  }
+
+  MessageBodyAudio() {
+    log.info("Instansiating MessageBodyAudio");
+  }
 }

@@ -17,41 +17,36 @@ import java.util.stream.Collectors;
 @ToString
 public class MessageBodySingleSelect extends MessageBody {
 
-	public ArrayList<SelectItem> choices = new ArrayList<SelectItem>();
-	
-    public MessageBodySingleSelect(String content, List<SelectItem> items) {
-    	super(content);
-    	this.choices.addAll(items);
-	}
+  public ArrayList<SelectItem> choices = new ArrayList<SelectItem>();
 
-    MessageBodySingleSelect(){}
+  public MessageBodySingleSelect(String content, List<SelectItem> items) {
+    super(content);
+    this.choices.addAll(items);
+  }
 
-    @JsonIgnore
-    public SelectItem getSelectedItem() {
-		for (SelectItem o : this.choices) {
-			if(o.selected) {
-				return o;
-			}
-		}
-		throw new RuntimeException(String.format(
-			"No item selected for list: [%s]",
-			this.choices
-				.stream()
-				.map(SelectItem::toString)
-				.collect(Collectors.joining(","))
-			)
-		);
-	}
+  MessageBodySingleSelect() {}
 
-	@Override
-	public void render(UserContext userContext) {
-		choices.forEach(x -> x.render(userContext));
+  @JsonIgnore
+  public SelectItem getSelectedItem() {
+    for (SelectItem o : this.choices) {
+      if (o.selected) {
+        return o;
+      }
+    }
+    throw new RuntimeException(
+        String.format(
+            "No item selected for list: [%s]",
+            this.choices.stream().map(SelectItem::toString).collect(Collectors.joining(","))));
+  }
 
-		super.render(userContext);
-	}
+  @Override
+  public void render(UserContext userContext) {
+    choices.forEach(x -> x.render(userContext));
 
-	public boolean removeItemIf(Predicate<? super SelectItem> predicate) {
-		return choices.removeIf(predicate);
-	}
+    super.render(userContext);
+  }
 
+  public boolean removeItemIf(Predicate<? super SelectItem> predicate) {
+    return choices.removeIf(predicate);
+  }
 }

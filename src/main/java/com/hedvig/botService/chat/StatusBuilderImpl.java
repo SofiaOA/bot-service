@@ -26,67 +26,66 @@ import java.time.*;
 @Component
 public class StatusBuilderImpl implements StatusBuilder {
 
-    @Override
-    public String getStatusMessage(Clock c) {
+  @Override
+  public String getStatusMessage(Clock c) {
 
-        Instant now = Instant.now(c);
-        ZonedDateTime time = now.atZone(ZoneId.of("Europe/Stockholm"));
+    Instant now = Instant.now(c);
+    ZonedDateTime time = now.atZone(ZoneId.of("Europe/Stockholm"));
 
-        final DayOfWeek dayOfWeek = time.getDayOfWeek();
-        final int hour = time.getHour();
-        switch (dayOfWeek) {
-            case MONDAY:
-            case TUESDAY:
-            case WEDNESDAY:
-            case THURSDAY: {
-                if(hour <= 2) {
-                    return "Hedvig svarar imorgon";
-                }
-                if(hour <= 9) {
-                    return "Hedvig svarar efter kl. 9";
-                }
-                if(hour < 18) {
-                    return "Hedvig svarar inom 5 min";
-                }else if(hour < 23) {
-                    return "Hedvig svarar inom 15 min";
-                }
-                else {
-                    return "Hedvig svarar imorgon";
-                }
-            }
-            case FRIDAY: {
-                if(hour <= 2) {
-                    return "Hedvig svarar imorgon";
-                }
-                if(hour <= 9) {
-                    return "Hedvig svarar efter kl. 9";
-                }
-                if(hour < 18) {
-                    return "Hedvig svarar inom 5 min";
-                }else if(hour < 23) {
-                    return "Hedvig svarar inom 30 min";
-                }
-                else {
-                    return "Hedvig svarar imorgon";
-                }
-            }
-            case SATURDAY:
-            case SUNDAY:{
-                if(hour <= 2) {
-                    return "Hedvig svarar imorgon";
-                }
-                if(hour <= 10) {
-                    return "Hedvig svarar efter kl. 10";
-                }
-                else if(hour < 23) {
-                    return "Hedvig svarar inom 30 min";
-                }
-                else {
-                    return "Hedvig svarar imorgon";
-                }
-            }
+    final DayOfWeek dayOfWeek = time.getDayOfWeek();
+    final int hour = time.getHour();
+    switch (dayOfWeek) {
+      case MONDAY:
+      case TUESDAY:
+      case WEDNESDAY:
+      case THURSDAY:
+        {
+          if (hour <= 2) {
+            return "Hedvig svarar imorgon";
+          }
+          if (hour <= 9) {
+            return "Hedvig svarar efter kl. 9";
+          }
+          if (hour < 18) {
+            return "Hedvig svarar inom 5 min";
+          } else if (hour < 23) {
+            return "Hedvig svarar inom 15 min";
+          } else {
+            return "Hedvig svarar imorgon";
+          }
         }
-
-        return "";
+      case FRIDAY:
+        {
+          if (hour <= 2) {
+            return "Hedvig svarar imorgon";
+          }
+          if (hour <= 9) {
+            return "Hedvig svarar efter kl. 9";
+          }
+          if (hour < 18) {
+            return "Hedvig svarar inom 5 min";
+          } else if (hour < 23) {
+            return "Hedvig svarar inom 30 min";
+          } else {
+            return "Hedvig svarar imorgon";
+          }
+        }
+      case SATURDAY:
+      case SUNDAY:
+        {
+          if (hour <= 2) {
+            return "Hedvig svarar imorgon";
+          }
+          if (hour <= 10) {
+            return "Hedvig svarar efter kl. 10";
+          } else if (hour < 23) {
+            return "Hedvig svarar inom 30 min";
+          } else {
+            return "Hedvig svarar imorgon";
+          }
+        }
     }
+
+    return "";
+  }
 }

@@ -15,6 +15,5 @@ import javax.persistence.Entity;
 @ToString
 public class MessageBodyPolling extends MessageBody {
 
-    public MessageBodyPolling(){}
-
+  public MessageBodyPolling() {}
 }

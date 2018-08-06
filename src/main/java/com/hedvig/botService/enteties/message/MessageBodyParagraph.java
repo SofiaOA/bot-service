@@ -10,8 +10,9 @@ import javax.persistence.Entity;
 @ToString
 public class MessageBodyParagraph extends MessageBody {
 
-    public MessageBodyParagraph(String content) {
-    	super(content);
-	}
-    MessageBodyParagraph(){}
+  public MessageBodyParagraph(String content) {
+    super(content);
+  }
+
+  MessageBodyParagraph() {}
 }

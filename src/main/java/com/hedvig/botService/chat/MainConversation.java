@@ -20,199 +20,207 @@ import java.util.Objects;
 @Component
 public class MainConversation extends Conversation {
 
-	public static final String MESSAGE_HEDVIG_COM = "hedvig.com";
-	public static final String MESSAGE_HEDVIG_COM_CLAIMS = "hedvig.com.claims";
-	public static final String MESSAGE_QUESTION_RECIEVED = "message.question.recieved";
-	public static final String MESSAGE_MAIN_END = "message.main.end";
-	public static final String MESSAGE_MAIN_CALLME = "message.main.callme";
-	public static final String MESSAGE_MAIN_QUESTION = "main.question";
-	public static final String MESSAGE_MAIN_START_TRUSTLY = "message.main.start_trustly";
-	public static final String MESSAGE_ERROR = "error";
-	public static final String MESSAGE_MAIN_REPORT = "message.main.report";
-	public static final String MESSAGE_MAIN_ONBOARDING_DONE = "onboarding.done";
-	public static final String CONVERSATION_DONE = "conversation.done";
-	public static final String MESSAGE_MAIN_START_CHAT = "message.main.start.chat";
+  public static final String MESSAGE_HEDVIG_COM = "hedvig.com";
+  public static final String MESSAGE_HEDVIG_COM_CLAIMS = "hedvig.com.claims";
+  public static final String MESSAGE_QUESTION_RECIEVED = "message.question.recieved";
+  public static final String MESSAGE_MAIN_END = "message.main.end";
+  public static final String MESSAGE_MAIN_CALLME = "message.main.callme";
+  public static final String MESSAGE_MAIN_QUESTION = "main.question";
+  public static final String MESSAGE_MAIN_START_TRUSTLY = "message.main.start_trustly";
+  public static final String MESSAGE_ERROR = "error";
+  public static final String MESSAGE_MAIN_REPORT = "message.main.report";
+  public static final String MESSAGE_MAIN_ONBOARDING_DONE = "onboarding.done";
+  public static final String CONVERSATION_DONE = "conversation.done";
+  public static final String MESSAGE_MAIN_START_CHAT = "message.main.start.chat";
 
-	private static Logger log = LoggerFactory.getLogger(MainConversation.class);
-	private final ConversationFactory conversationFactory;
-	private final ProductPricingService productPricingService;
-	private final ApplicationEventPublisher eventPublisher;
+  private static Logger log = LoggerFactory.getLogger(MainConversation.class);
+  private final ConversationFactory conversationFactory;
+  private final ProductPricingService productPricingService;
+  private final ApplicationEventPublisher eventPublisher;
 
+  @Autowired
+  public MainConversation(
+      ProductPricingService productPricingService,
+      ConversationFactory conversationFactory,
+      ApplicationEventPublisher eventPublisher) {
+    super();
+    this.productPricingService = productPricingService;
+    this.conversationFactory = conversationFactory;
+    this.eventPublisher = eventPublisher;
 
-	@Autowired
-	public MainConversation(ProductPricingService productPricingService, ConversationFactory conversationFactory, ApplicationEventPublisher eventPublisher) {
-		super();
-		this.productPricingService = productPricingService;
-		this.conversationFactory = conversationFactory;
-		this.eventPublisher = eventPublisher;
+    createMessage(
+        MESSAGE_HEDVIG_COM,
+        new MessageBodySingleSelect(
+            "Hej {NAME}, vad vill du göra idag?",
+            Lists.newArrayList(
+                new SelectOption("Rapportera en skada", MESSAGE_MAIN_REPORT),
+                new SelectOption("Ring mig!", MESSAGE_MAIN_CALLME),
+                new SelectOption("Jag har en fråga", MESSAGE_MAIN_QUESTION))));
 
-		createMessage(MESSAGE_HEDVIG_COM,
-				new MessageBodySingleSelect("Hej {NAME}, vad vill du göra idag?",
-						Lists.newArrayList(
-							new SelectOption("Rapportera en skada", MESSAGE_MAIN_REPORT),
-							new SelectOption("Ring mig!", MESSAGE_MAIN_CALLME),
-							new SelectOption("Jag har en fråga", MESSAGE_MAIN_QUESTION)
-				)));
+    createMessage(
+        MESSAGE_HEDVIG_COM_CLAIMS,
+        new MessageBodySingleSelect(
+            "Är det något mer du vill ha hjälp med?",
+            Lists.newArrayList(
+                new SelectOption("Rapportera en skada", MESSAGE_MAIN_REPORT),
+                new SelectOption("Ring mig!", MESSAGE_MAIN_CALLME),
+                new SelectOption("Jag har en fråga", MESSAGE_MAIN_QUESTION))));
 
-		createMessage(MESSAGE_HEDVIG_COM_CLAIMS,
-				new MessageBodySingleSelect("Är det något mer du vill ha hjälp med?",
-						Lists.newArrayList(
-								new SelectOption("Rapportera en skada", MESSAGE_MAIN_REPORT),
-								new SelectOption("Ring mig!", MESSAGE_MAIN_CALLME),
-								new SelectOption("Jag har en fråga", MESSAGE_MAIN_QUESTION)
-						)));
-		
-		createMessage(MESSAGE_QUESTION_RECIEVED,
-				new MessageBodySingleSelect("Tack {NAME}, jag återkommer så snart jag kan med svar på din fråga",
-						Lists.newArrayList(
-							new SelectOption("Jag har en till fråga", MESSAGE_MAIN_QUESTION),
-							SelectLink.toDashboard("Hem", MESSAGE_HEDVIG_COM)
-				)));
-		
-        createMessage(MESSAGE_MAIN_END,
-                new MessageBodySingleSelect("Tack. Jag ringer upp dig så snart jag kan",
-                        Lists.newArrayList(
-                        	SelectLink.toDashboard("Hem", MESSAGE_MAIN_ONBOARDING_DONE)
-						)
-                ));
-        
-		createMessage(MESSAGE_MAIN_CALLME,
-				new MessageBodyNumber("Vad når jag dig på för nummer?"));
-		
-		createMessage(MESSAGE_MAIN_QUESTION, new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
-				new MessageBodyText("Självklart, vad kan jag hjälpa dig med?"));
+    createMessage(
+        MESSAGE_QUESTION_RECIEVED,
+        new MessageBodySingleSelect(
+            "Tack {NAME}, jag återkommer så snart jag kan med svar på din fråga",
+            Lists.newArrayList(
+                new SelectOption("Jag har en till fråga", MESSAGE_MAIN_QUESTION),
+                SelectLink.toDashboard("Hem", MESSAGE_HEDVIG_COM))));
 
-		
-		createMessage(MESSAGE_ERROR,
-				new MessageBodyText("Oj nu blev något fel..."));
-	}
+    createMessage(
+        MESSAGE_MAIN_END,
+        new MessageBodySingleSelect(
+            "Tack. Jag ringer upp dig så snart jag kan",
+            Lists.newArrayList(SelectLink.toDashboard("Hem", MESSAGE_MAIN_ONBOARDING_DONE))));
 
-	@Override
-	public void receiveMessage(UserContext userContext, Message m) {
-		
-		String nxtMsg = "";
-		
-		if(!validateReturnType(m,userContext)){return;}
-		
-		switch(m.id){
-			case MESSAGE_HEDVIG_COM_CLAIMS:
-			case MESSAGE_HEDVIG_COM: {
-				SelectItem item = ((MessageBodySingleSelect)m.body).getSelectedItem();
-				m.body.text = item.text;
-				if(Objects.equals(item.value, MESSAGE_MAIN_REPORT)) {
-					nxtMsg = CONVERSATION_DONE;
-				}
-				else if(Objects.equals(item.value, MESSAGE_MAIN_START_TRUSTLY)) {
-					addToChat(m, userContext);
-					userContext.completeConversation(this); // TODO: End conversation in better way
-					userContext.startConversation(conversationFactory.createConversation(TrustlyConversation.class));
-					userContext.putUserData(UserContext.FORCE_TRUSTLY_CHOICE, "false");
-					return;
-				}
+    createMessage(MESSAGE_MAIN_CALLME, new MessageBodyNumber("Vad når jag dig på för nummer?"));
 
-				addToChat(m, userContext); // Response parsed to nice format
-				break;
-			}
-		case MESSAGE_MAIN_CALLME:
-			userContext.putUserData("{PHONE_"+ new LocalDate().toString() + "}", m.body.text);
-			eventPublisher.publishEvent(new RequestPhoneCallEvent(userContext.getMemberId(), m.body.text, userContext.getOnBoardingData().getFirstName(), userContext.getOnBoardingData().getFamilyName()));
-			nxtMsg = MESSAGE_MAIN_END;
-			addToChat(m, userContext); // Response parsed to nice format
-			userContext.completeConversation(this); // TODO: End conversation in better way
-			break;
-		case MESSAGE_MAIN_QUESTION:
-			nxtMsg = handleQuestion(userContext, m);
-			break;
-		}
-		
-      /*
-	  * In a Single select, there is only one trigger event. Set default here to be a link to a new message
-	  */
-       if (nxtMsg.equals("") && m.body.getClass().equals(MessageBodySingleSelect.class)) {
+    createMessage(
+        MESSAGE_MAIN_QUESTION,
+        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
+        new MessageBodyText("Självklart, vad kan jag hjälpa dig med?"));
 
-           MessageBodySingleSelect body1 = (MessageBodySingleSelect) m.body;
-           for (SelectItem o : body1.choices) {
-               if(o.selected) {
-                   m.body.text = o.text;
-                   addToChat(m, userContext);
-                   nxtMsg = o.value;
-               }
-           }
-       }
-       
-       completeRequest(nxtMsg, userContext);
-		
-	}
+    createMessage(MESSAGE_ERROR, new MessageBodyText("Oj nu blev något fel..."));
+  }
 
-	public String handleQuestion(UserContext userContext, Message m) {
-		String nxtMsg;
-		final String question = m.body.text;
-		userContext.putUserData("{QUESTION_"+ new LocalDate().toString() + "}", question);
-		addToChat(m, userContext); // Response parsed to nice format
-		eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), question));
-		nxtMsg = MESSAGE_QUESTION_RECIEVED;
-		return nxtMsg;
-	}
+  @Override
+  public void receiveMessage(UserContext userContext, Message m) {
 
-	/*
-     * Generate next chat message or ends conversation
-     * */
-    @Override
-    public void completeRequest(String nxtMsg, UserContext userContext){
+    String nxtMsg = "";
 
-        switch(nxtMsg){
-            case CONVERSATION_DONE:
-                log.info("conversation complete");
-                userContext.completeConversation(this);
-				userContext.startConversation(conversationFactory.createConversation(ClaimsConversation.class));
-
-                return;
-			case MESSAGE_HEDVIG_COM + ".4":
-				addTrustlyButton(userContext);
-            case "":
-                log.error("I dont know where to go next...");
-                nxtMsg = "error";
-                break;
-
-        }
-
-        super.completeRequest(nxtMsg, userContext);
+    if (!validateReturnType(m, userContext)) {
+      return;
     }
 
-	public void addTrustlyButton(UserContext userContext) {
-		val message = getMessage(MESSAGE_HEDVIG_COM);
-		val body = (MessageBodySingleSelect) message.body;
-		String forceTrustly = userContext.getDataEntry(UserContext.FORCE_TRUSTLY_CHOICE);
-		if("true".equalsIgnoreCase(forceTrustly)) {
-            body.choices.add(new SelectOption("Koppla autogiro", MESSAGE_MAIN_START_TRUSTLY));
+    switch (m.id) {
+      case MESSAGE_HEDVIG_COM_CLAIMS:
+      case MESSAGE_HEDVIG_COM:
+        {
+          SelectItem item = ((MessageBodySingleSelect) m.body).getSelectedItem();
+          m.body.text = item.text;
+          if (Objects.equals(item.value, MESSAGE_MAIN_REPORT)) {
+            nxtMsg = CONVERSATION_DONE;
+          } else if (Objects.equals(item.value, MESSAGE_MAIN_START_TRUSTLY)) {
+            addToChat(m, userContext);
+            userContext.completeConversation(this); // TODO: End conversation in better way
+            userContext.startConversation(
+                conversationFactory.createConversation(TrustlyConversation.class));
+            userContext.putUserData(UserContext.FORCE_TRUSTLY_CHOICE, "false");
+            return;
+          }
+
+          addToChat(m, userContext); // Response parsed to nice format
+          break;
         }
-	}
+      case MESSAGE_MAIN_CALLME:
+        userContext.putUserData("{PHONE_" + new LocalDate().toString() + "}", m.body.text);
+        eventPublisher.publishEvent(
+            new RequestPhoneCallEvent(
+                userContext.getMemberId(),
+                m.body.text,
+                userContext.getOnBoardingData().getFirstName(),
+                userContext.getOnBoardingData().getFamilyName()));
+        nxtMsg = MESSAGE_MAIN_END;
+        addToChat(m, userContext); // Response parsed to nice format
+        userContext.completeConversation(this); // TODO: End conversation in better way
+        break;
+      case MESSAGE_MAIN_QUESTION:
+        nxtMsg = handleQuestion(userContext, m);
+        break;
+    }
 
-	@Override
-	public List<SelectItem> getSelectItemsForAnswer(UserContext uc) {
-		return Lists.newArrayList(
-				new SelectOption("Svara Hedvig", MESSAGE_MAIN_QUESTION),
-				new SelectOption("Tack, det var vad jag behövde veta", MESSAGE_HEDVIG_COM)
-		);
-	}
+    /*
+     * In a Single select, there is only one trigger event. Set default here to be a link to a new message
+     */
+    if (nxtMsg.equals("") && m.body.getClass().equals(MessageBodySingleSelect.class)) {
 
-	@Override
-	public boolean canAcceptAnswerToQuestion(UserContext uc) {
-		return true;
-	}
+      MessageBodySingleSelect body1 = (MessageBodySingleSelect) m.body;
+      for (SelectItem o : body1.choices) {
+        if (o.selected) {
+          m.body.text = o.text;
+          addToChat(m, userContext);
+          nxtMsg = o.value;
+        }
+      }
+    }
 
-	@Override
-	public void init(UserContext userContext) {
-    	log.info("Starting main conversation");
-		addTrustlyButton(userContext);
-        startConversation(userContext, MESSAGE_HEDVIG_COM); // Id of first message
-	}
+    completeRequest(nxtMsg, userContext);
+  }
 
-	@Override
-	public void init(UserContext userContext, String startMessage) {
-    	log.info("Starting main conversation with message: " + startMessage);
+  public String handleQuestion(UserContext userContext, Message m) {
+    String nxtMsg;
+    final String question = m.body.text;
+    userContext.putUserData("{QUESTION_" + new LocalDate().toString() + "}", question);
+    addToChat(m, userContext); // Response parsed to nice format
+    eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), question));
+    nxtMsg = MESSAGE_QUESTION_RECIEVED;
+    return nxtMsg;
+  }
+
+  /*
+   * Generate next chat message or ends conversation
+   * */
+  @Override
+  public void completeRequest(String nxtMsg, UserContext userContext) {
+
+    switch (nxtMsg) {
+      case CONVERSATION_DONE:
+        log.info("conversation complete");
+        userContext.completeConversation(this);
+        userContext.startConversation(
+            conversationFactory.createConversation(ClaimsConversation.class));
+
+        return;
+      case MESSAGE_HEDVIG_COM + ".4":
         addTrustlyButton(userContext);
-    	startConversation(userContext, MESSAGE_HEDVIG_COM); // Id of first message
-	}
+      case "":
+        log.error("I dont know where to go next...");
+        nxtMsg = "error";
+        break;
+    }
 
+    super.completeRequest(nxtMsg, userContext);
+  }
+
+  public void addTrustlyButton(UserContext userContext) {
+    val message = getMessage(MESSAGE_HEDVIG_COM);
+    val body = (MessageBodySingleSelect) message.body;
+    String forceTrustly = userContext.getDataEntry(UserContext.FORCE_TRUSTLY_CHOICE);
+    if ("true".equalsIgnoreCase(forceTrustly)) {
+      body.choices.add(new SelectOption("Koppla autogiro", MESSAGE_MAIN_START_TRUSTLY));
+    }
+  }
+
+  @Override
+  public List<SelectItem> getSelectItemsForAnswer(UserContext uc) {
+    return Lists.newArrayList(
+        new SelectOption("Svara Hedvig", MESSAGE_MAIN_QUESTION),
+        new SelectOption("Tack, det var vad jag behövde veta", MESSAGE_HEDVIG_COM));
+  }
+
+  @Override
+  public boolean canAcceptAnswerToQuestion(UserContext uc) {
+    return true;
+  }
+
+  @Override
+  public void init(UserContext userContext) {
+    log.info("Starting main conversation");
+    addTrustlyButton(userContext);
+    startConversation(userContext, MESSAGE_HEDVIG_COM); // Id of first message
+  }
+
+  @Override
+  public void init(UserContext userContext, String startMessage) {
+    log.info("Starting main conversation with message: " + startMessage);
+    addTrustlyButton(userContext);
+    startConversation(userContext, MESSAGE_HEDVIG_COM); // Id of first message
+  }
 }

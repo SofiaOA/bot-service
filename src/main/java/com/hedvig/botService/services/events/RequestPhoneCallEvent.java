@@ -5,12 +5,10 @@ import lombok.Value;
 @Value
 public class RequestPhoneCallEvent {
 
-    String memberId;
+  String memberId;
 
-    String phoneNumber;
+  String phoneNumber;
 
-    String firstName;
-    String lastName;
-
-
+  String firstName;
+  String lastName;
 }

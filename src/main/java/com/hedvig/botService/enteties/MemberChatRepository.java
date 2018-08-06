@@ -6,6 +6,5 @@ import java.util.Optional;
 
 public interface MemberChatRepository extends JpaRepository<MemberChat, Integer> {
 
-    Optional<MemberChat> findByMemberId(String id);
-
+  Optional<MemberChat> findByMemberId(String id);
 }

@@ -10,19 +10,18 @@ import javax.persistence.Entity;
 @DiscriminatorValue("bankidCollect")
 @ToString
 public class MessageBodyBankIdCollect extends MessageBody {
-    public String referenceId;
+  public String referenceId;
 
-    public MessageBodyBankIdCollect(){}
+  public MessageBodyBankIdCollect() {}
 
-    public MessageBodyBankIdCollect(String referenceId) {
-        super("");
-        this.referenceId = referenceId;
-    }
+  public MessageBodyBankIdCollect(String referenceId) {
+    super("");
+    this.referenceId = referenceId;
+  }
 
-
-    @Override
-    public void render(UserContext userContext) {
-        this.referenceId = userContext.replaceWithContext(this.referenceId);
-        super.render(userContext);
-    }
+  @Override
+  public void render(UserContext userContext) {
+    this.referenceId = userContext.replaceWithContext(this.referenceId);
+    super.render(userContext);
+  }
 }

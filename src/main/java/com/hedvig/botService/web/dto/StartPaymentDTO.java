@@ -6,6 +6,6 @@ import java.util.UUID;
 
 @Value
 public class StartPaymentDTO {
-    UUID triggerId;
-    String url;
+  UUID triggerId;
+  String url;
 }

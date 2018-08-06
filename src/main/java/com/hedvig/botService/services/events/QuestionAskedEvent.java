@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class QuestionAskedEvent {
-    String memberId;
-    String question;
+  String memberId;
+  String question;
 }

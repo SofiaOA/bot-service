@@ -20,26 +20,25 @@ import org.springframework.web.client.RestTemplate;
 @EnableTransactionManagement
 public class BotServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(BotServiceApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(BotServiceApplication.class, args);
+  }
 
-    @Bean
-    public RestTemplate createRestTemplate() {
-	    return new RestTemplate();
-    }
+  @Bean
+  public RestTemplate createRestTemplate() {
+    return new RestTemplate();
+  }
 
-    @Bean
-	@Profile(Profiles.PRODUCTION)
-	public NotificationMessagingTemplate notificationTemplate(AmazonSNS amazonSNS) {
-		return new NotificationMessagingTemplate(amazonSNS);
-	}
+  @Bean
+  @Profile(Profiles.PRODUCTION)
+  public NotificationMessagingTemplate notificationTemplate(AmazonSNS amazonSNS) {
+    return new NotificationMessagingTemplate(amazonSNS);
+  }
 
-	@Bean
-	public ApplicationEventMulticaster applicationEventMulticaster() {
-		SimpleApplicationEventMulticaster eventMulticaster = new SimpleApplicationEventMulticaster();
-		eventMulticaster.setErrorHandler(TaskUtils.LOG_AND_SUPPRESS_ERROR_HANDLER);
-		return eventMulticaster;
-	}
-
+  @Bean
+  public ApplicationEventMulticaster applicationEventMulticaster() {
+    SimpleApplicationEventMulticaster eventMulticaster = new SimpleApplicationEventMulticaster();
+    eventMulticaster.setErrorHandler(TaskUtils.LOG_AND_SUPPRESS_ERROR_HANDLER);
+    return eventMulticaster;
+  }
 }

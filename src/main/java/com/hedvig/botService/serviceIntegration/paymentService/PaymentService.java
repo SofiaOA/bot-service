@@ -11,26 +11,28 @@ import java.util.UUID;
 @Component
 public class PaymentService {
 
-    private PaymentServiceClient client;
+  private PaymentServiceClient client;
 
-    public PaymentService(PaymentServiceClient client) {
-        this.client = client;
-    }
+  public PaymentService(PaymentServiceClient client) {
+    this.client = client;
+  }
 
+  public DirectDebitResponse registerTrustlyDirectDebit(
+      String firstName, String lastName, String ssn, String memberId, UUID triggerId) {
 
-    public DirectDebitResponse registerTrustlyDirectDebit(String firstName, String lastName, String ssn, String memberId, UUID triggerId) {
+    DirectDebitRequest dto =
+        new DirectDebitRequest(firstName, lastName, ssn, memberId, triggerId.toString());
 
-        DirectDebitRequest dto = new DirectDebitRequest(firstName, lastName, ssn, memberId, triggerId.toString());
+    final ResponseEntity<DirectDebitResponse> urlResponseResponseEntity =
+        this.client.registerDirectDebit(dto);
 
-        final ResponseEntity<DirectDebitResponse> urlResponseResponseEntity = this.client.registerDirectDebit(dto);
+    return urlResponseResponseEntity.getBody();
+  }
 
-        return urlResponseResponseEntity.getBody();
-    }
+  public OrderInformation getTrustlyOrderInformation(String orderId) {
 
-    public OrderInformation getTrustlyOrderInformation(String orderId) {
-
-        final ResponseEntity<OrderInformation> orderInformationResponseEntity = this.client.orderInformation(orderId);
-        return orderInformationResponseEntity.getBody();
-    }
-
+    final ResponseEntity<OrderInformation> orderInformationResponseEntity =
+        this.client.orderInformation(orderId);
+    return orderInformationResponseEntity.getBody();
+  }
 }

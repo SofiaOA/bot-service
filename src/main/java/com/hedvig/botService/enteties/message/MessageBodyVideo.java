@@ -12,11 +12,15 @@ import javax.persistence.Entity;
 @ToString
 public class MessageBodyVideo extends MessageBody {
 
-	public String URL;
-	private static Logger log = LoggerFactory.getLogger(MessageBodyVideo.class);
-    public MessageBodyVideo(String content, String URL) {
-    	super(content);
-    	this.URL = URL;
-	}
-    MessageBodyVideo(){log.info("Instansiating MessageBodyVideo");}
+  public String URL;
+  private static Logger log = LoggerFactory.getLogger(MessageBodyVideo.class);
+
+  public MessageBodyVideo(String content, String URL) {
+    super(content);
+    this.URL = URL;
+  }
+
+  MessageBodyVideo() {
+    log.info("Instansiating MessageBodyVideo");
+  }
 }

@@ -7,8 +7,11 @@ import java.util.Optional;
 
 public interface SignupCodeRepository extends JpaRepository<SignupCode, Integer> {
 
-    Optional<SignupCode> findByEmail(String email);
-    Optional<SignupCode> findByCode(String code);
-    Long countByEmail(String email);
-    List<SignupCode> findAllByOrderByDateAsc();
+  Optional<SignupCode> findByEmail(String email);
+
+  Optional<SignupCode> findByCode(String code);
+
+  Long countByEmail(String email);
+
+  List<SignupCode> findAllByOrderByDateAsc();
 }

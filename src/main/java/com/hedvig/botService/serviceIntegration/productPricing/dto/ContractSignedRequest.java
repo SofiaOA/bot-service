@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class ContractSignedRequest {
-    String memberId;
-    String referenceToken;
+  String memberId;
+  String referenceToken;
 }

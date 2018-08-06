@@ -9,12 +9,12 @@ import javax.persistence.Entity;
 @DiscriminatorValue("bankidLink")
 @ToString
 public class MessageBodyBankIdLink extends MessageBody {
-    public String URL;
+  public String URL;
 
-    public MessageBodyBankIdLink(){}
+  public MessageBodyBankIdLink() {}
 
-    public MessageBodyBankIdLink(String URL) {
-        super("");
-        this.URL = URL;
-    }
+  public MessageBodyBankIdLink(String URL) {
+    super("");
+    this.URL = URL;
+  }
 }

@@ -8,18 +8,17 @@ import java.util.Optional;
 @Value
 public class MemberProfile {
 
-    private final String memberId;
-    private final String ssn;
+  private final String memberId;
+  private final String ssn;
 
-    private final String firstName;
-    private final String lastName;
+  private final String firstName;
+  private final String lastName;
 
-    private final Optional<MemberAddress> address;
+  private final Optional<MemberAddress> address;
 
-    private final String email;
-    private final String phoneNumber;
-    private final String country;
+  private final String email;
+  private final String phoneNumber;
+  private final String country;
 
-    private final LocalDate birthDate;
-
+  private final LocalDate birthDate;
 }

@@ -15,30 +15,31 @@ import java.util.Objects;
 @RequestMapping("/v2/app")
 public class AppController {
 
-    private static Logger log = LoggerFactory.getLogger(AppController.class);
+  private static Logger log = LoggerFactory.getLogger(AppController.class);
 
-    private final MessagesService messagesService;
+  private final MessagesService messagesService;
 
-    public AppController(MessagesService messagesService) {
-        this.messagesService = messagesService;
-    }
+  public AppController(MessagesService messagesService) {
+    this.messagesService = messagesService;
+  }
 
-    @GetMapping("/")
-    public MessagesDTO getMessages(
-            @RequestHeader("hedvig.token") String hid,
-            @RequestParam(name = "intent", required = false, defaultValue = "onboarding") String intentParameter) {
+  @GetMapping("/")
+  public MessagesDTO getMessages(
+      @RequestHeader("hedvig.token") String hid,
+      @RequestParam(name = "intent", required = false, defaultValue = "onboarding")
+          String intentParameter) {
 
-        SessionManager.Intent intent = Objects.equals(intentParameter, "login") ? SessionManager.Intent.LOGIN : SessionManager.Intent.ONBOARDING;
-        return this.messagesService.getMessagesAndStatus(hid, intent);
-    }
+    SessionManager.Intent intent =
+        Objects.equals(intentParameter, "login")
+            ? SessionManager.Intent.LOGIN
+            : SessionManager.Intent.ONBOARDING;
+    return this.messagesService.getMessagesAndStatus(hid, intent);
+  }
 
+  @PostMapping("fabTrigger/{actionId}")
+  public ResponseEntity<?> fabTrigger(
+      @RequestHeader("hedvig.token") String hid, @PathVariable FABAction actionId) {
 
-    @PostMapping("fabTrigger/{actionId}")
-    public ResponseEntity<?> fabTrigger(@RequestHeader("hedvig.token") String hid, @PathVariable FABAction actionId) {
-
-        return this.messagesService.fabTrigger(hid, actionId);
-
-    }
-
-
+    return this.messagesService.fabTrigger(hid, actionId);
+  }
 }

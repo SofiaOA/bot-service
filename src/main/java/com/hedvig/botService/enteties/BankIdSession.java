@@ -3,35 +3,38 @@ package com.hedvig.botService.enteties;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdProgressStatus;
 
 public interface BankIdSession {
-    boolean shouldAbort();
+  boolean shouldAbort();
 
-    void setDone();
+  void setDone();
 
-    boolean isDone();
+  boolean isDone();
 
-    void addError();
+  void addError();
 
-    void update(BankIdProgressStatus bankIdStatus);
+  void update(BankIdProgressStatus bankIdStatus);
 
-    Boolean getDone();
+  Boolean getDone();
 
-    Long getId();
+  Long getId();
 
-    String getReferenceToken();
+  String getReferenceToken();
 
-    String getAutoStartToken();
+  String getAutoStartToken();
 
-    CollectionType getCollectionType();
+  CollectionType getCollectionType();
 
-    UserContext getUserContext();
+  UserContext getUserContext();
 
-    String getLastStatus();
+  String getLastStatus();
 
-    Long getVersion();
+  Long getVersion();
 
-    java.time.Instant getLastCallTime();
+  java.time.Instant getLastCallTime();
 
-    Integer getErrorCount();
+  Integer getErrorCount();
 
-    public enum CollectionType { AUTH, SIGN }
+  public enum CollectionType {
+    AUTH,
+    SIGN
+  }
 }

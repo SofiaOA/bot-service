@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class AddMessageRequestDTO {
-    String memberId;
-    String msg;
+  String memberId;
+  String msg;
 }

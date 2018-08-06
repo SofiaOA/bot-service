@@ -6,10 +6,10 @@ import lombok.Data;
 
 @Data
 public class TrackingDTO {
-	 String utmSource;
-	 String utmMedium;
-	 List<String> utmContent;
-	 String utmCampaign;
-	 List<String> utmTerm;
-	 String phoneNumber;
+  String utmSource;
+  String utmMedium;
+  List<String> utmContent;
+  String utmCampaign;
+  List<String> utmTerm;
+  String phoneNumber;
 }

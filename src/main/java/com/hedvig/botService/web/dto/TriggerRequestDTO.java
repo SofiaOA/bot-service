@@ -7,6 +7,5 @@ import java.util.UUID;
 @Value
 public class TriggerRequestDTO {
 
-    UUID triggerId;
-
+  UUID triggerId;
 }

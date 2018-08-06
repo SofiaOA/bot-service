@@ -7,9 +7,9 @@ import java.util.UUID;
 @Value
 public class OrderInformation {
 
-    UUID id;
+  UUID id;
 
-    String iframeUrl;
+  String iframeUrl;
 
-    OrderState state;
+  OrderState state;
 }

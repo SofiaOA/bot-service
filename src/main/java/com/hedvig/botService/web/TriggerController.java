@@ -22,73 +22,84 @@ import java.util.UUID;
 @RequestMapping("/hedvig/trigger")
 public class TriggerController {
 
-    private final Logger log = LoggerFactory.getLogger(TriggerController.class);
+  private final Logger log = LoggerFactory.getLogger(TriggerController.class);
 
-    private final TriggerService triggerService;
-    private final Environment environment;
-    private final URI errorPageUrl;
+  private final TriggerService triggerService;
+  private final Environment environment;
+  private final URI errorPageUrl;
 
-    public TriggerController(TriggerService triggerService, Environment environment, @Value("${hedvig.trigger.errorPageUrl:http://hedvig.com/error}") String errorPageUrl) {
-        this.triggerService = triggerService;
-        this.environment = environment;
-        this.errorPageUrl = URI.create(errorPageUrl);
+  public TriggerController(
+      TriggerService triggerService,
+      Environment environment,
+      @Value("${hedvig.trigger.errorPageUrl:http://hedvig.com/error}") String errorPageUrl) {
+    this.triggerService = triggerService;
+    this.environment = environment;
+    this.errorPageUrl = URI.create(errorPageUrl);
+  }
+
+  @PostMapping("{triggerId}")
+  public ResponseEntity<TriggerResponseDTO> index(
+      @RequestHeader("hedvig.token") String hid, @PathVariable UUID triggerId) {
+
+    final String triggerUrl = triggerService.getTriggerUrl(triggerId, hid);
+    if (triggerUrl == null) {
+      return ResponseEntity.notFound().build();
     }
 
-    @PostMapping("{triggerId}")
-    public ResponseEntity<TriggerResponseDTO> index(@RequestHeader("hedvig.token") String hid, @PathVariable UUID triggerId) {
+    TriggerResponseDTO response =
+        new TriggerResponseDTO(triggerUrl + "&gui=native&color=%23651EFF&bordercolor=%230F007A");
+    return ResponseEntity.ok(response);
+  }
 
-        final String triggerUrl = triggerService.getTriggerUrl(triggerId, hid);
-        if(triggerUrl == null) {
-            return ResponseEntity.notFound().build();
-        }
+  /**
+   * Helper function that allows easy testing of the DirectDebitMandates during development.
+   *
+   * @return
+   */
+  @PostMapping("_/createDDM")
+  public ResponseEntity<String> index(
+      @RequestHeader("hedvig.token") String hid,
+      @RequestBody CreateDirectDebitMandateDTO requestData) {
 
-        TriggerResponseDTO response = new TriggerResponseDTO(triggerUrl + "&gui=native&color=%23651EFF&bordercolor=%230F007A");
-        return ResponseEntity.ok(response);
+    if (ArrayUtils.contains(environment.getActiveProfiles(), Profiles.PRODUCTION)) {
+      return ResponseEntity.notFound().build();
     }
 
-    /**
-     * Helper function that allows easy testing of the DirectDebitMandates during development.
-     * @return
-     */
-    @PostMapping("_/createDDM")
-    public ResponseEntity<String> index(@RequestHeader("hedvig.token") String hid, @RequestBody CreateDirectDebitMandateDTO requestData) {
+    final UUID triggerId = triggerService.createTrustlyDirectDebitMandate(requestData, hid);
 
-        if(ArrayUtils.contains(environment.getActiveProfiles(), Profiles.PRODUCTION)) {
-            return ResponseEntity.notFound().build();
-        }
+    return ResponseEntity.ok("{\"id\":\"" + triggerId.toString() + "\"}");
+  }
 
+  @GetMapping("/notification")
+  public ResponseEntity<?> getNotification(
+      @RequestParam("triggerId") UUID triggerId,
+      @RequestParam("status") DirectDebitMandateTrigger.TriggerStatus status) {
 
-        final UUID triggerId = triggerService.createTrustlyDirectDebitMandate(
-                requestData,
-                hid
-        );
+    log.info(
+        "GET /hedvig/trigger/notification, triggerId: {}, status: {}",
+        triggerId.toString(),
+        status.name());
 
+    try {
+      final String redirectionUrl = triggerService.clientNotificationReceived(triggerId, status);
 
-        return ResponseEntity.ok("{\"id\":\"" + triggerId.toString() + "\"}");
+      log.info("Redirecting to: {}", redirectionUrl);
+      return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+          .location(URI.create(redirectionUrl))
+          .build(); // .location()
+    } catch (Exception ex) {
+      log.error(
+          "Exception caught in TriggerController.getNotificaiton, redirecting to " + errorPageUrl,
+          ex);
     }
 
-    @GetMapping("/notification")
-    public ResponseEntity<?> getNotification(@RequestParam("triggerId") UUID triggerId,@RequestParam("status")  DirectDebitMandateTrigger.TriggerStatus status) {
+    log.info("Redirecting to: {}", this.errorPageUrl);
+    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(this.errorPageUrl).build();
+  }
 
-        log.info("GET /hedvig/trigger/notification, triggerId: {}, status: {}", triggerId.toString(), status.name());
-
-        try {
-            final String redirectionUrl = triggerService.clientNotificationReceived(triggerId, status);
-
-            log.info("Redirecting to: {}", redirectionUrl);
-            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(URI.create(redirectionUrl)).build();//.location()
-        }
-        catch(Exception ex) {
-            log.error("Exception caught in TriggerController.getNotificaiton, redirecting to " + errorPageUrl, ex);
-        }
-
-        log.info("Redirecting to: {}", this.errorPageUrl);
-        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).location(this.errorPageUrl).build();
-    }
-
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(UnathorizedException.class)
-    public String handleException(UnathorizedException ex) {
-        return ex.getMessage();
-    }
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  @ExceptionHandler(UnathorizedException.class)
+  public String handleException(UnathorizedException ex) {
+    return ex.getMessage();
+  }
 }

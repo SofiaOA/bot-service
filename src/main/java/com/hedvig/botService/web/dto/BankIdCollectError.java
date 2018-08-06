@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class BankIdCollectError {
-    String errorCode;
-    String message;
+  String errorCode;
+  String message;
 }

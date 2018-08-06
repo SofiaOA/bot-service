@@ -4,11 +4,10 @@ import lombok.Value;
 
 @Value
 public class CreateDirectDebitMandateDTO {
-    String ssn;
+  String ssn;
 
-    String firstName;
-    String lastName;
+  String firstName;
+  String lastName;
 
-    String email;
-
+  String email;
 }

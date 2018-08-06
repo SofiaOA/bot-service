@@ -24,49 +24,40 @@ import com.hedvig.botService.web.dto.TrackingDTO;
 @ToString
 public class TrackingEntity {
 
-	private static Logger log = LoggerFactory.getLogger(TrackingEntity.class);
-	
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  private static Logger log = LoggerFactory.getLogger(TrackingEntity.class);
 
-    @Getter
-    private String utmSource;
-    
-    @Getter
-    private String utmMedium;
-    
-    @ElementCollection
-    private List<String> utmContent = new ArrayList<String>();
-    
-    @Getter
-    private String utmCampaign;
-    
-    @ElementCollection
-    private List<String> utmTerm = new ArrayList<String>();
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Getter
-    private String phoneNumber;
-    
-	@NotNull
-	@Column(nullable = false)
-    @Getter
-    @Setter
-	private Instant timestamp;
-    
-    
-    public TrackingEntity(String memberId, TrackingDTO tracking){
-    	this.memberId = memberId;
-    	this.utmSource = tracking.getUtmSource();
-    	this.utmMedium = tracking.getUtmMedium();
-    	this.utmCampaign = tracking.getUtmCampaign();
-    	this.phoneNumber = tracking.getPhoneNumber();
-    	this.utmContent = tracking.getUtmContent();
-    	this.utmTerm = tracking.getUtmTerm();
-    	this.timestamp = Instant.now();
-    }
-    
-    @Getter
-    public String memberId;
+  @Getter private String utmSource;
 
+  @Getter private String utmMedium;
+
+  @ElementCollection private List<String> utmContent = new ArrayList<String>();
+
+  @Getter private String utmCampaign;
+
+  @ElementCollection private List<String> utmTerm = new ArrayList<String>();
+
+  @Getter private String phoneNumber;
+
+  @NotNull
+  @Column(nullable = false)
+  @Getter
+  @Setter
+  private Instant timestamp;
+
+  public TrackingEntity(String memberId, TrackingDTO tracking) {
+    this.memberId = memberId;
+    this.utmSource = tracking.getUtmSource();
+    this.utmMedium = tracking.getUtmMedium();
+    this.utmCampaign = tracking.getUtmCampaign();
+    this.phoneNumber = tracking.getPhoneNumber();
+    this.utmContent = tracking.getUtmContent();
+    this.utmTerm = tracking.getUtmTerm();
+    this.timestamp = Instant.now();
+  }
+
+  @Getter public String memberId;
 }

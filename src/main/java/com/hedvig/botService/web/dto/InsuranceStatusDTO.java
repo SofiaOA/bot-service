@@ -7,7 +7,6 @@ import java.util.List;
 @Value
 public class InsuranceStatusDTO {
 
-    List<String> safetyIncreasers;
-    String insuranceStatus;
-
+  List<String> safetyIncreasers;
+  String insuranceStatus;
 }

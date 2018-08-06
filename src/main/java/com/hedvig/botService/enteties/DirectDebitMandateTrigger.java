@@ -16,29 +16,28 @@ import java.util.UUID;
 @ToString
 public class DirectDebitMandateTrigger implements Serializable {
 
-    public enum TriggerStatus {
-        CRATED,
-        IN_PROGRESS,
-        FAILED,
-        SUCCESS
-    }
+  public enum TriggerStatus {
+    CRATED,
+    IN_PROGRESS,
+    FAILED,
+    SUCCESS
+  }
 
-    @Id
-    @GeneratedValue
-    @Column( columnDefinition = "uuid", updatable = false )
-    UUID id;
+  @Id
+  @GeneratedValue
+  @Column(columnDefinition = "uuid", updatable = false)
+  UUID id;
 
-    String firstName;
-    String lastName;
-    String email;
-    String ssn;
+  String firstName;
+  String lastName;
+  String email;
+  String ssn;
 
-    String url;
+  String url;
 
-    @NotNull
-    String memberId;
+  @NotNull String memberId;
 
-    String orderId;
+  String orderId;
 
-    TriggerStatus  status;
+  TriggerStatus status;
 }

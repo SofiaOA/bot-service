@@ -6,5 +6,5 @@ import lombok.Value;
 @Value
 @ToString
 public class ExpoDeviceInfoDTO {
-    private DeviceInformation deviceInfo;
+  private DeviceInformation deviceInfo;
 }

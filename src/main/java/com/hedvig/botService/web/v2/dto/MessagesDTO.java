@@ -8,25 +8,22 @@ import java.util.List;
 @Value
 public class MessagesDTO {
 
-    @Value
-    public static class State {
-        boolean ongoingClaim;
-        boolean showOfferScreen;
-        boolean onboardingDone;
-    }
+  @Value
+  public static class State {
+    boolean ongoingClaim;
+    boolean showOfferScreen;
+    boolean onboardingDone;
+  }
 
-    @Value
-    public static class FABOption {
-        String text;
-        String triggerUrl;
-        boolean enabled;
-    }
+  @Value
+  public static class FABOption {
+    String text;
+    String triggerUrl;
+    boolean enabled;
+  }
 
-    State state;
+  State state;
 
-
-    List<Message> messages;
-    List<FABOption> fabOptions;
+  List<Message> messages;
+  List<FABOption> fabOptions;
 }
-
-

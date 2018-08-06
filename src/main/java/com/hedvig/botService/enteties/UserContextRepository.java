@@ -8,7 +8,6 @@ import java.util.Optional;
 
 public interface UserContextRepository extends JpaRepository<UserContext, Integer> {
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<UserContext> findByMemberId(String id);
-
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  Optional<UserContext> findByMemberId(String id);
 }

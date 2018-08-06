@@ -7,8 +7,7 @@ import java.time.LocalDateTime;
 @Value
 public class StartClaimAudioDTO {
 
-	String userId;
-	LocalDateTime registrationDate;
-	String audioURL;
-
+  String userId;
+  LocalDateTime registrationDate;
+  String audioURL;
 }

@@ -13,84 +13,84 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ConversationFactoryImpl implements ConversationFactory {
-    private final Logger log = LoggerFactory.getLogger(ConversationFactoryImpl.class);
-    private final MemberService memberService;
-    private final ProductPricingService productPricingService;
-    private final TriggerService triggerService;
-    private final SignupCodeRepository signupCodeRepository;
-    private final ApplicationEventPublisher eventPublisher;
-    private final ClaimsService claimsService;
+  private final Logger log = LoggerFactory.getLogger(ConversationFactoryImpl.class);
+  private final MemberService memberService;
+  private final ProductPricingService productPricingService;
+  private final TriggerService triggerService;
+  private final SignupCodeRepository signupCodeRepository;
+  private final ApplicationEventPublisher eventPublisher;
+  private final ClaimsService claimsService;
 
-    private final StatusBuilder statusBuilder;
-    private Integer queuePos;
+  private final StatusBuilder statusBuilder;
+  private Integer queuePos;
 
-    public ConversationFactoryImpl(MemberService memberService,
-                                   ProductPricingService productPricingService,
-                                   TriggerService triggerService,
-                                   SignupCodeRepository signupCodeRepository,
-                                   ApplicationEventPublisher eventPublisher,
-                                   ClaimsService claimsService,
-                                   StatusBuilder statusBuilder,
-                                   @Value("${hedvig.waitlist.length}") Integer queuePos) {
-        this.memberService = memberService;
-        this.productPricingService = productPricingService;
-        this.triggerService = triggerService;
+  public ConversationFactoryImpl(
+      MemberService memberService,
+      ProductPricingService productPricingService,
+      TriggerService triggerService,
+      SignupCodeRepository signupCodeRepository,
+      ApplicationEventPublisher eventPublisher,
+      ClaimsService claimsService,
+      StatusBuilder statusBuilder,
+      @Value("${hedvig.waitlist.length}") Integer queuePos) {
+    this.memberService = memberService;
+    this.productPricingService = productPricingService;
+    this.triggerService = triggerService;
 
-        this.signupCodeRepository = signupCodeRepository;
-        this.eventPublisher = eventPublisher;
-        this.claimsService = claimsService;
-        this.statusBuilder = statusBuilder;
-        this.queuePos = queuePos;
+    this.signupCodeRepository = signupCodeRepository;
+    this.eventPublisher = eventPublisher;
+    this.claimsService = claimsService;
+    this.statusBuilder = statusBuilder;
+    this.queuePos = queuePos;
+  }
+
+  @Override
+  public Conversation createConversation(Class<?> conversationClass) {
+
+    if (conversationClass.equals(CharityConversation.class)) {
+      return new CharityConversation(this, memberService, productPricingService);
     }
 
-    @Override
-    public Conversation createConversation(Class<?> conversationClass) {
-
-        if(conversationClass.equals(CharityConversation.class)) {
-            return new CharityConversation(this, memberService, productPricingService);
-        }
-
-        if(conversationClass.equals(ClaimsConversation.class)) {
-            return new ClaimsConversation(eventPublisher, claimsService, productPricingService, this);
-        }
-
-        if(conversationClass.equals(MainConversation.class)) {
-            return new MainConversation(productPricingService, this, eventPublisher);
-        }
-
-        if(conversationClass.equals(OnboardingConversationDevi.class)) {
-            final OnboardingConversationDevi onboardingConversationDevi = new OnboardingConversationDevi(memberService, productPricingService, signupCodeRepository, eventPublisher, this);
-            onboardingConversationDevi.queuePos = queuePos;
-            return onboardingConversationDevi;
-        }
-
-        if(conversationClass.equals(TrustlyConversation.class)) {
-                return new TrustlyConversation(triggerService, this, memberService);
-        }
-
-        if(conversationClass.equals(FreeChatConversation.class)) {
-            return new FreeChatConversation(statusBuilder, eventPublisher, productPricingService);
-        }
-
-        if(conversationClass.equals(CallMeConversation.class)) {
-            return new CallMeConversation(statusBuilder, eventPublisher);
-        }
-
-        return null;
+    if (conversationClass.equals(ClaimsConversation.class)) {
+      return new ClaimsConversation(eventPublisher, claimsService, productPricingService, this);
     }
 
-    @Override
-    public Conversation createConversation(String conversationClassName) {
-        try {
-            Class<?> concreteClass = Class.forName(conversationClassName);
-            return createConversation(concreteClass);
-        }catch(ClassNotFoundException ex) {
-            log.error("Could not create conversation for classname: {}", conversationClassName, ex);
-        }
-
-        return null;
+    if (conversationClass.equals(MainConversation.class)) {
+      return new MainConversation(productPricingService, this, eventPublisher);
     }
 
+    if (conversationClass.equals(OnboardingConversationDevi.class)) {
+      final OnboardingConversationDevi onboardingConversationDevi =
+          new OnboardingConversationDevi(
+              memberService, productPricingService, signupCodeRepository, eventPublisher, this);
+      onboardingConversationDevi.queuePos = queuePos;
+      return onboardingConversationDevi;
+    }
 
+    if (conversationClass.equals(TrustlyConversation.class)) {
+      return new TrustlyConversation(triggerService, this, memberService);
+    }
 
+    if (conversationClass.equals(FreeChatConversation.class)) {
+      return new FreeChatConversation(statusBuilder, eventPublisher, productPricingService);
+    }
+
+    if (conversationClass.equals(CallMeConversation.class)) {
+      return new CallMeConversation(statusBuilder, eventPublisher);
+    }
+
+    return null;
+  }
+
+  @Override
+  public Conversation createConversation(String conversationClassName) {
+    try {
+      Class<?> concreteClass = Class.forName(conversationClassName);
+      return createConversation(concreteClass);
+    } catch (ClassNotFoundException ex) {
+      log.error("Could not create conversation for classname: {}", conversationClassName, ex);
+    }
+
+    return null;
+  }
 }

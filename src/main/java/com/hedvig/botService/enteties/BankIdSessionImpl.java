@@ -13,68 +13,63 @@ import java.time.Instant;
 @ToString(exclude = "userContext")
 public class BankIdSessionImpl implements BankIdSession {
 
-    private Boolean done;
+  private Boolean done;
 
-    @Override
-    public boolean shouldAbort() {
-        if(errorCount == null) {
-            errorCount = 0;
-        }
-        return errorCount > 3;
+  @Override
+  public boolean shouldAbort() {
+    if (errorCount == null) {
+      errorCount = 0;
     }
+    return errorCount > 3;
+  }
 
-    @Override
-    public void setDone() {
-        this.done = true;
+  @Override
+  public void setDone() {
+    this.done = true;
+  }
+
+  @Override
+  public boolean isDone() {
+    return this.done == null ? false : this.done;
+  };
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  private String referenceToken;
+
+  private String autoStartToken;
+
+  private CollectionType collectionType;
+
+  @ManyToOne private UserContext userContext;
+
+  private String lastStatus;
+
+  @Version private Long version;
+
+  private Instant lastCallTime;
+
+  private Integer errorCount = 0;
+
+  public BankIdSessionImpl() {}
+
+  @Override
+  public void addError() {
+    if (errorCount == null) {
+      errorCount = 0;
     }
+    errorCount++;
+  }
 
-    @Override
-    public boolean isDone() {
-        return this.done == null ? false : this.done;
-    }
+  @Override
+  public void update(BankIdProgressStatus bankIdStatus) {
+    this.lastStatus = bankIdStatus.name();
+  }
 
-    ;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String referenceToken;
-
-    private String autoStartToken;
-
-    private CollectionType collectionType;
-
-    @ManyToOne
-    private UserContext userContext;
-
-    private String lastStatus;
-
-    @Version
-    private Long version;
-
-    private Instant lastCallTime;
-
-    private Integer errorCount = 0;
-
-    public BankIdSessionImpl() {
-    }
-
-    @Override
-    public void addError() {
-        if(errorCount == null) {
-            errorCount = 0;
-        }
-        errorCount++;
-    }
-
-    @Override
-    public void update(BankIdProgressStatus bankIdStatus) {
-        this.lastStatus = bankIdStatus.name();
-    }
-
-    public boolean allowedToCall() {
-        Instant now = Instant.now();
-        return Duration.between(getLastCallTime(), now).toMillis() > 300;
-    }
+  public boolean allowedToCall() {
+    Instant now = Instant.now();
+    return Duration.between(getLastCallTime(), now).toMillis() > 300;
+  }
 }

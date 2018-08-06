@@ -8,6 +8,5 @@ import java.util.UUID;
 @Repository
 public interface DirectDebitRepository extends CrudRepository<DirectDebitMandateTrigger, UUID> {
 
-
-    //DirectDebitMandateTrigger findOne(DirectDebitMandateTrigger directDebitMandate);
+  // DirectDebitMandateTrigger findOne(DirectDebitMandateTrigger directDebitMandate);
 }

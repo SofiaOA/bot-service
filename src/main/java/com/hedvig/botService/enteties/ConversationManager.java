@@ -20,143 +20,151 @@ import java.util.stream.Collectors;
  * */
 
 @Entity
-//@Table(indexes = {
+// @Table(indexes = {
 //        @Index(columnList = "id", name = "conversation_manager_id_idx")
-//})
+// })
 @ToString
 public class ConversationManager {
 
-	private static Logger log = LoggerFactory.getLogger(ConversationManager.class);
-	
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+  private static Logger log = LoggerFactory.getLogger(ConversationManager.class);
 
-    @Getter
-    private String memberId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
 
-    @OneToMany(mappedBy="conversationManager", cascade = CascadeType.ALL, orphanRemoval=true)
-    private List<ConversationEntity> conversations;
+  @Getter private String memberId;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private ConversationEntity activeConversation;
-    
-    public ConversationManager() {
-        conversations = new ArrayList<>();
-    }
+  @OneToMany(mappedBy = "conversationManager", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ConversationEntity> conversations;
 
-    ConversationManager(String memberId) {
-    	log.info("Instantiating ConversationManager for member: " + memberId);
-        this.memberId = memberId;
-        this.conversations = new ArrayList<>();
-    }
+  @OneToOne(cascade = CascadeType.ALL)
+  private ConversationEntity activeConversation;
 
+  public ConversationManager() {
+    conversations = new ArrayList<>();
+  }
 
-    
-	List<ConversationEntity> getConversations() {
-		return conversations;
-	}
+  ConversationManager(String memberId) {
+    log.info("Instantiating ConversationManager for member: " + memberId);
+    this.memberId = memberId;
+    this.conversations = new ArrayList<>();
+  }
 
-    boolean startConversation(Class<? extends Conversation> conversationClass) {
+  List<ConversationEntity> getConversations() {
+    return conversations;
+  }
 
-        return startConversation(conversationClass, null);
-    }
+  boolean startConversation(Class<? extends Conversation> conversationClass) {
 
-    boolean startConversation(Class<? extends Conversation> conversationClass, String startMessage) {
+    return startConversation(conversationClass, null);
+  }
 
-        for(ConversationEntity c : conversations){
-            if(c.getConversationStatus() == Conversation.conversationStatus.ONGOING) {
-                if (c.containsConversation(conversationClass)){
-                    return false;
-                } else {
-                    c.setConversationStatus(Conversation.conversationStatus.COMPLETE);
-                }
-            }
+  boolean startConversation(Class<? extends Conversation> conversationClass, String startMessage) {
+
+    for (ConversationEntity c : conversations) {
+      if (c.getConversationStatus() == Conversation.conversationStatus.ONGOING) {
+        if (c.containsConversation(conversationClass)) {
+          return false;
+        } else {
+          c.setConversationStatus(Conversation.conversationStatus.COMPLETE);
         }
-
-        ConversationEntity conv = new ConversationEntity(this, getMemberId(), conversationClass, startMessage);
-
-        addConversationAndSetActive(conv);
-
-        return true;
+      }
     }
 
-    Optional<ConversationEntity> getActiveConversation() {
-        if(this.activeConversation == null) {
-            return  conversations.
-                    stream().
-                    filter(x -> x.getConversationStatus() == Conversation.conversationStatus.ONGOING).
-                    findFirst();
-        }
+    ConversationEntity conv =
+        new ConversationEntity(this, getMemberId(), conversationClass, startMessage);
 
-        return Optional.of(activeConversation);
+    addConversationAndSetActive(conv);
+
+    return true;
+  }
+
+  Optional<ConversationEntity> getActiveConversation() {
+    if (this.activeConversation == null) {
+      return conversations
+          .stream()
+          .filter(x -> x.getConversationStatus() == Conversation.conversationStatus.ONGOING)
+          .findFirst();
     }
 
-    void setActiveConversation(Conversation conversationClass) {
-        List<ConversationEntity> potentialConversations = conversations
+    return Optional.of(activeConversation);
+  }
+
+  void setActiveConversation(Conversation conversationClass) {
+    List<ConversationEntity> potentialConversations =
+        conversations
             .stream()
             .filter(c -> c.containsConversation(conversationClass.getClass()))
             .collect(Collectors.toList());
-        if (potentialConversations.size() != 1) {
-            throw new RuntimeException(String.format("Invalid invariant, more than one occurrence of conversation: %s", conversationClass.getClass().toString()));
-        }
-        activeConversation = potentialConversations.get(0);
+    if (potentialConversations.size() != 1) {
+      throw new RuntimeException(
+          String.format(
+              "Invalid invariant, more than one occurrence of conversation: %s",
+              conversationClass.getClass().toString()));
     }
+    activeConversation = potentialConversations.get(0);
+  }
 
-    private void addConversationAndSetActive(ConversationEntity c) {
-        conversations.add(c);
-        activeConversation = c;
-    }
+  private void addConversationAndSetActive(ConversationEntity c) {
+    conversations.add(c);
+    activeConversation = c;
+  }
 
-    void completeConversation(Conversation conversation) {
-        if(activeConversation == null) {
-            for (ConversationEntity c : getConversations()) {
-                if (c.containsConversation(conversation) && c.conversationStatus == Conversation.conversationStatus.ONGOING) {
-                    c.conversationStatus = Conversation.conversationStatus.COMPLETE;
-                }
-            }
+  void completeConversation(Conversation conversation) {
+    if (activeConversation == null) {
+      for (ConversationEntity c : getConversations()) {
+        if (c.containsConversation(conversation)
+            && c.conversationStatus == Conversation.conversationStatus.ONGOING) {
+          c.conversationStatus = Conversation.conversationStatus.COMPLETE;
         }
-        else {
-            activeConversation.setConversationStatus(Conversation.conversationStatus.COMPLETE);
-        }
+      }
+    } else {
+      activeConversation.setConversationStatus(Conversation.conversationStatus.COMPLETE);
     }
+  }
 
-    public void receiveEvent(String eventType, String value, ConversationFactory conversationFactory, UserContext userContext) {
-        Conversation.EventTypes type = Conversation.EventTypes.valueOf(eventType);
+  public void receiveEvent(
+      String eventType,
+      String value,
+      ConversationFactory conversationFactory,
+      UserContext userContext) {
+    Conversation.EventTypes type = Conversation.EventTypes.valueOf(eventType);
 
+    List<ConversationEntity> conversations =
+        new ArrayList<>(getConversations()); // We will add a new element to uc.conversationManager
+    for (ConversationEntity c : conversations) {
 
-        List<ConversationEntity> conversations = new ArrayList<>(getConversations()); //We will add a new element to uc.conversationManager
-        for(ConversationEntity c : conversations){
+      // Only deliver messages to ongoing conversations
+      if (!c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING)) continue;
 
-            // Only deliver messages to ongoing conversations
-            if(!c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING))continue;
+      try {
+        final Class<?> conversationClass = Class.forName(c.getClassName());
+        final Conversation conversation = conversationFactory.createConversation(conversationClass);
+        conversation.receiveEvent(type, value, userContext);
 
-            try {
-                final Class<?> conversationClass = Class.forName(c.getClassName());
-                final Conversation conversation = conversationFactory.createConversation(conversationClass);
-                conversation.receiveEvent(type, value, userContext);
-
-            } catch (ClassNotFoundException e) {
-                log.error("Could not load conversation from db!", e);
-            }
-        }
+      } catch (ClassNotFoundException e) {
+        log.error("Could not load conversation from db!", e);
+      }
     }
+  }
 
-    public void receiveMessage(Message m, ConversationFactory conversationFactory, UserContext userContext) {
-List<ConversationEntity> conversations = new ArrayList<>(getConversations()); //We will add a new element to uc.conversationManager
-        for(ConversationEntity c : conversations){
+  public void receiveMessage(
+      Message m, ConversationFactory conversationFactory, UserContext userContext) {
+    List<ConversationEntity> conversations =
+        new ArrayList<>(getConversations()); // We will add a new element to uc.conversationManager
+    for (ConversationEntity c : conversations) {
 
-            // Only deliver messages to ongoing conversations
-            if(!c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING))continue;
+      // Only deliver messages to ongoing conversations
+      if (!c.getConversationStatus().equals(Conversation.conversationStatus.ONGOING)) continue;
 
-            try {
-                final Class<?> conversationClass = Class.forName(c.getClassName());
-                final Conversation conversation = conversationFactory.createConversation(conversationClass);
-                conversation.receiveMessage(userContext, m);
+      try {
+        final Class<?> conversationClass = Class.forName(c.getClassName());
+        final Conversation conversation = conversationFactory.createConversation(conversationClass);
+        conversation.receiveMessage(userContext, m);
 
-            } catch (ClassNotFoundException e) {
-                log.error("Could not load conversation from db!", e);
-            }
-        }
+      } catch (ClassNotFoundException e) {
+        log.error("Could not load conversation from db!", e);
+      }
     }
+  }
 }

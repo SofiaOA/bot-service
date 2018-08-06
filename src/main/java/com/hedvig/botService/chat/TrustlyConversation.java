@@ -195,7 +195,8 @@ public class TrustlyConversation extends Conversation {
 
   @Override
   void addToChat(Message m, UserContext userContext) {
-    if ((m.id.equals(START) || m.id.equals(CANCEL) || m.id.equals(FORCED_START)) && m.header.fromId == HEDVIG_USER_ID) {
+    if ((m.id.equals(START) || m.id.equals(CANCEL) || m.id.equals(FORCED_START))
+        && m.header.fromId == HEDVIG_USER_ID) {
       final UserData userData = userContext.getOnBoardingData();
       UUID triggerUUID =
           triggerService.createTrustlyDirectDebitMandate(

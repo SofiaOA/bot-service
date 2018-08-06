@@ -1,4 +1,3 @@
-
 package com.hedvig.botService.enteties;
 
 import com.hedvig.botService.chat.Conversation;
@@ -13,80 +12,83 @@ import java.util.Objects;
  * */
 
 @Entity
-@Table(indexes = {
-		@Index(columnList = "id", name = "conversation_entity_id_idx"),
-		@Index(columnList = "conversation_manager_id", name= "conversation_entity_manager_id_idx")
-})
+@Table(
+    indexes = {
+      @Index(columnList = "id", name = "conversation_entity_id_idx"),
+      @Index(columnList = "conversation_manager_id", name = "conversation_entity_manager_id_idx")
+    })
 @ToString(exclude = "conversationManager")
 public class ConversationEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    
-    @Getter
-    private String memberId;
-	
-    @ManyToOne()
-    private ConversationManager conversationManager;
-    
-    public Conversation.conversationStatus conversationStatus;
-    
-    private String className;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
 
-    private String startMessage; // Optional starting point in conversation
+  @Getter private String memberId;
 
-	public ConversationEntity() {}
+  @ManyToOne() private ConversationManager conversationManager;
 
-	public ConversationEntity(ConversationManager conversationManager, String memberId, Class<? extends Conversation> conversationClass, String startMessage) {
-		this.className = conversationClass.getName();
-		this.memberId = memberId;
-		this.setConversationStatus(Conversation.conversationStatus.ONGOING);
-		this.conversationManager = conversationManager;
-		if(startMessage != null) {
-			this.setStartMessage(startMessage);
-		}
-	}
+  public Conversation.conversationStatus conversationStatus;
 
-	public Integer getId() {
-		return id;
-	}
+  private String className;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+  private String startMessage; // Optional starting point in conversation
 
-	public Conversation.conversationStatus getConversationStatus() {
-		return conversationStatus;
-	}
+  public ConversationEntity() {}
 
-	public void setConversationStatus(Conversation.conversationStatus conversationStatus) {
-		this.conversationStatus = conversationStatus;
-	}
+  public ConversationEntity(
+      ConversationManager conversationManager,
+      String memberId,
+      Class<? extends Conversation> conversationClass,
+      String startMessage) {
+    this.className = conversationClass.getName();
+    this.memberId = memberId;
+    this.setConversationStatus(Conversation.conversationStatus.ONGOING);
+    this.conversationManager = conversationManager;
+    if (startMessage != null) {
+      this.setStartMessage(startMessage);
+    }
+  }
 
-	public String getClassName() {
-		return className;
-	}
+  public Integer getId() {
+    return id;
+  }
 
-	public String getStartMessage() {
-		return startMessage;
-	}
+  public void setId(Integer id) {
+    this.id = id;
+  }
 
-	public void setStartMessage(String startMessage) {
-		this.startMessage = startMessage;
-	}
+  public Conversation.conversationStatus getConversationStatus() {
+    return conversationStatus;
+  }
 
-	public ConversationManager getConversationManager() {
-		return conversationManager;
-	}
+  public void setConversationStatus(Conversation.conversationStatus conversationStatus) {
+    this.conversationStatus = conversationStatus;
+  }
 
-	public boolean containsConversation(Conversation conversation) {
-		String conversationClassName = conversation.getClass().getName();
-		return Objects.equals(this.getClassName(), conversationClassName);
-	}
+  public String getClassName() {
+    return className;
+  }
 
-	public boolean containsConversation(Class<? extends Conversation> conversationClass) {
-		String conversationClassName = conversationClass.getName();
-		return Objects.equals(this.getClassName(), conversationClassName);
-	}
+  public String getStartMessage() {
+    return startMessage;
+  }
+
+  public void setStartMessage(String startMessage) {
+    this.startMessage = startMessage;
+  }
+
+  public ConversationManager getConversationManager() {
+    return conversationManager;
+  }
+
+  public boolean containsConversation(Conversation conversation) {
+    String conversationClassName = conversation.getClass().getName();
+    return Objects.equals(this.getClassName(), conversationClassName);
+  }
+
+  public boolean containsConversation(Class<? extends Conversation> conversationClass) {
+    String conversationClassName = conversationClass.getName();
+    return Objects.equals(this.getClassName(), conversationClassName);
+  }
 }

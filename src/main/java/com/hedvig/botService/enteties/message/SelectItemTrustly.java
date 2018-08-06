@@ -6,27 +6,25 @@ import lombok.ToString;
 @ToString
 public class SelectItemTrustly extends SelectItem {
 
-    static final long serialVersionUID = 1L;
+  static final long serialVersionUID = 1L;
 
-    public String id;
+  public String id;
 
-    public SelectItemTrustly(String text, String value) {
-        super(false, text, value);
-    }
+  public SelectItemTrustly(String text, String value) {
+    super(false, text, value);
+  }
 
-    public SelectItemTrustly(String text, String value, Boolean selected, String id) {
-        super(selected, text, value);
-        this.id = id;
-    }
+  public SelectItemTrustly(String text, String value, Boolean selected, String id) {
+    super(selected, text, value);
+    this.id = id;
+  }
 
-    public SelectItemTrustly(){}
+  public SelectItemTrustly() {}
 
-    @Override
-    public void render(UserContext userContext) {
-        super.render(userContext);
+  @Override
+  public void render(UserContext userContext) {
+    super.render(userContext);
 
-        this.id = userContext.replaceWithContext(UserContext.TRUSTLY_TRIGGER_ID);
-    }
-
-
+    this.id = userContext.replaceWithContext(UserContext.TRUSTLY_TRIGGER_ID);
+  }
 }

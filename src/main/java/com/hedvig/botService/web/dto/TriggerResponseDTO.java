@@ -4,5 +4,5 @@ import lombok.Value;
 
 @Value
 public class TriggerResponseDTO {
-    String url;
+  String url;
 }
