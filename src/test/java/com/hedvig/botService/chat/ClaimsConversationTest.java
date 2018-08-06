@@ -63,16 +63,6 @@ public class ClaimsConversationTest {
   }
 
   @Test
-  public void AudioReceived_SendsClaimAudioReceivedEvent_AndCreatesClaimInClaimsService() {
-    Message m = testConversation.getMessage("message.claims.audio");
-    val body = (MessageBodyAudio) m.body;
-    body.url = AUDIO_RECORDING_URL;
-    testConversation.receiveMessage(userContext, m);
-
-    assertThat(Iterables.getFirst(userContext.getMemberChat().getMessages(),null)).hasFieldOrPropertyWithValue("id", "claims.trustly.start");
-  }
-
-  @Test
   public void init_WhenMemberInsuranceIsInactive_StartsNotActiveFlow() {
     when(productPricingService.isMemberInsuranceActive(TOLVANSSON_MEMBER_ID)).thenReturn(false);
 
