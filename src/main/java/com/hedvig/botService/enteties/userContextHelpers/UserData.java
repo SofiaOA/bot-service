@@ -1,7 +1,6 @@
 package com.hedvig.botService.enteties.userContextHelpers;
 
 import com.hedvig.botService.enteties.UserContext;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,8 @@ public class UserData {
 
   public int getAge() {
     String dateString = ctx.getDataEntry(MEMBER_BIRTH_DATE);
-    if (dateString == null) return -1;
+    if (dateString == null)
+      return -1;
     LocalDate date = LocalDate.parse(dateString);
 
     return date.until(LocalDate.now()).getYears();
@@ -53,7 +53,8 @@ public class UserData {
 
   public LocalDate getBirthDate() {
     String bDate = ctx.getDataEntry(MEMBER_BIRTH_DATE);
-    if (bDate == null) return null;
+    if (bDate == null)
+      return null;
     return LocalDate.parse(bDate); // = birthDate;
   }
 
@@ -270,7 +271,7 @@ public class UserData {
     try {
       return Boolean.parseBoolean(ctx.getDataEntry(STUDENT_POLICY_ELIGIBILITY));
     } catch (Exception e) {
-      return false;
+      return null;
     }
   }
 }
