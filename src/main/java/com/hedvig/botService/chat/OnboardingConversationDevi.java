@@ -795,12 +795,14 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     // Student policy-related messages
 
-    createMessage(MESSAGE_STUDENT_LIMIT_PERSONS, new MessageBodySingleSelect(
-        "“Okej! För så många personer (fler än 2) gäller inte studentförsäkringen. Men inga problem, du får den vanliga hemförsäkringen som ger ett bredare skydd och jag fixar ett grymt pris till dig ändå! 🙌",
+    createChatMessage(MESSAGE_STUDENT_LIMIT_PERSONS, new MessageBodySingleSelect(
+        "Okej! För så många personer (fler än 2) gäller inte studentförsäkringen.\f"
+            + "Men inga problem, du får den vanliga hemförsäkringen som ger ett bredare skydd och jag fixar ett grymt pris till dig ändå! 🙌",
         Lists.newArrayList(new SelectOption("Okej, jag förstår", MESSAGE_SAKERHET))));
 
-    createMessage(MESSAGE_STUDENT_LIMIT_LIVING_SPACE, new MessageBodySingleSelect(
-        "“Okej! För så stora lägenheter (över 50kvm) gäller inte studentförsäkringen. Men inga problem, du får den vanliga hemförsäkringen som ger ett bredare skydd och jag fixar ett grymt pris till dig ändå! 🙌”",
+    createChatMessage(MESSAGE_STUDENT_LIMIT_LIVING_SPACE, new MessageBodySingleSelect(
+        "Okej! För så stora lägenheter (över 50 kvm) gäller inte studentförsäkringen.\f"
+            + "Men inga problem, du får den vanliga hemförsäkringen som ger ett bredare skydd och jag fixar ett grymt pris till dig ändå! 🙌",
         Lists.newArrayList(new SelectOption("Okej, jag förstår", "message.lghtyp"))));
 
     createMessage(MESSAGE_STUDENT_ELIGIBLE_BRF,
@@ -1022,14 +1024,15 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         nxtMsg = "message.pers";
         break;
       }
-      case "message.bankidja":
-      case "message.bankidja.noaddress":
-      case "message.varbordufeladress": {
-        if (onBoardingData.getAge() > 0 && onBoardingData.getAge() < 30) {
-          nxtMsg = "message.student";
+      case "message.bankidja": {
+        addToChat(m, userContext);
+        val item = ((MessageBodySingleSelect) m.body).getSelectedItem();
+        if (Objects.equals(item.value, "message.kvadrat")) {
+          nxtMsg = handleStudentEntrypoint("message.kvadrat", userContext);
         }
         break;
       }
+
       case "message.student": {
         SelectItem sitem2 = ((MessageBodySingleSelect) m.body).getSelectedItem();
         if (sitem2.value.equals("message.studentja")) {
@@ -1169,26 +1172,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
           break;
         }
 
-        if (onBoardingData.isStudent() && onBoardingData.getStudentPolicyEligibility() == null
-            && onBoardingData.getPersonsInHouseHold() > 2) {
-          nxtMsg = MESSAGE_STUDENT_LIMIT_PERSONS;
-          onBoardingData.setStudentPolicyEligibility(false);
-          break;
-        }
-
-        if (onBoardingData.isStudent() && onBoardingData.getStudentPolicyEligibility() == null) {
-          if (Objects.equals(onBoardingData.getHouseType(), ProductTypes.BRF.toString())) {
-            nxtMsg = MESSAGE_STUDENT_ELIGIBLE_BRF;
-            onBoardingData.setHouseType(ProductTypes.STUDENT_BRF.toString());
-            break;
-          }
-
-          if (Objects.equals(onBoardingData.getHouseType(), ProductTypes.RENT.toString())) {
-            nxtMsg = MESSAGE_STUDENT_ELIGIBLE_RENT;
-            onBoardingData.setHouseType(ProductTypes.STUDENT_RENT.toString());
-          }
-        }
-
+        nxtMsg = handleStudentPolicyPersonLimit(MESSAGE_SAKERHET, userContext);
         break;
       case "message.kvadrat": {
         String kvm = m.body.text;
@@ -1199,12 +1183,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
           nxtMsg = "message.uwlimit.housingsize";
           break;
         }
-        if (onBoardingData.isStudent() && onBoardingData.getLivingSpace() > 50) {
-          nxtMsg = MESSAGE_STUDENT_LIMIT_LIVING_SPACE;
-          onBoardingData.setStudentPolicyEligibility(false);
-          break;
-        }
-        nxtMsg = "message.lghtyp";
+        nxtMsg = handleStudentPolicyLivingSpace("message.lghtyp", userContext);
         break;
       }
       case "message.manuellnamn":
@@ -1242,7 +1221,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
       case "message.varbordupostnr":
         onBoardingData.setAddressZipCode(m.body.text);
         addToChat(m, userContext);
-        nxtMsg = "message.kvadrat";
+        nxtMsg = handleStudentEntrypoint("message.kvadrat", userContext);
         break;
       case "message.varbordu":
         onBoardingData.setAddressStreet(m.body.text);
@@ -1405,6 +1384,66 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     }
 
     completeRequest(nxtMsg, userContext);
+  }
+
+  private String handleStudentEntrypoint(String defaultMessage, UserContext uc) {
+    val onboardingData = uc.getOnBoardingData();
+    if (onboardingData.getAge() > 0 && onboardingData.getAge() < 30) {
+      return "message.student";
+    }
+    return defaultMessage;
+  }
+
+  private String handleStudentPolicyLivingSpace(String defaultMessage, UserContext uc) {
+    val onboardingData = uc.getOnBoardingData();
+    val isStudent = onboardingData.isStudent();
+
+    if (!isStudent) {
+      return defaultMessage;
+    }
+
+    val livingSpace = onboardingData.getLivingSpace();
+    if (livingSpace > 50) {
+      onboardingData.setStudentPolicyEligibility(false);
+      return MESSAGE_STUDENT_LIMIT_LIVING_SPACE;
+    }
+
+    return defaultMessage;
+  }
+
+  private String handleStudentPolicyPersonLimit(String defaultMessage, UserContext uc) {
+    val onboardingData = uc.getOnBoardingData();
+    val isStudent = onboardingData.isStudent();
+    if (!isStudent) {
+      return defaultMessage;
+    }
+
+    val policyEligibility = onboardingData.getStudentPolicyEligibility();
+    if (policyEligibility != null && policyEligibility == false) {
+      return defaultMessage;
+    }
+
+    val personsInHousehold = onboardingData.getPersonsInHouseHold();
+    if (personsInHousehold > 2) {
+      onboardingData.setStudentPolicyEligibility(false);
+      return MESSAGE_STUDENT_LIMIT_PERSONS;
+    }
+
+    onboardingData.setStudentPolicyEligibility(true);
+
+    val houseType = onboardingData.getHouseType();
+    if (Objects.equals(houseType, ProductTypes.BRF.toString())) {
+      onboardingData.setHouseType(ProductTypes.STUDENT_BRF.toString());
+      return MESSAGE_STUDENT_ELIGIBLE_BRF;
+    }
+
+    if (Objects.equals(houseType, ProductTypes.RENT.toString())) {
+      onboardingData.setHouseType(ProductTypes.STUDENT_RENT.toString());
+      return MESSAGE_STUDENT_ELIGIBLE_RENT;
+    }
+
+    log.error("This state should be unreachable");
+    return defaultMessage;
   }
 
   private String handle50KLimitAnswer(String nxtMsg, UserContext userContext,
