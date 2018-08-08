@@ -446,26 +446,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     createMessage("message.varbordupostnr", new MessageBodyNumber("Vad är ditt postnummer?"));
     setExpectedReturnType("message.varbordupostnr", new ZipCodeSweden());
 
-    createMessage("message.student",
-        new MessageBodySingleSelect(
-            "Okej! Jag ser att du är under 30. Är du kanske student? " + emoji_school_satchel,
-            new ArrayList<SelectItem>() {
-              {
-                add(new SelectOption("Ja", "message.studentja"));
-                add(new SelectOption("Nej", "message.studentnej"));
-              }
-            }));
-
-    createMessage("message.studentnej", new MessageBodyParagraph("Okej, då vet jag"));
-    addRelay("message.studentnej", MESSAGE_SAKERHET);
-
-    createMessage("message.studentja", new MessageBodySingleSelect(
-        "Vad kul! Jag har tagit fram ett grymt erbjudande som är skräddarsytt för studenter i lite mindre lägenheter 🎓",
-        new ArrayList<SelectItem>() {
-          {
-            add(new SelectOption("Okej, toppen!", "message.kvadrat"));
-          }
-        }));
 
     createMessage("message.lghtyp", new MessageBodySingleSelect(
         "Hoppas du trivs! Hyr du eller äger du den?", new ArrayList<SelectItem>() {
@@ -794,11 +774,32 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     createMessage("error", new MessageBodyText("Oj nu blev något fel..."));
 
     // Student policy-related messages
+    createMessage("message.student",
+        new MessageBodySingleSelect(
+            "Okej! Jag ser att du är under 30. Är du kanske student? " + emoji_school_satchel,
+            new ArrayList<SelectItem>() {
+              {
+                add(new SelectOption("Ja", "message.studentja"));
+                add(new SelectOption("Nej", "message.studentnej"));
+              }
+            }));
+
+    createMessage("message.studentnej", new MessageBodyParagraph("Okej, då vet jag"));
+    addRelay("message.studentnej", MESSAGE_SAKERHET);
+
+    createMessage("message.studentja", new MessageBodySingleSelect(
+        "Vad kul! Jag har tagit fram ett grymt erbjudande som är skräddarsytt för studenter som bor i lite mindre lägenheter ‍🎓",
+        new ArrayList<SelectItem>() {
+          {
+            add(new SelectOption("Okej, toppen!", "message.kvadrat"));
+          }
+        }));
 
     createChatMessage(MESSAGE_STUDENT_LIMIT_LIVING_SPACE, new MessageBodySingleSelect(
-        "Okej! För så stora lägenheter (över 50 kvm) gäller dessvärre inte studentförsäkringen.\f"
+        "Okej! För så stora lägenheter (över 50 kvm) gäller dessvärre inte studentförsäkringen\f"
             + "Men inga problem, du får den vanliga hemförsäkringen som ger ett bredare skydd och jag fixar ett grymt pris till dig ändå! 🙌",
-        Lists.newArrayList(new SelectOption("Okej, jag förstår", "message.lghtyp"))));
+        Lists.newArrayList(
+            new SelectOption("Okej, jag förstår", MESSAGE_STUDENT_LIMIT_LIVING_SPACE_HOUSE_TYPE))));
 
     createMessage(MESSAGE_STUDENT_LIMIT_LIVING_SPACE_HOUSE_TYPE, new MessageBodySingleSelect(
         "Hyr du eller äger du lägenheten?", new ArrayList<SelectItem>() {
@@ -809,19 +810,19 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         }));
 
     createChatMessage(MESSAGE_STUDENT_LIMIT_PERSONS, new MessageBodySingleSelect(
-        "Okej! För så många personer (fler än 2) gäller dessvärre inte studentförsäkringen.\f"
+        "Okej! För så många personer (fler än 2) gäller dessvärre inte studentförsäkringen\f"
             + "Men inga problem, du får den vanliga hemförsäkringen som ger ett bredare skydd och jag fixar ett grymt pris till dig ändå! 🙌",
         Lists.newArrayList(new SelectOption("Okej, jag förstår", MESSAGE_SAKERHET))));
 
     createMessage(MESSAGE_STUDENT_ELIGIBLE_BRF,
         new MessageBodySingleSelect(
             "Grymt! Då får du vårt fantastiska studentpris och betalar bara 99 kr per månad! 🙌",
-            Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
+            Lists.newArrayList(new SelectOption("Okej, nice!", MESSAGE_SAKERHET))));
 
     createMessage(MESSAGE_STUDENT_ELIGIBLE_RENT,
         new MessageBodySingleSelect(
             "Grymt! Då får du vårt fantastiska studentpris och betalar bara 79 kr per månad! 🙌",
-            Lists.newArrayList(new SelectOption("Ok", MESSAGE_SAKERHET))));
+            Lists.newArrayList(new SelectOption("Okej, nice!", MESSAGE_SAKERHET))));
 
     createChatMessage(MESSAGE_STUDENT_25K_LIMIT, new MessageBodySingleSelect(
         "Okej! Dina prylar som du har hemma skyddas upp till 200 000 kr 🏺🖼️\f"
