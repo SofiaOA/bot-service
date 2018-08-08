@@ -1025,8 +1025,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         break;
       }
       case "message.bankidja": {
-        addToChat(m, userContext);
         val item = ((MessageBodySingleSelect) m.body).getSelectedItem();
+        m.body.text = item.text;
+        addToChat(m, userContext);
         if (Objects.equals(item.value, "message.kvadrat")) {
           nxtMsg = handleStudentEntrypoint("message.kvadrat", userContext);
         }

@@ -17,11 +17,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-
 import static com.hedvig.botService.services.TriggerServiceTest.TOLVANSSON_MEMBERID;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,10 +29,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = BotServiceApplicationTests.class)
 public class InternalMessagesControllerTest {
 
-  @Autowired MockMvc mockMvc;
-  @Autowired ObjectMapper objectMapper;
-  @MockBean private SessionManager sessionManager;
-  @MockBean private MessageRepository messageRepository;
+  @Autowired
+  MockMvc mockMvc;
+  @Autowired
+  ObjectMapper objectMapper;
+  @MockBean
+  private SessionManager sessionManager;
+  @MockBean
+  private MessageRepository messageRepository;
 
   @Before
   public void setUp() {}
@@ -46,13 +48,9 @@ public class InternalMessagesControllerTest {
     when(sessionManager.addMessageFromHedvig(any())).thenReturn(true);
 
     ResultActions perform =
-        mockMvc.perform(
-            post("/_/messages/addmessage")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_UTF8)
-                .content(
-                    objectMapper.writeValueAsBytes(
-                        new AddMessageRequestDTO(TOLVANSSON_MEMBERID, "Hejsan!"))));
+        mockMvc.perform(post("/_/messages/addmessage").contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_UTF8).content(objectMapper
+                .writeValueAsBytes(new AddMessageRequestDTO(TOLVANSSON_MEMBERID, "Hejsan!"))));
 
     perform.andExpect(status().isNoContent());
   }
@@ -64,13 +62,9 @@ public class InternalMessagesControllerTest {
     when(sessionManager.addMessageFromHedvig(any())).thenReturn(false);
 
     ResultActions perform =
-        mockMvc.perform(
-            post("/_/messages/addmessage")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_UTF8)
-                .content(
-                    objectMapper.writeValueAsBytes(
-                        new AddMessageRequestDTO(TOLVANSSON_MEMBERID, "Hejsan!"))));
+        mockMvc.perform(post("/_/messages/addmessage").contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_UTF8).content(objectMapper
+                .writeValueAsBytes(new AddMessageRequestDTO(TOLVANSSON_MEMBERID, "Hejsan!"))));
 
     perform.andExpect(status().isForbidden());
   }
