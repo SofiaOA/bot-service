@@ -243,6 +243,8 @@ public class UserData {
     ctx.removeDataEntry(RECOMMEND_FRIEND_EMAIL);
     ctx.removeDataEntry(USER_HAS_SIGNED);
     ctx.removeDataEntry(USER_AUTHED_BANKID);
+    ctx.removeDataEntry(IS_STUDENT);
+    ctx.removeDataEntry(STUDENT_POLICY_ELIGIBILITY);
 
     String nrOfItemsString = ctx.getDataEntry(SECURE_ITEMS_NO);
     int nrOfItems = nrOfItemsString != null ? Integer.parseInt(nrOfItemsString) : 0;
