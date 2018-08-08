@@ -1,7 +1,6 @@
 package com.hedvig.botService.enteties.userContextHelpers;
 
 import com.hedvig.botService.enteties.UserContext;
-import lombok.val;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -272,14 +271,10 @@ public class UserData {
   }
 
   public Boolean getStudentPolicyEligibility() {
-    val dataEntry = ctx.getDataEntry(STUDENT_POLICY_ELIGIBILITY);
-    if (dataEntry == null) {
-      return null;
-    }
     try {
-      return Boolean.parseBoolean(dataEntry);
+      return Boolean.parseBoolean(ctx.getDataEntry(STUDENT_POLICY_ELIGIBILITY));
     } catch (Exception e) {
-      return null;
+      return false;
     }
   }
 }

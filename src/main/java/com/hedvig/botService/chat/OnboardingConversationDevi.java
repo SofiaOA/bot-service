@@ -1414,7 +1414,6 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     val livingSpace = onboardingData.getLivingSpace();
     if (livingSpace > 50) {
-      onboardingData.setStudentPolicyEligibility(false);
       return MESSAGE_STUDENT_LIMIT_LIVING_SPACE;
     }
 
@@ -1428,8 +1427,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
       return defaultMessage;
     }
 
-    val policyEligibility = onboardingData.getStudentPolicyEligibility();
-    if (policyEligibility != null && policyEligibility == false) {
+    val livingSpace = onboardingData.getLivingSpace();
+    if (livingSpace > 50) {
       return defaultMessage;
     }
 
