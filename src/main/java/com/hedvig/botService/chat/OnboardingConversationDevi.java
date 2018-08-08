@@ -456,11 +456,11 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
               }
             }));
 
-    createMessage("message.studentnej", new MessageBodyParagraph("Okej då vet jag"));
+    createMessage("message.studentnej", new MessageBodyParagraph("Okej, då vet jag"));
     addRelay("message.studentnej", MESSAGE_SAKERHET);
 
     createMessage("message.studentja", new MessageBodySingleSelect(
-        "Vad kul! Jag har tagit fram ett grymt erbjudande som är skräddarsytt för studenter i lite mindre lägenheter med max två personer",
+        "Vad kul! Jag har tagit fram ett grymt erbjudande som är skräddarsytt för studenter i lite mindre lägenheter 🎓",
         new ArrayList<SelectItem>() {
           {
             add(new SelectOption("Okej, toppen!", "message.kvadrat"));
