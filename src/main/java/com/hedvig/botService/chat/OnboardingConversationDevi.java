@@ -71,14 +71,14 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
   public static final String MESSAGE_LAGENHET_PRE = "message.lagenhet.pre";
   public static final String MESSAGE_LAGENHET = "message.lagenhet";
 
-  public static final String MESSAGE_STUDENT_LIMIT_BOTH = "message.student.limit.both";
   public static final String MESSAGE_STUDENT_LIMIT_PERSONS = "message.student.limit.persons";
   public static final String MESSAGE_STUDENT_LIMIT_LIVING_SPACE =
       "message.student.limit.livingspace";
+  public static final String MESSAGE_STUDENT_LIMIT_LIVING_SPACE_HOUSE_TYPE =
+      "message.student.limit.livingspace.lghtyp";
   public static final String MESSAGE_STUDENT_ELIGIBLE_BRF = "message.student.eligible.brf";
   public static final String MESSAGE_STUDENT_ELIGIBLE_RENT = "message.student.eligible.rent";
   public static final String MESSAGE_STUDENT_25K_LIMIT = "message.student.25klimit";
-  public static final String MESSAGE_STUDENT_LIMIT_TELLMEMORE = "message.student.limit.tellmemore";
 
   public static final String IN_OFFER = "{IN_OFFER}";
   /*
@@ -795,15 +795,23 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     // Student policy-related messages
 
-    createChatMessage(MESSAGE_STUDENT_LIMIT_PERSONS, new MessageBodySingleSelect(
-        "Okej! För så många personer (fler än 2) gäller inte studentförsäkringen.\f"
-            + "Men inga problem, du får den vanliga hemförsäkringen som ger ett bredare skydd och jag fixar ett grymt pris till dig ändå! 🙌",
-        Lists.newArrayList(new SelectOption("Okej, jag förstår", MESSAGE_SAKERHET))));
-
     createChatMessage(MESSAGE_STUDENT_LIMIT_LIVING_SPACE, new MessageBodySingleSelect(
-        "Okej! För så stora lägenheter (över 50 kvm) gäller inte studentförsäkringen.\f"
+        "Okej! För så stora lägenheter (över 50 kvm) gäller dessvärre inte studentförsäkringen.\f"
             + "Men inga problem, du får den vanliga hemförsäkringen som ger ett bredare skydd och jag fixar ett grymt pris till dig ändå! 🙌",
         Lists.newArrayList(new SelectOption("Okej, jag förstår", "message.lghtyp"))));
+
+    createMessage(MESSAGE_STUDENT_LIMIT_LIVING_SPACE_HOUSE_TYPE, new MessageBodySingleSelect(
+        "Hyr du eller äger du lägenheten?", new ArrayList<SelectItem>() {
+          {
+            add(new SelectOption("Jag hyr den", ProductTypes.RENT.toString()));
+            add(new SelectOption("Jag äger den", ProductTypes.BRF.toString()));
+          }
+        }));
+
+    createChatMessage(MESSAGE_STUDENT_LIMIT_PERSONS, new MessageBodySingleSelect(
+        "Okej! För så många personer (fler än 2) gäller dessvärre inte studentförsäkringen.\f"
+            + "Men inga problem, du får den vanliga hemförsäkringen som ger ett bredare skydd och jag fixar ett grymt pris till dig ändå! 🙌",
+        Lists.newArrayList(new SelectOption("Okej, jag förstår", MESSAGE_SAKERHET))));
 
     createMessage(MESSAGE_STUDENT_ELIGIBLE_BRF,
         new MessageBodySingleSelect(
@@ -1000,6 +1008,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         }
         break;
       }
+      case MESSAGE_STUDENT_LIMIT_LIVING_SPACE_HOUSE_TYPE:
       case "message.lghtyp": {
         SelectItem item = ((MessageBodySingleSelect) m.body).getSelectedItem();
 
