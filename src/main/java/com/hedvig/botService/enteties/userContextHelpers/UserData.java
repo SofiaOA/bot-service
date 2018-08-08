@@ -1,7 +1,7 @@
 package com.hedvig.botService.enteties.userContextHelpers;
 
 import com.hedvig.botService.enteties.UserContext;
-
+import lombok.val;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,8 @@ public class UserData {
 
   public int getAge() {
     String dateString = ctx.getDataEntry(MEMBER_BIRTH_DATE);
-    if (dateString == null) return -1;
+    if (dateString == null)
+      return -1;
     LocalDate date = LocalDate.parse(dateString);
 
     return date.until(LocalDate.now()).getYears();
@@ -53,7 +54,8 @@ public class UserData {
 
   public LocalDate getBirthDate() {
     String bDate = ctx.getDataEntry(MEMBER_BIRTH_DATE);
-    if (bDate == null) return null;
+    if (bDate == null)
+      return null;
     return LocalDate.parse(bDate); // = birthDate;
   }
 
@@ -70,7 +72,8 @@ public class UserData {
   }
 
   public Boolean isStudent() {
-    return (ctx.getDataEntry(IS_STUDENT) != null && ctx.getDataEntry(IS_STUDENT) == "1");
+    return (ctx.getDataEntry(IS_STUDENT) != null
+        && Objects.equals(ctx.getDataEntry(IS_STUDENT), "1"));
   }
 
   public void setEmail(String email) {
@@ -267,10 +270,14 @@ public class UserData {
   }
 
   public Boolean getStudentPolicyEligibility() {
+    val dataEntry = ctx.getDataEntry(STUDENT_POLICY_ELIGIBILITY);
+    if (dataEntry == null) {
+      return null;
+    }
     try {
-      return Boolean.parseBoolean(ctx.getDataEntry(STUDENT_POLICY_ELIGIBILITY));
+      return Boolean.parseBoolean(dataEntry);
     } catch (Exception e) {
-      return false;
+      return null;
     }
   }
 }
