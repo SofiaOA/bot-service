@@ -1450,7 +1450,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
       MessageBodySingleSelect body) {
     if (body.getSelectedItem().value.equalsIgnoreCase(MESSAGE_50K_LIMIT_YES_YES)) {
       UserData userData = userContext.getOnBoardingData();
-      if (userData.getStudentPolicyEligibility() == true) {
+      val studentPolicyEligibility = userData.getStudentPolicyEligibility();
+      if (studentPolicyEligibility != null && studentPolicyEligibility == true) {
         userContext.putUserData(UserData.TWENTYFIVE_THOUSAND_LIMIT, "true");
       } else {
         userContext.putUserData("{50K_LIMIT}", "true");
