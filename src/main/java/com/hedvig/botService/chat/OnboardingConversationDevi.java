@@ -13,8 +13,10 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResp
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
 import com.hedvig.botService.serviceIntegration.memberService.exceptions.ErrorType;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.services.events.MemberSignedEvent;
 import com.hedvig.botService.services.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.services.events.RequestObjectInsuranceEvent;
+import com.hedvig.botService.services.events.RequestStudentObjectInsuranceEvent;
 import com.hedvig.botService.services.events.SignedOnWaitlistEvent;
 import com.hedvig.botService.services.events.UnderwritingLimitExcededEvent;
 import lombok.val;
@@ -788,7 +790,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     addRelay("message.studentnej", MESSAGE_SAKERHET);
 
     createMessage("message.studentja", new MessageBodySingleSelect(
-        "Vad kul! Jag har tagit fram ett grymt erbjudande som är skräddarsytt för studenter som bor i lite mindre lägenheter ‍🎓",
+        "Vad kul! Jag har tagit fram ett extra grymt erbjudande som är skräddarsytt för studenter som bor max två personer på max 50 kvm ‍🎓",
         new ArrayList<SelectItem>() {
           {
             add(new SelectOption("Okej, toppen!", "message.kvadrat"));
@@ -1600,15 +1602,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     Boolean signed = userContext.getOnBoardingData().getUserHasSigned();
 
     if (!signed) {
-      log.info("Onboarding complete");
-
-      log.info("Will try to reflag onboarding conversation as active");
       val maybeActiveConversation = userContext.getActiveConversation();
       if (maybeActiveConversation.isPresent()) {
-        log.info("An active conversation was found");
         val activeConversation = maybeActiveConversation.get();
         if (activeConversation.containsConversation(FreeChatConversation.class)) {
-          log.info("FreeChatConversation was active, reflagging");
           activeConversation.setConversationStatus(conversationStatus.COMPLETE);
           userContext.setActiveConversation(this);
 
@@ -1618,19 +1615,22 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                   "active conversation is for some reason not onboarding chat anymore"));
           onboardingConversation.conversationStatus = conversationStatus.ONGOING;
 
-        } else {
-          log.info("FreeChatConversation was not active, will not reflag");
         }
-      } else {
-        log.info("No active conversation was found");
       }
 
       addToChat(getMessage("message.kontraktklar"), userContext);
       userContext.getOnBoardingData().setUserHasSigned(true);
       userContext.setInOfferState(false);
-      String dataEntry = userContext.getDataEntry("{50K_LIMIT}");
-      if (Objects.equals(dataEntry, "true")) {
-        eventPublisher.publishEvent(new RequestObjectInsuranceEvent(userContext.getMemberId()));
+      val productType = userContext.getDataEntry(UserData.HOUSE);
+      val memberId = userContext.getMemberId();
+      val fiftyKLimit = userContext.getDataEntry("{50K_LIMIT}");
+      val twentyFiveKLimit = userContext.getDataEntry(UserData.TWENTYFIVE_THOUSAND_LIMIT);
+      if (Objects.equals(fiftyKLimit, "true")) {
+        eventPublisher.publishEvent(new RequestObjectInsuranceEvent(memberId, productType));
+      } else if (Objects.equals(twentyFiveKLimit, "true")) {
+        eventPublisher.publishEvent(new RequestStudentObjectInsuranceEvent(memberId, productType));
+      } else {
+        eventPublisher.publishEvent(new MemberSignedEvent(memberId, productType));
       }
       // userContext.completeConversation(this);
     }

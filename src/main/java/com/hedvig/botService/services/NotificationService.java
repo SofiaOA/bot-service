@@ -7,6 +7,7 @@ import org.springframework.cloud.aws.messaging.core.NotificationMessagingTemplat
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import lombok.val;
 
 @Component
 @Profile("production")
@@ -27,28 +28,23 @@ public class NotificationService {
 
   @EventListener
   public void on(RequestPhoneCallEvent evt) {
-    final String message =
-        String.format(
-            "Medlem %s %s vill bli kontaktad på %s",
-            evt.getFirstName(), evt.getLastName(), evt.getPhoneNumber());
+    final String message = String.format("Medlem %s %s vill bli kontaktad på %s",
+        evt.getFirstName(), evt.getLastName(), evt.getPhoneNumber());
     sendNotification(message, "CallMe");
   }
 
   @EventListener
   public void on(UnderwritingLimitExcededEvent event) {
-    final String message =
-        String.format(
-            "Underwriting guideline för onboarding-medlem: %s, ring upp medlem på nummer: %s",
-            event.getMemberId(), event.getPhoneNumber());
+    final String message = String.format(
+        "Underwriting guideline för onboarding-medlem: %s, ring upp medlem på nummer: %s",
+        event.getMemberId(), event.getPhoneNumber());
     sendNotification(message, "CallMe");
   }
 
   @EventListener
   public void on(OnboardingQuestionAskedEvent event) {
-    final String message =
-        String.format(
-            "Ny fråga från onboarding-medlem: %s, \"%s\"",
-            event.getMemberId(), event.getQuestion());
+    final String message = String.format("Ny fråga från onboarding-medlem: %s, \"%s\"",
+        event.getMemberId(), event.getQuestion());
     sendNotification(message, "CallMe");
   }
 
@@ -60,30 +56,40 @@ public class NotificationService {
 
   @EventListener
   public void on(QuestionAskedEvent event) {
-    final String message =
-        String.format(
-            "Ny fråga från medlem: %s, \"%s\".", event.getMemberId(), event.getQuestion());
+    final String message = String.format("Ny fråga från medlem: %s, \"%s\".", event.getMemberId(),
+        event.getQuestion());
     sendNotification(message, "CallMe");
   }
 
   @EventListener
   public void on(RequestObjectInsuranceEvent event) {
-    final String message =
-        String.format(
-            "Medlem nr: %s signerat, och har någon pryl som är dyrare än 50':-",
-            event.getMemberId());
+    final String message = String.format(
+        "Medlem nr: %s signerat, och har någon pryl som är dyrare än 50':-. Produkttypen är %s",
+        event.getMemberId(), event.getProductType());
+    sendNotification(message, "CallMe");
+  }
+
+  @EventListener
+  public void on(RequestStudentObjectInsuranceEvent event) {
+    val message = String.format(
+        "Studentmedlem nr: %s signerat, och har någon pryl som är dyrare än 25':-. Produkttypen är %s",
+        event.getMemberId(), event.getProductType());
+    sendNotification(message, "CallMe");
+  }
+
+  @EventListener
+  public void on(MemberSignedEvent event) {
+    val message = String.format("Ny medlem signerad! Medlemmen har id %s och produkttypen är %s",
+        event.getMemberId(), event.getProductType());
     sendNotification(message, "CallMe");
   }
 
   @EventListener
   public void on(ClaimCallMeEvent event) {
-    final String message =
-        String.format(
-            "Medlem %s %s med %s försäkring har fått en skada och vill bli uppringd på %s",
-            event.getFirstName(),
-            event.getFamilyName(),
-            event.isInsuranceActive() ? "AKTIV" : "INAKTIV",
-            event.getPhoneNumber());
+    final String message = String.format(
+        "Medlem %s %s med %s försäkring har fått en skada och vill bli uppringd på %s",
+        event.getFirstName(), event.getFamilyName(),
+        event.isInsuranceActive() ? "AKTIV" : "INAKTIV", event.getPhoneNumber());
     sendNotification(message, "CallMe");
   }
 
