@@ -816,15 +816,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             + "Men inga problem, du får den vanliga hemförsäkringen som ger ett bredare skydd och jag fixar ett grymt pris till dig ändå! 🙌",
         Lists.newArrayList(new SelectOption("Okej, jag förstår", MESSAGE_SAKERHET))));
 
-    createMessage(MESSAGE_STUDENT_ELIGIBLE_BRF,
-        new MessageBodySingleSelect(
-            "Grymt! Då får du vårt fantastiska studentpris och betalar bara 99 kr per månad! 🙌",
-            Lists.newArrayList(new SelectOption("Okej, nice!", MESSAGE_SAKERHET))));
+    createMessage(MESSAGE_STUDENT_ELIGIBLE_BRF, new MessageBodySingleSelect(
+        "Grymt! Då får du vår fantastiska studentförsäkring där drulle ingår och betalar bara 99 kr per månad! 🙌",
+        Lists.newArrayList(new SelectOption("Okej, nice!", MESSAGE_SAKERHET))));
 
-    createMessage(MESSAGE_STUDENT_ELIGIBLE_RENT,
-        new MessageBodySingleSelect(
-            "Grymt! Då får du vårt fantastiska studentpris och betalar bara 79 kr per månad! 🙌",
-            Lists.newArrayList(new SelectOption("Okej, nice!", MESSAGE_SAKERHET))));
+    createMessage(MESSAGE_STUDENT_ELIGIBLE_RENT, new MessageBodySingleSelect(
+        "Grymt! Då får du vår fantastiska studentförsäkring där drulle ingår och betalar bara 79 kr per månad! 🙌",
+        Lists.newArrayList(new SelectOption("Okej, nice!", MESSAGE_SAKERHET))));
 
     createChatMessage(MESSAGE_STUDENT_25K_LIMIT, new MessageBodySingleSelect(
         "Okej! Dina prylar som du har hemma skyddas upp till 200 000 kr 🏺🖼️\f"
