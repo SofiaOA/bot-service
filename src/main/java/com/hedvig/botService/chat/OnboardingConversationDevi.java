@@ -787,7 +787,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             }));
 
     createMessage("message.studentnej", new MessageBodyParagraph("Okej, då vet jag"));
-    addRelay("message.studentnej", MESSAGE_SAKERHET);
+    addRelay("message.studentnej", "message.kvadrat");
 
     createMessage("message.studentja", new MessageBodySingleSelect(
         "Vad kul! Jag har tagit fram ett extra grymt erbjudande som är skräddarsytt för studenter som bor max två personer på max 50 kvm ‍🎓",
