@@ -64,7 +64,7 @@ public class NotificationService {
   @EventListener
   public void on(RequestObjectInsuranceEvent event) {
     final String message = String.format(
-        "Medlem nr: %s signerat, och har någon pryl som är dyrare än 50':-. Produkttypen är %s",
+        "Ny medlem signerad! Medlemmen har id %s och har någon pryl som är dyrare än 50':-. Produkttypen är %s",
         event.getMemberId(), event.getProductType());
     sendNotification(message, "CallMe");
   }
@@ -72,7 +72,7 @@ public class NotificationService {
   @EventListener
   public void on(RequestStudentObjectInsuranceEvent event) {
     val message = String.format(
-        "Studentmedlem nr: %s signerat, och har någon pryl som är dyrare än 25':-. Produkttypen är %s",
+        "Ny studentmedlem signerad! Medlemmen har id %s och har någon pryl som är dyrare än 25':-. Produkttypen är %s",
         event.getMemberId(), event.getProductType());
     sendNotification(message, "CallMe");
   }
