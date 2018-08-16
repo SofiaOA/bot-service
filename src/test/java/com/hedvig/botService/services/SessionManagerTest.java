@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
+import com.hedvig.botService.enteties.ResourceNotFoundException;
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.TrackingDataRespository;
 import com.hedvig.botService.enteties.UserContext;
@@ -26,13 +27,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
 import java.util.Optional;
 import java.util.UUID;
-
 import static com.hedvig.botService.chat.Conversation.HEDVIG_USER_ID;
 import static com.hedvig.botService.services.TriggerServiceTest.TOLVANSSON_MEMBERID;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
@@ -42,44 +42,46 @@ public class SessionManagerTest {
 
   public static final String MESSAGE = "Heh hej";
   public static final SelectLink SELECT_LINK = SelectLink.toOffer("Offer", "offer");
-  @Mock UserContextRepository userContextRepository;
+  public static final String TOLVANSSON_FCM_TOKEN = "test-token";
+  @Mock
+  UserContextRepository userContextRepository;
 
-  @Mock MemberService memberService;
+  @Mock
+  MemberService memberService;
 
-  @Mock ProductPricingService productPricingService;
+  @Mock
+  ProductPricingService productPricingService;
 
-  @Mock SignupCodeRepository signupCodeRepository;
+  @Mock
+  SignupCodeRepository signupCodeRepository;
 
-  @Mock TrackingDataRespository campaignCodeRepository;
+  @Mock
+  TrackingDataRespository campaignCodeRepository;
 
-  @Mock ConversationFactory conversationFactory;
+  @Mock
+  ConversationFactory conversationFactory;
 
   @Mock(answer = Answers.CALLS_REAL_METHODS)
   Conversation mockConversation;
 
-  @Mock MessagesService messagesService;
+  @Mock
+  MessagesService messagesService;
 
-  @Mock ClaimsService claimsService;
+  @Mock
+  ClaimsService claimsService;
 
   SessionManager sessionManager;
 
   @Before
   public void setUp() {
     val objectMapper = new ObjectMapper();
-    sessionManager =
-        new SessionManager(
-            userContextRepository,
-            memberService,
-            claimsService,
-            conversationFactory,
-            campaignCodeRepository,
-            objectMapper);
+    sessionManager = new SessionManager(userContextRepository, memberService, claimsService,
+        conversationFactory, campaignCodeRepository, objectMapper);
   }
 
   // FIXME
   @Test
-  public void
-      givenConversationThatCanAcceptMessage_WhenAddMessageFromHedvig_ThenAddsMessageToHistory() {
+  public void givenConversationThatCanAcceptMessage_WhenAddMessageFromHedvig_ThenAddsMessageToHistory() {
 
     val tolvanssonUserContext = makeTolvanssonUserContext();
     startMockConversation(tolvanssonUserContext);
@@ -136,14 +138,13 @@ public class SessionManagerTest {
 
     val messages = sessionManager.getAllMessages(TOLVANSSON_MEMBERID, null);
 
-    assertThat(Iterables.getLast(messages))
-        .hasFieldOrPropertyWithValue("id", "message.onboardingstart");
+    assertThat(Iterables.getLast(messages)).hasFieldOrPropertyWithValue("id",
+        "message.onboardingstart");
     assertThat(tolvanssonUserContext.getActiveConversation().get()).isNotNull();
   }
 
   @Test
-  public void
-      givenNoExistingConversation_whenGetAllMessagesWithIntentLOGIN_thenOnboardingConversationIsStarted() {
+  public void givenNoExistingConversation_whenGetAllMessagesWithIntentLOGIN_thenOnboardingConversationIsStarted() {
 
     val tolvanssonUserContext = makeTolvanssonUserContext();
 
@@ -155,8 +156,57 @@ public class SessionManagerTest {
 
     val messages = sessionManager.getAllMessages(TOLVANSSON_MEMBERID, SessionManager.Intent.LOGIN);
 
-    assertThat(Iterables.getLast(messages))
-        .hasFieldOrPropertyWithValue("id", "message.start.login");
+    assertThat(Iterables.getLast(messages)).hasFieldOrPropertyWithValue("id",
+        "message.start.login");
+  }
+
+  @Test
+  public void givenAnExistingMember_whenRegisteringAnFCMToken_ThenShouldPersistTokenInUserContext() {
+    val tolvanssonUserContext = makeTolvanssonUserContext();
+
+    when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID))
+        .thenReturn(Optional.of(tolvanssonUserContext));
+
+    sessionManager.saveFirebasePushToken(TOLVANSSON_MEMBERID, TOLVANSSON_FCM_TOKEN);
+
+    assertThat(tolvanssonUserContext.getDataEntry("FIREBASE-TOKEN"))
+        .isEqualTo(TOLVANSSON_FCM_TOKEN);
+  }
+
+  @Test
+  public void givenANonExistingMember_whenRegisteringAnFCMToken_ThenShouldThrowException() {
+    when(userContextRepository.findByMemberId("")).thenReturn(Optional.empty());
+    assertThatExceptionOfType(ResourceNotFoundException.class)
+        .isThrownBy(() -> sessionManager.saveFirebasePushToken("", ""));
+  }
+
+  @Test
+  public void givenAnExistingMemberWithFCMToken_whenGettingFCMToken_ThenShouldReturnFCMToken() {
+    val tolvanssonUserContext = makeTolvanssonUserContext();
+    tolvanssonUserContext.putUserData("FIREBASE-TOKEN", TOLVANSSON_FCM_TOKEN);
+    when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID))
+        .thenReturn(Optional.of(tolvanssonUserContext));
+
+    val token = sessionManager.getFirebasePushToken(TOLVANSSON_MEMBERID);
+    assertThat(token).isEqualTo(TOLVANSSON_FCM_TOKEN);
+  }
+
+  @Test
+  public void givenANonExistingMember_whenGettingFCMToken_ThenShouldThrowException() {
+    when(userContextRepository.findByMemberId("")).thenReturn(Optional.empty());
+
+    assertThatExceptionOfType(ResourceNotFoundException.class)
+        .isThrownBy(() -> sessionManager.getFirebasePushToken(""));
+  }
+
+  @Test
+  public void givenAnExistingMemberWithoutFCMToken_whenGettingFCMToken_ThenShouldReturnNull() {
+    val tolvanssonUserContext = makeTolvanssonUserContext();
+
+    when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID))
+        .thenReturn(Optional.of(tolvanssonUserContext));
+
+    assertThat(sessionManager.getFirebasePushToken(TOLVANSSON_MEMBERID)).isNull();
   }
 
   private OnboardingConversationDevi makeOnboardingConversation() {
@@ -164,8 +214,8 @@ public class SessionManagerTest {
   }
 
   private BankIdAuthResponse makeBankIdResponse() {
-    return new BankIdAuthResponse(
-        BankIdStatusType.STARTED, UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    return new BankIdAuthResponse(BankIdStatusType.STARTED, UUID.randomUUID().toString(),
+        UUID.randomUUID().toString());
   }
 
   private UserContext makeTolvanssonUserContext() {
