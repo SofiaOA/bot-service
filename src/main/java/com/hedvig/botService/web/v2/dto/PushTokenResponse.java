@@ -4,5 +4,5 @@ import lombok.Value;
 
 @Value
 public class PushTokenResponse {
-  String fcmRegistrationToken;
+  String token;
 }
