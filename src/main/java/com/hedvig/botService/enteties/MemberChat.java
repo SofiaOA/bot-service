@@ -106,7 +106,7 @@ public class MemberChat {
   }
 
   public void addToHistory(Message m) {
-    log.info("MemberChat.addToHistory(Message: " + m + " ," + "chat: " + this);
+    log.info("MemberChat.addToHistory(Message: " + m);
     Instant time = Instant.now();
     m.deleted = false;
     m.setTimestamp(time);
