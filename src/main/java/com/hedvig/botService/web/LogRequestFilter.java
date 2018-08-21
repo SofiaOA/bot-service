@@ -1,5 +1,7 @@
 package com.hedvig.botService.web;
 
+import io.sentry.Sentry;
+import io.sentry.event.UserBuilder;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +27,7 @@ public class LogRequestFilter implements Filter {
         String hedvigToken = httpRequest.getHeader("hedvig.token");
         if (hedvigToken != null) {
           MDC.put("memberId", hedvigToken);
+          Sentry.getContext().setUser(new UserBuilder().setId(hedvigToken).build());
         }
       }
       chain.doFilter(request, response);
