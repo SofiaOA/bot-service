@@ -40,7 +40,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ContextConfiguration(classes = BotServiceApplicationTests.class)
 @AutoConfigureWireMock(port = 4777)
 @TestPropertySource(
-    properties = {"hedvig.member-service.url=localhost:4777"},
+    properties = {"hedvig.member-service.url=localhost:4777", "hedvig.notificationservice.baseurl:test"},
     locations = "/application-test.yml")
 @EnableFeignClients
 public class MemberServiceClientTest {
