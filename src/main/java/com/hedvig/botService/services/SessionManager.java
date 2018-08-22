@@ -70,17 +70,6 @@ public class SessionManager {
     uc.putUserData("PUSH-TOKEN", pushToken);
   }
 
-  public void saveFirebasePushToken(String hid, String pushToken) {
-    UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(
-        () -> new ResourceNotFoundException("Could not find UserContext for user :" + hid));
-    uc.putUserData("FIREBASE-TOKEN", pushToken);
-  }
-
-  public String getFirebasePushToken(String hid) {
-    UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(() -> new ResourceNotFoundException("Could not find UserContext for user: " + hid));
-    return uc.getDataEntry("FIREBASE-TOKEN");
-  }
-
   public void saveTrackingInformation(String hid, TrackingDTO tracker) {
     TrackingEntity cc = new TrackingEntity(hid, tracker);
     trackerRepo.save(cc);

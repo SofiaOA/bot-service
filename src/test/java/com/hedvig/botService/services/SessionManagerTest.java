@@ -160,55 +160,6 @@ public class SessionManagerTest {
         "message.start.login");
   }
 
-  @Test
-  public void givenAnExistingMember_whenRegisteringAnFCMToken_ThenShouldPersistTokenInUserContext() {
-    val tolvanssonUserContext = makeTolvanssonUserContext();
-
-    when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID))
-        .thenReturn(Optional.of(tolvanssonUserContext));
-
-    sessionManager.saveFirebasePushToken(TOLVANSSON_MEMBERID, TOLVANSSON_FCM_TOKEN);
-
-    assertThat(tolvanssonUserContext.getDataEntry("FIREBASE-TOKEN"))
-        .isEqualTo(TOLVANSSON_FCM_TOKEN);
-  }
-
-  @Test
-  public void givenANonExistingMember_whenRegisteringAnFCMToken_ThenShouldThrowException() {
-    when(userContextRepository.findByMemberId("")).thenReturn(Optional.empty());
-    assertThatExceptionOfType(ResourceNotFoundException.class)
-        .isThrownBy(() -> sessionManager.saveFirebasePushToken("", ""));
-  }
-
-  @Test
-  public void givenAnExistingMemberWithFCMToken_whenGettingFCMToken_ThenShouldReturnFCMToken() {
-    val tolvanssonUserContext = makeTolvanssonUserContext();
-    tolvanssonUserContext.putUserData("FIREBASE-TOKEN", TOLVANSSON_FCM_TOKEN);
-    when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID))
-        .thenReturn(Optional.of(tolvanssonUserContext));
-
-    val token = sessionManager.getFirebasePushToken(TOLVANSSON_MEMBERID);
-    assertThat(token).isEqualTo(TOLVANSSON_FCM_TOKEN);
-  }
-
-  @Test
-  public void givenANonExistingMember_whenGettingFCMToken_ThenShouldThrowException() {
-    when(userContextRepository.findByMemberId("")).thenReturn(Optional.empty());
-
-    assertThatExceptionOfType(ResourceNotFoundException.class)
-        .isThrownBy(() -> sessionManager.getFirebasePushToken(""));
-  }
-
-  @Test
-  public void givenAnExistingMemberWithoutFCMToken_whenGettingFCMToken_ThenShouldReturnNull() {
-    val tolvanssonUserContext = makeTolvanssonUserContext();
-
-    when(userContextRepository.findByMemberId(TOLVANSSON_MEMBERID))
-        .thenReturn(Optional.of(tolvanssonUserContext));
-
-    assertThat(sessionManager.getFirebasePushToken(TOLVANSSON_MEMBERID)).isNull();
-  }
-
   private OnboardingConversationDevi makeOnboardingConversation() {
     return new OnboardingConversationDevi(memberService, productPricingService, null, null, null);
   }

@@ -1,6 +1,6 @@
 package com.hedvig.botService.web.v2;
 
-import com.hedvig.botService.services.SessionManager;
+import com.hedvig.botService.serviceIntegration.notificationService.NotificationService;
 import com.hedvig.botService.web.v2.dto.RegisterPushTokenRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,16 +12,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/v2/push-token")
 public class PushTokenController {
-  private SessionManager sessionManager;
+  private NotificationService notificationService;
 
-  public PushTokenController(SessionManager sessionManager) {
-    this.sessionManager = sessionManager;
+  public PushTokenController(NotificationService notificationService) {
+    this.notificationService = notificationService;
   }
 
   @PostMapping
-  public ResponseEntity<Void> pushToken(@RequestBody RegisterPushTokenRequest dto,
-      @RequestHeader(value = "hedvig.token") String hid) {
-    sessionManager.saveFirebasePushToken(hid, dto.getFcmRegistrationToken());
+  public ResponseEntity<Void> pushToken(
+      @RequestBody RegisterPushTokenRequest dto,
+      @RequestHeader(value = "hedvig.token") String memberId) {
+    notificationService.setFirebaseToken(memberId, dto.getFcmRegistrationToken());
     return ResponseEntity.noContent().build();
   }
 }
