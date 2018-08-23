@@ -1,8 +1,9 @@
 package com.hedvig.botService.serviceIntegration.notificationService;
 
+import feign.FeignException;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,9 +17,17 @@ public class NotificationServiceImpl implements NotificationService {
   }
 
   @Override
-  public String getFirebaseToken(String memberId) {
-    ResponseEntity<String> response = notificationServiceClient.getFirebaseToken(memberId);
-    return response.getBody();
+  public Optional<String> getFirebaseToken(String memberId) {
+    try {
+      return Optional.of(notificationServiceClient.getFirebaseToken(memberId).getBody());
+    } catch (FeignException e) {
+      if (e.status() == 404) {
+        return Optional.empty();
+      } else {
+        logger.error("Something wrong with the notification-service, {}", e);
+        throw e;
+      }
+    }
   }
 
   @Override

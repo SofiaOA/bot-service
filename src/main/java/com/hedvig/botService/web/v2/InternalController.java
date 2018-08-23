@@ -1,7 +1,7 @@
 package com.hedvig.botService.web.v2;
 
 import com.hedvig.botService.serviceIntegration.notificationService.NotificationService;
-import com.hedvig.botService.web.v2.dto.PushTokenResponse;
+import java.util.Optional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,13 +19,10 @@ public class InternalController {
   }
 
   @GetMapping("{memberId}/push-token")
-  public ResponseEntity<PushTokenResponse> pushToken(@PathVariable String memberId) {
-    String token = notificationService.getFirebaseToken(memberId);
+  public ResponseEntity<String> pushToken(@PathVariable String memberId) {
 
-    if (token == null) {
-      return ResponseEntity.notFound().build();
-    }
+    Optional<String> possibleToken = notificationService.getFirebaseToken(memberId);
 
-    return ResponseEntity.ok(new PushTokenResponse(token));
+    return possibleToken.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
   }
 }
