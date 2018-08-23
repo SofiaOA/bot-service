@@ -95,7 +95,12 @@ public class InternalMessagesController {
     String linkUri = "hedvig://+";
     if (json != null && json.getDeviceInfo() != null) {
       log.info(json.toString());
-      linkUri = json.getDeviceInfo().getLinkingUri();
+
+      final String clientLinkingUri = json.getDeviceInfo().getLinkingUri();
+      if(clientLinkingUri != null) {
+        linkUri = clientLinkingUri;
+      }
+
     }
     sessionManager.init(hid, linkUri);
 
