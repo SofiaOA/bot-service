@@ -97,7 +97,7 @@ public class TrustlyConversationTest {
   }
 
   @Test
-  public void onWindowClose_shouldNotSendEmail_whenForcedTrustlyChoice_isTrue() {
+  public void onWindowClose_shouldNotSendEmail_whenTrustlyForcedStart_isTrue() {
 
     userContext.putUserData(UserContext.TRUSTLY_TRIGGER_ID, TRIGGER_UUID.toString());
     userContext.putUserData(TRUSTLY_FORCED_START, "true");

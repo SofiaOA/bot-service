@@ -147,7 +147,7 @@ public class MemberServiceFeign implements MemberService {
   public void sendOnboardedActiveToday(String email, String name) {
     send(
         () ->
-            this.client.sendOnboardedActiveToday(new SendOnboardedActiveTodayRequest(email, name)));
+            this.client.sendOnboardedActiveToday(new SendOnboardedActiveTodayRequest(name, email)));
   }
 
   @Override
