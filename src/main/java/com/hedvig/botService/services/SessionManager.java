@@ -17,25 +17,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Objects;
-
 import static com.hedvig.botService.chat.OnboardingConversationDevi.LOGIN;
 import static com.hedvig.botService.chat.OnboardingConversationDevi.MESSAGE_START_LOGIN;
 
 /*
- * The services manager is the main controller class for the chat service. It contains all user sessions with chat histories, context etc
- * It is a singleton accessed through the request controller
- * */
+ * The services manager is the main controller class for the chat service. It contains all user
+ * sessions with chat histories, context etc It is a singleton accessed through the request
+ * controller
+ */
 
 @Component
 @Transactional
 public class SessionManager {
 
   public enum Intent {
-    LOGIN,
-    ONBOARDING
+    LOGIN, ONBOARDING
   }
 
   private static Logger log = LoggerFactory.getLogger(SessionManager.class);
@@ -48,13 +46,9 @@ public class SessionManager {
   private final ObjectMapper objectMapper;
 
   @Autowired
-  public SessionManager(
-      UserContextRepository userContextRepository,
-      MemberService memberService,
-      ClaimsService claimsService,
-      ConversationFactory conversationFactory,
-      TrackingDataRespository trackerRepo,
-      ObjectMapper objectMapper) {
+  public SessionManager(UserContextRepository userContextRepository, MemberService memberService,
+      ClaimsService claimsService, ConversationFactory conversationFactory,
+      TrackingDataRespository trackerRepo, ObjectMapper objectMapper) {
     this.userContextRepository = userContextRepository;
     this.memberService = memberService;
     this.claimsService = claimsService;
@@ -70,12 +64,9 @@ public class SessionManager {
     return messages.subList(Math.max(messages.size() - i, 0), messages.size());
   }
 
-  public void savePushToken(String hid, String pushToken) {
-    UserContext uc =
-        userContextRepository
-            .findByMemberId(hid)
-            .orElseThrow(
-                () -> new ResourceNotFoundException("Could not find usercontext for user: " + hid));
+  public void saveExpoPushToken(String hid, String pushToken) {
+    UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(
+        () -> new ResourceNotFoundException("Could not find usercontext for user: " + hid));
     uc.putUserData("PUSH-TOKEN", pushToken);
   }
 
@@ -85,20 +76,15 @@ public class SessionManager {
   }
 
   public String getPushToken(String hid) {
-    UserContext uc =
-        userContextRepository
-            .findByMemberId(hid)
-            .orElseThrow(
-                () -> new ResourceNotFoundException("Could not find usercontext for user: " + hid));
+    UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(
+        () -> new ResourceNotFoundException("Could not find usercontext for user: " + hid));
     return uc.getDataEntry("PUSH-TOKEN");
   }
 
   public void receiveEvent(String eventType, String value, String hid) {
 
-    UserContext uc =
-        userContextRepository
-            .findByMemberId(hid)
-            .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    UserContext uc = userContextRepository.findByMemberId(hid)
+        .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
     uc.conversationManager.receiveEvent(eventType, value, conversationFactory, uc);
   }
@@ -107,26 +93,20 @@ public class SessionManager {
 
     CollectService service = new CollectService(userContextRepository, memberService);
 
-    return service.collect(
-        hid,
-        referenceToken,
+    return service.collect(hid, referenceToken,
         (BankIdChat) conversationFactory.createConversation(OnboardingConversationDevi.class));
   }
 
   /*
    * Create a new users chat and context
-   * */
+   */
   public void init(String hid, String linkUri) {
 
-    UserContext uc =
-        userContextRepository
-            .findByMemberId(hid)
-            .orElseGet(
-                () -> {
-                  UserContext newUserContext = new UserContext(hid);
-                  userContextRepository.save(newUserContext);
-                  return newUserContext;
-                });
+    UserContext uc = userContextRepository.findByMemberId(hid).orElseGet(() -> {
+      UserContext newUserContext = new UserContext(hid);
+      userContextRepository.save(newUserContext);
+      return newUserContext;
+    });
 
     uc.putUserData("{LINK_URI}", linkUri);
     uc.putUserData(UserContext.ONBOARDING_COMPLETE, "false");
@@ -136,22 +116,18 @@ public class SessionManager {
 
   /*
    * Mark all messages (incl) last input from user deleted
-   * */
+   */
   public void editHistory(String hid) {
-    UserContext uc =
-        userContextRepository
-            .findByMemberId(hid)
-            .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    UserContext uc = userContextRepository.findByMemberId(hid)
+        .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
     MemberChat mc = uc.getMemberChat();
     mc.revertLastInput();
     userContextRepository.saveAndFlush(uc);
   }
 
   public boolean addAnswerFromHedvig(BackOfficeAnswerDTO backOfficeAnswer) {
-    UserContext uc =
-        userContextRepository
-            .findByMemberId(backOfficeAnswer.getUserId())
-            .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    UserContext uc = userContextRepository.findByMemberId(backOfficeAnswer.getUserId())
+        .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
     Conversation conversation = getActiveConversationOrStart(uc, MainConversation.class);
 
@@ -159,36 +135,30 @@ public class SessionManager {
   }
 
   public boolean addMessageFromHedvig(AddMessageRequestDTO backOfficeMessage) {
-    val uc =
-        userContextRepository
-            .findByMemberId(backOfficeMessage.getMemberId())
-            .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    val uc = userContextRepository.findByMemberId(backOfficeMessage.getMemberId())
+        .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
     Conversation activeConversation = getActiveConversationOrStart(uc, MainConversation.class);
-    return activeConversation.addMessageFromBackOffice(
-        uc, backOfficeMessage.getMsg(), "message.bo.message");
+    return activeConversation.addMessageFromBackOffice(uc, backOfficeMessage.getMsg(),
+        "message.bo.message");
   }
 
-  private Conversation getActiveConversationOrStart(
-      UserContext uc, Class<MainConversation> conversationToStart) {
+  private Conversation getActiveConversationOrStart(UserContext uc,
+      Class<MainConversation> conversationToStart) {
     return uc.getActiveConversation()
-        .map(x -> conversationFactory.createConversation(x.getClassName()))
-        .orElseGet(
-            () -> {
-              val newConversation = conversationFactory.createConversation(conversationToStart);
-              uc.startConversation(newConversation);
-              return newConversation;
-            });
+        .map(x -> conversationFactory.createConversation(x.getClassName())).orElseGet(() -> {
+          val newConversation = conversationFactory.createConversation(conversationToStart);
+          uc.startConversation(newConversation);
+          return newConversation;
+        });
   }
 
   /*
    * Mark all messages (incl) last input from user deleted
-   * */
+   */
   public void resetOnboardingChat(String hid) {
-    UserContext uc =
-        userContextRepository
-            .findByMemberId(hid)
-            .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    UserContext uc = userContextRepository.findByMemberId(hid)
+        .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
     MemberChat mc = uc.getMemberChat();
 
     // Conversations can only be reset during onboarding
@@ -219,12 +189,10 @@ public class SessionManager {
 
     /*
      * Find users chat and context. First time it is created
-     * */
+     */
 
-    UserContext uc =
-        userContextRepository
-            .findByMemberId(hid)
-            .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    UserContext uc = userContextRepository.findByMemberId(hid)
+        .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
     val messages = uc.getMessages(intent, conversationFactory);
 
@@ -235,14 +203,12 @@ public class SessionManager {
 
   /*
    * Add the "what do you want to do today" message to the chat
-   * */
+   */
   public void mainMenu(String hid) {
     log.info("Main menu from user: " + hid);
 
-    UserContext uc =
-        userContextRepository
-            .findByMemberId(hid)
-            .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    UserContext uc = userContextRepository.findByMemberId(hid)
+        .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
     Conversation mainConversation = conversationFactory.createConversation(MainConversation.class);
     uc.startConversation(mainConversation);
@@ -251,11 +217,8 @@ public class SessionManager {
   }
 
   public void trustlyClosed(String hid) {
-    UserContext uc =
-        userContextRepository
-            .findByMemberId(hid)
-            .orElseThrow(
-                () -> new ResourceNotFoundException("Could not find usercontext for user: " + hid));
+    UserContext uc = userContextRepository.findByMemberId(hid).orElseThrow(
+        () -> new ResourceNotFoundException("Could not find usercontext for user: " + hid));
 
     TrustlyConversation tr =
         (TrustlyConversation) conversationFactory.createConversation(TrustlyConversation.class);
@@ -274,16 +237,15 @@ public class SessionManager {
 
     m.header.fromId = new Long(hid);
 
-    UserContext uc =
-        userContextRepository
-            .findByMemberId(hid)
-            .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    UserContext uc = userContextRepository.findByMemberId(hid)
+        .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
     uc.conversationManager.receiveMessage(m, conversationFactory, uc);
   }
 
   public void getFabActions(String hid) {
 
-    if (claimsService.getActiveClaims(hid) > 0) {}
+    if (claimsService.getActiveClaims(hid) > 0) {
+    }
   }
 }
