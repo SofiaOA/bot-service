@@ -4,5 +4,5 @@ import lombok.Value;
 
 @Value
 public class RegisterPushTokenRequest {
-  String fcmRegistrationToken;
+  String token;
 }
