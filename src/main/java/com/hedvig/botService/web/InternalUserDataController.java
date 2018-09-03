@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,5 +35,14 @@ public class InternalUserDataController {
       return ResponseEntity.ok("{\"token\":null}");
     }
     return new ResponseEntity<String>(token, HttpStatus.OK);
+  }
+
+  @PostMapping(value = "{memberId}/enableTrustlyButton")
+  ResponseEntity<?> enableTrustlyButton(@PathVariable String memberId) {
+    log.info("Enabling trustly button");
+
+    sessionManager.enableTrustlyButtonForMember(memberId);
+
+    return ResponseEntity.accepted().build();
   }
 }
