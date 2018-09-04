@@ -1,9 +1,9 @@
 package com.hedvig.botService.enteties;
 
+import com.hedvig.botService.web.dto.TrackingDTO;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -11,20 +11,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.hedvig.botService.web.dto.TrackingDTO;
 
 @Entity
 @ToString
 public class TrackingEntity {
-
-  private static Logger log = LoggerFactory.getLogger(TrackingEntity.class);
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

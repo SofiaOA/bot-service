@@ -1,7 +1,8 @@
 package com.hedvig.botService.web;
 
+import static net.logstash.logback.argument.StructuredArguments.value;
+
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
-import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.services.SessionManager;
 import com.hedvig.botService.web.dto.CollectResponse;
 import com.hedvig.botService.web.dto.TrackingDTO;
@@ -9,9 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import static net.logstash.logback.argument.StructuredArguments.value;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/hedvig")
@@ -19,12 +23,10 @@ public class HedvigController {
 
   private final Logger log = LoggerFactory.getLogger(HedvigController.class);
   private final SessionManager sessionManager;
-  private final ProductPricingService productPricingService;
 
   @Autowired
-  public HedvigController(SessionManager sessions, ProductPricingService productPricingService) {
+  public HedvigController(SessionManager sessions) {
     this.sessionManager = sessions;
-    this.productPricingService = productPricingService;
   }
 
   @PostMapping(path = "/register_campaign")

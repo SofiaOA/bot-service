@@ -1,5 +1,7 @@
 package com.hedvig.botService.web;
 
+import static java.lang.Long.valueOf;
+
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.services.SessionManager;
 import com.hedvig.botService.web.dto.AvatarDTO;
@@ -81,7 +83,7 @@ public class MessagesController {
 
     log.info("Response received from messageId: " + msg.globalId);
 
-    msg.header.fromId = new Long(hid);
+    msg.header.fromId = valueOf(hid);
 
     // Clear all key information to generate a new entry
     msg.globalId = null;

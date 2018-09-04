@@ -56,7 +56,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
     }
 
     if (conversationClass.equals(MainConversation.class)) {
-      return new MainConversation(productPricingService, this, eventPublisher);
+      return new MainConversation(this, eventPublisher);
     }
 
     if (conversationClass.equals(OnboardingConversationDevi.class)) {
@@ -68,7 +68,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
     }
 
     if (conversationClass.equals(TrustlyConversation.class)) {
-      return new TrustlyConversation(triggerService, this, memberService);
+      return new TrustlyConversation(triggerService, memberService);
     }
 
     if (conversationClass.equals(FreeChatConversation.class)) {
@@ -76,7 +76,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
     }
 
     if (conversationClass.equals(CallMeConversation.class)) {
-      return new CallMeConversation(statusBuilder, eventPublisher);
+      return new CallMeConversation(eventPublisher);
     }
 
     return null;

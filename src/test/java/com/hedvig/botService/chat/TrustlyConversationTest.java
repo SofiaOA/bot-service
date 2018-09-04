@@ -41,7 +41,7 @@ public class TrustlyConversationTest {
   public void setup() {
     userContext = new UserContext(TOLVANSSON_MEMBER_ID);
 
-    testConversation = new TrustlyConversation(triggerService, factory, memberService);
+    testConversation = new TrustlyConversation(triggerService, memberService);
   }
 
   public void addTolvansonToUserContext() {

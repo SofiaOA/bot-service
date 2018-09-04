@@ -4,18 +4,19 @@ import com.hedvig.botService.services.MessagesService;
 import com.hedvig.botService.services.SessionManager;
 import com.hedvig.botService.web.v2.dto.FABAction;
 import com.hedvig.botService.web.v2.dto.MessagesDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.Objects;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController()
 @RequestMapping("/v2/app")
 public class AppController {
-
-  private static Logger log = LoggerFactory.getLogger(AppController.class);
 
   private final MessagesService messagesService;
 

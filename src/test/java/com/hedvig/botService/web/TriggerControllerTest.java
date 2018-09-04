@@ -1,11 +1,22 @@
 package com.hedvig.botService.web;
 
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_MEMBER_ID;
+import static com.hedvig.botService.testHelpers.TestData.toJson;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.hedvig.botService.BotServiceApplicationTests;
 import com.hedvig.botService.enteties.DirectDebitMandateTrigger;
+import com.hedvig.botService.services.exceptions.UnauthorizedException;
 import com.hedvig.botService.services.triggerService.TriggerService;
-import com.hedvig.botService.services.exceptions.UnathorizedException;
-import com.hedvig.botService.testHelpers.TestData;
 import com.hedvig.botService.services.triggerService.dto.CreateDirectDebitMandateDTO;
+import com.hedvig.botService.testHelpers.TestData;
+import java.util.UUID;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +28,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.UUID;
-
-import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_MEMBER_ID;
-import static com.hedvig.botService.testHelpers.TestData.toJson;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SuppressWarnings("unchecked")
 @RunWith(SpringRunner.class)
@@ -48,7 +50,7 @@ public class TriggerControllerTest {
 
     //noinspection unchecked
     given(triggerService.getTriggerUrl(triggerId, TestData.TOLVANSSON_MEMBER_ID))
-        .willThrow(UnathorizedException.class);
+        .willThrow(UnauthorizedException.class);
 
     mockMvc
         .perform(
