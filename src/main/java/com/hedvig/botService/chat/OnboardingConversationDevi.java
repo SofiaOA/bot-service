@@ -1,5 +1,7 @@
 package com.hedvig.botService.chat;
 
+import static com.hedvig.botService.enteties.userContextHelpers.UserData.INSURANCE_COMPANY_TODAY;
+
 import com.google.common.collect.Lists;
 import com.hedvig.botService.dataTypes.*;
 import com.hedvig.botService.enteties.SignupCode;
@@ -1319,7 +1321,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         break;
       case MESSAGE_ANNATBOLAG:
         String _comp = m.body.text;
-        userContext.putUserData("{INSURANCE_COMPANY_TODAY}", _comp);
+        userContext.getOnBoardingData().setCurrentInsurer(_comp);
         m.body.text = _comp;
         nxtMsg = MESSAGE_BYTESINFO;
         addToChat(m, userContext);
@@ -1328,7 +1330,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
       case "message.bolag.annat.expand":
         String comp = getValue((MessageBodySingleSelect) m.body);
         if (!comp.startsWith("message.")) {
-          userContext.putUserData("{INSURANCE_COMPANY_TODAY}", comp);
+          userContext.getOnBoardingData().setCurrentInsurer(comp);
           m.body.text = comp;
           nxtMsg = MESSAGE_BYTESINFO;
           addToChat(m, userContext);

@@ -41,7 +41,7 @@ public class TrustlyConversationTest {
   public void setup() {
     userContext = new UserContext(TOLVANSSON_MEMBER_ID);
 
-    testConversation = new TrustlyConversation(triggerService, factory, memberService);
+    testConversation = new TrustlyConversation(triggerService, memberService);
   }
 
   public void addTolvansonToUserContext() {
@@ -108,6 +108,34 @@ public class TrustlyConversationTest {
     testConversation.windowClosed(userContext);
 
     then(memberService).should(times(0)).sendOnboardedActiveToday(any(), any());
-    then(memberService).should(times(0)).sendOnboardedActiveLater(any(), any(), any());
+  }
+
+  @Test
+  public void onWindowClose_shouldNotSendEmail_whenTrustlyForcedStartIsFalseAndCurrentInsurerIsSet() {
+
+    userContext.putUserData(UserContext.TRUSTLY_TRIGGER_ID, TRIGGER_UUID.toString());
+    userContext.putUserData(TRUSTLY_FORCED_START, "false");
+    userContext.getOnBoardingData().setCurrentInsurer("OtherInsurer");
+
+    given(this.triggerService.getTrustlyOrderInformation(TRIGGER_UUID.toString()))
+      .willReturn(TriggerStatus.SUCCESS);
+
+    testConversation.windowClosed(userContext);
+
+    then(memberService).should(times(0)).sendOnboardedActiveToday(any(), any());
+  }
+
+  @Test
+  public void onWindowClose_shouldSendEmail_whenTrustlyForcedStartIsFalseAndCurrentInsurerIsNull() {
+
+    userContext.putUserData(UserContext.TRUSTLY_TRIGGER_ID, TRIGGER_UUID.toString());
+    userContext.putUserData(TRUSTLY_FORCED_START, "false");
+
+    given(this.triggerService.getTrustlyOrderInformation(TRIGGER_UUID.toString()))
+      .willReturn(TriggerStatus.SUCCESS);
+
+    testConversation.windowClosed(userContext);
+
+    then(memberService).should(times(1)).sendOnboardedActiveToday(any(), any());
   }
 }

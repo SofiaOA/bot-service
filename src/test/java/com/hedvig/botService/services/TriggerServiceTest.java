@@ -6,7 +6,7 @@ import com.hedvig.botService.serviceIntegration.paymentService.PaymentService;
 import com.hedvig.botService.serviceIntegration.paymentService.dto.DirectDebitResponse;
 import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderInformation;
 import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderState;
-import com.hedvig.botService.services.exceptions.UnathorizedException;
+import com.hedvig.botService.services.exceptions.UnauthorizedException;
 import com.hedvig.botService.services.triggerService.TriggerService;
 import com.hedvig.botService.services.triggerService.dto.CreateDirectDebitMandateDTO;
 import org.junit.Before;
@@ -150,7 +150,7 @@ private UUID generatedTriggerId;
     given(repo.findOne(TRIGGER_ID)).willReturn(ddm);
 
     // act
-    thrown.expect(UnathorizedException.class);
+    thrown.expect(UnauthorizedException.class);
     sut.getTriggerUrl(TRIGGER_ID, "1338");
 
     // assert

@@ -1,9 +1,23 @@
 package com.hedvig.botService.services;
 
+import static com.hedvig.botService.chat.OnboardingConversationDevi.LOGIN;
+import static com.hedvig.botService.chat.OnboardingConversationDevi.MESSAGE_START_LOGIN;
+import static java.lang.Long.valueOf;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hedvig.botService.chat.*;
-import com.hedvig.botService.enteties.*;
+import com.hedvig.botService.chat.BankIdChat;
+import com.hedvig.botService.chat.Conversation;
+import com.hedvig.botService.chat.ConversationFactory;
+import com.hedvig.botService.chat.MainConversation;
+import com.hedvig.botService.chat.OnboardingConversationDevi;
+import com.hedvig.botService.chat.TrustlyConversation;
+import com.hedvig.botService.enteties.MemberChat;
+import com.hedvig.botService.enteties.ResourceNotFoundException;
+import com.hedvig.botService.enteties.TrackingDataRespository;
+import com.hedvig.botService.enteties.TrackingEntity;
+import com.hedvig.botService.enteties.UserContext;
+import com.hedvig.botService.enteties.UserContextRepository;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
@@ -11,16 +25,14 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectR
 import com.hedvig.botService.web.dto.AddMessageRequestDTO;
 import com.hedvig.botService.web.dto.BackOfficeAnswerDTO;
 import com.hedvig.botService.web.dto.TrackingDTO;
+import java.util.List;
+import java.util.Objects;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import java.util.Objects;
-import static com.hedvig.botService.chat.OnboardingConversationDevi.LOGIN;
-import static com.hedvig.botService.chat.OnboardingConversationDevi.MESSAGE_START_LOGIN;
 
 /*
  * The services manager is the main controller class for the chat service. It contains all user
@@ -235,7 +247,7 @@ public class SessionManager {
       log.error("Could not convert message to json in order to log: {}", m.toString());
     }
 
-    m.header.fromId = new Long(hid);
+    m.header.fromId = valueOf(hid);
 
     UserContext uc = userContextRepository.findByMemberId(hid)
         .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));

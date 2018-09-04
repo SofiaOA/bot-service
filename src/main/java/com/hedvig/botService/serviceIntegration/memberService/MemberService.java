@@ -29,8 +29,6 @@ public interface MemberService {
 
   void sendSignupMail(String email, UUID uuid);
 
-  void sendOnboardedActiveLater(String email, String name, String memberId);
-
   void sendOnboardedActiveToday(String email, String name);
 
   void selectCashback(String memberId, UUID charityId);

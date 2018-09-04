@@ -23,8 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v2/app")
 public class AppController {
 
-  private static Logger log = LoggerFactory.getLogger(AppController.class);
-
   private final MessagesService messagesService;
   private final NotificationService notificationService;
 
