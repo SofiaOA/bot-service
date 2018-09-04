@@ -134,9 +134,7 @@ public class TrustlyConversation extends Conversation {
     final String email = onBoardingData.getEmail();
     final String currentInsurer = onBoardingData.getCurrentInsurer();
 
-    if (currentInsurer != null) {
-      memberService.sendOnboardedActiveLater(email, name, userContext.getMemberId());
-    } else {
+    if (currentInsurer == null) {
       memberService.sendOnboardedActiveToday(email, name);
     }
   }
