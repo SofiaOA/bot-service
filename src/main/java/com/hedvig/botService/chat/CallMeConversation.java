@@ -16,11 +16,10 @@ public class CallMeConversation extends Conversation {
   public static final String CALLME_PHONE_OK = "callme.phone.ok";
   public static final String CALLME_PHONE_CHANGE = "callme.phone.change";
 
-  private final StatusBuilder statusBuilder;
   private final ApplicationEventPublisher eventPublisher;
 
-  public CallMeConversation(StatusBuilder statusBuilder, ApplicationEventPublisher eventPublisher) {
-    this.statusBuilder = statusBuilder;
+  public CallMeConversation(ApplicationEventPublisher eventPublisher) {
+
     this.eventPublisher = eventPublisher;
     createMessage(
         CALLME_CHAT_START,

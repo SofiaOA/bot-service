@@ -34,7 +34,7 @@ public class MainConversationTest {
   @Before
   public void setup() {
     testConversation =
-        new MainConversation(productPricingService, conversationFactory, eventPublisher);
+        new MainConversation(conversationFactory, eventPublisher);
 
     uc = new UserContext(TOLVANSSON_MEMBER_ID);
   }

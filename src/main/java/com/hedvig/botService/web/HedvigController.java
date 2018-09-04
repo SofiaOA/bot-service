@@ -1,5 +1,7 @@
 package com.hedvig.botService.web;
 
+import static net.logstash.logback.argument.StructuredArguments.value;
+
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.services.SessionManager;
 import com.hedvig.botService.web.dto.CollectResponse;

@@ -1,5 +1,7 @@
 package com.hedvig.botService.chat;
 
+import static java.lang.Long.valueOf;
+
 import com.hedvig.botService.dataTypes.HedvigDataType;
 import com.hedvig.botService.dataTypes.TextInput;
 import com.hedvig.botService.enteties.UserContext;
@@ -79,7 +81,7 @@ public abstract class Conversation {
     m.id = id;
     m.header = header;
     m.body = body;
-    m.header.pollingInterval = new Long(delay);
+    m.header.pollingInterval = valueOf(delay);
     messageList.put(m.id, m);
   }
 

@@ -135,13 +135,6 @@ public class MemberServiceFeign implements MemberService {
     this.client.sendSignup(sendSignupRequest);
   }
 
-  @Override
-  public void sendOnboardedActiveLater(String email, String name, String memberId) {
-    send(
-        () ->
-            this.client.sendOnboardedActiveLater(
-                new SendOnboardedActiveLaterRequest(email, name, memberId)));
-  }
 
   @Override
   public void sendOnboardedActiveToday(String email, String name) {

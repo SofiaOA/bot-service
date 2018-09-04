@@ -50,10 +50,6 @@ public interface MemberServiceClient {
   @RequestMapping(value = "/_/mail/sendActivated")
   ResponseEntity<String> sendActivated(@RequestBody SendActivatedRequest request);
 
-  @RequestMapping(value = "/_/mail/sendOnboardedActiveLater")
-  ResponseEntity<String> sendOnboardedActiveLater(
-      @RequestBody SendOnboardedActiveLaterRequest request);
-
   @RequestMapping(value = "/_/mail/sendOnboardedActiveToday")
   ResponseEntity<String> sendOnboardedActiveToday(
       @RequestBody SendOnboardedActiveTodayRequest request);

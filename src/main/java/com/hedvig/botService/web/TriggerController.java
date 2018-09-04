@@ -2,8 +2,8 @@ package com.hedvig.botService.web;
 
 import com.hedvig.botService.Profiles;
 import com.hedvig.botService.enteties.DirectDebitMandateTrigger;
+import com.hedvig.botService.services.exceptions.UnauthorizedException;
 import com.hedvig.botService.services.triggerService.TriggerService;
-import com.hedvig.botService.services.exceptions.UnathorizedException;
 import com.hedvig.botService.services.triggerService.dto.CreateDirectDebitMandateDTO;
 import com.hedvig.botService.web.dto.TriggerResponseDTO;
 import org.apache.commons.lang.ArrayUtils;
@@ -98,8 +98,8 @@ public class TriggerController {
   }
 
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
-  @ExceptionHandler(UnathorizedException.class)
-  public String handleException(UnathorizedException ex) {
+  @ExceptionHandler(UnauthorizedException.class)
+  public String handleException(UnauthorizedException ex) {
     return ex.getMessage();
   }
 }
