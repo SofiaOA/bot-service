@@ -277,4 +277,11 @@ public class UserData {
       return false;
     }
   }
+
+  public void clearAddress() {
+    setAddressZipCode(null);
+    setAddressCity(null);
+    setFloor(0);
+    setAddressStreet(null);
+  }
 }

@@ -1,13 +1,28 @@
 package com.hedvig.botService.chat;
 
-import static com.hedvig.botService.enteties.userContextHelpers.UserData.INSURANCE_COMPANY_TODAY;
-
 import com.google.common.collect.Lists;
-import com.hedvig.botService.dataTypes.*;
+import com.hedvig.botService.dataTypes.EmailAdress;
+import com.hedvig.botService.dataTypes.HouseholdMemberNumber;
+import com.hedvig.botService.dataTypes.LivingSpaceSquareMeters;
+import com.hedvig.botService.dataTypes.SSNSweden;
+import com.hedvig.botService.dataTypes.TextInput;
+import com.hedvig.botService.dataTypes.ZipCodeSweden;
 import com.hedvig.botService.enteties.SignupCode;
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.*;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodyAudio;
+import com.hedvig.botService.enteties.message.MessageBodyBankIdCollect;
+import com.hedvig.botService.enteties.message.MessageBodyMultipleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyNumber;
+import com.hedvig.botService.enteties.message.MessageBodyParagraph;
+import com.hedvig.botService.enteties.message.MessageBodyPhotoUpload;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyText;
+import com.hedvig.botService.enteties.message.MessageHeader;
+import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.enteties.message.SelectLink;
+import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.MemberProfile;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
@@ -21,18 +36,18 @@ import com.hedvig.botService.services.events.RequestObjectInsuranceEvent;
 import com.hedvig.botService.services.events.RequestStudentObjectInsuranceEvent;
 import com.hedvig.botService.services.events.SignedOnWaitlistEvent;
 import com.hedvig.botService.services.events.UnderwritingLimitExcededEvent;
-import lombok.val;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Component;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
 
 @Component
 public class OnboardingConversationDevi extends Conversation implements BankIdChat {
@@ -85,6 +100,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
   public static final String MESSAGE_STUDENT_25K_LIMIT = "message.student.25klimit";
 
   public static final String IN_OFFER = "{IN_OFFER}";
+  private static final String MESSAGE_BANKIDJA = "message.bankidja";
+  private static final String MESSAGE_KVADRAT = "message.kvadrat";
+  private static final String MESSAGE_VARBORDUFELADRESS = "message.varbordufeladress";
   /*
    * Need to be stateless. I.e no data beyond response scope
    *
@@ -416,26 +434,26 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
               }
             }));
 
-    createMessage("message.bankidja", new MessageBodySingleSelect(
+    createMessage(MESSAGE_BANKIDJA, new MessageBodySingleSelect(
         "Tack {NAME}! Stämmer det att du bor på {ADDRESS}?", new ArrayList<SelectItem>() {
           {
-            add(new SelectOption("Ja", "message.kvadrat"));
-            add(new SelectOption("Nej", "message.varbordufeladress"));
+            add(new SelectOption("Ja", MESSAGE_KVADRAT));
+            add(new SelectOption("Nej", MESSAGE_VARBORDUFELADRESS));
           }
         }));
 
     createMessage("message.bankidja.noaddress",
         new MessageBodyText("Tack {NAME}! Nu skulle jag behöva veta vilken gatuadress bor du på?"));
 
-    createMessage("message.varbordufeladress",
+    createMessage(MESSAGE_VARBORDUFELADRESS,
         new MessageBodyText("Inga problem! Vilken gatuadress bor du på?"));
     createMessage("message.varbordufelpostnr",
         new MessageBodyNumber("Och vad har du för postnummer?"));
     setExpectedReturnType("message.varbordufelpostnr", new ZipCodeSweden());
 
-    createMessage("message.kvadrat",
+    createMessage(MESSAGE_KVADRAT,
         new MessageBodyNumber("Hur många kvadratmeter är lägenheten?"));
-    setExpectedReturnType("message.kvadrat", new LivingSpaceSquareMeters());
+    setExpectedReturnType(MESSAGE_KVADRAT, new LivingSpaceSquareMeters());
 
     createChatMessage("message.manuellnamn", new MessageBodyText(
         "Inga problem! Då ställer jag bara några extra frågor nu\fMen om du vill bli medlem sen så måste du signera med BankID, bara så du vet!\fVad heter du i förnamn?"));
@@ -789,13 +807,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
             }));
 
     createMessage("message.studentnej", new MessageBodyParagraph("Okej, då vet jag"));
-    addRelay("message.studentnej", "message.kvadrat");
+    addRelay("message.studentnej", MESSAGE_KVADRAT);
 
     createMessage("message.studentja", new MessageBodySingleSelect(
         "Vad kul! Jag har tagit fram ett extra grymt erbjudande som är skräddarsytt för studenter som bor max två personer på max 50 kvm ‍🎓",
         new ArrayList<SelectItem>() {
           {
-            add(new SelectOption("Okej, toppen!", "message.kvadrat"));
+            add(new SelectOption("Okej, toppen!", MESSAGE_KVADRAT));
           }
         }));
 
@@ -1036,12 +1054,15 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         nxtMsg = "message.pers";
         break;
       }
-      case "message.bankidja": {
+      case MESSAGE_BANKIDJA: {
         val item = ((MessageBodySingleSelect) m.body).getSelectedItem();
         m.body.text = item.text;
         addToChat(m, userContext);
-        if (Objects.equals(item.value, "message.kvadrat")) {
-          nxtMsg = handleStudentEntrypoint("message.kvadrat", userContext);
+        if (Objects.equals(item.value, MESSAGE_KVADRAT)) {
+          nxtMsg = handleStudentEntrypoint(MESSAGE_KVADRAT, userContext);
+        }else if(Objects.equals(item.value, MESSAGE_VARBORDUFELADRESS)) {
+          val obd = userContext.getOnBoardingData();
+          obd.clearAddress();
         }
         break;
       }
@@ -1187,7 +1208,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
         nxtMsg = handleStudentPolicyPersonLimit(MESSAGE_SAKERHET, userContext);
         break;
-      case "message.kvadrat": {
+      case MESSAGE_KVADRAT: {
         String kvm = m.body.text;
         onBoardingData.setLivingSpace(Float.parseFloat(kvm));
         m.body.text = kvm + " kvm";
@@ -1225,7 +1246,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         nxtMsg = "message.varborduadress";
         break;
       case "message.bankidja.noaddress":
-      case "message.varbordufeladress":
+      case MESSAGE_VARBORDUFELADRESS:
       case "message.varborduadress":
         onBoardingData.setAddressStreet(m.body.text);
         addToChat(m, userContext);
@@ -1234,12 +1255,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
       case "message.varbordupostnr":
         onBoardingData.setAddressZipCode(m.body.text);
         addToChat(m, userContext);
-        nxtMsg = handleStudentEntrypoint("message.kvadrat", userContext);
+        nxtMsg = handleStudentEntrypoint(MESSAGE_KVADRAT, userContext);
         break;
       case "message.varbordu":
         onBoardingData.setAddressStreet(m.body.text);
         addToChat(m, userContext);
-        nxtMsg = "message.kvadrat";
+        nxtMsg = MESSAGE_KVADRAT;
         break;
       case "message.mail":
         onBoardingData.setEmail(m.body.text);
@@ -1577,7 +1598,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
       userContext.removeDataEntry(LOGIN);
       addToChat(getMessage("message.membernotfound"), userContext);
     } else {
-      addToChat(getMessage("message.bankidja"), userContext);
+      addToChat(getMessage(MESSAGE_BANKIDJA), userContext);
     }
   }
 
