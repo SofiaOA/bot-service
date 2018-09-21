@@ -148,7 +148,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     createChatMessage(MESSAGE_WAITLIST_START, new MessageBodySingleSelect("Hej! Jag heter Hedvig "
         + emoji_waving_hand
-        + "\fJag har designat om försäkring från grunden, så att det är schysst och lätt att använda!\fFör att kunna ta fram ett prisförslag behöver jag veta lite mer om dig och hur du bor\fDu binder inte upp dig på något genom att gå vidare, och om du undrar något längs vägen är det bara att fråga!",
+        + "\fDet här går på nolltid! Jag ställer några frågor, sen ger jag dig ett förslag på en hemförsäkring",
         Lists.newArrayList(new SelectOption("Låter bra!", MESSAGE_PRE_FORSLAGSTART),
             new SelectOption("Jag är redan medlem", "message.bankid.start"))));
 
@@ -307,7 +307,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     setupBankidErrorHandlers("message.medlem");
 
     createMessage(MESSAGE_PRE_FORSLAGSTART, new MessageBodyParagraph(
-        "Toppen! Då ställer jag några frågor så att jag kan räkna ut ditt pris"), 1500);
+        "Toppen! Då ställer jag några frågor så att jag kan räkna ut ditt pris"), 1500); // Delete this message
     addRelay(MESSAGE_PRE_FORSLAGSTART, MESSAGE_FORSLAGSTART);
 
     createMessage(MESSAGE_FORSLAGSTART, new MessageBodySingleSelect(
@@ -325,9 +325,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         "Har du BankID? I så fall kan vi hoppa över några frågor så du får se ditt prisförslag snabbare!",
         new ArrayList<SelectItem>() {
           {
-            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null,
+            add(new SelectLink("Fortsätt med BankID", "message.bankid.autostart.respond", null,
                 "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null, false));
-            add(new SelectOption("Jag har inte BankID", "message.manuellnamn"));
+            add(new SelectOption("Fortsätt utan", "message.manuellnamn"));
           }
         }), (m, uc) -> {
           UserData obd = uc.getOnBoardingData();
