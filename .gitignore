@@ -36,3 +36,6 @@ application-development.yml
 .vscode
 .sts4-cache
 .factorypath
+
+# jEnv support
+.java-version
