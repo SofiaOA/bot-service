@@ -149,13 +149,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     createChatMessage(MESSAGE_WAITLIST_START, new MessageBodySingleSelect("Hej! Jag heter Hedvig "
         + emoji_waving_hand
         + "\fDet här går på nolltid! Jag ställer några frågor, sen ger jag dig ett förslag på en hemförsäkring",
-        Lists.newArrayList(new SelectOption("Låter bra!", MESSAGE_PRE_FORSLAGSTART),
+        Lists.newArrayList(new SelectOption("Låter bra!", MESSAGE_FORSLAGSTART),
             new SelectOption("Jag är redan medlem", "message.bankid.start"))));
 
     createChatMessage("message.membernotfound",
         new MessageBodySingleSelect("Hmm, det verkar som att du inte är medlem här hos mig ännu"
             + "\fMen jag tar gärna fram ett försäkringsförslag till dig, det är precis som allt annat med mig superenkelt",
-            Lists.newArrayList(new SelectOption("Låter bra!", MESSAGE_PRE_FORSLAGSTART))));
+            Lists.newArrayList(new SelectOption("Låter bra!", MESSAGE_FORSLAGSTART))));
 
     createMessage(MESSAGE_SIGNUP_TO_WAITLIST,
         new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
@@ -262,7 +262,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     createMessage("message.activate.ok.b",
         new MessageBodyParagraph("Nu ska jag ta fram ett försäkringsförslag åt dig"), 2000);
-    addRelay("message.activate.ok.b", MESSAGE_PRE_FORSLAGSTART);
+    addRelay("message.activate.ok.b", MESSAGE_FORSLAGSTART);
 
     createMessage("message.uwlimit.tack", new MessageBodySingleSelect(
         "Tack! Jag hör av mig så fort jag kan", new ArrayList<SelectItem>() {
@@ -306,8 +306,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         });
     setupBankidErrorHandlers("message.medlem");
 
+    // Deprecated
     createMessage(MESSAGE_PRE_FORSLAGSTART, new MessageBodyParagraph(
-        "Toppen! Då ställer jag några frågor så att jag kan räkna ut ditt pris"), 1500); // Delete this message
+        "Toppen! Då ställer jag några frågor så att jag kan räkna ut ditt pris"), 1500);
     addRelay(MESSAGE_PRE_FORSLAGSTART, MESSAGE_FORSLAGSTART);
 
     createMessage(MESSAGE_FORSLAGSTART, new MessageBodySingleSelect(
