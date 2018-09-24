@@ -1,5 +1,23 @@
 package com.hedvig.botService.chat;
 
+import static com.hedvig.botService.chat.OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES_YES;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_FIRSTNAME;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_LASTNAME;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_MEMBER_ID;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_PHONE_NUMBER;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_PRODUCT_TYPE;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_SSN;
+import static com.hedvig.botService.testHelpers.TestData.addCityToContext;
+import static com.hedvig.botService.testHelpers.TestData.addFamilynameToContext;
+import static com.hedvig.botService.testHelpers.TestData.addFirstnameToContext;
+import static com.hedvig.botService.testHelpers.TestData.addFloorToContext;
+import static com.hedvig.botService.testHelpers.TestData.addSsnToContext;
+import static com.hedvig.botService.testHelpers.TestData.addStreetToContext;
+import static com.hedvig.botService.testHelpers.TestData.addZipCodeToContext;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
+
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
@@ -10,6 +28,7 @@ import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingSer
 import com.hedvig.botService.services.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.services.events.RequestObjectInsuranceEvent;
 import com.hedvig.botService.services.events.UnderwritingLimitExcededEvent;
+import com.hedvig.botService.testHelpers.TestData;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,11 +36,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.context.ApplicationEventPublisher;
-import static com.hedvig.botService.chat.OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES_YES;
-import static com.hedvig.botService.testHelpers.TestData.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OnboardingConversationDeviTest {
@@ -54,10 +68,35 @@ public class OnboardingConversationDeviTest {
   }
 
   @Test
+  public void ClearMembersAdress_WhenMemberEntersAddressManually(){
+    addSsnToContext(userContext, TOLVANSSON_SSN);
+    addFirstnameToContext(userContext, TOLVANSSON_FIRSTNAME);
+    addFamilynameToContext(userContext, TOLVANSSON_LASTNAME);
+    TestData.addBirthDateToContext(userContext, TestData.TOLVANSSON_BIRTH_DATE);
+
+    addFloorToContext(userContext, TestData.TOLVANSSON_FLOOR);
+    addStreetToContext(userContext, TestData.TOLVANSSON_STREET);
+    addCityToContext(userContext, TestData.TOLVANSSON_CITY);
+    addZipCodeToContext(userContext, TestData.TOLVANSSON_ZIP);
+
+    Message m = testConversation.getMessage("message.bankidja");
+    val body = (MessageBodySingleSelect) m.body;
+    body.choices.get(1).selected = true;
+
+    testConversation.receiveMessage(userContext, m);
+
+    val onBoardingData = userContext.getOnBoardingData();
+    assertThat(onBoardingData.getAddressCity()).isNull();
+    assertThat(onBoardingData.getAddressStreet()).isNull();
+    assertThat(onBoardingData.getAddressZipCode()).isNull();
+    assertThat(onBoardingData.getFloor()).isZero();
+  }
+
+  @Test
   public void SendNotificationEventOn_HouseingUnderWritingLimit() {
 
-    addLastnameToContext(userContext, TOLVANSSON_FIRSTNAME);
-    addFirstnametoContext(userContext, TOLVANSSON_LASTNAME);
+    addFirstnameToContext(userContext, TOLVANSSON_FIRSTNAME);
+    addFamilynameToContext(userContext, TOLVANSSON_LASTNAME);
 
     Message m = testConversation.getMessage("message.uwlimit.housingsize");
     m.body.text = TOLVANSSON_PHONE_NUMBER;
@@ -73,8 +112,8 @@ public class OnboardingConversationDeviTest {
   @Test
   public void SendNotificationEventOn_HousholdUnderWritingLimit() {
 
-    addLastnameToContext(userContext, TOLVANSSON_FIRSTNAME);
-    addFirstnametoContext(userContext, TOLVANSSON_LASTNAME);
+    addFirstnameToContext(userContext, TOLVANSSON_FIRSTNAME);
+    addFamilynameToContext(userContext, TOLVANSSON_LASTNAME);
 
     Message m = testConversation.getMessage("message.uwlimit.householdsize");
     m.body.text = TOLVANSSON_PHONE_NUMBER;
@@ -89,8 +128,8 @@ public class OnboardingConversationDeviTest {
 
   @Test
   public void SendNotificationEventOn_FriFraga() {
-    addLastnameToContext(userContext, TOLVANSSON_LASTNAME);
-    addFirstnametoContext(userContext, TOLVANSSON_FIRSTNAME);
+    addFirstnameToContext(userContext, TOLVANSSON_LASTNAME);
+    addFamilynameToContext(userContext, TOLVANSSON_FIRSTNAME);
 
     Message m = testConversation.getMessage("message.frifraga");
     m.body.text = "I wonder if I can get a home insurance, even thouh my name is Tolvan?";
