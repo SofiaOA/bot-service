@@ -39,8 +39,8 @@ public class NotificationService {
   public void on(RequestPhoneCallEvent evt) {
     final String message =
         String.format(
-            "Medlem %s %s vill bli kontaktad på %s",
-            evt.getFirstName(), evt.getLastName(), evt.getPhoneNumber());
+            "Medlem %s(%s %s) vill bli kontaktad på %s",
+            evt.getMemberId(), evt.getFirstName(), evt.getLastName(), evt.getPhoneNumber());
     sendNotification(message, "CallMe");
   }
 
@@ -107,7 +107,8 @@ public class NotificationService {
   public void on(ClaimCallMeEvent event) {
     final String message =
         String.format(
-            "Medlem %s %s med %s försäkring har fått en skada och vill bli uppringd på %s",
+            "Medlem %s(%s %s) med %s försäkring har fått en skada och vill bli uppringd på %s",
+            event.getMemberId(),
             event.getFirstName(),
             event.getFamilyName(),
             event.isInsuranceActive() ? "AKTIV" : "INAKTIV",

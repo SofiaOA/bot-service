@@ -37,7 +37,7 @@ public class NotificationServiceTest {
   }
 
   @Test
-  public void RequestPhoneCall_SendsEventThatContains_PhoneNumer() {
+  public void RequestPhoneCall_SendsEventThatContains_PhoneNumerMemberId() {
 
     RequestPhoneCallEvent event =
         new RequestPhoneCallEvent(
@@ -49,7 +49,8 @@ public class NotificationServiceTest {
 
     then(messagingTemplate)
         .should()
-        .sendNotification(anyString(), contains(TOLVANSSON_PHONE_NUMBER), anyString());
+        .sendNotification(
+          anyString(), and(contains(TOLVANSSON_PHONE_NUMBER), contains(TOLVANSSON_MEMBER_ID)), anyString());
   }
 
   @Test
@@ -107,12 +108,12 @@ public class NotificationServiceTest {
     then(messagingTemplate)
         .should()
         .sendNotification(
-            anyString(), and(contains(TOLVANSSON_PHONE_NUMBER), contains("AKTIV")), anyString());
+            anyString(), and(and(contains(TOLVANSSON_PHONE_NUMBER), contains(TOLVANSSON_MEMBER_ID)), contains("AKTIV")), anyString());
   }
 
   @Test
   public void
-      ClaimCallMeEventWithInactiveInsurace_SendsEventThatContains_MemberId_InsuranceStatus() {
+      ClaimCallMeEventWithInactiveInsurace_SendsEventThatContains_PhoneNumber_InsuranceStatus() {
     ClaimCallMeEvent event =
         new ClaimCallMeEvent(
             TOLVANSSON_MEMBER_ID,

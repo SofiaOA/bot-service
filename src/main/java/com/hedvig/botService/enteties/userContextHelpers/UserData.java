@@ -40,7 +40,9 @@ public class UserData {
 
   public int getAge() {
     String dateString = ctx.getDataEntry(MEMBER_BIRTH_DATE);
-    if (dateString == null) return -1;
+    if (dateString == null) {
+      return -1;
+    }
     LocalDate date = LocalDate.parse(dateString);
 
     return date.until(LocalDate.now()).getYears();
