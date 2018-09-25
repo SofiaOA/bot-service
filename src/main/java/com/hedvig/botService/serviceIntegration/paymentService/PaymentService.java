@@ -3,10 +3,9 @@ package com.hedvig.botService.serviceIntegration.paymentService;
 import com.hedvig.botService.serviceIntegration.paymentService.dto.DirectDebitRequest;
 import com.hedvig.botService.serviceIntegration.paymentService.dto.DirectDebitResponse;
 import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderInformation;
+import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 @Component
 public class PaymentService {

@@ -8,11 +8,10 @@ import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderInformat
 import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderState;
 import com.hedvig.botService.services.exceptions.UnauthorizedException;
 import com.hedvig.botService.services.triggerService.dto.CreateDirectDebitMandateDTO;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Transactional
 @Service

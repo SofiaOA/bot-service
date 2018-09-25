@@ -1,8 +1,7 @@
 package com.hedvig.botService.serviceIntegration.memberService.dto;
 
-import lombok.Value;
-
 import java.util.UUID;
+import lombok.Value;
 
 @Value
 public class SendSignupRequest {

@@ -2,15 +2,17 @@ package com.hedvig.botService.chat;
 
 import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.*;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyText;
+import com.hedvig.botService.enteties.message.MessageHeader;
+import com.hedvig.botService.enteties.message.SelectItem;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.services.events.OnboardingQuestionAskedEvent;
-
 import com.hedvig.botService.services.events.QuestionAskedEvent;
-import org.springframework.context.ApplicationEventPublisher;
-
 import java.time.Clock;
 import java.util.List;
+import org.springframework.context.ApplicationEventPublisher;
 
 public class FreeChatConversation extends Conversation {
 

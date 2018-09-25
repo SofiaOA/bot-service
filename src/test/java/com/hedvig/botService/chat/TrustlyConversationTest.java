@@ -111,14 +111,15 @@ public class TrustlyConversationTest {
   }
 
   @Test
-  public void onWindowClose_shouldNotSendEmail_whenTrustlyForcedStartIsFalseAndCurrentInsurerIsSet() {
+  public void
+      onWindowClose_shouldNotSendEmail_whenTrustlyForcedStartIsFalseAndCurrentInsurerIsSet() {
 
     userContext.putUserData(UserContext.TRUSTLY_TRIGGER_ID, TRIGGER_UUID.toString());
     userContext.putUserData(TRUSTLY_FORCED_START, "false");
     userContext.getOnBoardingData().setCurrentInsurer("OtherInsurer");
 
     given(this.triggerService.getTrustlyOrderInformation(TRIGGER_UUID.toString()))
-      .willReturn(TriggerStatus.SUCCESS);
+        .willReturn(TriggerStatus.SUCCESS);
 
     testConversation.windowClosed(userContext);
 
@@ -132,7 +133,7 @@ public class TrustlyConversationTest {
     userContext.putUserData(TRUSTLY_FORCED_START, "false");
 
     given(this.triggerService.getTrustlyOrderInformation(TRIGGER_UUID.toString()))
-      .willReturn(TriggerStatus.SUCCESS);
+        .willReturn(TriggerStatus.SUCCESS);
 
     testConversation.windowClosed(userContext);
 

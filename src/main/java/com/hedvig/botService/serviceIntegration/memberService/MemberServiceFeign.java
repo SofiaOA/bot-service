@@ -1,17 +1,26 @@
 package com.hedvig.botService.serviceIntegration.memberService;
 
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
-import com.hedvig.botService.serviceIntegration.memberService.dto.*;
+import com.hedvig.botService.serviceIntegration.memberService.dto.Address;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthRequest;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignRequest;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
+import com.hedvig.botService.serviceIntegration.memberService.dto.FinalizeOnBoardingRequest;
+import com.hedvig.botService.serviceIntegration.memberService.dto.SendOnboardedActiveTodayRequest;
+import com.hedvig.botService.serviceIntegration.memberService.dto.SendSignupRequest;
+import com.hedvig.botService.serviceIntegration.memberService.dto.StartOnboardingWithSSNRequest;
+import com.hedvig.botService.serviceIntegration.memberService.dto.UpdateEmailRequest;
 import com.hedvig.botService.web.dto.Member;
 import feign.FeignException;
+import java.util.Optional;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
-
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class MemberServiceFeign implements MemberService {
@@ -134,7 +143,6 @@ public class MemberServiceFeign implements MemberService {
         new SendSignupRequest(uuid, email, requestId.toString());
     this.client.sendSignup(sendSignupRequest);
   }
-
 
   @Override
   public void sendOnboardedActiveToday(String email, String name) {

@@ -3,12 +3,10 @@ package com.hedvig.botService.enteties;
 import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.UUID;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
 import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

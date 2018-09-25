@@ -40,8 +40,9 @@ public class UserData {
 
   public int getAge() {
     String dateString = ctx.getDataEntry(MEMBER_BIRTH_DATE);
-    if (dateString == null)
+    if (dateString == null) {
       return -1;
+    }
     LocalDate date = LocalDate.parse(dateString);
 
     return date.until(LocalDate.now()).getYears();
@@ -53,8 +54,7 @@ public class UserData {
 
   public LocalDate getBirthDate() {
     String bDate = ctx.getDataEntry(MEMBER_BIRTH_DATE);
-    if (bDate == null)
-      return null;
+    if (bDate == null) return null;
     return LocalDate.parse(bDate); // = birthDate;
   }
 

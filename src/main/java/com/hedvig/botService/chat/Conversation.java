@@ -5,15 +5,23 @@ import static java.lang.Long.valueOf;
 import com.hedvig.botService.dataTypes.HedvigDataType;
 import com.hedvig.botService.dataTypes.TextInput;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.*;
-import lombok.val;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBody;
+import com.hedvig.botService.enteties.message.MessageBodyMultipleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyNumber;
+import com.hedvig.botService.enteties.message.MessageBodyParagraph;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyText;
+import com.hedvig.botService.enteties.message.MessageHeader;
+import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.enteties.message.SelectOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import lombok.val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class Conversation {
 
@@ -46,7 +54,7 @@ public abstract class Conversation {
     return m;
   }
 
-  void addRelay(String s1, String s2) {
+  protected void addRelay(String s1, String s2) {
     relayList.put(s1, s2);
   }
 
@@ -54,7 +62,7 @@ public abstract class Conversation {
     return relayList.get(s1);
   }
 
-  void addToChat(String messageId, UserContext userContext) {
+  protected void addToChat(String messageId, UserContext userContext) {
     addToChat(getMessage(messageId), userContext);
   }
 
@@ -62,7 +70,7 @@ public abstract class Conversation {
 
   public abstract boolean canAcceptAnswerToQuestion(UserContext uc);
 
-  void addToChat(Message m, UserContext userContext) {
+  protected void addToChat(Message m, UserContext userContext) {
     m.render(userContext);
     log.info("Putting message: " + m.id + " content: " + m.body.text);
     userContext.addToHistory(m);
@@ -236,7 +244,7 @@ public abstract class Conversation {
 
   public abstract void receiveMessage(UserContext userContext, Message m);
 
-  public void completeRequest(String nxtMsg, UserContext userContext) {
+  protected void completeRequest(String nxtMsg, UserContext userContext) {
     if (getMessage(nxtMsg) != null) {
       addToChat(getMessage(nxtMsg), userContext);
     }

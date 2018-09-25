@@ -15,9 +15,11 @@ import static com.hedvig.botService.testHelpers.TestData.addSsnToContext;
 import static com.hedvig.botService.testHelpers.TestData.addStreetToContext;
 import static com.hedvig.botService.testHelpers.TestData.addZipCodeToContext;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
+import com.hedvig.botService.chat.Conversation.EventTypes;
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
@@ -40,20 +42,15 @@ import org.springframework.context.ApplicationEventPublisher;
 @RunWith(MockitoJUnitRunner.class)
 public class OnboardingConversationDeviTest {
 
-  @Mock
-  private MemberService memberService;
+  @Mock private MemberService memberService;
 
-  @Mock
-  private ProductPricingService productPricingService;
+  @Mock private ProductPricingService productPricingService;
 
-  @Mock
-  private SignupCodeRepository signupRepo;
+  @Mock private SignupCodeRepository signupRepo;
 
-  @Mock
-  private ApplicationEventPublisher publisher;
+  @Mock private ApplicationEventPublisher publisher;
 
-  @Mock
-  private ConversationFactory conversationFactory;
+  @Mock private ConversationFactory conversationFactory;
 
   private UserContext userContext;
   private OnboardingConversationDevi testConversation;
@@ -63,12 +60,13 @@ public class OnboardingConversationDeviTest {
     userContext = new UserContext(TOLVANSSON_MEMBER_ID);
     userContext.putUserData(UserData.HOUSE, TOLVANSSON_PRODUCT_TYPE);
 
-    testConversation = new OnboardingConversationDevi(memberService, productPricingService,
-        signupRepo, publisher, conversationFactory);
+    testConversation =
+        new OnboardingConversationDevi(
+            memberService, productPricingService, signupRepo, publisher, conversationFactory);
   }
 
   @Test
-  public void ClearMembersAdress_WhenMemberEntersAddressManually(){
+  public void ClearMembersAdress_WhenMemberEntersAddressManually() {
     addSsnToContext(userContext, TOLVANSSON_SSN);
     addFirstnameToContext(userContext, TOLVANSSON_FIRSTNAME);
     addFamilynameToContext(userContext, TOLVANSSON_LASTNAME);
@@ -103,10 +101,15 @@ public class OnboardingConversationDeviTest {
 
     testConversation.receiveMessage(userContext, m);
 
-    then(publisher).should()
-        .publishEvent(new UnderwritingLimitExcededEvent(TOLVANSSON_MEMBER_ID,
-            TOLVANSSON_PHONE_NUMBER, TOLVANSSON_FIRSTNAME, TOLVANSSON_LASTNAME,
-            UnderwritingLimitExcededEvent.UnderwritingType.HouseingSize));
+    then(publisher)
+        .should()
+        .publishEvent(
+            new UnderwritingLimitExcededEvent(
+                TOLVANSSON_MEMBER_ID,
+                TOLVANSSON_PHONE_NUMBER,
+                TOLVANSSON_FIRSTNAME,
+                TOLVANSSON_LASTNAME,
+                UnderwritingLimitExcededEvent.UnderwritingType.HouseingSize));
   }
 
   @Test
@@ -120,10 +123,15 @@ public class OnboardingConversationDeviTest {
 
     testConversation.receiveMessage(userContext, m);
 
-    then(publisher).should()
-        .publishEvent(new UnderwritingLimitExcededEvent(TOLVANSSON_MEMBER_ID,
-            TOLVANSSON_PHONE_NUMBER, TOLVANSSON_FIRSTNAME, TOLVANSSON_LASTNAME,
-            UnderwritingLimitExcededEvent.UnderwritingType.HouseholdSize));
+    then(publisher)
+        .should()
+        .publishEvent(
+            new UnderwritingLimitExcededEvent(
+                TOLVANSSON_MEMBER_ID,
+                TOLVANSSON_PHONE_NUMBER,
+                TOLVANSSON_FIRSTNAME,
+                TOLVANSSON_LASTNAME,
+                UnderwritingLimitExcededEvent.UnderwritingType.HouseholdSize));
   }
 
   @Test
@@ -136,22 +144,30 @@ public class OnboardingConversationDeviTest {
 
     testConversation.receiveMessage(userContext, m);
 
-    then(publisher).should()
+    then(publisher)
+        .should()
         .publishEvent(new OnboardingQuestionAskedEvent(TOLVANSSON_MEMBER_ID, m.body.text));
   }
 
   @Test
-  public void DoNotSendNotificationEvent_WhenMessge_50K_LIMIT_YES_withAnswer_MESSAGE_50K_LIMIT_YES_YES() {
+  public void
+      DoNotSendNotificationEvent_WhenMessge_50K_LIMIT_YES_withAnswer_MESSAGE_50K_LIMIT_YES_YES() {
     Message m =
         testConversation.getMessage(OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES + ".2");
-    val choice = ((MessageBodySingleSelect) m.body).choices.stream()
-        .filter(x -> x.value.equalsIgnoreCase(MESSAGE_50K_LIMIT_YES_YES)).findFirst();
+    val choice =
+        ((MessageBodySingleSelect) m.body)
+            .choices
+            .stream()
+            .filter(x -> x.value.equalsIgnoreCase(MESSAGE_50K_LIMIT_YES_YES))
+            .findFirst();
 
     choice.get().selected = true;
 
     testConversation.receiveMessage(userContext, m);
-    then(publisher).should(times(0)).publishEvent(
-        new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID, TOLVANSSON_PRODUCT_TYPE));
+    then(publisher)
+        .should(times(0))
+        .publishEvent(
+            new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID, TOLVANSSON_PRODUCT_TYPE));
   }
 
   @Test
@@ -159,16 +175,20 @@ public class OnboardingConversationDeviTest {
     String referenceId = "53bb6e92-5cc7-11e8-8c3b-235d0786c76b";
     userContext.putUserData("{50K_LIMIT}", "true");
     testConversation.memberSigned(referenceId, userContext);
-    then(publisher).should(times(1)).publishEvent(
-        new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID, TOLVANSSON_PRODUCT_TYPE));
+    then(publisher)
+        .should(times(1))
+        .publishEvent(
+            new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID, TOLVANSSON_PRODUCT_TYPE));
   }
 
   @Test
   public void DoNothing_WhenMemberSignedIsCalled_withUserContextValue50K_LIMITeqNULL() {
     String referenceId = "53bb6e92-5cc7-11e8-8c3b-235d0786c76b";
     testConversation.memberSigned(referenceId, userContext);
-    then(publisher).should(times(0)).publishEvent(
-        new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID, TOLVANSSON_PRODUCT_TYPE));
+    then(publisher)
+        .should(times(0))
+        .publishEvent(
+            new RequestObjectInsuranceEvent(TOLVANSSON_MEMBER_ID, TOLVANSSON_PRODUCT_TYPE));
   }
 
   @Test
@@ -183,11 +203,58 @@ public class OnboardingConversationDeviTest {
   @Test
   public void ReturnTrue_WhenUserContext_ContainsHouseChoice() {
 
-    userContext.getOnBoardingData()
+    userContext
+        .getOnBoardingData()
         .setHouseType(OnboardingConversationDevi.ProductTypes.BRF.toString());
 
     val canAcceptAnswer = testConversation.canAcceptAnswerToQuestion(userContext);
 
     assertThat(canAcceptAnswer).isEqualTo(true);
+  }
+
+  @Test
+  public void AddCorrectStartMessage_WhenInitWithMessageId() {
+
+    testConversation.init(userContext, OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
+
+    assertThat(userContext.getMemberChat().chatHistory)
+        .first()
+        .hasFieldOrPropertyWithValue(
+            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
+  }
+
+  @Test
+  public void AddMessageOnboardingStartShort_WhenCallingInit_WithOutMessageId() {
+
+    testConversation.init(userContext);
+
+    assertThat(userContext.getMemberChat().chatHistory)
+        .first()
+        .hasFieldOrPropertyWithValue(
+            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
+  }
+
+  @Test
+  public void RelayToMessageForslagsstart_FromMessageOboardingstartShort() {
+
+    testConversation.receiveEvent(
+        EventTypes.MESSAGE_FETCHED,
+        OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT,
+        userContext);
+
+    assertThat(userContext.getMemberChat().chatHistory)
+        .first()
+        .hasFieldOrPropertyWithValue("id", OnboardingConversationDevi.MESSAGE_FORSLAGSTART);
+  }
+
+  @Test
+  public void MessageForslagStartContainsOptionForExsistingMembers() {
+    val message = testConversation.getMessage(OnboardingConversationDevi.MESSAGE_FORSLAGSTART);
+
+    val body = (MessageBodySingleSelect) message.body;
+
+    assertThat(body.choices)
+        .extracting("text", "value")
+        .contains(tuple("Jag är redan medlem", "message.bankid.start"));
   }
 }

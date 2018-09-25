@@ -1,9 +1,8 @@
 package com.hedvig.botService.web.dto;
 
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Value;
-
-import java.time.LocalDate;
 
 @Value
 @AllArgsConstructor

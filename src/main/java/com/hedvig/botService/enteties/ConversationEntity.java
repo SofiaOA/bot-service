@@ -1,11 +1,16 @@
 package com.hedvig.botService.enteties;
 
 import com.hedvig.botService.chat.Conversation;
+import java.util.Objects;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import lombok.Getter;
 import lombok.ToString;
-
-import javax.persistence.*;
-import java.util.Objects;
 
 /*
  * Stores persistent properties for a Conversation

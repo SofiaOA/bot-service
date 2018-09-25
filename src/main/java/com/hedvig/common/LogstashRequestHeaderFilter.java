@@ -1,10 +1,9 @@
 package com.hedvig.common;
 
-import net.logstash.logback.composite.accessevent.HeaderFilter;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import net.logstash.logback.composite.accessevent.HeaderFilter;
 
 /**
  * A simple {@link HeaderFilter} that determines whether or not a header is included based on a set

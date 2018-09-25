@@ -32,15 +32,15 @@ public class TestData {
     userContext.getOnBoardingData().setFirstName(tolvanssonFirstname);
   }
 
-  public static void addSsnToContext(UserContext userContext, String ssn){
+  public static void addSsnToContext(UserContext userContext, String ssn) {
     userContext.getOnBoardingData().setSSN(ssn);
   }
 
-  public static void addStreetToContext(UserContext userContext, String street){
+  public static void addStreetToContext(UserContext userContext, String street) {
     userContext.getOnBoardingData().setAddressStreet(street);
   }
 
-  public static void addFloorToContext(UserContext userContext, int floor){
+  public static void addFloorToContext(UserContext userContext, int floor) {
     userContext.getOnBoardingData().setFloor(floor);
   }
 

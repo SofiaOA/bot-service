@@ -1,12 +1,18 @@
 package com.hedvig.botService.services;
 
+import static com.hedvig.botService.chat.Conversation.HEDVIG_USER_ID;
+import static com.hedvig.botService.services.TriggerServiceTest.TOLVANSSON_MEMBERID;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
-import com.hedvig.botService.enteties.ResourceNotFoundException;
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.TrackingDataRespository;
 import com.hedvig.botService.enteties.UserContext;
@@ -20,6 +26,8 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResp
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdStatusType;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.web.dto.AddMessageRequestDTO;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,15 +35,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import java.util.Optional;
-import java.util.UUID;
-import static com.hedvig.botService.chat.Conversation.HEDVIG_USER_ID;
-import static com.hedvig.botService.services.TriggerServiceTest.TOLVANSSON_MEMBERID;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SessionManagerTest {
@@ -43,45 +42,44 @@ public class SessionManagerTest {
   public static final String MESSAGE = "Heh hej";
   public static final SelectLink SELECT_LINK = SelectLink.toOffer("Offer", "offer");
   public static final String TOLVANSSON_FCM_TOKEN = "test-token";
-  @Mock
-  UserContextRepository userContextRepository;
+  @Mock UserContextRepository userContextRepository;
 
-  @Mock
-  MemberService memberService;
+  @Mock MemberService memberService;
 
-  @Mock
-  ProductPricingService productPricingService;
+  @Mock ProductPricingService productPricingService;
 
-  @Mock
-  SignupCodeRepository signupCodeRepository;
+  @Mock SignupCodeRepository signupCodeRepository;
 
-  @Mock
-  TrackingDataRespository campaignCodeRepository;
+  @Mock TrackingDataRespository campaignCodeRepository;
 
-  @Mock
-  ConversationFactory conversationFactory;
+  @Mock ConversationFactory conversationFactory;
 
   @Mock(answer = Answers.CALLS_REAL_METHODS)
   Conversation mockConversation;
 
-  @Mock
-  MessagesService messagesService;
+  @Mock MessagesService messagesService;
 
-  @Mock
-  ClaimsService claimsService;
+  @Mock ClaimsService claimsService;
 
   SessionManager sessionManager;
 
   @Before
   public void setUp() {
     val objectMapper = new ObjectMapper();
-    sessionManager = new SessionManager(userContextRepository, memberService, claimsService,
-        conversationFactory, campaignCodeRepository, objectMapper);
+    sessionManager =
+        new SessionManager(
+            userContextRepository,
+            memberService,
+            claimsService,
+            conversationFactory,
+            campaignCodeRepository,
+            objectMapper);
   }
 
   // FIXME
   @Test
-  public void givenConversationThatCanAcceptMessage_WhenAddMessageFromHedvig_ThenAddsMessageToHistory() {
+  public void
+      givenConversationThatCanAcceptMessage_WhenAddMessageFromHedvig_ThenAddsMessageToHistory() {
 
     val tolvanssonUserContext = makeTolvanssonUserContext();
     startMockConversation(tolvanssonUserContext);
@@ -138,13 +136,15 @@ public class SessionManagerTest {
 
     val messages = sessionManager.getAllMessages(TOLVANSSON_MEMBERID, null);
 
-    assertThat(Iterables.getLast(messages)).hasFieldOrPropertyWithValue("id",
-        "message.onboardingstart");
+    assertThat(Iterables.getLast(messages))
+        .hasFieldOrPropertyWithValue(
+            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
     assertThat(tolvanssonUserContext.getActiveConversation().get()).isNotNull();
   }
 
   @Test
-  public void givenNoExistingConversation_whenGetAllMessagesWithIntentLOGIN_thenOnboardingConversationIsStarted() {
+  public void
+      givenNoExistingConversation_whenGetAllMessagesWithIntentLOGIN_thenOnboardingConversationIsStarted() {
 
     val tolvanssonUserContext = makeTolvanssonUserContext();
 
@@ -156,8 +156,8 @@ public class SessionManagerTest {
 
     val messages = sessionManager.getAllMessages(TOLVANSSON_MEMBERID, SessionManager.Intent.LOGIN);
 
-    assertThat(Iterables.getLast(messages)).hasFieldOrPropertyWithValue("id",
-        "message.start.login");
+    assertThat(Iterables.getLast(messages))
+        .hasFieldOrPropertyWithValue("id", "message.start.login");
   }
 
   private OnboardingConversationDevi makeOnboardingConversation() {
@@ -165,8 +165,8 @@ public class SessionManagerTest {
   }
 
   private BankIdAuthResponse makeBankIdResponse() {
-    return new BankIdAuthResponse(BankIdStatusType.STARTED, UUID.randomUUID().toString(),
-        UUID.randomUUID().toString());
+    return new BankIdAuthResponse(
+        BankIdStatusType.STARTED, UUID.randomUUID().toString(), UUID.randomUUID().toString());
   }
 
   private UserContext makeTolvanssonUserContext() {

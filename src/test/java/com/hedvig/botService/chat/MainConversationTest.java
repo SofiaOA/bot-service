@@ -1,5 +1,11 @@
 package com.hedvig.botService.chat;
 
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_FIRSTNAME;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_LASTNAME;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_MEMBER_ID;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_PHONE_NUMBER;
+import static org.mockito.BDDMockito.then;
+
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
@@ -12,9 +18,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
-
-import static com.hedvig.botService.testHelpers.TestData.*;
-import static org.mockito.BDDMockito.then;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MainConversationTest {
@@ -33,8 +36,7 @@ public class MainConversationTest {
 
   @Before
   public void setup() {
-    testConversation =
-        new MainConversation(conversationFactory, eventPublisher);
+    testConversation = new MainConversation(conversationFactory, eventPublisher);
 
     uc = new UserContext(TOLVANSSON_MEMBER_ID);
   }

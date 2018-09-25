@@ -1,9 +1,9 @@
 package com.hedvig.botService.web;
 
+import static net.logstash.logback.marker.Markers.append;
+
 import net.logstash.logback.marker.LogstashMarker;
 import org.jetbrains.annotations.NotNull;
-
-import static net.logstash.logback.marker.Markers.append;
 
 public class ControllerUtils {
   @NotNull
