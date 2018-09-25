@@ -10,8 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import static net.logstash.logback.argument.StructuredArguments.value;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/hedvig")
@@ -26,16 +30,16 @@ public class HedvigController {
   }
 
   @PostMapping(path = "/register_campaign")
-  public ResponseEntity<Void> campaign(@RequestBody TrackingDTO tracker,
-      @RequestHeader(value = "hedvig.token") String hid) {
+  public ResponseEntity<Void> campaign(
+      @RequestBody TrackingDTO tracker, @RequestHeader(value = "hedvig.token") String hid) {
     log.info("Received tracking information for user " + hid);
     sessionManager.saveTrackingInformation(hid, tracker);
     return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/push-token")
-  ResponseEntity<Void> pushToken(@RequestBody String tokenJson,
-      @RequestHeader(value = "hedvig.token") String hid) {
+  ResponseEntity<Void> pushToken(
+      @RequestBody String tokenJson, @RequestHeader(value = "hedvig.token") String hid) {
     log.info("Push token for memberId:{}, is: {}", value("memberId", ""), tokenJson);
     sessionManager.saveExpoPushToken(hid, tokenJson);
     return ResponseEntity.noContent().build();
@@ -51,8 +55,8 @@ public class HedvigController {
   }
 
   @PostMapping("collect")
-  ResponseEntity<?> collect(@RequestParam String referenceToken,
-      @RequestHeader(value = "hedvig.token") String hid) {
+  ResponseEntity<?> collect(
+      @RequestParam String referenceToken, @RequestHeader(value = "hedvig.token") String hid) {
 
     log.info("Post collect with reference token: {}", value("referenceToken", referenceToken));
     try {

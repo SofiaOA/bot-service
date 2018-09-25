@@ -1,9 +1,8 @@
 package com.hedvig.botService.enteties.message;
 
-import lombok.ToString;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import lombok.ToString;
 
 @Entity
 @DiscriminatorValue("text")

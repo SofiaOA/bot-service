@@ -1,9 +1,8 @@
 package com.hedvig.botService.serviceIntegration.memberService;
 
-import lombok.Value;
-
 import java.time.LocalDate;
 import java.util.Optional;
+import lombok.Value;
 
 @Value
 public class MemberProfile {

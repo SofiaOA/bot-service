@@ -1,7 +1,13 @@
 package com.hedvig.botService.services;
 
+import static net.logstash.logback.argument.StructuredArguments.value;
+
 import com.hedvig.botService.chat.BankIdChat;
-import com.hedvig.botService.enteties.*;
+import com.hedvig.botService.enteties.BankIdSession;
+import com.hedvig.botService.enteties.BankIdSessionImpl;
+import com.hedvig.botService.enteties.ResourceNotFoundException;
+import com.hedvig.botService.enteties.UserContext;
+import com.hedvig.botService.enteties.UserContextRepository;
 import com.hedvig.botService.serviceIntegration.memberService.MemberProfile;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
@@ -11,8 +17,6 @@ import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
-
-import static net.logstash.logback.argument.StructuredArguments.value;
 
 public class CollectService {
 

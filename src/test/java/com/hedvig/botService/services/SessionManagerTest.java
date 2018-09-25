@@ -42,45 +42,44 @@ public class SessionManagerTest {
   public static final String MESSAGE = "Heh hej";
   public static final SelectLink SELECT_LINK = SelectLink.toOffer("Offer", "offer");
   public static final String TOLVANSSON_FCM_TOKEN = "test-token";
-  @Mock
-  UserContextRepository userContextRepository;
+  @Mock UserContextRepository userContextRepository;
 
-  @Mock
-  MemberService memberService;
+  @Mock MemberService memberService;
 
-  @Mock
-  ProductPricingService productPricingService;
+  @Mock ProductPricingService productPricingService;
 
-  @Mock
-  SignupCodeRepository signupCodeRepository;
+  @Mock SignupCodeRepository signupCodeRepository;
 
-  @Mock
-  TrackingDataRespository campaignCodeRepository;
+  @Mock TrackingDataRespository campaignCodeRepository;
 
-  @Mock
-  ConversationFactory conversationFactory;
+  @Mock ConversationFactory conversationFactory;
 
   @Mock(answer = Answers.CALLS_REAL_METHODS)
   Conversation mockConversation;
 
-  @Mock
-  MessagesService messagesService;
+  @Mock MessagesService messagesService;
 
-  @Mock
-  ClaimsService claimsService;
+  @Mock ClaimsService claimsService;
 
   SessionManager sessionManager;
 
   @Before
   public void setUp() {
     val objectMapper = new ObjectMapper();
-    sessionManager = new SessionManager(userContextRepository, memberService, claimsService,
-        conversationFactory, campaignCodeRepository, objectMapper);
+    sessionManager =
+        new SessionManager(
+            userContextRepository,
+            memberService,
+            claimsService,
+            conversationFactory,
+            campaignCodeRepository,
+            objectMapper);
   }
 
   // FIXME
   @Test
-  public void givenConversationThatCanAcceptMessage_WhenAddMessageFromHedvig_ThenAddsMessageToHistory() {
+  public void
+      givenConversationThatCanAcceptMessage_WhenAddMessageFromHedvig_ThenAddsMessageToHistory() {
 
     val tolvanssonUserContext = makeTolvanssonUserContext();
     startMockConversation(tolvanssonUserContext);
@@ -144,7 +143,8 @@ public class SessionManagerTest {
   }
 
   @Test
-  public void givenNoExistingConversation_whenGetAllMessagesWithIntentLOGIN_thenOnboardingConversationIsStarted() {
+  public void
+      givenNoExistingConversation_whenGetAllMessagesWithIntentLOGIN_thenOnboardingConversationIsStarted() {
 
     val tolvanssonUserContext = makeTolvanssonUserContext();
 
@@ -156,8 +156,8 @@ public class SessionManagerTest {
 
     val messages = sessionManager.getAllMessages(TOLVANSSON_MEMBERID, SessionManager.Intent.LOGIN);
 
-    assertThat(Iterables.getLast(messages)).hasFieldOrPropertyWithValue("id",
-        "message.start.login");
+    assertThat(Iterables.getLast(messages))
+        .hasFieldOrPropertyWithValue("id", "message.start.login");
   }
 
   private OnboardingConversationDevi makeOnboardingConversation() {
@@ -165,8 +165,8 @@ public class SessionManagerTest {
   }
 
   private BankIdAuthResponse makeBankIdResponse() {
-    return new BankIdAuthResponse(BankIdStatusType.STARTED, UUID.randomUUID().toString(),
-        UUID.randomUUID().toString());
+    return new BankIdAuthResponse(
+        BankIdStatusType.STARTED, UUID.randomUUID().toString(), UUID.randomUUID().toString());
   }
 
   private UserContext makeTolvanssonUserContext() {

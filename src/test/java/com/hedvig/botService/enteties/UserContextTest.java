@@ -19,22 +19,20 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class UserContextTest {
 
   @Mock ConversationFactory conversationFactory;
-  @Mock
-  Conversation mockConversation;
+  @Mock Conversation mockConversation;
 
   @Test
   public void getMessages_withIntentOnboarding_callsInitWithCorrectStartMessage() {
 
-
-    given(conversationFactory.createConversation(OnboardingConversationDevi.class)).willReturn(mockConversation);
+    given(conversationFactory.createConversation(OnboardingConversationDevi.class))
+        .willReturn(mockConversation);
 
     val uc = new UserContext(TOLVANSSON_MEMBER_ID);
 
     uc.getMessages(Intent.ONBOARDING, conversationFactory);
 
-    then(mockConversation).should(times(1)).init(uc, OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
-
+    then(mockConversation)
+        .should(times(1))
+        .init(uc, OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
   }
-
-
 }

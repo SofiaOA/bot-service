@@ -27,8 +27,7 @@ public class TrustlyConversation extends Conversation {
   private final TriggerService triggerService;
   private final MemberService memberService;
 
-  public TrustlyConversation(
-    TriggerService triggerService, MemberService memberService) {
+  public TrustlyConversation(TriggerService triggerService, MemberService memberService) {
     super();
     this.triggerService = triggerService;
     this.memberService = memberService;
@@ -43,8 +42,7 @@ public class TrustlyConversation extends Conversation {
         FORCED_START,
         new MessageBodySingleSelect(
             "Då är det dags att sätta upp din betalning \fDet ska vara smidigt såklart, så jag använder digitalt autogiro genom Trustly\fInga pengar dras såklart förrän försäkringen börjar gälla!",
-            Lists.newArrayList(
-                new SelectItemTrustly("Välj bankkonto", "trustly.noop"))));
+            Lists.newArrayList(new SelectItemTrustly("Välj bankkonto", "trustly.noop"))));
 
     createChatMessage(
         TRUSTLY_POLL,
@@ -52,25 +50,20 @@ public class TrustlyConversation extends Conversation {
             "Om du hellre vill så kan vi vänta med att sätta upp betalningen!\fDå hör jag av mig till dig lite innan din försäkring aktiveras",
             Lists.newArrayList(
                 new SelectItemTrustly("Vi gör klart det nu", "trustly.noop"),
-                SelectLink.toDashboard("Vi gör det senare, ta mig till appen!", "end")
-                )));
+                SelectLink.toDashboard("Vi gör det senare, ta mig till appen!", "end"))));
 
     createMessage(
         CANCEL,
         new MessageBodySingleSelect(
             "Oj, nu verkar det som att något gick lite fel med betalningsregistreringen. Vi testar igen!",
-          Lists.newArrayList(
-            new SelectItemTrustly("Välj bankkonto", "trustly.noop")
-          )
-        ));
+            Lists.newArrayList(new SelectItemTrustly("Välj bankkonto", "trustly.noop"))));
 
     createMessage(
         COMPLETE,
         new MessageBodySingleSelect(
             "Tack! Dags att börja utforska appen!",
-          Lists.newArrayList(new SelectLink("Sätt igång", "end", "Dashboard", null, null, false)
-          )
-        ));
+            Lists.newArrayList(
+                new SelectLink("Sätt igång", "end", "Dashboard", null, null, false))));
   }
 
   @Override

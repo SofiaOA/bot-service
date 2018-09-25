@@ -2,15 +2,22 @@ package com.hedvig.botService.enteties;
 
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.enteties.message.Message;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MapKey;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import lombok.Getter;
 import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.persistence.*;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 /*
  * All timestamp information is set from here

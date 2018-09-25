@@ -1,5 +1,7 @@
 package com.hedvig.botService.services;
 
+import static com.hedvig.botService.chat.FreeChatConversation.FREE_CHAT_ONBOARDING_START;
+
 import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.FreeChatConversation;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
@@ -14,16 +16,13 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdProgress
 import com.hedvig.botService.serviceIntegration.memberService.exceptions.BankIdError;
 import com.hedvig.botService.serviceIntegration.memberService.exceptions.ErrorType;
 import com.hedvig.botService.web.dto.BankidStartResponse;
+import java.time.Instant;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestHeader;
-
-import java.time.Instant;
-
-import static com.hedvig.botService.chat.FreeChatConversation.FREE_CHAT_ONBOARDING_START;
 
 @Service
 @Transactional

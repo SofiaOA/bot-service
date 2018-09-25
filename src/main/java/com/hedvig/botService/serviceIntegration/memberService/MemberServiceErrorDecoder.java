@@ -1,19 +1,18 @@
 package com.hedvig.botService.serviceIntegration.memberService;
 
+import static feign.FeignException.errorStatus;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hedvig.botService.serviceIntegration.memberService.dto.APIErrorDTO;
 import com.hedvig.botService.serviceIntegration.memberService.exceptions.BankIdError;
 import com.hedvig.botService.serviceIntegration.memberService.exceptions.ErrorType;
-import com.hedvig.botService.serviceIntegration.memberService.dto.APIErrorDTO;
 import feign.Response;
 import feign.codec.ErrorDecoder;
+import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-
-import static feign.FeignException.errorStatus;
 
 public class MemberServiceErrorDecoder implements ErrorDecoder {
 

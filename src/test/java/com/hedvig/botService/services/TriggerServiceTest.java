@@ -1,5 +1,11 @@
 package com.hedvig.botService.services;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
+
 import com.hedvig.botService.enteties.DirectDebitMandateTrigger;
 import com.hedvig.botService.enteties.DirectDebitRepository;
 import com.hedvig.botService.serviceIntegration.paymentService.PaymentService;
@@ -9,6 +15,7 @@ import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderState;
 import com.hedvig.botService.services.exceptions.UnauthorizedException;
 import com.hedvig.botService.services.triggerService.TriggerService;
 import com.hedvig.botService.services.triggerService.dto.CreateDirectDebitMandateDTO;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -18,14 +25,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.never;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TriggerServiceTest {
@@ -44,7 +43,7 @@ public class TriggerServiceTest {
   @Mock PaymentService pService;
   @Captor ArgumentCaptor<DirectDebitMandateTrigger> mandateCaptor;
   private TriggerService sut;;
-private UUID generatedTriggerId;
+  private UUID generatedTriggerId;
 
   @Before
   public void setUp() {

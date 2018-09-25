@@ -1,17 +1,20 @@
 package com.hedvig.botService.serviceIntegration.productPricing;
 
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
-import com.hedvig.botService.serviceIntegration.productPricing.dto.*;
+import com.hedvig.botService.serviceIntegration.productPricing.dto.Address;
+import com.hedvig.botService.serviceIntegration.productPricing.dto.CalculateQuoteRequest;
+import com.hedvig.botService.serviceIntegration.productPricing.dto.ContractSignedRequest;
+import com.hedvig.botService.serviceIntegration.productPricing.dto.Created;
+import com.hedvig.botService.serviceIntegration.productPricing.dto.SafetyIncreaserType;
 import com.hedvig.botService.web.dto.InsuranceStatusDTO;
 import feign.FeignException;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class ProductPricingService {

@@ -1,5 +1,14 @@
 package com.hedvig.botService.web;
 
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_EMAIL;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_FIRSTNAME;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_LASTNAME;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_MEMBER_ID;
+import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_SSN;
+import static com.hedvig.botService.testHelpers.TestData.toJson;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.hedvig.botService.BotServiceApplicationTests;
 import com.hedvig.botService.services.triggerService.TriggerService;
 import com.hedvig.botService.services.triggerService.dto.CreateDirectDebitMandateDTO;
@@ -13,10 +22,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
-import static com.hedvig.botService.testHelpers.TestData.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = TriggerController.class)

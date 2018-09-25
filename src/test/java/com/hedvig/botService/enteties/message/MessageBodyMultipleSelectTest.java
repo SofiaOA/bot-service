@@ -1,11 +1,12 @@
 package com.hedvig.botService.enteties.message;
 
-import org.junit.Test;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 import java.util.Objects;
-
-import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.*;
+import org.junit.Test;
 
 public class MessageBodyMultipleSelectTest {
 

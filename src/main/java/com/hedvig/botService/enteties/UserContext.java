@@ -57,34 +57,30 @@ public class UserContext implements Serializable {
   public static final String TRUSTLY_FORCED_START = "{TRUSTLY_FORCED_START}";
 
   private static Logger log = LoggerFactory.getLogger(UserContext.class);
-  private static Map<String, String> requiredData = new ImmutableMap.Builder<String, String>().
+  private static Map<String, String> requiredData =
+      new ImmutableMap.Builder<String, String>()
+          .put("{ADDRESS}", "T.ex har jag vet jag inte var du bor. Vad har du för gatuadress?")
+          .put("{ADDRESS_ZIP}", "T.ex har jag inte ditt postnummer?")
+          .
+          // ("{EMAIL}"), Email is not required to get a quote
 
-  put("{ADDRESS}","T.ex har jag vet jag inte var du bor. Vad har du för gatuadress?").
-
-  put("{ADDRESS_ZIP}","T.ex har jag inte ditt postnummer?").
-  // ("{EMAIL}"), Email is not required to get a quote
-
-  put("{FAMILY_NAME}"
-    ,"T.ex vet jag inte vad heter i efternamn... "
+          put(
+              "{FAMILY_NAME}",
+              "T.ex vet jag inte vad heter i efternamn... "
                   + OnboardingConversationDevi.emoji_flushed_face
-        +" ?").
-
-  put("{HOUSE}","T.ex vet jag inte om du bor i hus eller lägenhet?").
-
-  put("{KVM}","T.ex vet jag inte hur stor din bostad är?").
-
-  put("{SSN}","T.ex har jag inte ditt personnummer?").
-
-  put("{NAME}"
-    ,"T.ex vet jag inte vad heter... "+OnboardingConversationDevi.emoji_flushed_face +" ?").
-
-  put("{NR_PERSONS}","Tex. hur många är ni i hushållet").
-
-  put("{SECURE_ITEMS_NO}","T.ex skulle jag behöver veta hur många säkerhetsgrejer du har?"
-  ).
-
-  build();
-      
+                  + " ?")
+          .put("{HOUSE}", "T.ex vet jag inte om du bor i hus eller lägenhet?")
+          .put("{KVM}", "T.ex vet jag inte hur stor din bostad är?")
+          .put("{SSN}", "T.ex har jag inte ditt personnummer?")
+          .put(
+              "{NAME}",
+              "T.ex vet jag inte vad heter... "
+                  + OnboardingConversationDevi.emoji_flushed_face
+                  + " ?")
+          .put("{NR_PERSONS}", "Tex. hur många är ni i hushållet")
+          .put(
+              "{SECURE_ITEMS_NO}", "T.ex skulle jag behöver veta hur många säkerhetsgrejer du har?")
+          .build();
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

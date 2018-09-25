@@ -1,9 +1,8 @@
 package com.hedvig.botService.web.v2.dto;
 
 import com.hedvig.botService.enteties.message.Message;
-import lombok.Value;
-
 import java.util.List;
+import lombok.Value;
 
 @Value
 public class MessagesDTO {
