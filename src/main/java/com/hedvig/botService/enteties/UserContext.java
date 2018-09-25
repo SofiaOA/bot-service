@@ -306,7 +306,7 @@ public class UserContext implements Serializable {
       if (intent == SessionManager.Intent.LOGIN) {
         initChat(OnboardingConversationDevi.MESSAGE_START_LOGIN, conversationFactory);
       } else {
-        initChat(OnboardingConversationDevi.MESSAGE_WAITLIST_START, conversationFactory);
+        initChat(OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT, conversationFactory);
       }
     }
 

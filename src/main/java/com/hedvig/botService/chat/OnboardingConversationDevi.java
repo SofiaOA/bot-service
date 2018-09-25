@@ -62,8 +62,10 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
   public static final String MESSAGE_TIPSA = "message.tipsa";
   public static final String MESSAGE_AVSLUTOK = "message.avslutok";
   public static final String MESSAGE_NAGOTMER = "message.nagotmer";
-  public static final String MESSAGE_WAITLIST_START = "message.onboardingstart";
-  public static final String MESSAGE_ONBOARDING_START = "message.activate.ok.a";
+  public static final String MESSAGE_ONBOARDINGSTART = "message.onboardingstart";
+  public static final String MESSAGE_ONBOARDINGSTART_SHORT = "message.onboardingstart.short";
+  public static final String MESSAGE_ACTIVATE_OK_A = "message.activate.ok.a";
+  public static final String MESSAGE_ACTIVATE_OK_B = "message.activate.ok.b";
   public static final String MESSAGE_SIGNUP_TO_WAITLIST = "message.waitlist";
   public static final String MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST = "message.activate";
   public static final String MESSAGE_WAITLIST_NOT_ACTIVATED = "message.activate.notactive";
@@ -103,6 +105,8 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
   private static final String MESSAGE_BANKIDJA = "message.bankidja";
   private static final String MESSAGE_KVADRAT = "message.kvadrat";
   private static final String MESSAGE_VARBORDUFELADRESS = "message.varbordufeladress";
+  private static final String MESSAGE_NOTMEMBER = "message.notmember";
+
   /*
    * Need to be stateless. I.e no data beyond response scope
    *
@@ -164,15 +168,30 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     this.eventPublisher = eventPublisher;
     this.conversationFactory = conversationFactory;
 
-    createChatMessage(MESSAGE_WAITLIST_START, new MessageBodySingleSelect("Hej! Jag heter Hedvig "
-        + emoji_waving_hand
-        + "\fDet här går på nolltid! Jag ställer några frågor, sen ger jag dig ett förslag på en hemförsäkring",
-        Lists.newArrayList(new SelectOption("Låter bra!", MESSAGE_FORSLAGSTART),
-            new SelectOption("Jag är redan medlem", "message.bankid.start"))));
+    createChatMessage(
+      MESSAGE_ONBOARDINGSTART,
+        new MessageBodySingleSelect(
+            "Hej! Jag heter Hedvig "
+                + emoji_waving_hand
+                + "\fDet här går på nolltid! Jag ställer några frågor, sen ger jag dig ett förslag på en hemförsäkring",
+            Lists.newArrayList(
+                new SelectOption("Låter bra!", MESSAGE_FORSLAGSTART),
+                new SelectOption("Jag är redan medlem", "message.bankid.start"))));
 
-    createChatMessage("message.membernotfound",
-        new MessageBodySingleSelect("Hmm, det verkar som att du inte är medlem här hos mig ännu"
-            + "\fMen jag tar gärna fram ett försäkringsförslag till dig, det är precis som allt annat med mig superenkelt",
+    createMessage(
+        MESSAGE_ONBOARDINGSTART_SHORT,
+        new MessageBodyParagraph(
+            "Hej! Jag heter Hedvig "
+                + emoji_waving_hand
+                + "\fDet här går på nolltid! Jag ställer några frågor, sen ger jag dig ett förslag på en hemförsäkring"),
+        1500);
+    addRelay(MESSAGE_ONBOARDINGSTART_SHORT, MESSAGE_FORSLAGSTART);
+
+    createChatMessage(
+        "message.membernotfound",
+        new MessageBodySingleSelect(
+            "Hmm, det verkar som att du inte är medlem här hos mig ännu"
+                + "\fMen jag tar gärna fram ett försäkringsförslag till dig, det är precis som allt annat med mig superenkelt",
             Lists.newArrayList(new SelectOption("Låter bra!", MESSAGE_FORSLAGSTART))));
 
     createMessage(MESSAGE_SIGNUP_TO_WAITLIST,
@@ -216,13 +235,17 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
               }
             }));
 
-    createMessage("message.notmember", new MessageBodyParagraph(
-        "Okej! Då tar jag fram ett försäkringsförslag till dig på nolltid"));
-    addRelay("message.notmember", "message.notmember.start");
+    createMessage(
+      MESSAGE_NOTMEMBER,
+        new MessageBodyParagraph(
+            "Okej! Då tar jag fram ett försäkringsförslag till dig på nolltid"));
+    addRelay(MESSAGE_NOTMEMBER, "message.notmember.start");
 
-    createMessage("message.notmember.start", new MessageBodyParagraph(
-        "Jag ställer några snabba frågor så att jag kan räkna ut ditt pris"));
-    addRelay("message.notmember", MESSAGE_FORSLAGSTART);
+    createMessage(
+        "message.notmember.start",
+        new MessageBodyParagraph(
+            "Jag ställer några snabba frågor så att jag kan räkna ut ditt pris"));
+    addRelay("message.notmember.start", MESSAGE_FORSLAGSTART);
 
     // Deprecated
     createChatMessage("message.waitlist.user.alreadyactive", new MessageBodyText("Grattis! "
@@ -275,12 +298,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         new MessageBodyText("Kul! Skriv in din mailadress här"));
     setExpectedReturnType(MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST, new EmailAdress());
 
-    createMessage("message.activate.ok.a", new MessageBodyParagraph("Välkommen!"), 1000);
-    addRelay("message.activate.ok.a", "message.activate.ok.b");
+    createMessage(MESSAGE_ACTIVATE_OK_A, new MessageBodyParagraph("Välkommen!"), 1000);
+    addRelay(MESSAGE_ACTIVATE_OK_A, MESSAGE_ACTIVATE_OK_B);
 
-    createMessage("message.activate.ok.b",
+    createMessage(MESSAGE_ACTIVATE_OK_B,
         new MessageBodyParagraph("Nu ska jag ta fram ett försäkringsförslag åt dig"), 2000);
-    addRelay("message.activate.ok.b", MESSAGE_FORSLAGSTART);
+    addRelay(MESSAGE_ACTIVATE_OK_B, MESSAGE_FORSLAGSTART);
 
     createMessage("message.uwlimit.tack", new MessageBodySingleSelect(
         "Tack! Jag hör av mig så fort jag kan", new ArrayList<SelectItem>() {
@@ -296,7 +319,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     createMessage("message.fileupload.result",
         new MessageBodySingleSelect("Ok uppladdningen gick bra!", new ArrayList<SelectItem>() {
           {
-            add(new SelectOption("Hem", MESSAGE_WAITLIST_START));
+            add(new SelectOption("Hem", MESSAGE_ONBOARDINGSTART));
           }
         }));
 
@@ -329,13 +352,15 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         "Toppen! Då ställer jag några frågor så att jag kan räkna ut ditt pris"), 1500);
     addRelay(MESSAGE_PRE_FORSLAGSTART, MESSAGE_FORSLAGSTART);
 
-    createMessage(MESSAGE_FORSLAGSTART, new MessageBodySingleSelect(
-        "Första frågan! Bor du i lägenhet eller eget hus?", new ArrayList<SelectItem>() {
-          {
-            add(new SelectOption("Lägenhet", MESSAGE_LAGENHET_PRE));
-            add(new SelectOption("Hus", MESSAGE_HUS));
-          }
-        }), "h_to_house");
+    createMessage(
+        MESSAGE_FORSLAGSTART,
+        new MessageBodySingleSelect(
+            "Första frågan! Bor du i lägenhet eller eget hus?",
+          Lists.newArrayList(
+            new SelectOption("Lägenhet", MESSAGE_LAGENHET_PRE),
+            new SelectOption("Hus", MESSAGE_HUS),
+            new SelectOption("Jag är redan medlem", "message.bankid.start"))),
+        "h_to_house");
 
     createMessage(MESSAGE_LAGENHET_PRE, new MessageBodyParagraph(emoji_hand_ok));
     addRelay(MESSAGE_LAGENHET_PRE, MESSAGE_LAGENHET);
@@ -367,18 +392,24 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         1500);
     addRelay(MESSAGE_START_LOGIN, "message.bankid.start");
 
-    createMessage("message.bankid.start", new MessageBodySingleSelect(
-        "Bara att logga in så ser du din försäkring", new ArrayList<SelectItem>() {
-          {
-            add(new SelectLink("Logga in med BankID", "message.bankid.autostart.respond", null,
-                "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null, false));
-            add(new SelectOption("Jag är inte medlem", "message.notmember"));
-          }
-        }), (m, uc) -> {
+    createMessage(
+        "message.bankid.start",
+        new MessageBodySingleSelect(
+            "Bara att logga in så ser du din försäkring",
+            Lists.newArrayList(
+                new SelectLink(
+                    "Logga in med BankID",
+                    "message.bankid.autostart.respond",
+                    null,
+                    "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}",
+                    null,
+                    false),
+                new SelectOption("Jag är inte medlem", MESSAGE_NOTMEMBER))),
+        (m, uc) -> {
           UserData obd = uc.getOnBoardingData();
           if (m.getSelectedItem().value.equals("message.bankid.autostart.respond")) {
             obd.setBankIdMessage("message.bankid.start");
-          } else if (m.getSelectedItem().value.equals(MESSAGE_WAITLIST_START)) {
+          } else if (m.getSelectedItem().value.equals(MESSAGE_NOTMEMBER)) {
             uc.putUserData(LOGIN, "false");
           }
 
@@ -774,11 +805,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     createMessage("message.avslutok",
         new MessageBodySingleSelect(
             "Okej! Trevligt att chattas, ha det fint och hoppas vi hörs igen!",
-            new ArrayList<SelectItem>() {
-              {
-                add(new SelectOption("Jag vill starta om chatten", MESSAGE_WAITLIST_START));
-              }
-            }));
+            Lists.newArrayList(new SelectOption("Jag vill starta om chatten", MESSAGE_ONBOARDINGSTART_SHORT))));
 
     createChatMessage("message.quote.close", new MessageBodySingleSelect(
         "Du kanske undrade över något" + "\fNågot av det här kanske?", new ArrayList<SelectItem>() {
@@ -891,9 +918,9 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
   public void init(UserContext userContext) {
     log.info("Starting onboarding conversation");
     if (userContext.getDataEntry("{SIGNED_UP}") == null) {
-      startConversation(userContext, MESSAGE_WAITLIST_START); // Id of first message
+      startConversation(userContext, MESSAGE_ONBOARDINGSTART_SHORT); // Id of first message
     } else {
-      startConversation(userContext, "message.activate.ok.b"); // Id of first message
+      startConversation(userContext, MESSAGE_ACTIVATE_OK_B); // Id of first message
     }
   }
 
@@ -1021,12 +1048,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     // ... and then the incomming message id
     switch (m.getBaseMessageId()) {
-      case MESSAGE_WAITLIST_START: {
+      case MESSAGE_ONBOARDINGSTART: {
         val email = userContext.getDataEntry(EMAIL);
         if (emailIsActivated(email)) {
           flagCodeAsUsed(email);
           userContext.putUserData(SIGNED_UP, "true");
-          nxtMsg = MESSAGE_ONBOARDING_START;
+          nxtMsg = MESSAGE_ACTIVATE_OK_A;
         }
         break;
       }
@@ -1114,7 +1141,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
           if (esc.getActive()) { // User should have got an activation code
             flagCodeAsUsed(userEmail);
             userContext.putUserData(SIGNED_UP, "true");
-            nxtMsg = MESSAGE_ONBOARDING_START;
+            nxtMsg = MESSAGE_ACTIVATE_OK_A;
           } else {
             nxtMsg = "message.signup.checkposition";
           }
@@ -1141,7 +1168,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
           flagCodeAsUsed(email);
           userContext.putUserData(SIGNED_UP, "true");
           userContext.putUserData(EMAIL, email);
-          nxtMsg = MESSAGE_ONBOARDING_START;
+          nxtMsg = MESSAGE_ACTIVATE_OK_A;
           addToChat(m, userContext);
           break;
         }
@@ -1170,7 +1197,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
           break;
         }
         if (emailIsActivated(email)) {
-          nxtMsg = MESSAGE_ONBOARDING_START;
+          nxtMsg = MESSAGE_ACTIVATE_OK_A;
         } else {
           nxtMsg = MESSAGE_SIGNUP_NOT_ACTIVATED_YET;
         }
@@ -1540,7 +1567,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         if (!authResponse.isPresent()) {
           log.error("Could not start bankIdAuthentication!");
 
-          nxtMsg = MESSAGE_WAITLIST_START;
+          nxtMsg = MESSAGE_ONBOARDINGSTART_SHORT;
         } else {
           BankIdAuthResponse bankIdAuthResponse = authResponse.get();
           userContext.startBankIdAuth(bankIdAuthResponse);
@@ -1584,7 +1611,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
   }
 
   @Override
-  void addToChat(Message m, UserContext userContext) {
+  protected void addToChat(Message m, UserContext userContext) {
     super.addToChat(m, userContext);
   }
 

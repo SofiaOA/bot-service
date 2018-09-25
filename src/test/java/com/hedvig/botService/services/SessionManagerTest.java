@@ -138,8 +138,9 @@ public class SessionManagerTest {
 
     val messages = sessionManager.getAllMessages(TOLVANSSON_MEMBERID, null);
 
-    assertThat(Iterables.getLast(messages)).hasFieldOrPropertyWithValue("id",
-        "message.onboardingstart");
+    assertThat(Iterables.getLast(messages))
+        .hasFieldOrPropertyWithValue(
+            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
     assertThat(tolvanssonUserContext.getActiveConversation().get()).isNotNull();
   }
 

@@ -15,9 +15,11 @@ import static com.hedvig.botService.testHelpers.TestData.addSsnToContext;
 import static com.hedvig.botService.testHelpers.TestData.addStreetToContext;
 import static com.hedvig.botService.testHelpers.TestData.addZipCodeToContext;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
+import com.hedvig.botService.chat.Conversation.EventTypes;
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
@@ -189,5 +191,49 @@ public class OnboardingConversationDeviTest {
     val canAcceptAnswer = testConversation.canAcceptAnswerToQuestion(userContext);
 
     assertThat(canAcceptAnswer).isEqualTo(true);
+  }
+
+  @Test
+  public void AddCorrectStartMessage_WhenInitWithMessageId() {
+
+    testConversation.init(userContext, OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
+
+    assertThat(userContext.getMemberChat().chatHistory)
+        .first()
+        .hasFieldOrPropertyWithValue(
+            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
+  }
+
+  @Test
+  public void AddMessageOnboardingStartShort_WhenCallingInit_WithOutMessageId() {
+
+    testConversation.init(userContext);
+
+    assertThat(userContext.getMemberChat().chatHistory)
+      .first()
+      .hasFieldOrPropertyWithValue(
+        "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
+  }
+
+  @Test
+  public void RelayToMessageForslagsstart_FromMessageOboardingstartShort() {
+
+    testConversation.receiveEvent(
+        EventTypes.MESSAGE_FETCHED,
+        OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT,
+        userContext);
+
+    assertThat(userContext.getMemberChat().chatHistory)
+        .first()
+        .hasFieldOrPropertyWithValue("id", OnboardingConversationDevi.MESSAGE_FORSLAGSTART);
+  }
+
+  @Test
+  public void MessageForslagStartContainsOptionForExsistingMembers(){
+    val message = testConversation.getMessage(OnboardingConversationDevi.MESSAGE_FORSLAGSTART);
+
+    val body = (MessageBodySingleSelect) message.body;
+
+    assertThat(body.choices).extracting("text", "value").contains(tuple("Jag är redan medlem", "message.bankid.start"));
   }
 }

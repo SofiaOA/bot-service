@@ -46,7 +46,7 @@ public abstract class Conversation {
     return m;
   }
 
-  void addRelay(String s1, String s2) {
+  protected void addRelay(String s1, String s2) {
     relayList.put(s1, s2);
   }
 
@@ -54,7 +54,7 @@ public abstract class Conversation {
     return relayList.get(s1);
   }
 
-  void addToChat(String messageId, UserContext userContext) {
+  protected void addToChat(String messageId, UserContext userContext) {
     addToChat(getMessage(messageId), userContext);
   }
 
@@ -62,7 +62,7 @@ public abstract class Conversation {
 
   public abstract boolean canAcceptAnswerToQuestion(UserContext uc);
 
-  void addToChat(Message m, UserContext userContext) {
+  protected void addToChat(Message m, UserContext userContext) {
     m.render(userContext);
     log.info("Putting message: " + m.id + " content: " + m.body.text);
     userContext.addToHistory(m);
@@ -236,7 +236,7 @@ public abstract class Conversation {
 
   public abstract void receiveMessage(UserContext userContext, Message m);
 
-  public void completeRequest(String nxtMsg, UserContext userContext) {
+  protected void completeRequest(String nxtMsg, UserContext userContext) {
     if (getMessage(nxtMsg) != null) {
       addToChat(getMessage(nxtMsg), userContext);
     }
