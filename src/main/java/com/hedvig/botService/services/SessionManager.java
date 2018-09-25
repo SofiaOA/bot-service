@@ -255,9 +255,4 @@ public class SessionManager {
     uc.conversationManager.receiveMessage(m, conversationFactory, uc);
   }
 
-  public void getFabActions(String hid) {
-
-    if (claimsService.getActiveClaims(hid) > 0) {
-    }
-  }
 }
