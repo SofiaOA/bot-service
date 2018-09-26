@@ -1410,6 +1410,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
       case MESSAGE_NYHETSBREV:
         onBoardingData.setNewsLetterEmail(m.body.text);
+        addToChat(m, userContext);
         nxtMsg = MESSAGE_NAGOTMER;
         break;
       case "message.signup.email":
