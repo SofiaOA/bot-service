@@ -27,6 +27,7 @@ public abstract class Conversation {
 
   public static final long HEDVIG_USER_ID = 1; // The id hedvig uses to chat
   private Map<String, SelectItemMessageCallback> callbacks = new TreeMap<>();
+  private static final String CHAT_ID_FORMAT = "%s.%s";
 
   public enum conversationStatus {
     INITIATED,
@@ -54,8 +55,33 @@ public abstract class Conversation {
     return m;
   }
 
+  protected void addRelayToChatMessage(String s1, String s2) {
+    String i = findLastChatMessageId(s1);
+
+    relayList.put(i, s2);
+  }
+
   protected void addRelay(String s1, String s2) {
+
     relayList.put(s1, s2);
+  }
+
+  String findLastChatMessageId(String messageId) {
+    int i = 0;
+    while (messageList.containsKey(String.format(CHAT_ID_FORMAT, messageId, i))) {
+      i++;
+
+      if(i== 100) {
+        val format = String.format("Found 100 ChatMessages messages for %s, this seems strange", messageId);
+        throw new RuntimeException(format);
+      }
+    }
+
+    if(i>0) {
+      return String.format(CHAT_ID_FORMAT, messageId, i-1);
+    }
+
+    return messageId;
   }
 
   String getRelay(String s1) {
@@ -267,15 +293,15 @@ public abstract class Conversation {
    * */
   public void createChatMessage(String id, MessageBody body, String avatar) {
     String[] paragraphs = body.text.split("\f");
-    Integer pId = 0;
-    Integer delayFactor = 25; // Milliseconds per character TODO: Externalize this!
+    int pId = 0;
+    int delayFactor = 25; // Milliseconds per character TODO: Externalize this!
 
     ArrayList<String> msgs = new ArrayList<String>();
 
     for (int i = 0; i < (paragraphs.length - 1); i++) {
       String s = paragraphs[i];
-      String s1 = i == 0 ? id : (id + "." + (pId++).toString());
-      String s2 = id + "." + (pId++).toString();
+      String s1 = i == 0 ? id : String.format(CHAT_ID_FORMAT, id, pId++);
+      String s2 = String.format(CHAT_ID_FORMAT, id, pId++);
       // log.info("Create message of size "+(s.length())+" with load time:" +
       // (s.length()*delayFactor));
       // createMessage(s1, new MessageBodyParagraph(""), "h_symbol",(s.length()*delayFactor));
@@ -292,8 +318,8 @@ public abstract class Conversation {
     }
 
     // The 'actual' message
-    String sWrite = id + "." + (pId++).toString();
-    String sFinal = id + "." + (pId++).toString();
+    String sWrite = String.format(CHAT_ID_FORMAT, id, pId++);
+    String sFinal = String.format(CHAT_ID_FORMAT, id, pId++);
     String s = paragraphs[paragraphs.length - 1]; // Last paragraph is put on actual message
     body.text = s;
     // createMessage(sWrite, new MessageBodyParagraph(""), "h_symbol",(s.length()*delayFactor));

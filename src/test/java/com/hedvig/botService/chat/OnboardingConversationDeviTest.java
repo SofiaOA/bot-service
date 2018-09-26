@@ -66,7 +66,7 @@ public class OnboardingConversationDeviTest {
   }
 
   @Test
-  public void ClearMembersAdress_WhenMemberEntersAddressManually() {
+  public void ClearMembersAddress_WhenMemberEntersAddressManually() {
     addSsnToContext(userContext, TOLVANSSON_SSN);
     addFirstnameToContext(userContext, TOLVANSSON_FIRSTNAME);
     addFamilynameToContext(userContext, TOLVANSSON_LASTNAME);
@@ -91,7 +91,7 @@ public class OnboardingConversationDeviTest {
   }
 
   @Test
-  public void SendNotificationEventOn_HouseingUnderWritingLimit() {
+  public void SendNotificationEventOn_HousingUnderWritingLimit() {
 
     addFirstnameToContext(userContext, TOLVANSSON_FIRSTNAME);
     addFamilynameToContext(userContext, TOLVANSSON_LASTNAME);
@@ -113,7 +113,7 @@ public class OnboardingConversationDeviTest {
   }
 
   @Test
-  public void SendNotificationEventOn_HousholdUnderWritingLimit() {
+  public void SendNotificationEventOn_HouseholdUnderWritingLimit() {
 
     addFirstnameToContext(userContext, TOLVANSSON_FIRSTNAME);
     addFamilynameToContext(userContext, TOLVANSSON_LASTNAME);
@@ -151,7 +151,7 @@ public class OnboardingConversationDeviTest {
 
   @Test
   public void
-      DoNotSendNotificationEvent_WhenMessge_50K_LIMIT_YES_withAnswer_MESSAGE_50K_LIMIT_YES_YES() {
+  DoNotSendNotificationEvent_WhenMessage_50K_LIMIT_YES_withAnswer_MESSAGE_50K_LIMIT_YES_YES() {
     Message m =
         testConversation.getMessage(OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES + ".2");
     val choice =
@@ -239,7 +239,7 @@ public class OnboardingConversationDeviTest {
 
     testConversation.receiveEvent(
         EventTypes.MESSAGE_FETCHED,
-        OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT,
+        testConversation.findLastChatMessageId(OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT),
         userContext);
 
     assertThat(userContext.getMemberChat().chatHistory)
@@ -248,7 +248,7 @@ public class OnboardingConversationDeviTest {
   }
 
   @Test
-  public void MessageForslagStartContainsOptionForExsistingMembers() {
+  public void MessageForelegStartContainsOptionForExistingMembers() {
     val message = testConversation.getMessage(OnboardingConversationDevi.MESSAGE_FORSLAGSTART);
 
     val body = (MessageBodySingleSelect) message.body;

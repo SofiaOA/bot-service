@@ -218,14 +218,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
                 new SelectOption("Låter bra!", MESSAGE_FORSLAGSTART),
                 new SelectOption("Jag är redan medlem", "message.bankid.start"))));
 
-    createMessage(
+    createChatMessage(
         MESSAGE_ONBOARDINGSTART_SHORT,
         new MessageBodyParagraph(
             "Hej! Jag heter Hedvig "
                 + emoji_waving_hand
-                + "\fDet här går på nolltid! Jag ställer några frågor, sen ger jag dig ett förslag på en hemförsäkring"),
-        1500);
-    addRelay(MESSAGE_ONBOARDINGSTART_SHORT, MESSAGE_FORSLAGSTART);
+                + "\fDet här går på nolltid! Jag ställer några frågor, sen ger jag dig ett förslag på en hemförsäkring"));
+    addRelayToChatMessage(MESSAGE_ONBOARDINGSTART_SHORT, MESSAGE_FORSLAGSTART);
 
     createChatMessage(
         "message.membernotfound",
