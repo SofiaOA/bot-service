@@ -78,6 +78,7 @@ public class MemberServiceFeign implements MemberService {
     req.setMemberId(memberId);
     req.setSsn(data.getSSN());
     req.setEmail(data.getEmail());
+    req.setPhoneNumber(data.getPhoneNumber());
 
     Address address = new Address();
     address.setStreet(data.getAddressStreet());
