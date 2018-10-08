@@ -38,7 +38,7 @@ public class InternalUserDataController {
     return new ResponseEntity<String>(token, HttpStatus.OK);
   }
 
-  @PostMapping(value = "{memberId}/updateContextWebOnBoarding", consumes = "application/json")
+  @PostMapping(value = "{memberId}/initSessionWebOnBoarding", consumes = "application/json")
   ResponseEntity<?> updateMemberContext(@PathVariable(name = "memberId") String memberId,
     @Valid UpdateUserContextDTO req) {
     log.info("Update user context request for member {} with request {}", memberId, req);
