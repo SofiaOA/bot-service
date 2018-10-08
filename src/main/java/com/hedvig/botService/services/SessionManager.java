@@ -25,6 +25,7 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectR
 import com.hedvig.botService.web.dto.AddMessageRequestDTO;
 import com.hedvig.botService.web.dto.BackOfficeAnswerDTO;
 import com.hedvig.botService.web.dto.TrackingDTO;
+import com.hedvig.botService.web.dto.UpdateUserContextDTO;
 import java.util.List;
 import java.util.Objects;
 import lombok.val;
@@ -57,6 +58,9 @@ public class SessionManager {
   private final ConversationFactory conversationFactory;
   private final TrackingDataRespository trackerRepo;
   private final ObjectMapper objectMapper;
+
+  private static final String LINK_URI_KEY = "{{LINK_URI}";
+  private static final String LINK_URI_VALUE = "hedvig://+";
 
   @Autowired
   public SessionManager(
@@ -141,6 +145,30 @@ public class SessionManager {
 
     uc.putUserData("{LINK_URI}", linkUri);
     uc.putUserData(UserContext.ONBOARDING_COMPLETE, "false");
+
+    userContextRepository.saveAndFlush(uc);
+  }
+
+  /*
+   * Create a new users chat and context WEB ONBOARDING
+   */
+  public void init_web_onboarding(String memberId, UpdateUserContextDTO context) {
+
+    UserContext uc =
+      userContextRepository
+        .findByMemberId(memberId)
+        .orElseGet(
+          () -> {
+            UserContext newUserContext = new UserContext(memberId);
+            userContextRepository.save(newUserContext);
+            return newUserContext;
+          });
+
+    uc.updateUserContextWebOnboarding(context);
+
+    uc.putUserData(LINK_URI_KEY,LINK_URI_VALUE);
+    uc.putUserData(UserContext.ONBOARDING_COMPLETE, "true");
+    uc.putUserData(UserContext.FORCE_TRUSTLY_CHOICE, "true");
 
     userContextRepository.saveAndFlush(uc);
   }

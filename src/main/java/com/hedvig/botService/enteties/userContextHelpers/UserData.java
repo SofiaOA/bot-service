@@ -86,6 +86,8 @@ public class UserData {
 
   public String getPhoneNumber(){ return ctx.getDataEntry(PHONE_NUMBER); }
 
+  public void setPhoneNumber(String phoneNumber) { ctx.putUserData(PHONE_NUMBER, phoneNumber); }
+
   public void setFamilyName(String familyName) {
     ctx.putUserData(FAMILY_NAME, familyName);
   }
