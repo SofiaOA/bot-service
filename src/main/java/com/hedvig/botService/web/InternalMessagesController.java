@@ -37,14 +37,10 @@ public class InternalMessagesController {
   }
 
   /** This endpoint is used internally to send messages from back-office personnel to end users */
-  @RequestMapping(
-      path = {"/_/messages/addmessage", "/addmessage"},
-      method = RequestMethod.POST,
+  @RequestMapping(path = {"/_/messages/addmessage", "/addmessage"}, method = RequestMethod.POST,
       produces = "application/json; charset=utf-8")
   public ResponseEntity<?> addMessage(@Valid @RequestBody AddMessageRequestDTO backOfficeMessage) {
-    log.info(
-        "Message from Hedvig to hid: {} with messageId: {}",
-        backOfficeMessage.getMemberId(),
+    log.info("Message from Hedvig to hid: {} with messageId: {}", backOfficeMessage.getMemberId(),
         backOfficeMessage.getMsg());
 
     if (sessionManager.addMessageFromHedvig(backOfficeMessage) == true) {
@@ -57,14 +53,10 @@ public class InternalMessagesController {
   /**
    * This endpoint is used internally to question answers from back-office personnel to end users
    */
-  @RequestMapping(
-      path = "/_/messages/addanswer",
-      method = RequestMethod.POST,
+  @RequestMapping(path = "/_/messages/addanswer", method = RequestMethod.POST,
       produces = "application/json; charset=utf-8")
   public ResponseEntity<?> addAnswer(@Valid @RequestBody() BackOfficeAnswerDTO backOfficeAnswer) {
-    log.info(
-        "Received answer from Hedvig to hid: {} with message {}",
-        backOfficeAnswer.getUserId(),
+    log.info("Received answer from Hedvig to hid: {} with message {}", backOfficeAnswer.getUserId(),
         backOfficeAnswer.getMsg());
 
     if (sessionManager.addAnswerFromHedvig(backOfficeAnswer) == true) {
@@ -79,18 +71,14 @@ public class InternalMessagesController {
     Instant timestamp = Instant.ofEpochMilli(from);
     List<Message> messages = messageRepository.findFromTimestamp(timestamp);
 
-    return messages
-        .stream()
-        .map(m -> new BackOfficeMessageDTO(m, m.chat.getMemberId()))
+    return messages.stream().map(m -> new BackOfficeMessageDTO(m, m.chat.getMemberId()))
         .collect(Collectors.toList());
   }
 
   /**
    * Initialize chat with member. The method is used in api-gateway "/helloHedvig" method handler.
    */
-  @RequestMapping(
-      path = {"/_/messages/init", "/init"},
-      method = RequestMethod.POST)
+  @RequestMapping(path = {"/_/messages/init", "/init"}, method = RequestMethod.POST)
   public ResponseEntity<?> create(
       @RequestHeader(value = "hedvig.token", required = false) String hid,
       @RequestBody(required = false) ExpoDeviceInfoDTO json) {
@@ -101,7 +89,7 @@ public class InternalMessagesController {
       log.info(json.toString());
 
       final String clientLinkingUri = json.getDeviceInfo().getLinkingUri();
-      if (clientLinkingUri != null) {
+      if (clientLinkingUri != null && clientLinkingUri.contains("://")) {
         linkUri = clientLinkingUri;
       }
     }
