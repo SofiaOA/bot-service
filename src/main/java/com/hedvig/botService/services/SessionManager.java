@@ -168,6 +168,7 @@ public class SessionManager {
 
     uc.putUserData(LINK_URI_KEY,LINK_URI_VALUE);
     uc.putUserData(UserContext.ONBOARDING_COMPLETE, "true");
+    uc.putUserData(UserContext.FORCE_TRUSTLY_CHOICE, "true");
 
     userContextRepository.saveAndFlush(uc);
   }
