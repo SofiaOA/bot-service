@@ -152,14 +152,14 @@ public class SessionManager {
   /*
    * Create a new users chat and context WEB ONBOARDING
    */
-  public void init_web_onboarding(String hid, UpdateUserContextDTO context) {
+  public void init_web_onboarding(String memberId, UpdateUserContextDTO context) {
 
     UserContext uc =
       userContextRepository
-        .findByMemberId(hid)
+        .findByMemberId(memberId)
         .orElseGet(
           () -> {
-            UserContext newUserContext = new UserContext(hid);
+            UserContext newUserContext = new UserContext(memberId);
             userContextRepository.save(newUserContext);
             return newUserContext;
           });

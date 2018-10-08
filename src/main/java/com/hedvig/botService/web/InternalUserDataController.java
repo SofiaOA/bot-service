@@ -28,7 +28,7 @@ public class InternalUserDataController {
     this.sessionManager = sessions;
   }
 
-  @GetMapping(value = "{hid}/push-token", produces = "application/json")
+  @GetMapping(value = "{memberId}/push-token", produces = "application/json")
   ResponseEntity<?> pushToken(@PathVariable String memberId) {
     log.info("Get pushtoken for memberId:{}, is: {}", value("memberId", ""));
     String token = sessionManager.getPushToken(memberId);
@@ -38,8 +38,8 @@ public class InternalUserDataController {
     return new ResponseEntity<String>(token, HttpStatus.OK);
   }
 
-  @PostMapping(value = "{hid}/updateContext", consumes = "application/json")
-  ResponseEntity<?> updateMemberContext(@PathVariable String memberId,
+  @PostMapping(value = "{memberId}/updateContextWebOnBoarding", consumes = "application/json")
+  ResponseEntity<?> updateMemberContext(@PathVariable(name = "memberId") String memberId,
     @Valid UpdateUserContextDTO req) {
     log.info("Update user context request for member {} with request {}", memberId, req);
 
