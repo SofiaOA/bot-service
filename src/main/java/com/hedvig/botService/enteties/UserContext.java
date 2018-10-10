@@ -12,6 +12,7 @@ import com.hedvig.botService.serviceIntegration.memberService.MemberProfile;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
 import com.hedvig.botService.services.SessionManager;
+import com.hedvig.botService.web.dto.UpdateUserContextDTO;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashMap;
@@ -239,6 +240,24 @@ public class UserContext implements Serializable {
 
     this.putUserData("{AUTOSTART_TOKEN}", autoStartToken);
     this.putUserData("{REFERENCE_TOKEN}", referenceToken);
+  }
+
+  public void updateUserContextWebOnboarding(UpdateUserContextDTO context){
+    UserData ud = getOnBoardingData();
+
+    ud.setSSN(context.getPersonalNumber());
+
+    ud.setFirstName(context.getFirstName());
+    ud.setFamilyName(context.getLastName());
+
+    ud.setEmail(context.getEmail());
+    ud.setPhoneNumber(context.getPhoneNumber());
+
+    ud.setAddressStreet(context.getStreet());
+    ud.setAddressCity(context.getCity());
+    ud.setAddressZipCode(context.getZipCode());
+
+    ud.setUserHasSigned(context.isHasSigned());
   }
 
   public void fillMemberData(MemberProfile member) {

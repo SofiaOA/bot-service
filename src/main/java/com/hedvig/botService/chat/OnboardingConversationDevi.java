@@ -1830,7 +1830,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
   private String handleUnderwritingLimitResponse(
       UserContext userContext, Message m, String messageId) {
     String nxtMsg;
-    userContext.putUserData("{PHONENUMBER}", m.body.text);
+    userContext.putUserData("{PHONE_NUMBER}", m.body.text);
     UnderwritingLimitExcededEvent.UnderwritingType type =
         messageId.endsWith("householdsize")
             ? UnderwritingLimitExcededEvent.UnderwritingType.HouseholdSize

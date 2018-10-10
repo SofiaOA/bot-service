@@ -32,6 +32,7 @@ public class UserData {
   public static final String FLOOR = "{FLOOR}";
   public static final String STUDENT_POLICY_ELIGIBILITY = "{STUDENT_POLICY_ELIGIBILITY}";
   public static final String TWENTYFIVE_THOUSAND_LIMIT = "{25K_LIMIT}";
+  public static final String PHONE_NUMBER = "{PHONE_NUMBER}";
   private final UserContext ctx;
 
   public UserData(UserContext ctx) {
@@ -82,6 +83,10 @@ public class UserData {
   public String getEmail() {
     return ctx.getDataEntry(EMAIL);
   }
+
+  public String getPhoneNumber(){ return ctx.getDataEntry(PHONE_NUMBER); }
+
+  public void setPhoneNumber(String phoneNumber) { ctx.putUserData(PHONE_NUMBER, phoneNumber); }
 
   public void setFamilyName(String familyName) {
     ctx.putUserData(FAMILY_NAME, familyName);
