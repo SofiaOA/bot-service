@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,8 +40,8 @@ public class InternalUserDataController {
   }
 
   @PostMapping(value = "{memberId}/initSessionWebOnBoarding", consumes = "application/json")
-  ResponseEntity<?> updateMemberContext(@PathVariable(name = "memberId") String memberId,
-    @Valid UpdateUserContextDTO req) {
+  ResponseEntity<?> updateMemberContext(@PathVariable(name = "memberId") String memberId, @RequestBody @Valid
+    UpdateUserContextDTO req) {
     log.info("Update user context request for member {} with request {}", memberId, req);
 
     sessionManager.init_web_onboarding(memberId, req);
