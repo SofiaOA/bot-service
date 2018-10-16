@@ -3,6 +3,7 @@ package com.hedvig.botService.chat;
 import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodyFileUpload;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
 import com.hedvig.botService.enteties.message.MessageBodyText;
 import com.hedvig.botService.enteties.message.MessageHeader;
@@ -16,10 +17,12 @@ import org.springframework.context.ApplicationEventPublisher;
 
 public class FreeChatConversation extends Conversation {
 
-  private static final String FREE_CHAT_START = "free.chat.start";
+  public static final String FREE_CHAT_START = "free.chat.start";
   private static final String FREE_CHAT_MESSAGE = "free.chat.message";
   public static final String FREE_CHAT_FROM_BO = "free.chat.from.bo";
   public static final String FREE_CHAT_ONBOARDING_START = "free.chat.onboarding.start";
+  public static final String FILE_QUESTION_MESSAGE = "file of type %s is uploaded";
+
   private final StatusBuilder statusBuilder;
   private final ApplicationEventPublisher eventPublisher;
   private final ProductPricingService productPricingService;
@@ -69,13 +72,23 @@ public class FreeChatConversation extends Conversation {
       case FREE_CHAT_MESSAGE:
         {
           m.header.statusMessage = statusBuilder.getStatusMessage(Clock.systemUTC());
+
+          boolean isFile = m.body instanceof MessageBodyFileUpload;
           if (productPricingService.getInsuranceStatus(userContext.getMemberId()) != null) {
-            eventPublisher.publishEvent(
-                new QuestionAskedEvent(userContext.getMemberId(), m.body.text));
+            if(isFile){
+              eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), String.format(FILE_QUESTION_MESSAGE, ((MessageBodyFileUpload) m.body).type)));
+            }
+            else{
+              eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), m.body.text));
+            }
           } else {
-            eventPublisher.publishEvent(
-                new OnboardingQuestionAskedEvent(userContext.getMemberId(), m.body.text));
+            if (isFile){
+              eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(), String.format(FILE_QUESTION_MESSAGE, ((MessageBodyFileUpload)m.body).type)));
+            }else{
+              eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(), m.body.text));
+            }
           }
+
           addToChat(m, userContext);
           nxtMsg = FREE_CHAT_MESSAGE;
           break;
