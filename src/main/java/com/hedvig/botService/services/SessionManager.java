@@ -304,7 +304,7 @@ public class SessionManager {
   }
 
   public void receiveMessage(Message m, String hid) {
-    log.info("Recieving messages from user: " + hid);
+    log.info("Receiving messages from user: " + hid);
     try {
       log.info(objectMapper.writeValueAsString(m));
     } catch (JsonProcessingException ex) {
