@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Headers("Accept: application/xml")
-@FeignClient(name = "productPricingClient", url = "${hedvig.product-pricing.url}")
+@FeignClient(name = "productPricingClient", url = "${hedvig.product-pricing.url:product-pricing}")
 public interface ProductPricingClient {
 
   @RequestMapping(
