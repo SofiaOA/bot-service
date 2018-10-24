@@ -21,7 +21,7 @@ public class FreeChatConversation extends Conversation {
   private static final String FREE_CHAT_MESSAGE = "free.chat.message";
   public static final String FREE_CHAT_FROM_BO = "free.chat.from.bo";
   public static final String FREE_CHAT_ONBOARDING_START = "free.chat.onboarding.start";
-  public static final String FILE_QUESTION_MESSAGE = "file of type %s is uploaded";
+  public static final String FILE_QUESTION_MESSAGE = "file with mime type: %s is uploaded";
 
   private final StatusBuilder statusBuilder;
   private final ApplicationEventPublisher eventPublisher;
@@ -76,14 +76,14 @@ public class FreeChatConversation extends Conversation {
           boolean isFile = m.body instanceof MessageBodyFileUpload;
           if (productPricingService.getInsuranceStatus(userContext.getMemberId()) != null) {
             if(isFile){
-              eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), String.format(FILE_QUESTION_MESSAGE, ((MessageBodyFileUpload) m.body).type)));
+              eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), String.format(FILE_QUESTION_MESSAGE, ((MessageBodyFileUpload) m.body).mimeType)));
             }
             else{
               eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), m.body.text));
             }
           } else {
             if (isFile){
-              eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(), String.format(FILE_QUESTION_MESSAGE, ((MessageBodyFileUpload)m.body).type)));
+              eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(), String.format(FILE_QUESTION_MESSAGE, ((MessageBodyFileUpload)m.body).mimeType)));
             }else{
               eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(), m.body.text));
             }
