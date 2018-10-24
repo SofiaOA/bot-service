@@ -74,6 +74,6 @@ public class FreeChatConversationTest {
       .publishEvent(
         new OnboardingQuestionAskedEvent(
           userContext.getMemberId(),
-          "file of type TestType is uploaded"));
+          "file with mime type: TestType is uploaded"));
   }
 }
