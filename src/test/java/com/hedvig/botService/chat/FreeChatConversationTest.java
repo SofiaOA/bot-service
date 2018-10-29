@@ -9,6 +9,7 @@ import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodyFileUpload;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.services.events.FileUploadedEvent;
 import com.hedvig.botService.services.events.OnboardingFileUploadedEvent;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +60,7 @@ public class FreeChatConversationTest {
   }
 
   @Test
-  public void Should_SendOnboardingFileUploadedEventWithKeyAndType_WhenUserUploadsPicture() {
+  public void Should_SendOnboardingFileUploadedEventWithKeyAndType_WhenUserUploadsFile() {
 
     userContext.putUserData("{NAME}", "TestName");
 
@@ -75,6 +76,28 @@ public class FreeChatConversationTest {
       .should()
       .publishEvent(
         new OnboardingFileUploadedEvent(
+          userContext.getMemberId(),
+          TEST_KEY,
+          TEST_TYPE));
+  }
+
+  @Test
+  public void Should_SendFileUploadedEventWithKeyAndType_WhenUserUploadsFileAndInsuranceIsSigned() {
+
+    userContext.putUserData("{NAME}", "TestName");
+
+    when(productPricingService.getInsuranceStatus(anyString())).thenReturn("SIGNED");
+
+    Message m = testFreeChatConversation
+      .getMessage(FreeChatConversation.FREE_CHAT_ONBOARDING_START);
+    m.body = new MessageBodyFileUpload("TestContent", TEST_KEY, TEST_TYPE);
+
+    testFreeChatConversation.receiveMessage(userContext, m);
+
+    then(eventPublisher)
+      .should()
+      .publishEvent(
+        new FileUploadedEvent(
           userContext.getMemberId(),
           TEST_KEY,
           TEST_TYPE));
