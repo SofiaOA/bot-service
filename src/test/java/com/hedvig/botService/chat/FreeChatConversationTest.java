@@ -9,7 +9,7 @@ import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodyFileUpload;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
-import com.hedvig.botService.services.events.OnboardingQuestionAskedEvent;
+import com.hedvig.botService.services.events.OnboardingFileUploadedEvent;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +20,8 @@ import org.springframework.context.ApplicationEventPublisher;
 @RunWith(MockitoJUnitRunner.class)
 public class FreeChatConversationTest {
 
+  private static final String TEST_KEY = "TestKey";
+  private static final String TEST_TYPE = "TestType";
   @Mock
   private StatusBuilder statusBuilder;
 
@@ -57,7 +59,7 @@ public class FreeChatConversationTest {
   }
 
   @Test
-  public void Should_SendOnboardingQuestionAskedEventWithQuestionFile_WhenUserUploadPicture() {
+  public void Should_SendOnboardingFileUploadedEventWithKeyAndType_WhenUserUploadsPicture() {
 
     userContext.putUserData("{NAME}", "TestName");
 
@@ -65,15 +67,16 @@ public class FreeChatConversationTest {
 
     Message m = testFreeChatConversation
       .getMessage(FreeChatConversation.FREE_CHAT_ONBOARDING_START);
-    m.body = new MessageBodyFileUpload("TestContent", "TestKey", "TestType");
+    m.body = new MessageBodyFileUpload("TestContent", TEST_KEY, TEST_TYPE);
 
     testFreeChatConversation.receiveMessage(userContext, m);
 
     then(eventPublisher)
       .should()
       .publishEvent(
-        new OnboardingQuestionAskedEvent(
+        new OnboardingFileUploadedEvent(
           userContext.getMemberId(),
-          "file with mime type: TestType is uploaded"));
+          TEST_KEY,
+          TEST_TYPE));
   }
 }

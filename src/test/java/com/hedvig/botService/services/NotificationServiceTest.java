@@ -12,11 +12,14 @@ import static org.mockito.Matchers.contains;
 
 import com.hedvig.botService.services.events.ClaimAudioReceivedEvent;
 import com.hedvig.botService.services.events.ClaimCallMeEvent;
+import com.hedvig.botService.services.events.FileUploadedEvent;
+import com.hedvig.botService.services.events.OnboardingFileUploadedEvent;
 import com.hedvig.botService.services.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.services.events.QuestionAskedEvent;
 import com.hedvig.botService.services.events.RequestObjectInsuranceEvent;
 import com.hedvig.botService.services.events.RequestPhoneCallEvent;
 import com.hedvig.botService.services.events.UnderwritingLimitExcededEvent;
+import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +30,12 @@ import org.springframework.cloud.aws.messaging.core.NotificationMessagingTemplat
 @RunWith(MockitoJUnitRunner.class)
 public class NotificationServiceTest {
 
-  public static final String GOOD_QUESTION = "A long and good question";
+
+
+
+  private static final String UPLOAD_KEY = "UPLOAD_KEY";
+  private static final String UPLOAD_TYPE = "UPLOAD_TYPE";
+  private static final String GOOD_QUESTION = "A long and good question";
   @Mock private NotificationMessagingTemplate messagingTemplate;
   private NotificationService notificationService;
 
@@ -151,5 +159,33 @@ public class NotificationServiceTest {
     then(messagingTemplate)
         .should()
         .sendNotification(anyString(), contains(TOLVANSSON_MEMBER_ID), anyString());
+  }
+
+  @Test
+  public void OnboardingFileUploadedEvent_SendsEventThatContains_MemberIdAndKeyAndType()
+  {
+    val event = new OnboardingFileUploadedEvent(TOLVANSSON_MEMBER_ID, UPLOAD_KEY, UPLOAD_TYPE);
+
+    notificationService.on(event);
+
+    then(messagingTemplate)
+      .should()
+      .sendNotification(anyString(), and(contains(TOLVANSSON_MEMBER_ID),and(contains(UPLOAD_KEY), contains(UPLOAD_TYPE))),
+        anyString());
+
+  }
+
+  @Test
+  public void FileUploadedEvent_SendsEventThatContains_MemberIdAndKeyAndType()
+  {
+    val event = new FileUploadedEvent(TOLVANSSON_MEMBER_ID, UPLOAD_KEY, UPLOAD_TYPE);
+
+    notificationService.on(event);
+
+    then(messagingTemplate)
+      .should()
+      .sendNotification(anyString(), and(contains(TOLVANSSON_MEMBER_ID),and(contains(UPLOAD_KEY), contains(UPLOAD_TYPE))),
+        anyString());
+
   }
 }
