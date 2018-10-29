@@ -85,7 +85,7 @@ public class MainConversation extends Conversation {
 
     createMessage(
         MESSAGE_MAIN_QUESTION,
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
+        new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
         new MessageBodyText("Självklart, vad kan jag hjälpa dig med?"));
 
     createMessage(MESSAGE_ERROR, new MessageBodyText("Oj nu blev något fel..."));

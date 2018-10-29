@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 public abstract class Conversation {
 
-  public static final long HEDVIG_USER_ID = 1; // The id hedvig uses to chat
   private Map<String, SelectItemMessageCallback> callbacks = new TreeMap<>();
   private static final String CHAT_ID_FORMAT = "%s.%s";
 
@@ -139,33 +138,33 @@ public abstract class Conversation {
   }
 
   void createMessage(String id, MessageBody body, Integer delay) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     createMessage(id, header, body, delay);
   }
 
   void createMessage(
       String id, MessageBody body, Integer delay, SelectItemMessageCallback callback) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     createMessage(id, header, body, delay);
     this.setMessageCallback(id, callback);
   }
 
   void createMessage(String id, MessageBody body, String avatarName, Integer delay) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     header.avatarName = avatarName;
     createMessage(id, header, body, delay);
   }
 
   void createMessage(
       String id, MessageBody body, String avatarName, SelectItemMessageCallback callback) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     header.avatarName = avatarName;
     this.setMessageCallback(id, callback);
     createMessage(id, header, body);
   }
 
   void createMessage(String id, MessageBody body, Image image, Integer delay) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     body.imageURL = image.imageURL;
     body.imageHeight = image.imageHeight;
     body.imageWidth = image.imageWidth;
@@ -175,18 +174,18 @@ public abstract class Conversation {
   // -------------------------
 
   void createMessage(String id, MessageBody body) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     createMessage(id, header, body);
   }
 
   void createMessage(String id, MessageBody body, String avatarName) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     header.avatarName = avatarName;
     createMessage(id, header, body);
   }
 
   void createMessage(String id, MessageBody body, Image image) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     body.imageURL = image.imageURL;
     body.imageHeight = image.imageHeight;
     body.imageWidth = image.imageWidth;
@@ -350,7 +349,7 @@ public abstract class Conversation {
     Message msg = new Message();
     val selectionItems = getSelectItemsForAnswer(uc);
     msg.body = new MessageBodySingleSelect(message, selectionItems);
-    msg.header.fromId = HEDVIG_USER_ID;
+    msg.header.fromId = MessageHeader.HEDVIG_USER_ID;
     msg.globalId = null;
     msg.header.messageId = null;
     msg.body.id = null;

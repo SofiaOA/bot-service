@@ -235,13 +235,13 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
 
     createMessage(
         MESSAGE_SIGNUP_TO_WAITLIST,
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
+        new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
         new MessageBodyText("Det ordnar jag! Vad är din mailadress?"));
     setExpectedReturnType(MESSAGE_SIGNUP_TO_WAITLIST, new EmailAdress());
 
     createMessage(
         "message.signup.email",
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
+        new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
         new MessageBodyText("Det ordnar jag! Vad är din mailadress?"));
     setExpectedReturnType("message.signup.email", new EmailAdress());
 
@@ -561,12 +561,12 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
     setExpectedReturnType(MESSAGE_TIPSA, new EmailAdress());
     createMessage(
         MESSAGE_FRIFRAGA,
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
+        new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
         new MessageBodyText("Fråga på!"));
 
     createMessage(
         MESSAGE_FRIONBOARDINGFRAGA,
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
+        new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
         new MessageBodyText("Fråga på! "));
 
     createMessage(
