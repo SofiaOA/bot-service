@@ -9,10 +9,13 @@ import com.hedvig.botService.enteties.message.MessageBodyText;
 import com.hedvig.botService.enteties.message.MessageHeader;
 import com.hedvig.botService.enteties.message.SelectItem;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.services.events.FileUploadedEvent;
+import com.hedvig.botService.services.events.OnboardingFileUploadedEvent;
 import com.hedvig.botService.services.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.services.events.QuestionAskedEvent;
 import java.time.Clock;
 import java.util.List;
+import lombok.val;
 import org.springframework.context.ApplicationEventPublisher;
 
 public class FreeChatConversation extends Conversation {
@@ -66,7 +69,6 @@ public class FreeChatConversation extends Conversation {
   @Override
   public void receiveMessage(UserContext userContext, Message m) {
     String nxtMsg = "";
-
     switch (m.id) {
       case FREE_CHAT_START:
       case FREE_CHAT_ONBOARDING_START:
@@ -77,16 +79,16 @@ public class FreeChatConversation extends Conversation {
         boolean isFile = m.body instanceof MessageBodyFileUpload;
         if (productPricingService.getInsuranceStatus(userContext.getMemberId()) != null) {
           if (isFile) {
-            eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(),
-              String.format(FILE_QUESTION_MESSAGE, ((MessageBodyFileUpload) m.body).mimeType)));
+            val body = (MessageBodyFileUpload) m.body;
+            eventPublisher.publishEvent(new FileUploadedEvent(userContext.getMemberId(), body.key, body.mimeType));
           } else {
             eventPublisher
               .publishEvent(new QuestionAskedEvent(userContext.getMemberId(), m.body.text));
           }
         } else {
           if (isFile) {
-            eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(),
-              String.format(FILE_QUESTION_MESSAGE, ((MessageBodyFileUpload) m.body).mimeType)));
+            val body = (MessageBodyFileUpload) m.body;
+            eventPublisher.publishEvent(new OnboardingFileUploadedEvent(userContext.getMemberId(), body.key, body.mimeType));
           } else {
             eventPublisher.publishEvent(
               new OnboardingQuestionAskedEvent(userContext.getMemberId(), m.body.text));
@@ -102,6 +104,7 @@ public class FreeChatConversation extends Conversation {
     /*
      * In a Single select, there is only one trigger event. Set default here to be a link to a new message
      */
+
     if (nxtMsg.equals("") && m.body.getClass().equals(MessageBodySingleSelect.class)) {
 
       MessageBodySingleSelect body1 = (MessageBodySingleSelect) m.body;
