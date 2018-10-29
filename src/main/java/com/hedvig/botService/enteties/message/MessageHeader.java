@@ -1,5 +1,6 @@
 package com.hedvig.botService.enteties.message;
 
+import javax.annotation.Nullable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -26,7 +27,9 @@ public class MessageHeader {
   public String avatarName; // Link to avatar animation to show over message
   public Long pollingInterval; // Frequency of next request
   public String statusMessage = null;
-  public boolean richTextChatCompatible = false;
+
+  @Nullable
+  public Boolean richTextChatCompatible = false;
 
   @Transient
   public boolean editAllowed; // For client use to indicate if the last message is editable
