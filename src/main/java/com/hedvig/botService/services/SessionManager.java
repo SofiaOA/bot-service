@@ -266,9 +266,6 @@ public class SessionManager {
             .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
     val messages = uc.getMessages(intent, conversationFactory);
-
-    userContextRepository.save(uc);
-
     return messages;
   }
 
