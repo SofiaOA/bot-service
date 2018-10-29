@@ -164,7 +164,7 @@ public class ClaimsConversation extends Conversation {
 
     createMessage(
         "message.claims.record.ok3",
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
+        new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
         new MessageBodyText(
             "Tack för att du delat med dig om det som hänt. Ta hand om dig så länge, så hörs vi snart!"));
 
@@ -174,7 +174,7 @@ public class ClaimsConversation extends Conversation {
   public void init(UserContext userContext, String startMessage) {
     log.info("Starting claims conversation for user: " + userContext.getMemberId());
     Message m = getMessage(startMessage);
-    m.header.fromId = HEDVIG_USER_ID; // new Long(userContext.getMemberId());
+    m.header.fromId = MessageHeader.HEDVIG_USER_ID; // new Long(userContext.getMemberId());
     addToChat(m, userContext);
     startConversation(userContext, startMessage); // Id of first message
   }

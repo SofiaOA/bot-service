@@ -7,6 +7,7 @@ import com.hedvig.botService.enteties.DirectDebitMandateTrigger;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageHeader;
 import com.hedvig.botService.enteties.message.SelectItem;
 import com.hedvig.botService.enteties.message.SelectItemTrustly;
 import com.hedvig.botService.enteties.message.SelectLink;
@@ -174,7 +175,7 @@ public class TrustlyConversation extends Conversation {
   @Override
   protected void addToChat(Message m, UserContext userContext) {
     if ((m.id.equals(START) || m.id.equals(CANCEL) || m.id.equals(FORCED_START))
-        && m.header.fromId == HEDVIG_USER_ID) {
+        && m.header.fromId == MessageHeader.HEDVIG_USER_ID) {
       final UserData userData = userContext.getOnBoardingData();
       UUID triggerUUID =
           triggerService.createTrustlyDirectDebitMandate(

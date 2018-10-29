@@ -1,7 +1,7 @@
 package com.hedvig.botService.enteties;
 
-import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageHeader;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +71,7 @@ public class MemberChat {
      * */
     boolean hasUserInput = false;
     for (Message m : chatHistory) {
-      if (!m.deleted && m.header.fromId != Conversation.HEDVIG_USER_ID) {
+      if (!m.deleted && m.header.fromId != MessageHeader.HEDVIG_USER_ID) {
         hasUserInput = true;
         break;
       }
@@ -82,7 +82,7 @@ public class MemberChat {
 
     for (Message m : chatHistory) {
       m.deleted = true;
-      if (!(m.header.fromId == Conversation.HEDVIG_USER_ID)) {
+      if (!(m.header.fromId == MessageHeader.HEDVIG_USER_ID)) {
         break;
       }
     }
@@ -97,7 +97,7 @@ public class MemberChat {
      * */
     boolean hasUserInput = false;
     for (Message m : chatHistory) {
-      if (!m.deleted && m.header.fromId != Conversation.HEDVIG_USER_ID) {
+      if (!m.deleted && m.header.fromId != MessageHeader.HEDVIG_USER_ID) {
         hasUserInput = true;
         m.header.editAllowed = false;
       }
@@ -105,7 +105,7 @@ public class MemberChat {
     if (!hasUserInput) return;
 
     for (Message m : chatHistory) {
-      if (!(m.header.fromId == Conversation.HEDVIG_USER_ID)) {
+      if (!(m.header.fromId == MessageHeader.HEDVIG_USER_ID)) {
         m.header.editAllowed = true;
         break;
       }

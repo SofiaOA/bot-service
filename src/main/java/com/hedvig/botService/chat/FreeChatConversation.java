@@ -28,27 +28,29 @@ public class FreeChatConversation extends Conversation {
   private final ProductPricingService productPricingService;
 
   public FreeChatConversation(
-      StatusBuilder statusBuilder,
-      ApplicationEventPublisher eventPublisher,
-      ProductPricingService productPricingService) {
+    StatusBuilder statusBuilder,
+    ApplicationEventPublisher eventPublisher,
+    ProductPricingService productPricingService) {
     this.statusBuilder = statusBuilder;
     this.eventPublisher = eventPublisher;
     this.productPricingService = productPricingService;
 
     createMessage(
-        FREE_CHAT_START,
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
-        new MessageBodyText("Hej {NAME}! Hur kan jag hjälpa dig idag?"));
+      FREE_CHAT_START,
+      MessageHeader.createRichTextHeader(),
+      new MessageBodyText("Hej {NAME}! Hur kan jag hjälpa dig idag?"));
 
     createMessage(
-        FREE_CHAT_ONBOARDING_START,
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
-        new MessageBodyText("Hade du någon fundering?"));
+      FREE_CHAT_ONBOARDING_START,
+      MessageHeader.createRichTextHeader(),
+      new MessageBodyText("Hade du någon fundering?"));
 
     createMessage(
-        FREE_CHAT_MESSAGE,
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
-        new MessageBodyText(""));
+      FREE_CHAT_MESSAGE,
+      MessageHeader.createRichTextHeader(),
+      new MessageBodyText(""));
+
+
   }
 
   @Override
@@ -69,30 +71,32 @@ public class FreeChatConversation extends Conversation {
       case FREE_CHAT_START:
       case FREE_CHAT_ONBOARDING_START:
       case FREE_CHAT_FROM_BO:
-      case FREE_CHAT_MESSAGE:
-        {
-          m.header.statusMessage = statusBuilder.getStatusMessage(Clock.systemUTC());
+      case FREE_CHAT_MESSAGE: {
+        m.header.statusMessage = statusBuilder.getStatusMessage(Clock.systemUTC());
 
-          boolean isFile = m.body instanceof MessageBodyFileUpload;
-          if (productPricingService.getInsuranceStatus(userContext.getMemberId()) != null) {
-            if(isFile){
-              eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), String.format(FILE_QUESTION_MESSAGE, ((MessageBodyFileUpload) m.body).mimeType)));
-            }
-            else{
-              eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), m.body.text));
-            }
+        boolean isFile = m.body instanceof MessageBodyFileUpload;
+        if (productPricingService.getInsuranceStatus(userContext.getMemberId()) != null) {
+          if (isFile) {
+            eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(),
+              String.format(FILE_QUESTION_MESSAGE, ((MessageBodyFileUpload) m.body).mimeType)));
           } else {
-            if (isFile){
-              eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(), String.format(FILE_QUESTION_MESSAGE, ((MessageBodyFileUpload)m.body).mimeType)));
-            }else{
-              eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(), m.body.text));
-            }
+            eventPublisher
+              .publishEvent(new QuestionAskedEvent(userContext.getMemberId(), m.body.text));
           }
-
-          addToChat(m, userContext);
-          nxtMsg = FREE_CHAT_MESSAGE;
-          break;
+        } else {
+          if (isFile) {
+            eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(),
+              String.format(FILE_QUESTION_MESSAGE, ((MessageBodyFileUpload) m.body).mimeType)));
+          } else {
+            eventPublisher.publishEvent(
+              new OnboardingQuestionAskedEvent(userContext.getMemberId(), m.body.text));
+          }
         }
+
+        addToChat(m, userContext);
+        nxtMsg = FREE_CHAT_MESSAGE;
+        break;
+      }
     }
 
     /*
@@ -117,7 +121,7 @@ public class FreeChatConversation extends Conversation {
   protected Message createBackOfficeMessage(UserContext uc, String message, String id) {
     Message msg = new Message();
     msg.body = new MessageBodyText(message);
-    msg.header.fromId = HEDVIG_USER_ID;
+    msg.header.fromId = MessageHeader.HEDVIG_USER_ID;
     msg.globalId = null;
     msg.header.messageId = null;
     msg.body.id = null;
