@@ -19,7 +19,6 @@ import lombok.ToString;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
   @JsonSubTypes.Type(value = MessageBodyText.class, name = "text"),
-  @JsonSubTypes.Type(value = MessageBodyRichText.class, name = "rich_text"),
   @JsonSubTypes.Type(value = MessageBodyNumber.class, name = "number"),
   @JsonSubTypes.Type(value = MessageBodySingleSelect.class, name = "single_select"),
   @JsonSubTypes.Type(value = MessageBodyMultipleSelect.class, name = "multiple_select"),
