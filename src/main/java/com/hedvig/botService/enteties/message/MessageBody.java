@@ -29,7 +29,8 @@ import lombok.ToString;
   @JsonSubTypes.Type(value = MessageBodyHero.class, name = "hero"),
   @JsonSubTypes.Type(value = MessageBodyParagraph.class, name = "paragraph"),
   @JsonSubTypes.Type(value = MessageBodyBankIdCollect.class, name = "bankid_collect"),
-  @JsonSubTypes.Type(value = MessageBodyPolling.class, name = "polling")
+  @JsonSubTypes.Type(value = MessageBodyPolling.class, name = "polling"),
+  @JsonSubTypes.Type(value = MessageBodyFileUpload.class, name = "file_upload")
 })
 @ToString
 public class MessageBody {

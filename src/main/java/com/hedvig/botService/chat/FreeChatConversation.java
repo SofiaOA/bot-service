@@ -9,10 +9,13 @@ import com.hedvig.botService.enteties.message.MessageBodyText;
 import com.hedvig.botService.enteties.message.MessageHeader;
 import com.hedvig.botService.enteties.message.SelectItem;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.services.events.FileUploadedEvent;
+import com.hedvig.botService.services.events.OnboardingFileUploadedEvent;
 import com.hedvig.botService.services.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.services.events.QuestionAskedEvent;
 import java.time.Clock;
 import java.util.List;
+import lombok.val;
 import org.springframework.context.ApplicationEventPublisher;
 
 public class FreeChatConversation extends Conversation {
@@ -21,34 +24,36 @@ public class FreeChatConversation extends Conversation {
   private static final String FREE_CHAT_MESSAGE = "free.chat.message";
   public static final String FREE_CHAT_FROM_BO = "free.chat.from.bo";
   public static final String FREE_CHAT_ONBOARDING_START = "free.chat.onboarding.start";
-  public static final String FILE_QUESTION_MESSAGE = "file of type %s is uploaded";
+  public static final String FILE_QUESTION_MESSAGE = "file with mime type: %s is uploaded";
 
   private final StatusBuilder statusBuilder;
   private final ApplicationEventPublisher eventPublisher;
   private final ProductPricingService productPricingService;
 
   public FreeChatConversation(
-      StatusBuilder statusBuilder,
-      ApplicationEventPublisher eventPublisher,
-      ProductPricingService productPricingService) {
+    StatusBuilder statusBuilder,
+    ApplicationEventPublisher eventPublisher,
+    ProductPricingService productPricingService) {
     this.statusBuilder = statusBuilder;
     this.eventPublisher = eventPublisher;
     this.productPricingService = productPricingService;
 
     createMessage(
-        FREE_CHAT_START,
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
-        new MessageBodyText("Hej {NAME}! Hur kan jag hjälpa dig idag?"));
+      FREE_CHAT_START,
+      MessageHeader.createRichTextHeader(),
+      new MessageBodyText("Hej {NAME}! Hur kan jag hjälpa dig idag?"));
 
     createMessage(
-        FREE_CHAT_ONBOARDING_START,
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
-        new MessageBodyText("Hade du någon fundering?"));
+      FREE_CHAT_ONBOARDING_START,
+      MessageHeader.createRichTextHeader(),
+      new MessageBodyText("Hade du någon fundering?"));
 
     createMessage(
-        FREE_CHAT_MESSAGE,
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
-        new MessageBodyText(""));
+      FREE_CHAT_MESSAGE,
+      MessageHeader.createRichTextHeader(),
+      new MessageBodyText(""));
+
+
   }
 
   @Override
@@ -64,40 +69,42 @@ public class FreeChatConversation extends Conversation {
   @Override
   public void receiveMessage(UserContext userContext, Message m) {
     String nxtMsg = "";
-
     switch (m.id) {
       case FREE_CHAT_START:
       case FREE_CHAT_ONBOARDING_START:
       case FREE_CHAT_FROM_BO:
-      case FREE_CHAT_MESSAGE:
-        {
-          m.header.statusMessage = statusBuilder.getStatusMessage(Clock.systemUTC());
+      case FREE_CHAT_MESSAGE: {
+        m.header.statusMessage = statusBuilder.getStatusMessage(Clock.systemUTC());
 
-          boolean isFile = m.body instanceof MessageBodyFileUpload;
-          if (productPricingService.getInsuranceStatus(userContext.getMemberId()) != null) {
-            if(isFile){
-              eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), String.format(FILE_QUESTION_MESSAGE, ((MessageBodyFileUpload) m.body).type)));
-            }
-            else{
-              eventPublisher.publishEvent(new QuestionAskedEvent(userContext.getMemberId(), m.body.text));
-            }
+        boolean isFile = m.body instanceof MessageBodyFileUpload;
+        if (productPricingService.getInsuranceStatus(userContext.getMemberId()) != null) {
+          if (isFile) {
+            val body = (MessageBodyFileUpload) m.body;
+            eventPublisher.publishEvent(new FileUploadedEvent(userContext.getMemberId(), body.key, body.mimeType));
           } else {
-            if (isFile){
-              eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(), String.format(FILE_QUESTION_MESSAGE, ((MessageBodyFileUpload)m.body).type)));
-            }else{
-              eventPublisher.publishEvent(new OnboardingQuestionAskedEvent(userContext.getMemberId(), m.body.text));
-            }
+            eventPublisher
+              .publishEvent(new QuestionAskedEvent(userContext.getMemberId(), m.body.text));
           }
-
-          addToChat(m, userContext);
-          nxtMsg = FREE_CHAT_MESSAGE;
-          break;
+        } else {
+          if (isFile) {
+            val body = (MessageBodyFileUpload) m.body;
+            eventPublisher.publishEvent(new OnboardingFileUploadedEvent(userContext.getMemberId(), body.key, body.mimeType));
+          } else {
+            eventPublisher.publishEvent(
+              new OnboardingQuestionAskedEvent(userContext.getMemberId(), m.body.text));
+          }
         }
+
+        addToChat(m, userContext);
+        nxtMsg = FREE_CHAT_MESSAGE;
+        break;
+      }
     }
 
     /*
      * In a Single select, there is only one trigger event. Set default here to be a link to a new message
      */
+
     if (nxtMsg.equals("") && m.body.getClass().equals(MessageBodySingleSelect.class)) {
 
       MessageBodySingleSelect body1 = (MessageBodySingleSelect) m.body;
@@ -117,7 +124,7 @@ public class FreeChatConversation extends Conversation {
   protected Message createBackOfficeMessage(UserContext uc, String message, String id) {
     Message msg = new Message();
     msg.body = new MessageBodyText(message);
-    msg.header.fromId = HEDVIG_USER_ID;
+    msg.header.fromId = MessageHeader.HEDVIG_USER_ID;
     msg.globalId = null;
     msg.header.messageId = null;
     msg.body.id = null;

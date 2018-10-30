@@ -1,6 +1,6 @@
 package com.hedvig.botService.services;
 
-import static com.hedvig.botService.chat.Conversation.HEDVIG_USER_ID;
+import static com.hedvig.botService.enteties.message.MessageHeader.HEDVIG_USER_ID;
 import static com.hedvig.botService.services.TriggerServiceTest.TOLVANSSON_MEMBERID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;

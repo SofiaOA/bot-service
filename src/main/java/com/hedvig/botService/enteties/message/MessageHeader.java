@@ -1,16 +1,19 @@
 package com.hedvig.botService.enteties.message;
 
+import javax.annotation.Nullable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 import lombok.ToString;
+import lombok.val;
 
 @Entity
 @ToString
 public class MessageHeader {
 
+  public static final long HEDVIG_USER_ID = 1; // The id hedvig uses to chat
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   public Integer messageId;
@@ -23,8 +26,10 @@ public class MessageHeader {
   public String loadingIndicator; // Link to animation to show during load
   public String avatarName; // Link to avatar animation to show over message
   public Long pollingInterval; // Frequency of next request
-
   public String statusMessage = null;
+
+  @Nullable
+  public Boolean richTextChatCompatible = false;
 
   @Transient
   public boolean editAllowed; // For client use to indicate if the last message is editable
@@ -47,6 +52,12 @@ public class MessageHeader {
     this.pollingInterval = 1000L;
     this.loadingIndicator = "loader";
     this.shouldRequestPushNotifications = shouldRequestPushNotifications;
+  }
+
+  public static MessageHeader createRichTextHeader(){
+    val header = new MessageHeader(HEDVIG_USER_ID, -1, true);
+    header.richTextChatCompatible = true;
+    return header;
   }
 
   public MessageHeader() {}

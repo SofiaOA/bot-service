@@ -2,7 +2,9 @@ package com.hedvig.botService.services;
 
 import com.hedvig.botService.services.events.ClaimAudioReceivedEvent;
 import com.hedvig.botService.services.events.ClaimCallMeEvent;
+import com.hedvig.botService.services.events.FileUploadedEvent;
 import com.hedvig.botService.services.events.MemberSignedEvent;
+import com.hedvig.botService.services.events.OnboardingFileUploadedEvent;
 import com.hedvig.botService.services.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.services.events.QuestionAskedEvent;
 import com.hedvig.botService.services.events.RequestObjectInsuranceEvent;
@@ -59,6 +61,14 @@ public class NotificationService {
   }
 
   @EventListener
+  public void on(OnboardingFileUploadedEvent e) {
+    final String message = String.format(
+        "A new file during  is uploaded from onboarding-member %s with type %s. The file key is %s",
+        e.getMemberId(), e.getMimeType(), e.getKey());
+    sendMessageFromMemberNotification(message, "CallMe");
+  }
+
+  @EventListener
   public void on(ClaimAudioReceivedEvent event) {
     final String message = String.format("Ny skadeanmälan ifrån medlem: %s", event.getMemberId());
     sendNewClaimNotification(message, "CallMe");
@@ -68,6 +78,14 @@ public class NotificationService {
   public void on(QuestionAskedEvent event) {
     final String message = String.format("Ny fråga från medlem: %s, \"%s\".", event.getMemberId(),
         event.getQuestion());
+    sendMessageFromMemberNotification(message, "CallMe");
+  }
+
+  @EventListener
+  public void on(FileUploadedEvent e) {
+    final String message =
+        String.format("A new file is uploaded from member %s with type %s. The file key is %s",
+            e.getMemberId(), e.getMimeType(), e.getKey());
     sendMessageFromMemberNotification(message, "CallMe");
   }
 

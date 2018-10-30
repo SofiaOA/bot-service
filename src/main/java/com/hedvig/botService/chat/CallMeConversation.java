@@ -31,7 +31,7 @@ public class CallMeConversation extends Conversation {
     this.eventPublisher = eventPublisher;
     createMessage(
       CALLME_CHAT_START,
-      new MessageHeader(Conversation.HEDVIG_USER_ID, -1, false),
+      new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, false),
       new MessageBodySingleSelect(
         "Hej {NAME}, ska jag ringa dig på {PHONE_NUMBER}?",
         Lists.newArrayList(
@@ -40,19 +40,19 @@ public class CallMeConversation extends Conversation {
 
     createMessage(
       CALLME_CHAT_START_WITHOUT_PHONE,
-      new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
+      new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
       new MessageBodyText("Hej {NAME}, vilket telefonnummer kan jag nå dig på?"));
 
     createMessage(
       CALLME_PHONE_OK,
-      new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
+      new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
       new MessageBodySingleSelect(
         "Ok då ser jag till att någon ringer dig?",
         Lists.newArrayList(SelectLink.toDashboard("Ok", "callme.phone.dashboard"))));
 
     createMessage(
       CALLME_PHONE_CHANGE,
-      new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
+      new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
       new MessageBodyText("Vilket telefonnummer kan jag nå dig på?"));
   }
 
