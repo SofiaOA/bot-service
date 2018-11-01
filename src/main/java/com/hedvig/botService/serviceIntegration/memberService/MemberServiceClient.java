@@ -7,10 +7,6 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignRequ
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.FinalizeOnBoardingRequest;
 import com.hedvig.botService.serviceIntegration.memberService.dto.FinalizeOnBoardingResponse;
-import com.hedvig.botService.serviceIntegration.memberService.dto.SendActivatedRequest;
-import com.hedvig.botService.serviceIntegration.memberService.dto.SendOnboardedActiveTodayRequest;
-import com.hedvig.botService.serviceIntegration.memberService.dto.SendSignupRequest;
-import com.hedvig.botService.serviceIntegration.memberService.dto.SendWaitIsOverRequest;
 import com.hedvig.botService.serviceIntegration.memberService.dto.StartOnboardingWithSSNRequest;
 import com.hedvig.botService.serviceIntegration.memberService.dto.UpdateEmailRequest;
 import com.hedvig.botService.web.dto.Member;
@@ -56,19 +52,6 @@ public interface MemberServiceClient {
   @RequestMapping(value = "/i/member/{memberId}/updateEmail")
   ResponseEntity<String> updateEmail(
       @PathVariable("memberId") String memberId, @RequestBody UpdateEmailRequest request);
-
-  @RequestMapping(value = "/_/mail/sendSignup")
-  ResponseEntity<String> sendSignup(@RequestBody SendSignupRequest request);
-
-  @RequestMapping(value = "/_/mail/sendWaitIsOver")
-  ResponseEntity<String> sendWaitIsOver(@RequestBody SendWaitIsOverRequest request);
-
-  @RequestMapping(value = "/_/mail/sendActivated")
-  ResponseEntity<String> sendActivated(@RequestBody SendActivatedRequest request);
-
-  @RequestMapping(value = "/_/mail/sendOnboardedActiveToday")
-  ResponseEntity<String> sendOnboardedActiveToday(
-      @RequestBody SendOnboardedActiveTodayRequest request);
 
   @RequestMapping(value = "/cashback", method = RequestMethod.POST)
   ResponseEntity<String> selectCashback(

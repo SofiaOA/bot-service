@@ -8,8 +8,6 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectR
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignRequest;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.FinalizeOnBoardingRequest;
-import com.hedvig.botService.serviceIntegration.memberService.dto.SendOnboardedActiveTodayRequest;
-import com.hedvig.botService.serviceIntegration.memberService.dto.SendSignupRequest;
 import com.hedvig.botService.serviceIntegration.memberService.dto.StartOnboardingWithSSNRequest;
 import com.hedvig.botService.serviceIntegration.memberService.dto.UpdateEmailRequest;
 import com.hedvig.botService.web.dto.Member;
@@ -101,11 +99,6 @@ public class MemberServiceFeign implements MemberService {
   }
 
   @Override
-  public MemberProfile convertToFakeUser(String memberId) {
-    throw new RuntimeException("Cannot create fake user in live environment!");
-  }
-
-  @Override
   public MemberProfile getProfile(String memberId) {
 
     final Member profile = this.client.profile(memberId).getBody();
@@ -135,21 +128,6 @@ public class MemberServiceFeign implements MemberService {
   @Override
   public void startOnBoardingWithSSN(String memberId, String ssn) {
     this.client.startOnBoardingWithSSN(memberId, new StartOnboardingWithSSNRequest(ssn));
-  }
-
-  @Override
-  public void sendSignupMail(String email, UUID uuid) {
-    final Long requestId = Math.round(Math.random() * 1000);
-    final SendSignupRequest sendSignupRequest =
-        new SendSignupRequest(uuid, email, requestId.toString());
-    this.client.sendSignup(sendSignupRequest);
-  }
-
-  @Override
-  public void sendOnboardedActiveToday(String email, String name) {
-    send(
-        () ->
-            this.client.sendOnboardedActiveToday(new SendOnboardedActiveTodayRequest(name, email)));
   }
 
   @Override

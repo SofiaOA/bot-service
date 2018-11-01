@@ -95,48 +95,4 @@ public class TrustlyConversationTest {
 
     assertThat(userContext.getMemberChat().chatHistory.size()).isEqualTo(1);
   }
-
-  @Test
-  public void onWindowClose_shouldNotSendEmail_whenTrustlyForcedStart_isTrue() {
-
-    userContext.putUserData(UserContext.TRUSTLY_TRIGGER_ID, TRIGGER_UUID.toString());
-    userContext.putUserData(TRUSTLY_FORCED_START, "true");
-
-    given(this.triggerService.getTrustlyOrderInformation(TRIGGER_UUID.toString()))
-        .willReturn(TriggerStatus.SUCCESS);
-
-    testConversation.windowClosed(userContext);
-
-    then(memberService).should(times(0)).sendOnboardedActiveToday(any(), any());
-  }
-
-  @Test
-  public void
-      onWindowClose_shouldNotSendEmail_whenTrustlyForcedStartIsFalseAndCurrentInsurerIsSet() {
-
-    userContext.putUserData(UserContext.TRUSTLY_TRIGGER_ID, TRIGGER_UUID.toString());
-    userContext.putUserData(TRUSTLY_FORCED_START, "false");
-    userContext.getOnBoardingData().setCurrentInsurer("OtherInsurer");
-
-    given(this.triggerService.getTrustlyOrderInformation(TRIGGER_UUID.toString()))
-        .willReturn(TriggerStatus.SUCCESS);
-
-    testConversation.windowClosed(userContext);
-
-    then(memberService).should(times(0)).sendOnboardedActiveToday(any(), any());
-  }
-
-  @Test
-  public void onWindowClose_shouldSendEmail_whenTrustlyForcedStartIsFalseAndCurrentInsurerIsNull() {
-
-    userContext.putUserData(UserContext.TRUSTLY_TRIGGER_ID, TRIGGER_UUID.toString());
-    userContext.putUserData(TRUSTLY_FORCED_START, "false");
-
-    given(this.triggerService.getTrustlyOrderInformation(TRIGGER_UUID.toString()))
-        .willReturn(TriggerStatus.SUCCESS);
-
-    testConversation.windowClosed(userContext);
-
-    then(memberService).should(times(1)).sendOnboardedActiveToday(any(), any());
-  }
 }

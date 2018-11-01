@@ -20,15 +20,9 @@ public interface MemberService {
 
   BankIdCollectResponse collect(String referenceToken, String memberId);
 
-  MemberProfile convertToFakeUser(String memberId);
-
   MemberProfile getProfile(String hid);
 
   void startOnBoardingWithSSN(String memberId, String ssn);
-
-  void sendSignupMail(String email, UUID uuid);
-
-  void sendOnboardedActiveToday(String email, String name);
 
   void selectCashback(String memberId, UUID charityId);
 
