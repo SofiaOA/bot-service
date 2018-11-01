@@ -117,20 +117,6 @@ public class TrustlyConversation extends Conversation {
   private void endConversation(UserContext userContext) {
     userContext.completeConversation(this);
     userContext.putUserData(FORCE_TRUSTLY_CHOICE, "false");
-    if (!Objects.equals("true", userContext.getDataEntry(UserContext.TRUSTLY_FORCED_START))) {
-      sendOnboardingCompleteEmail(userContext);
-    }
-  }
-
-  private void sendOnboardingCompleteEmail(UserContext userContext) {
-    final UserData onBoardingData = userContext.getOnBoardingData();
-    final String name = onBoardingData.getFirstName() + " " + onBoardingData.getFamilyName();
-    final String email = onBoardingData.getEmail();
-    final String currentInsurer = onBoardingData.getCurrentInsurer();
-
-    if (currentInsurer == null) {
-      memberService.sendOnboardedActiveToday(email, name);
-    }
   }
 
   @Override
