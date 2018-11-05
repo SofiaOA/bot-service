@@ -29,6 +29,7 @@ import com.hedvig.botService.web.dto.UpdateUserContextDTO;
 import java.util.List;
 import java.util.Objects;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,6 +107,14 @@ public class SessionManager {
             .orElseThrow(
                 () -> new ResourceNotFoundException("Could not find usercontext for user: " + hid));
     return uc.getDataEntry("PUSH-TOKEN");
+  }
+
+  public void enableTrustlyButtonForMember(@NotNull String memberId) {
+    val uc = userContextRepository.findByMemberId(memberId).orElseThrow(
+      () -> new ResourceNotFoundException("Could not find usercontext for user: " + memberId));
+
+    uc.putUserData(UserContext.FORCE_TRUSTLY_CHOICE, "true");
+    userContextRepository.save(uc);
   }
 
   public void receiveEvent(String eventType, String value, String hid) {

@@ -39,13 +39,19 @@ public class InternalUserDataController {
     return new ResponseEntity<String>(token, HttpStatus.OK);
   }
 
+  @PostMapping(value = "{memberId}/enableTrustlyButton")
+  ResponseEntity<?> enableTrustlyButton(@PathVariable String memberId) {
+    log.info("Enabling trustly button");
+    sessionManager.enableTrustlyButtonForMember(memberId);
+    return ResponseEntity.accepted().build();
+  }
+
   @PostMapping(value = "{memberId}/initSessionWebOnBoarding", consumes = "application/json")
-  ResponseEntity<?> updateMemberContext(@PathVariable(name = "memberId") String memberId, @RequestBody @Valid
-    UpdateUserContextDTO req) {
+  ResponseEntity<?> updateMemberContext(@PathVariable(name = "memberId") String memberId,
+    @RequestBody @Valid
+      UpdateUserContextDTO req) {
     log.info("Update user context request for member {} with request {}", memberId, req);
-
     sessionManager.init_web_onboarding(memberId, req);
-
     return ResponseEntity.noContent().build();
   }
 }
