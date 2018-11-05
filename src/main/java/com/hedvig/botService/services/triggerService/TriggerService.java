@@ -6,13 +6,12 @@ import com.hedvig.botService.serviceIntegration.paymentService.PaymentService;
 import com.hedvig.botService.serviceIntegration.paymentService.dto.DirectDebitResponse;
 import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderInformation;
 import com.hedvig.botService.serviceIntegration.paymentService.dto.OrderState;
-import com.hedvig.botService.services.exceptions.UnathorizedException;
+import com.hedvig.botService.services.exceptions.UnauthorizedException;
 import com.hedvig.botService.services.triggerService.dto.CreateDirectDebitMandateDTO;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Transactional
 @Service
@@ -61,7 +60,7 @@ public class TriggerService {
 
     final DirectDebitMandateTrigger one = repo.findOne(triggerId);
     if (!one.getMemberId().equals(memberId)) {
-      throw new UnathorizedException("No allowed to access trigger");
+      throw new UnauthorizedException("No allowed to access trigger");
     }
 
     if (one.getUrl() == null) {

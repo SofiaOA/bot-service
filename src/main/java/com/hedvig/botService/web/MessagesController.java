@@ -1,19 +1,32 @@
 package com.hedvig.botService.web;
 
+import static java.lang.Long.valueOf;
+
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.services.SessionManager;
 import com.hedvig.botService.web.dto.AvatarDTO;
 import com.hedvig.botService.web.dto.EventDTO;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class MessagesController {
@@ -81,7 +94,7 @@ public class MessagesController {
 
     log.info("Response received from messageId: " + msg.globalId);
 
-    msg.header.fromId = new Long(hid);
+    msg.header.fromId = valueOf(hid);
 
     // Clear all key information to generate a new entry
     msg.globalId = null;

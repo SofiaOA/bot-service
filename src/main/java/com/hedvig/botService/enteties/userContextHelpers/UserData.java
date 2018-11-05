@@ -32,6 +32,7 @@ public class UserData {
   public static final String FLOOR = "{FLOOR}";
   public static final String STUDENT_POLICY_ELIGIBILITY = "{STUDENT_POLICY_ELIGIBILITY}";
   public static final String TWENTYFIVE_THOUSAND_LIMIT = "{25K_LIMIT}";
+  public static final String PHONE_NUMBER = "{PHONE_NUMBER}";
   private final UserContext ctx;
 
   public UserData(UserContext ctx) {
@@ -40,8 +41,9 @@ public class UserData {
 
   public int getAge() {
     String dateString = ctx.getDataEntry(MEMBER_BIRTH_DATE);
-    if (dateString == null)
+    if (dateString == null) {
       return -1;
+    }
     LocalDate date = LocalDate.parse(dateString);
 
     return date.until(LocalDate.now()).getYears();
@@ -53,8 +55,7 @@ public class UserData {
 
   public LocalDate getBirthDate() {
     String bDate = ctx.getDataEntry(MEMBER_BIRTH_DATE);
-    if (bDate == null)
-      return null;
+    if (bDate == null) return null;
     return LocalDate.parse(bDate); // = birthDate;
   }
 
@@ -82,6 +83,10 @@ public class UserData {
   public String getEmail() {
     return ctx.getDataEntry(EMAIL);
   }
+
+  public String getPhoneNumber(){ return ctx.getDataEntry(PHONE_NUMBER); }
+
+  public void setPhoneNumber(String phoneNumber) { ctx.putUserData(PHONE_NUMBER, phoneNumber); }
 
   public void setFamilyName(String familyName) {
     ctx.putUserData(FAMILY_NAME, familyName);
@@ -276,5 +281,12 @@ public class UserData {
     } catch (Exception e) {
       return false;
     }
+  }
+
+  public void clearAddress() {
+    setAddressZipCode(null);
+    setAddressCity(null);
+    setFloor(0);
+    setAddressStreet(null);
   }
 }

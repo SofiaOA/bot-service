@@ -1,8 +1,7 @@
 package com.hedvig.botService.serviceIntegration.claimsService.dto;
 
-import lombok.Value;
-
 import java.time.LocalDateTime;
+import lombok.Value;
 
 @Value
 public class StartClaimAudioDTO {

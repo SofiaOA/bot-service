@@ -1,10 +1,9 @@
 package com.hedvig.botService.enteties.message;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.hedvig.botService.enteties.UserContext;
+import java.io.Serializable;
 import lombok.ToString;
 
 /*

@@ -2,10 +2,18 @@ package com.hedvig.botService.chat;
 
 import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.*;
-import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodyNumber;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyText;
+import com.hedvig.botService.enteties.message.MessageHeader;
+import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.enteties.message.SelectLink;
+import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.services.events.QuestionAskedEvent;
 import com.hedvig.botService.services.events.RequestPhoneCallEvent;
+import java.util.List;
+import java.util.Objects;
 import lombok.val;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -13,9 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Objects;
 
 @Component
 public class MainConversation extends Conversation {
@@ -35,16 +40,12 @@ public class MainConversation extends Conversation {
 
   private static Logger log = LoggerFactory.getLogger(MainConversation.class);
   private final ConversationFactory conversationFactory;
-  private final ProductPricingService productPricingService;
   private final ApplicationEventPublisher eventPublisher;
 
   @Autowired
   public MainConversation(
-      ProductPricingService productPricingService,
-      ConversationFactory conversationFactory,
-      ApplicationEventPublisher eventPublisher) {
+      ConversationFactory conversationFactory, ApplicationEventPublisher eventPublisher) {
     super();
-    this.productPricingService = productPricingService;
     this.conversationFactory = conversationFactory;
     this.eventPublisher = eventPublisher;
 
@@ -84,7 +85,7 @@ public class MainConversation extends Conversation {
 
     createMessage(
         MESSAGE_MAIN_QUESTION,
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
+        new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
         new MessageBodyText("Självklart, vad kan jag hjälpa dig med?"));
 
     createMessage(MESSAGE_ERROR, new MessageBodyText("Oj nu blev något fel..."));

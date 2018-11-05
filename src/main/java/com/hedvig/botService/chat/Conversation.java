@@ -1,22 +1,32 @@
 package com.hedvig.botService.chat;
 
+import static java.lang.Long.valueOf;
+
 import com.hedvig.botService.dataTypes.HedvigDataType;
 import com.hedvig.botService.dataTypes.TextInput;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.*;
-import lombok.val;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBody;
+import com.hedvig.botService.enteties.message.MessageBodyMultipleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyNumber;
+import com.hedvig.botService.enteties.message.MessageBodyParagraph;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyText;
+import com.hedvig.botService.enteties.message.MessageHeader;
+import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.enteties.message.SelectOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import lombok.val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class Conversation {
 
-  public static final long HEDVIG_USER_ID = 1; // The id hedvig uses to chat
   private Map<String, SelectItemMessageCallback> callbacks = new TreeMap<>();
+  private static final String CHAT_ID_FORMAT = "%s.%s";
 
   public enum conversationStatus {
     INITIATED,
@@ -44,15 +54,40 @@ public abstract class Conversation {
     return m;
   }
 
-  void addRelay(String s1, String s2) {
+  protected void addRelayToChatMessage(String s1, String s2) {
+    String i = findLastChatMessageId(s1);
+
+    relayList.put(i, s2);
+  }
+
+  protected void addRelay(String s1, String s2) {
+
     relayList.put(s1, s2);
+  }
+
+  String findLastChatMessageId(String messageId) {
+    int i = 0;
+    while (messageList.containsKey(String.format(CHAT_ID_FORMAT, messageId, i))) {
+      i++;
+
+      if(i== 100) {
+        val format = String.format("Found 100 ChatMessages messages for %s, this seems strange", messageId);
+        throw new RuntimeException(format);
+      }
+    }
+
+    if(i>0) {
+      return String.format(CHAT_ID_FORMAT, messageId, i-1);
+    }
+
+    return messageId;
   }
 
   String getRelay(String s1) {
     return relayList.get(s1);
   }
 
-  void addToChat(String messageId, UserContext userContext) {
+  protected void addToChat(String messageId, UserContext userContext) {
     addToChat(getMessage(messageId), userContext);
   }
 
@@ -60,7 +95,7 @@ public abstract class Conversation {
 
   public abstract boolean canAcceptAnswerToQuestion(UserContext uc);
 
-  void addToChat(Message m, UserContext userContext) {
+  protected void addToChat(Message m, UserContext userContext) {
     m.render(userContext);
     log.info("Putting message: " + m.id + " content: " + m.body.text);
     userContext.addToHistory(m);
@@ -79,7 +114,7 @@ public abstract class Conversation {
     m.id = id;
     m.header = header;
     m.body = body;
-    m.header.pollingInterval = new Long(delay);
+    m.header.pollingInterval = valueOf(delay);
     messageList.put(m.id, m);
   }
 
@@ -103,33 +138,33 @@ public abstract class Conversation {
   }
 
   void createMessage(String id, MessageBody body, Integer delay) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     createMessage(id, header, body, delay);
   }
 
   void createMessage(
       String id, MessageBody body, Integer delay, SelectItemMessageCallback callback) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     createMessage(id, header, body, delay);
     this.setMessageCallback(id, callback);
   }
 
   void createMessage(String id, MessageBody body, String avatarName, Integer delay) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     header.avatarName = avatarName;
     createMessage(id, header, body, delay);
   }
 
   void createMessage(
       String id, MessageBody body, String avatarName, SelectItemMessageCallback callback) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     header.avatarName = avatarName;
     this.setMessageCallback(id, callback);
     createMessage(id, header, body);
   }
 
   void createMessage(String id, MessageBody body, Image image, Integer delay) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     body.imageURL = image.imageURL;
     body.imageHeight = image.imageHeight;
     body.imageWidth = image.imageWidth;
@@ -139,18 +174,18 @@ public abstract class Conversation {
   // -------------------------
 
   void createMessage(String id, MessageBody body) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     createMessage(id, header, body);
   }
 
   void createMessage(String id, MessageBody body, String avatarName) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     header.avatarName = avatarName;
     createMessage(id, header, body);
   }
 
   void createMessage(String id, MessageBody body, Image image) {
-    MessageHeader header = new MessageHeader(Conversation.HEDVIG_USER_ID, -1); // Default value
+    MessageHeader header = new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1); // Default value
     body.imageURL = image.imageURL;
     body.imageHeight = image.imageHeight;
     body.imageWidth = image.imageWidth;
@@ -234,7 +269,7 @@ public abstract class Conversation {
 
   public abstract void receiveMessage(UserContext userContext, Message m);
 
-  public void completeRequest(String nxtMsg, UserContext userContext) {
+  protected void completeRequest(String nxtMsg, UserContext userContext) {
     if (getMessage(nxtMsg) != null) {
       addToChat(getMessage(nxtMsg), userContext);
     }
@@ -257,15 +292,15 @@ public abstract class Conversation {
    * */
   public void createChatMessage(String id, MessageBody body, String avatar) {
     String[] paragraphs = body.text.split("\f");
-    Integer pId = 0;
-    Integer delayFactor = 25; // Milliseconds per character TODO: Externalize this!
+    int pId = 0;
+    int delayFactor = 25; // Milliseconds per character TODO: Externalize this!
 
     ArrayList<String> msgs = new ArrayList<String>();
 
     for (int i = 0; i < (paragraphs.length - 1); i++) {
       String s = paragraphs[i];
-      String s1 = i == 0 ? id : (id + "." + (pId++).toString());
-      String s2 = id + "." + (pId++).toString();
+      String s1 = i == 0 ? id : String.format(CHAT_ID_FORMAT, id, pId++);
+      String s2 = String.format(CHAT_ID_FORMAT, id, pId++);
       // log.info("Create message of size "+(s.length())+" with load time:" +
       // (s.length()*delayFactor));
       // createMessage(s1, new MessageBodyParagraph(""), "h_symbol",(s.length()*delayFactor));
@@ -282,8 +317,8 @@ public abstract class Conversation {
     }
 
     // The 'actual' message
-    String sWrite = id + "." + (pId++).toString();
-    String sFinal = id + "." + (pId++).toString();
+    String sWrite = String.format(CHAT_ID_FORMAT, id, pId++);
+    String sFinal = String.format(CHAT_ID_FORMAT, id, pId++);
     String s = paragraphs[paragraphs.length - 1]; // Last paragraph is put on actual message
     body.text = s;
     // createMessage(sWrite, new MessageBodyParagraph(""), "h_symbol",(s.length()*delayFactor));
@@ -314,7 +349,7 @@ public abstract class Conversation {
     Message msg = new Message();
     val selectionItems = getSelectItemsForAnswer(uc);
     msg.body = new MessageBodySingleSelect(message, selectionItems);
-    msg.header.fromId = HEDVIG_USER_ID;
+    msg.header.fromId = MessageHeader.HEDVIG_USER_ID;
     msg.globalId = null;
     msg.header.messageId = null;
     msg.body.id = null;

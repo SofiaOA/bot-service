@@ -1,8 +1,7 @@
 package com.hedvig.botService.web.dto;
 
-import lombok.Value;
-
 import java.time.Instant;
+import lombok.Value;
 
 @Value
 public class MemberAuthedEvent {

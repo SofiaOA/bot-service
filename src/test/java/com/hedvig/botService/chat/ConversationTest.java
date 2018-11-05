@@ -1,18 +1,25 @@
 package com.hedvig.botService.chat;
 
-import com.hedvig.botService.enteties.MemberChat;
-import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.*;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.*;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import static com.hedvig.botService.testHelpers.MessageHelpers.createSingleSelectMessage;
 import static com.hedvig.botService.testHelpers.MessageHelpers.createTextMessage;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.then;
+
+import com.hedvig.botService.enteties.MemberChat;
+import com.hedvig.botService.enteties.UserContext;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBody;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.SelectLink;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConversationTest {

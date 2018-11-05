@@ -1,16 +1,23 @@
 package com.hedvig.botService.enteties;
 
-import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageHeader;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MapKey;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import lombok.Getter;
 import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.persistence.*;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 /*
  * All timestamp information is set from here
@@ -64,7 +71,7 @@ public class MemberChat {
      * */
     boolean hasUserInput = false;
     for (Message m : chatHistory) {
-      if (!m.deleted && m.header.fromId != Conversation.HEDVIG_USER_ID) {
+      if (!m.deleted && m.header.fromId != MessageHeader.HEDVIG_USER_ID) {
         hasUserInput = true;
         break;
       }
@@ -75,7 +82,7 @@ public class MemberChat {
 
     for (Message m : chatHistory) {
       m.deleted = true;
-      if (!(m.header.fromId == Conversation.HEDVIG_USER_ID)) {
+      if (!(m.header.fromId == MessageHeader.HEDVIG_USER_ID)) {
         break;
       }
     }
@@ -90,7 +97,7 @@ public class MemberChat {
      * */
     boolean hasUserInput = false;
     for (Message m : chatHistory) {
-      if (!m.deleted && m.header.fromId != Conversation.HEDVIG_USER_ID) {
+      if (!m.deleted && m.header.fromId != MessageHeader.HEDVIG_USER_ID) {
         hasUserInput = true;
         m.header.editAllowed = false;
       }
@@ -98,7 +105,7 @@ public class MemberChat {
     if (!hasUserInput) return;
 
     for (Message m : chatHistory) {
-      if (!(m.header.fromId == Conversation.HEDVIG_USER_ID)) {
+      if (!(m.header.fromId == MessageHeader.HEDVIG_USER_ID)) {
         m.header.editAllowed = true;
         break;
       }

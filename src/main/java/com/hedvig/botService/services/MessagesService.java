@@ -13,8 +13,6 @@ import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.web.v2.dto.FABAction;
 import com.hedvig.botService.web.v2.dto.MessagesDTO;
 import lombok.val;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class MessagesService {
   public static final String triggerUrl = "/v2/app/fabTrigger/%s";
 
-  private static final Logger log = LoggerFactory.getLogger(MessagesService.class);
   private final UserContextRepository userContextRepository;
   private final ConversationFactory conversationFactory;
   private final ClaimsService claimsService;
@@ -46,7 +43,7 @@ public class MessagesService {
 
     val messages = uc.getMessages(intent, conversationFactory);
 
-    Boolean hasClaim = this.claimsService.getActiveClaims(hid) > 0;
+    boolean hasClaim = this.claimsService.getActiveClaims(hid) > 0;
 
     val options =
         Lists.newArrayList(

@@ -1,10 +1,14 @@
 package com.hedvig.botService.testHelpers;
 
-import com.hedvig.botService.enteties.message.*;
-
-import java.util.Arrays;
-
 import static com.hedvig.botService.chat.ConversationTest.TESTMESSAGE_ID;
+
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBody;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyText;
+import com.hedvig.botService.enteties.message.MessageHeader;
+import com.hedvig.botService.enteties.message.SelectItem;
+import java.util.Arrays;
 
 public class MessageHelpers {
 

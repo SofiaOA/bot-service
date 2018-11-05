@@ -1,5 +1,10 @@
 package com.hedvig.botService.services;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.hedvig.botService.chat.BankIdChat;
 import com.hedvig.botService.enteties.BankIdSessionImpl;
 import com.hedvig.botService.enteties.UserContext;
@@ -12,6 +17,10 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectR
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdProgressStatus;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdStatusType;
 import feign.FeignException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Optional;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,14 +28,6 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestClientException;
-
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 public class CollectServiceTests {

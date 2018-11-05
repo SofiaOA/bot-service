@@ -1,5 +1,12 @@
 package com.hedvig.botService.services;
 
+import static com.hedvig.botService.enteties.message.MessageHeader.HEDVIG_USER_ID;
+import static com.hedvig.botService.services.TriggerServiceTest.TOLVANSSON_MEMBERID;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -19,6 +26,8 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResp
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdStatusType;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.web.dto.AddMessageRequestDTO;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,21 +36,12 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Optional;
-import java.util.UUID;
-
-import static com.hedvig.botService.chat.Conversation.HEDVIG_USER_ID;
-import static com.hedvig.botService.services.TriggerServiceTest.TOLVANSSON_MEMBERID;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
-
 @RunWith(MockitoJUnitRunner.class)
 public class SessionManagerTest {
 
   public static final String MESSAGE = "Heh hej";
   public static final SelectLink SELECT_LINK = SelectLink.toOffer("Offer", "offer");
+  public static final String TOLVANSSON_FCM_TOKEN = "test-token";
   @Mock UserContextRepository userContextRepository;
 
   @Mock MemberService memberService;
@@ -137,7 +137,8 @@ public class SessionManagerTest {
     val messages = sessionManager.getAllMessages(TOLVANSSON_MEMBERID, null);
 
     assertThat(Iterables.getLast(messages))
-        .hasFieldOrPropertyWithValue("id", "message.onboardingstart");
+        .hasFieldOrPropertyWithValue(
+            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
     assertThat(tolvanssonUserContext.getActiveConversation().get()).isNotNull();
   }
 

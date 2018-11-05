@@ -41,7 +41,7 @@ public class TrustlyConversationTest {
   public void setup() {
     userContext = new UserContext(TOLVANSSON_MEMBER_ID);
 
-    testConversation = new TrustlyConversation(triggerService, factory, memberService);
+    testConversation = new TrustlyConversation(triggerService, memberService);
   }
 
   public void addTolvansonToUserContext() {
@@ -94,20 +94,5 @@ public class TrustlyConversationTest {
     testConversation.receiveMessage(userContext, message);
 
     assertThat(userContext.getMemberChat().chatHistory.size()).isEqualTo(1);
-  }
-
-  @Test
-  public void onWindowClose_shouldNotSendEmail_whenTrustlyForcedStart_isTrue() {
-
-    userContext.putUserData(UserContext.TRUSTLY_TRIGGER_ID, TRIGGER_UUID.toString());
-    userContext.putUserData(TRUSTLY_FORCED_START, "true");
-
-    given(this.triggerService.getTrustlyOrderInformation(TRIGGER_UUID.toString()))
-        .willReturn(TriggerStatus.SUCCESS);
-
-    testConversation.windowClosed(userContext);
-
-    then(memberService).should(times(0)).sendOnboardedActiveToday(any(), any());
-    then(memberService).should(times(0)).sendOnboardedActiveLater(any(), any(), any());
   }
 }

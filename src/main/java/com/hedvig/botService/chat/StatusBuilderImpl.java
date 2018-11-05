@@ -1,8 +1,11 @@
 package com.hedvig.botService.chat;
 
+import java.time.Clock;
+import java.time.DayOfWeek;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import org.springframework.stereotype.Component;
-
-import java.time.*;
 
 /*
 *Måndag-Torsdag*

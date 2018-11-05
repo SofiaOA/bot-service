@@ -7,13 +7,13 @@ import com.hedvig.botService.enteties.DirectDebitMandateTrigger;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageHeader;
 import com.hedvig.botService.enteties.message.SelectItem;
 import com.hedvig.botService.enteties.message.SelectItemTrustly;
 import com.hedvig.botService.enteties.message.SelectLink;
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.services.triggerService.TriggerService;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -28,8 +28,7 @@ public class TrustlyConversation extends Conversation {
   private final TriggerService triggerService;
   private final MemberService memberService;
 
-  public TrustlyConversation(
-      TriggerService triggerService, ConversationFactory factory, MemberService memberService) {
+  public TrustlyConversation(TriggerService triggerService, MemberService memberService) {
     super();
     this.triggerService = triggerService;
     this.memberService = memberService;
@@ -38,52 +37,34 @@ public class TrustlyConversation extends Conversation {
         START,
         new MessageBodySingleSelect(
             "Fantastiskt! Nu är allt klart, jag ska bara sätta upp din betalning \fDet ska vara smidigt såklart, så jag använder digitalt autogiro genom Trustly\fInga pengar dras såklart förrän försäkringen börjar gälla!",
-            new ArrayList<SelectItem>() {
-              {
-                add(new SelectItemTrustly("Välj bankkonto", "trustly.noop"));
-              }
-            }));
+            Lists.newArrayList(new SelectItemTrustly("Välj bankkonto", "trustly.noop"))));
 
     createChatMessage(
         FORCED_START,
         new MessageBodySingleSelect(
             "Då är det dags att sätta upp din betalning \fDet ska vara smidigt såklart, så jag använder digitalt autogiro genom Trustly\fInga pengar dras såklart förrän försäkringen börjar gälla!",
-            new ArrayList<SelectItem>() {
-              {
-                add(new SelectItemTrustly("Välj bankkonto", "trustly.noop"));
-              }
-            }));
+            Lists.newArrayList(new SelectItemTrustly("Välj bankkonto", "trustly.noop"))));
 
     createChatMessage(
         TRUSTLY_POLL,
         new MessageBodySingleSelect(
             "Om du hellre vill så kan vi vänta med att sätta upp betalningen!\fDå hör jag av mig till dig lite innan din försäkring aktiveras",
-            new ArrayList<SelectItem>() {
-              {
-                add(new SelectItemTrustly("Vi gör klart det nu", "trustly.noop"));
-                add(SelectLink.toDashboard("Vi gör det senare, ta mig till appen!", "end"));
-              }
-            }));
+            Lists.newArrayList(
+                new SelectItemTrustly("Vi gör klart det nu", "trustly.noop"),
+                SelectLink.toDashboard("Vi gör det senare, ta mig till appen!", "end"))));
 
     createMessage(
         CANCEL,
         new MessageBodySingleSelect(
             "Oj, nu verkar det som att något gick lite fel med betalningsregistreringen. Vi testar igen!",
-            new ArrayList<SelectItem>() {
-              {
-                add(new SelectItemTrustly("Välj bankkonto", "trustly.noop"));
-              }
-            }));
+            Lists.newArrayList(new SelectItemTrustly("Välj bankkonto", "trustly.noop"))));
 
     createMessage(
         COMPLETE,
         new MessageBodySingleSelect(
             "Tack! Dags att börja utforska appen!",
-            new ArrayList<SelectItem>() {
-              {
-                add(new SelectLink("Sätt igång", "end", "Dashboard", null, null, false));
-              }
-            }));
+            Lists.newArrayList(
+                new SelectLink("Sätt igång", "end", "Dashboard", null, null, false))));
   }
 
   @Override
@@ -136,22 +117,6 @@ public class TrustlyConversation extends Conversation {
   private void endConversation(UserContext userContext) {
     userContext.completeConversation(this);
     userContext.putUserData(FORCE_TRUSTLY_CHOICE, "false");
-    if (!Objects.equals("true", userContext.getDataEntry(UserContext.TRUSTLY_FORCED_START))) {
-      sendOnboardingCompleteEmail(userContext);
-    }
-  }
-
-  private void sendOnboardingCompleteEmail(UserContext userContext) {
-    final UserData onBoardingData = userContext.getOnBoardingData();
-    final String name = onBoardingData.getFirstName() + " " + onBoardingData.getFamilyName();
-    final String email = onBoardingData.getEmail();
-    final String currentInsurer = onBoardingData.getCurrentInsurer();
-
-    if (currentInsurer != null) {
-      memberService.sendOnboardedActiveLater(email, name, userContext.getMemberId());
-    } else {
-      memberService.sendOnboardedActiveToday(email, name);
-    }
   }
 
   @Override
@@ -194,9 +159,9 @@ public class TrustlyConversation extends Conversation {
   }
 
   @Override
-  void addToChat(Message m, UserContext userContext) {
+  protected void addToChat(Message m, UserContext userContext) {
     if ((m.id.equals(START) || m.id.equals(CANCEL) || m.id.equals(FORCED_START))
-        && m.header.fromId == HEDVIG_USER_ID) {
+        && m.header.fromId == MessageHeader.HEDVIG_USER_ID) {
       final UserData userData = userContext.getOnBoardingData();
       UUID triggerUUID =
           triggerService.createTrustlyDirectDebitMandate(

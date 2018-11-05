@@ -1,17 +1,24 @@
 package com.hedvig.botService.serviceIntegration.memberService;
 
 import com.hedvig.botService.enteties.userContextHelpers.UserData;
-import com.hedvig.botService.serviceIntegration.memberService.dto.*;
+import com.hedvig.botService.serviceIntegration.memberService.dto.Address;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthRequest;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignRequest;
+import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
+import com.hedvig.botService.serviceIntegration.memberService.dto.FinalizeOnBoardingRequest;
+import com.hedvig.botService.serviceIntegration.memberService.dto.StartOnboardingWithSSNRequest;
+import com.hedvig.botService.serviceIntegration.memberService.dto.UpdateEmailRequest;
 import com.hedvig.botService.web.dto.Member;
 import feign.FeignException;
+import java.util.Optional;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
-
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class MemberServiceFeign implements MemberService {
@@ -69,6 +76,7 @@ public class MemberServiceFeign implements MemberService {
     req.setMemberId(memberId);
     req.setSsn(data.getSSN());
     req.setEmail(data.getEmail());
+    req.setPhoneNumber(data.getPhoneNumber());
 
     Address address = new Address();
     address.setStreet(data.getAddressStreet());
@@ -88,11 +96,6 @@ public class MemberServiceFeign implements MemberService {
 
     ResponseEntity<BankIdCollectResponse> collect = this.client.collect(memberId, referenceToken);
     return collect.getBody();
-  }
-
-  @Override
-  public MemberProfile convertToFakeUser(String memberId) {
-    throw new RuntimeException("Cannot create fake user in live environment!");
   }
 
   @Override
@@ -125,29 +128,6 @@ public class MemberServiceFeign implements MemberService {
   @Override
   public void startOnBoardingWithSSN(String memberId, String ssn) {
     this.client.startOnBoardingWithSSN(memberId, new StartOnboardingWithSSNRequest(ssn));
-  }
-
-  @Override
-  public void sendSignupMail(String email, UUID uuid) {
-    final Long requestId = Math.round(Math.random() * 1000);
-    final SendSignupRequest sendSignupRequest =
-        new SendSignupRequest(uuid, email, requestId.toString());
-    this.client.sendSignup(sendSignupRequest);
-  }
-
-  @Override
-  public void sendOnboardedActiveLater(String email, String name, String memberId) {
-    send(
-        () ->
-            this.client.sendOnboardedActiveLater(
-                new SendOnboardedActiveLaterRequest(email, name, memberId)));
-  }
-
-  @Override
-  public void sendOnboardedActiveToday(String email, String name) {
-    send(
-        () ->
-            this.client.sendOnboardedActiveToday(new SendOnboardedActiveTodayRequest(name, email)));
   }
 
   @Override

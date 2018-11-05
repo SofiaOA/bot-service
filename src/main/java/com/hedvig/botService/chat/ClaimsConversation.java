@@ -2,20 +2,28 @@ package com.hedvig.botService.chat;
 
 import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.*;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodyAudio;
+import com.hedvig.botService.enteties.message.MessageBodyNumber;
+import com.hedvig.botService.enteties.message.MessageBodyParagraph;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyText;
+import com.hedvig.botService.enteties.message.MessageHeader;
+import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.enteties.message.SelectLink;
+import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.services.events.ClaimAudioReceivedEvent;
 import com.hedvig.botService.services.events.ClaimCallMeEvent;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class ClaimsConversation extends Conversation {
@@ -156,7 +164,7 @@ public class ClaimsConversation extends Conversation {
 
     createMessage(
         "message.claims.record.ok3",
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
+        new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
         new MessageBodyText(
             "Tack för att du delat med dig om det som hänt. Ta hand om dig så länge, så hörs vi snart!"));
 
@@ -166,7 +174,7 @@ public class ClaimsConversation extends Conversation {
   public void init(UserContext userContext, String startMessage) {
     log.info("Starting claims conversation for user: " + userContext.getMemberId());
     Message m = getMessage(startMessage);
-    m.header.fromId = HEDVIG_USER_ID; // new Long(userContext.getMemberId());
+    m.header.fromId = MessageHeader.HEDVIG_USER_ID; // new Long(userContext.getMemberId());
     addToChat(m, userContext);
     startConversation(userContext, startMessage); // Id of first message
   }

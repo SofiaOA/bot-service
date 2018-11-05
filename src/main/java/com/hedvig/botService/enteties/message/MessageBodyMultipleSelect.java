@@ -1,12 +1,11 @@
 package com.hedvig.botService.enteties.message;
 
-import lombok.ToString;
-
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import lombok.ToString;
 
 @Entity
 @DiscriminatorValue("multipleChoice")

@@ -2,6 +2,7 @@ package com.hedvig.botService.enteties;
 
 import static com.hedvig.botService.chat.OnboardingConversationDevi.IN_OFFER;
 
+import com.google.common.collect.ImmutableMap;
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.ConversationFactory;
 import com.hedvig.botService.chat.OnboardingConversationDevi;
@@ -11,6 +12,7 @@ import com.hedvig.botService.serviceIntegration.memberService.MemberProfile;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
 import com.hedvig.botService.services.SessionManager;
+import com.hedvig.botService.web.dto.UpdateUserContextDTO;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashMap;
@@ -56,31 +58,30 @@ public class UserContext implements Serializable {
   public static final String TRUSTLY_FORCED_START = "{TRUSTLY_FORCED_START}";
 
   private static Logger log = LoggerFactory.getLogger(UserContext.class);
-  private static HashMap<String, String> requiredData =
-      new HashMap<String, String>() {
-        {
-          put("{ADDRESS}", "T.ex har jag vet jag inte var du bor. Vad har du för gatuadress?");
-          put("{ADDRESS_ZIP}", "T.ex har jag inte ditt postnummer?");
-          // put("{EMAIL}"); Email is not required to get a quote
+  private static Map<String, String> requiredData =
+      new ImmutableMap.Builder<String, String>()
+          .put("{ADDRESS}", "T.ex har jag vet jag inte var du bor. Vad har du för gatuadress?")
+          .put("{ADDRESS_ZIP}", "T.ex har jag inte ditt postnummer?")
+          .
+          // ("{EMAIL}"), Email is not required to get a quote
+
           put(
               "{FAMILY_NAME}",
               "T.ex vet jag inte vad heter i efternamn... "
                   + OnboardingConversationDevi.emoji_flushed_face
-                  + " ?");
-          put("{HOUSE}", "T.ex vet jag inte om du bor i hus eller lägenhet?");
-          put("{KVM}", "T.ex vet jag inte hur stor din bostad är?");
-          put("{SSN}", "T.ex har jag inte ditt personnummer?");
-          put(
+                  + " ?")
+          .put("{HOUSE}", "T.ex vet jag inte om du bor i hus eller lägenhet?")
+          .put("{KVM}", "T.ex vet jag inte hur stor din bostad är?")
+          .put("{SSN}", "T.ex har jag inte ditt personnummer?")
+          .put(
               "{NAME}",
               "T.ex vet jag inte vad heter... "
                   + OnboardingConversationDevi.emoji_flushed_face
-                  + " ?");
-          put("{NR_PERSONS}", "Tex. hur många är ni i hushållet");
-          put(
-              "{SECURE_ITEMS_NO}",
-              "T.ex skulle jag behöver veta hur många säkerhetsgrejer du har?");
-        }
-      };
+                  + " ?")
+          .put("{NR_PERSONS}", "Tex. hur många är ni i hushållet")
+          .put(
+              "{SECURE_ITEMS_NO}", "T.ex skulle jag behöver veta hur många säkerhetsgrejer du har?")
+          .build();
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -241,6 +242,24 @@ public class UserContext implements Serializable {
     this.putUserData("{REFERENCE_TOKEN}", referenceToken);
   }
 
+  public void updateUserContextWebOnboarding(UpdateUserContextDTO context){
+    UserData ud = getOnBoardingData();
+
+    ud.setSSN(context.getPersonalNumber());
+
+    ud.setFirstName(context.getFirstName());
+    ud.setFamilyName(context.getLastName());
+
+    ud.setEmail(context.getEmail());
+    ud.setPhoneNumber(context.getPhoneNumber());
+
+    ud.setAddressStreet(context.getStreet());
+    ud.setAddressCity(context.getCity());
+    ud.setAddressZipCode(context.getZipCode());
+
+    ud.setUserHasSigned(context.isHasSigned());
+  }
+
   public void fillMemberData(MemberProfile member) {
     UserData obd = getOnBoardingData();
     obd.setBirthDate(member.getBirthDate());
@@ -302,7 +321,7 @@ public class UserContext implements Serializable {
       if (intent == SessionManager.Intent.LOGIN) {
         initChat(OnboardingConversationDevi.MESSAGE_START_LOGIN, conversationFactory);
       } else {
-        initChat(OnboardingConversationDevi.MESSAGE_WAITLIST_START, conversationFactory);
+        initChat(OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT, conversationFactory);
       }
     }
 

@@ -1,10 +1,8 @@
 package com.hedvig.botService.enteties.message;
 
 import java.time.LocalDateTime;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-
 import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

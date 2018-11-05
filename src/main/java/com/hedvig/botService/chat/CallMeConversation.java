@@ -2,46 +2,58 @@ package com.hedvig.botService.chat;
 
 import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.*;
+import com.hedvig.botService.enteties.message.Message;
+import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
+import com.hedvig.botService.enteties.message.MessageBodyText;
+import com.hedvig.botService.enteties.message.MessageHeader;
+import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.enteties.message.SelectLink;
+import com.hedvig.botService.enteties.message.SelectOption;
 import com.hedvig.botService.services.events.RequestPhoneCallEvent;
-import lombok.val;
-import org.springframework.context.ApplicationEventPublisher;
 import java.util.List;
 import java.util.Objects;
+import lombok.val;
+import org.springframework.context.ApplicationEventPublisher;
 
 public class CallMeConversation extends Conversation {
 
-  private static final String CALLME_CHAT_START = "callme.chat.start";
+  public static final String CALLME_CHAT_START = "callme.chat.start";
+  public static final String CALLME_CHAT_START_WITHOUT_PHONE = "callme.chat.start.without.phone";
   private static final String CALLME_CHAT_MESSAGE = "callme.chat.message";
   public static final String CALLME_PHONE_OK = "callme.phone.ok";
   public static final String CALLME_PHONE_CHANGE = "callme.phone.change";
+  public static final String PHONE_NUMBER = "{PHONE_NUMBER}";
 
-  private final StatusBuilder statusBuilder;
   private final ApplicationEventPublisher eventPublisher;
 
-  public CallMeConversation(StatusBuilder statusBuilder, ApplicationEventPublisher eventPublisher) {
-    this.statusBuilder = statusBuilder;
+  public CallMeConversation(ApplicationEventPublisher eventPublisher) {
+
     this.eventPublisher = eventPublisher;
     createMessage(
-        CALLME_CHAT_START,
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, false),
-        new MessageBodySingleSelect(
-            "Hej {NAME}, ska jag ringa dig på {PHONE_NUMBER}?",
-            Lists.newArrayList(
-                new SelectOption("Ja", CALLME_PHONE_OK),
-                new SelectOption("Nej", CALLME_PHONE_CHANGE))));
+      CALLME_CHAT_START,
+      new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, false),
+      new MessageBodySingleSelect(
+        "Hej {NAME}, ska jag ringa dig på {PHONE_NUMBER}?",
+        Lists.newArrayList(
+          new SelectOption("Ja", CALLME_PHONE_OK),
+          new SelectOption("Nej", CALLME_PHONE_CHANGE))));
 
     createMessage(
-        CALLME_PHONE_OK,
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
-        new MessageBodySingleSelect(
-            "Ok då ser jag till att någon ringer dig?",
-            Lists.newArrayList(SelectLink.toDashboard("Ok", "callme.phone.dashboard"))));
+      CALLME_CHAT_START_WITHOUT_PHONE,
+      new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
+      new MessageBodyText("Hej {NAME}, vilket telefonnummer kan jag nå dig på?"));
 
     createMessage(
-        CALLME_PHONE_CHANGE,
-        new MessageHeader(Conversation.HEDVIG_USER_ID, -1, true),
-        new MessageBodyText("Vilket telefonnummer kan jag nå dig på?"));
+      CALLME_PHONE_OK,
+      new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
+      new MessageBodySingleSelect(
+        "Ok då ser jag till att någon ringer dig?",
+        Lists.newArrayList(SelectLink.toDashboard("Ok", "callme.phone.dashboard"))));
+
+    createMessage(
+      CALLME_PHONE_CHANGE,
+      new MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
+      new MessageBodyText("Vilket telefonnummer kan jag nå dig på?"));
   }
 
   @Override
@@ -60,24 +72,23 @@ public class CallMeConversation extends Conversation {
 
     switch (m.getBaseMessageId()) {
       case CALLME_PHONE_CHANGE:
-        {
-          String trimmedText = m.body.text.trim();
-          // userContext.putUserData("{PHONE_NUMBER}", trimmedText);
-          m.body.text = "Ni kan nå mig på telefonnummer " + trimmedText;
-          addToChat(m, userContext);
+      case CALLME_CHAT_START_WITHOUT_PHONE: {
+        String trimmedText = m.body.text.trim();
+        userContext.putUserData("{PHONE_NUMBER}", trimmedText);
+        m.body.text = "Ni kan nå mig på telefonnummer " + trimmedText;
+        addToChat(m, userContext);
 
+        endConversation(userContext, m);
+        nxtMsg = CALLME_PHONE_OK;
+        break;
+      }
+      case CALLME_CHAT_START: {
+        val messageBody = (MessageBodySingleSelect) m.body;
+        val selectedItem = messageBody.getSelectedItem();
+        if (Objects.equals(selectedItem.value, CALLME_PHONE_OK)) {
           endConversation(userContext, m);
-          nxtMsg = CALLME_PHONE_OK;
-          break;
         }
-      case CALLME_CHAT_START:
-        {
-          val messageBody = (MessageBodySingleSelect) m.body;
-          val selectedItem = messageBody.getSelectedItem();
-          if (Objects.equals(selectedItem.value, CALLME_PHONE_OK)) {
-            endConversation(userContext, m);
-          }
-        }
+      }
     }
 
     /*
@@ -101,17 +112,23 @@ public class CallMeConversation extends Conversation {
 
   private void endConversation(UserContext userContext, Message m) {
     eventPublisher.publishEvent(
-        new RequestPhoneCallEvent(
-            userContext.getMemberId(),
-            m.body.text,
-            userContext.getOnBoardingData().getFirstName(),
-            userContext.getOnBoardingData().getFamilyName()));
+      new RequestPhoneCallEvent(
+        userContext.getMemberId(),
+        m.body.text,
+        userContext.getOnBoardingData().getFirstName(),
+        userContext.getOnBoardingData().getFamilyName()));
     userContext.completeConversation(this);
   }
 
   @Override
   public void init(UserContext userContext) {
-    startConversation(userContext, CALLME_CHAT_START); // Id of first message
+    String phoneNumberKey = userContext.getDataEntry(PHONE_NUMBER);
+
+    if (phoneNumberKey == null || phoneNumberKey.trim().isEmpty()) {
+      startConversation(userContext, CALLME_CHAT_START_WITHOUT_PHONE);
+    } else {
+      startConversation(userContext, CALLME_CHAT_START); // Id of first message
+    }
   }
 
   @Override

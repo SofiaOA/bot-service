@@ -3,7 +3,6 @@ package com.hedvig.botService.serviceIntegration.productPricing;
 import com.hedvig.botService.serviceIntegration.productPricing.dto.CalculateQuoteRequest;
 import com.hedvig.botService.serviceIntegration.productPricing.dto.ContractSignedRequest;
 import com.hedvig.botService.serviceIntegration.productPricing.dto.Created;
-
 import feign.Headers;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Headers("Accept: application/xml")
-@FeignClient(name = "productPricingClient", url = "${hedvig.product-pricing.url}")
+@FeignClient(name = "productPricingClient", url = "${hedvig.product-pricing.url:product-pricing}")
 public interface ProductPricingClient {
 
   @RequestMapping(

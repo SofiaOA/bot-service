@@ -1,5 +1,6 @@
 language: java
 sudo: required
+jdk: openjdk10
 services:
   - docker
 after_success:

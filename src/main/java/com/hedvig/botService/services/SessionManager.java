@@ -2,6 +2,7 @@ package com.hedvig.botService.services;
 
 import static com.hedvig.botService.chat.OnboardingConversationDevi.LOGIN;
 import static com.hedvig.botService.chat.OnboardingConversationDevi.MESSAGE_START_LOGIN;
+import static java.lang.Long.valueOf;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +25,7 @@ import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectR
 import com.hedvig.botService.web.dto.AddMessageRequestDTO;
 import com.hedvig.botService.web.dto.BackOfficeAnswerDTO;
 import com.hedvig.botService.web.dto.TrackingDTO;
+import com.hedvig.botService.web.dto.UpdateUserContextDTO;
 import java.util.List;
 import java.util.Objects;
 import lombok.val;
@@ -35,9 +37,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /*
- * The services manager is the main controller class for the chat service. It contains all user sessions with chat histories, context etc
- * It is a singleton accessed through the request controller
- * */
+ * The services manager is the main controller class for the chat service. It contains all user
+ * sessions with chat histories, context etc It is a singleton accessed through the request
+ * controller
+ */
 
 @Component
 @Transactional
@@ -56,6 +59,9 @@ public class SessionManager {
   private final ConversationFactory conversationFactory;
   private final TrackingDataRespository trackerRepo;
   private final ObjectMapper objectMapper;
+
+  private static final String LINK_URI_KEY = "{{LINK_URI}";
+  private static final String LINK_URI_VALUE = "hedvig://+";
 
   @Autowired
   public SessionManager(
@@ -80,7 +86,7 @@ public class SessionManager {
     return messages.subList(Math.max(messages.size() - i, 0), messages.size());
   }
 
-  public void savePushToken(String hid, String pushToken) {
+  public void saveExpoPushToken(String hid, String pushToken) {
     UserContext uc =
         userContextRepository
             .findByMemberId(hid)
@@ -133,7 +139,7 @@ public class SessionManager {
 
   /*
    * Create a new users chat and context
-   * */
+   */
   public void init(String hid, String linkUri) {
 
     UserContext uc =
@@ -153,8 +159,32 @@ public class SessionManager {
   }
 
   /*
+   * Create a new users chat and context WEB ONBOARDING
+   */
+  public void init_web_onboarding(String memberId, UpdateUserContextDTO context) {
+
+    UserContext uc =
+      userContextRepository
+        .findByMemberId(memberId)
+        .orElseGet(
+          () -> {
+            UserContext newUserContext = new UserContext(memberId);
+            userContextRepository.save(newUserContext);
+            return newUserContext;
+          });
+
+    uc.updateUserContextWebOnboarding(context);
+
+    uc.putUserData(LINK_URI_KEY,LINK_URI_VALUE);
+    uc.putUserData(UserContext.ONBOARDING_COMPLETE, "true");
+    uc.putUserData(UserContext.FORCE_TRUSTLY_CHOICE, "true");
+
+    userContextRepository.saveAndFlush(uc);
+  }
+
+  /*
    * Mark all messages (incl) last input from user deleted
-   * */
+   */
   public void editHistory(String hid) {
     UserContext uc =
         userContextRepository
@@ -201,7 +231,7 @@ public class SessionManager {
 
   /*
    * Mark all messages (incl) last input from user deleted
-   * */
+   */
   public void resetOnboardingChat(String hid) {
     UserContext uc =
         userContextRepository
@@ -237,7 +267,7 @@ public class SessionManager {
 
     /*
      * Find users chat and context. First time it is created
-     * */
+     */
 
     UserContext uc =
         userContextRepository
@@ -245,15 +275,12 @@ public class SessionManager {
             .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
     val messages = uc.getMessages(intent, conversationFactory);
-
-    userContextRepository.save(uc);
-
     return messages;
   }
 
   /*
    * Add the "what do you want to do today" message to the chat
-   * */
+   */
   public void mainMenu(String hid) {
     log.info("Main menu from user: " + hid);
 
@@ -283,14 +310,14 @@ public class SessionManager {
   }
 
   public void receiveMessage(Message m, String hid) {
-    log.info("Recieving messages from user: " + hid);
+    log.info("Receiving messages from user: " + hid);
     try {
       log.info(objectMapper.writeValueAsString(m));
     } catch (JsonProcessingException ex) {
       log.error("Could not convert message to json in order to log: {}", m.toString());
     }
 
-    m.header.fromId = new Long(hid);
+    m.header.fromId = valueOf(hid);
 
     UserContext uc =
         userContextRepository
@@ -298,10 +325,5 @@ public class SessionManager {
             .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
     uc.conversationManager.receiveMessage(m, conversationFactory, uc);
-  }
-
-  public void getFabActions(String hid) {
-
-    if (claimsService.getActiveClaims(hid) > 0) {}
   }
 }
