@@ -21,12 +21,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.Data;
 import lombok.ToString;
 
 @Entity
 @ToString(exclude = "chat")
+@Data
 public class Message {
 
   @Id
@@ -47,9 +48,9 @@ public class Message {
 
   @NotNull
   @Column(nullable = false)
-  @Getter
-  @Setter
   private Instant timestamp;
+
+  private String author;
 
   /** @return Message id without trailing numbers" */
   @JsonIgnore

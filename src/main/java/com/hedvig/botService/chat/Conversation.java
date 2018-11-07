@@ -2,6 +2,8 @@ package com.hedvig.botService.chat;
 
 import static java.lang.Long.valueOf;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedvig.botService.dataTypes.HedvigDataType;
 import com.hedvig.botService.dataTypes.TextInput;
 import com.hedvig.botService.enteties.UserContext;
@@ -15,6 +17,8 @@ import com.hedvig.botService.enteties.message.MessageBodyText;
 import com.hedvig.botService.enteties.message.MessageHeader;
 import com.hedvig.botService.enteties.message.SelectItem;
 import com.hedvig.botService.enteties.message.SelectOption;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +26,7 @@ import java.util.TreeMap;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.jwt.JwtHelper;
 
 public abstract class Conversation {
 
@@ -337,16 +342,25 @@ public abstract class Conversation {
   }
 
   public boolean addMessageFromBackOffice(UserContext uc, String message, String messageId) {
+    return addMessageFromBackOffice(uc, message, messageId, null);
+  }
+
+  public boolean addMessageFromBackOffice(UserContext uc, String message, String messageId, String userId) {
     if (!this.canAcceptAnswerToQuestion(uc)) {
       return false;
     }
 
-    val msg = createBackOfficeMessage(uc, message, messageId);
+    val msg = createBackOfficeMessage(uc, message, messageId, userId);
     uc.getMemberChat().addToHistory(msg);
     return true;
   }
 
   protected Message createBackOfficeMessage(UserContext uc, String message, String id) {
+    return createBackOfficeMessage(uc, message, id, null);
+  }
+
+
+  protected Message createBackOfficeMessage(UserContext uc, String message, String id, String userId) {
     Message msg = new Message();
     val selectionItems = getSelectItemsForAnswer(uc);
     msg.body = new MessageBodySingleSelect(message, selectionItems);
@@ -355,7 +369,22 @@ public abstract class Conversation {
     msg.header.messageId = null;
     msg.body.id = null;
     msg.id = id;
+    msg.setAuthor(getUserId(userId));
 
     return msg;
   }
+
+  private String getUserId (String token) {
+    try {
+      Map<String, String> map = (new ObjectMapper().readValue(JwtHelper.decode(token).getClaims(), new TypeReference<Map<String, String>>() {}));
+      return map.get("email");
+    } catch (IOException e) {
+      log.error(e.getMessage());
+      return "";
+    } catch (RuntimeException e) {
+    log.error(e.getMessage());
+      return "";
+    }
+  }
+
 }
