@@ -213,7 +213,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         new MessageBodySingleSelect(
             "Hej! Jag heter Hedvig "
                 + emoji_waving_hand
-                + "\fJag kommer behöva ställa några frågor till dig, för att kunna ge dig ett prisförslag på en hemförsäkring"
+                + "\fJag behöver ställa några frågor till dig, för att kunna ge dig ett prisförslag på  en hemförsäkring"
                 + "\fDu signar inte upp dig på något genom att fortsätta!",
             Lists.newArrayList(
                 new SelectOption("Låter bra!", MESSAGE_FORSLAGSTART),
@@ -224,7 +224,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         new MessageBodyParagraph(
             "Hej! Jag heter Hedvig "
                 + emoji_waving_hand
-                + "\fJag kommer behöva ställa några frågor till dig, för att kunna ge dig ett prisförslag på en hemförsäkring" 
+                + "\fJag behöver ställa några frågor till dig, för att kunna ge dig ett prisförslag på  en hemförsäkring" 
                 + "\fDu signar inte upp dig på något genom att fortsätta!"));
     addRelayToChatMessage(MESSAGE_ONBOARDINGSTART_SHORT, MESSAGE_FORSLAGSTART);
 
@@ -799,7 +799,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         new MessageBodySingleSelect(
             "Nu går vi igenom ditt förslag!",
             Lists.newArrayList(
-                SelectLink.toOffer("Gå till mitt förslag 🎁 " + emoji_thumbs_up, "message.forslag.dashboard"))));
+                SelectLink.toOffer("Gå till mitt förslag" + emoji_thumbs_up, "message.forslag.dashboard"))));
     addRelay(MESSAGE_FORSLAG, MESSAGE_FORSLAG2);
 
     createChatMessage(
@@ -1143,7 +1143,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         MESSAGE_STUDENT_25K_LIMIT,
         new MessageBodySingleSelect(
             "Okej! Dina prylar som du har hemma skyddas upp till 200 000 kr 🏺🖼️\f"
-                + "Men äger du något som du tar med dig utanför hemmet som är värt över 25 000 kr? 💍⌚",
+                + "Äger du något som du tar med dig utanför hemmet som är värt över 25 000 kr? 💍⌚",
             Lists.newArrayList(
                 new SelectOption("Ja", MESSAGE_50K_LIMIT_YES),
                 new SelectOption("Nej", MESSAGE_50K_LIMIT_NO))));
