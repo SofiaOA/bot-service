@@ -124,9 +124,9 @@ public class FreeChatConversation extends Conversation {
   protected Message createBackOfficeMessage(UserContext uc, String message, String id) {
     Message msg = new Message();
     msg.body = new MessageBodyText(message);
-    msg.header.fromId = MessageHeader.HEDVIG_USER_ID;
-    msg.globalId = null;
+    msg.header = MessageHeader.createRichTextHeader();
     msg.header.messageId = null;
+    msg.globalId = null;
     msg.body.id = null;
     msg.id = FREE_CHAT_FROM_BO;
 

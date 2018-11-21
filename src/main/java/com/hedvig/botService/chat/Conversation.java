@@ -349,8 +349,8 @@ public abstract class Conversation {
     Message msg = new Message();
     val selectionItems = getSelectItemsForAnswer(uc);
     msg.body = new MessageBodySingleSelect(message, selectionItems);
-    msg.header.fromId = MessageHeader.HEDVIG_USER_ID;
     msg.globalId = null;
+    msg.header = MessageHeader.createRichTextHeader();
     msg.header.messageId = null;
     msg.body.id = null;
     msg.id = id;
