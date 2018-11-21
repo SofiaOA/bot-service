@@ -213,7 +213,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         new MessageBodySingleSelect(
             "Hej! Jag heter Hedvig "
                 + emoji_waving_hand
-                + "\fJag behöver ställa några frågor till dig, för att kunna ge dig ett prisförslag på  en hemförsäkring"
+                + "\fDet här går på nolltid! Jag ställer några frågor sen ger jag dig ett förslag på en hemförsäkring"
                 + "\fDu signar inte upp dig på något genom att fortsätta!",
             Lists.newArrayList(
                 new SelectOption("Låter bra!", MESSAGE_FORSLAGSTART),
@@ -224,7 +224,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         new MessageBodyParagraph(
             "Hej! Jag heter Hedvig "
                 + emoji_waving_hand
-                + "\fJag behöver ställa några frågor till dig, för att kunna ge dig ett prisförslag på  en hemförsäkring" 
+                + "\fDet här går på nolltid! Jag ställer några frågor sen ger jag dig ett förslag på en hemförsäkring" 
                 + "\fDu signar inte upp dig på något genom att fortsätta!"));
     addRelayToChatMessage(MESSAGE_ONBOARDINGSTART_SHORT, MESSAGE_FORSLAGSTART);
 
