@@ -47,6 +47,7 @@ public class InternalMessagesControllerTest {
     ResultActions perform =
         mockMvc.perform(
             post("/_/messages/addmessage")
+                .header("Authorization", "123456")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .content(
@@ -65,6 +66,7 @@ public class InternalMessagesControllerTest {
     ResultActions perform =
         mockMvc.perform(
             post("/_/messages/addmessage")
+                .header("Authorization", "123456")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_UTF8)
                 .content(

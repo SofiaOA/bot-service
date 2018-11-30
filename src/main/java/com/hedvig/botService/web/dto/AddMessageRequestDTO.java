@@ -1,9 +1,11 @@
 package com.hedvig.botService.web.dto;
 
-import lombok.Value;
+public class AddMessageRequestDTO extends BackOfficeInputMessageDTO {
+  public static final String MESSAGE_ID="message.bo.message";
+  public AddMessageRequestDTO () { super (); }
 
-@Value
-public class AddMessageRequestDTO {
-  String memberId;
-  String msg;
+  public AddMessageRequestDTO(String memberId, String msg) {
+    this.memberId = memberId;
+    this.msg = msg;
+  }
 }

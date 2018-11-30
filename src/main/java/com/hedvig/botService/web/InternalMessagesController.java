@@ -39,11 +39,11 @@ public class InternalMessagesController {
   /** This endpoint is used internally to send messages from back-office personnel to end users */
   @RequestMapping(path = {"/_/messages/addmessage", "/addmessage"}, method = RequestMethod.POST,
       produces = "application/json; charset=utf-8")
-  public ResponseEntity<?> addMessage(@Valid @RequestBody AddMessageRequestDTO backOfficeMessage) {
-    log.info("Message from Hedvig to hid: {} with messageId: {}", backOfficeMessage.getMemberId(),
-        backOfficeMessage.getMsg());
+  public ResponseEntity<?> addMessage(@Valid @RequestBody AddMessageRequestDTO backOfficeMessage, @RequestHeader("Authorization") String token) {
+    log.info("Message from Hedvig to hid: {} with messageId: {}", backOfficeMessage.getMemberId(), backOfficeMessage.getMsg());
 
-    if (sessionManager.addMessageFromHedvig(backOfficeMessage) == true) {
+    backOfficeMessage.setUserId(token);
+    if (sessionManager.addMessageFromHedvig(backOfficeMessage)) {
       return ResponseEntity.noContent().build();
     }
 
@@ -55,11 +55,11 @@ public class InternalMessagesController {
    */
   @RequestMapping(path = "/_/messages/addanswer", method = RequestMethod.POST,
       produces = "application/json; charset=utf-8")
-  public ResponseEntity<?> addAnswer(@Valid @RequestBody() BackOfficeAnswerDTO backOfficeAnswer) {
-    log.info("Received answer from Hedvig to hid: {} with message {}", backOfficeAnswer.getUserId(),
-        backOfficeAnswer.getMsg());
+  public ResponseEntity<?> addAnswer(@Valid @RequestBody() BackOfficeAnswerDTO backOfficeAnswer, @RequestHeader("Authorization") String token) {
+    log.info("Received answer from Hedvig to hid: {} with message {}", backOfficeAnswer.getMemberId(), backOfficeAnswer.getMsg());
 
-    if (sessionManager.addAnswerFromHedvig(backOfficeAnswer) == true) {
+    backOfficeAnswer.setUserId(token);
+    if (sessionManager.addAnswerFromHedvig(backOfficeAnswer)) {
       return ResponseEntity.noContent().build();
     }
 

@@ -22,12 +22,14 @@ import com.hedvig.botService.enteties.message.Message;
 import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
+
+import java.util.List;
+import java.util.Objects;
+
 import com.hedvig.botService.web.dto.AddMessageRequestDTO;
 import com.hedvig.botService.web.dto.BackOfficeAnswerDTO;
 import com.hedvig.botService.web.dto.TrackingDTO;
 import com.hedvig.botService.web.dto.UpdateUserContextDTO;
-import java.util.List;
-import java.util.Objects;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -196,25 +198,22 @@ public class SessionManager {
   }
 
   public boolean addAnswerFromHedvig(BackOfficeAnswerDTO backOfficeAnswer) {
-    UserContext uc =
-        userContextRepository
-            .findByMemberId(backOfficeAnswer.getUserId())
-            .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
-
-    Conversation conversation = getActiveConversationOrStart(uc, MainConversation.class);
-
-    return conversation.addMessageFromBackOffice(uc, backOfficeAnswer.getMsg(), "message.answer");
+    return addMessage(backOfficeAnswer.getMemberId(), backOfficeAnswer.getUserId(), backOfficeAnswer.getMsg(), BackOfficeAnswerDTO.MESSAGE_ID);
   }
 
   public boolean addMessageFromHedvig(AddMessageRequestDTO backOfficeMessage) {
-    val uc =
-        userContextRepository
-            .findByMemberId(backOfficeMessage.getMemberId())
-            .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
+    return addMessage(backOfficeMessage.getMemberId(), backOfficeMessage.getUserId(), backOfficeMessage.getMsg(), AddMessageRequestDTO.MESSAGE_ID);
+  }
+
+  private boolean addMessage (String memberId, String userId, String msg, String msgId) {
+    UserContext uc =
+      userContextRepository
+        .findByMemberId(memberId)
+        .orElseThrow(() -> new ResourceNotFoundException("Could not find usercontext."));
 
     Conversation activeConversation = getActiveConversationOrStart(uc, MainConversation.class);
-    return activeConversation.addMessageFromBackOffice(
-        uc, backOfficeMessage.getMsg(), "message.bo.message");
+    return activeConversation.addMessageFromBackOffice(uc, msg, msgId, userId);
+
   }
 
   private Conversation getActiveConversationOrStart(
@@ -253,7 +252,7 @@ public class SessionManager {
 
       Conversation onboardingConversation =
           conversationFactory.createConversation(OnboardingConversationDevi.class);
-      if (Objects.equals("true", uc.getDataEntry(LOGIN)) == true) {
+      if (Objects.equals("true", uc.getDataEntry(LOGIN))) {
         uc.startConversation(onboardingConversation, MESSAGE_START_LOGIN);
       } else {
         uc.startConversation(onboardingConversation);
