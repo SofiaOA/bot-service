@@ -799,7 +799,7 @@ public class OnboardingConversationDevi extends Conversation implements BankIdCh
         new MessageBodySingleSelect(
             "Nu går vi igenom ditt förslag!",
             Lists.newArrayList(
-                SelectLink.toOffer("Gå till mitt förslag 🎁 " + emoji_thumbs_up, "message.forslag.dashboard"))));
+                SelectLink.toOffer("Gå till mitt förslag 👏", "message.forslag.dashboard"))));
     addRelay(MESSAGE_FORSLAG, MESSAGE_FORSLAG2);
 
     createChatMessage(
