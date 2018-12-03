@@ -35,6 +35,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.context.ApplicationEventPublisher;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SessionManagerTest {
@@ -61,6 +62,11 @@ public class SessionManagerTest {
 
   @Mock ClaimsService claimsService;
 
+  @Mock SignupCodeRepository signRepo;
+
+  @Mock
+  ApplicationEventPublisher applicationEventPublisher;
+
   SessionManager sessionManager;
 
   @Before
@@ -70,8 +76,7 @@ public class SessionManagerTest {
         new SessionManager(
             userContextRepository,
             memberService,
-            claimsService,
-            conversationFactory,
+          conversationFactory,
             campaignCodeRepository,
             objectMapper);
   }
@@ -161,7 +166,7 @@ public class SessionManagerTest {
   }
 
   private OnboardingConversationDevi makeOnboardingConversation() {
-    return new OnboardingConversationDevi(memberService, productPricingService, null, null, null);
+    return new OnboardingConversationDevi(memberService, productPricingService, signRepo, applicationEventPublisher, conversationFactory);
   }
 
   private BankIdAuthResponse makeBankIdResponse() {

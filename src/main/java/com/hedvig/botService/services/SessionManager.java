@@ -1,7 +1,7 @@
 package com.hedvig.botService.services;
 
-import static com.hedvig.botService.chat.OnboardingConversationDevi.LOGIN;
 import static com.hedvig.botService.chat.OnboardingConversationDevi.MESSAGE_START_LOGIN;
+import static com.hedvig.botService.enteties.userContextHelpers.UserData.LOGIN;
 import static java.lang.Long.valueOf;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -19,17 +19,14 @@ import com.hedvig.botService.enteties.TrackingEntity;
 import com.hedvig.botService.enteties.UserContext;
 import com.hedvig.botService.enteties.UserContextRepository;
 import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
-
-import java.util.List;
-import java.util.Objects;
-
 import com.hedvig.botService.web.dto.AddMessageRequestDTO;
 import com.hedvig.botService.web.dto.BackOfficeAnswerDTO;
 import com.hedvig.botService.web.dto.TrackingDTO;
 import com.hedvig.botService.web.dto.UpdateUserContextDTO;
+import java.util.List;
+import java.util.Objects;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -57,7 +54,6 @@ public class SessionManager {
   private final UserContextRepository userContextRepository;
   private final MemberService memberService;
 
-  private final ClaimsService claimsService;
   private final ConversationFactory conversationFactory;
   private final TrackingDataRespository trackerRepo;
   private final ObjectMapper objectMapper;
@@ -67,15 +63,13 @@ public class SessionManager {
 
   @Autowired
   public SessionManager(
-      UserContextRepository userContextRepository,
-      MemberService memberService,
-      ClaimsService claimsService,
-      ConversationFactory conversationFactory,
-      TrackingDataRespository trackerRepo,
-      ObjectMapper objectMapper) {
+    UserContextRepository userContextRepository,
+    MemberService memberService,
+    ConversationFactory conversationFactory,
+    TrackingDataRespository trackerRepo,
+    ObjectMapper objectMapper) {
     this.userContextRepository = userContextRepository;
     this.memberService = memberService;
-    this.claimsService = claimsService;
     this.conversationFactory = conversationFactory;
     this.trackerRepo = trackerRepo;
     this.objectMapper = objectMapper;

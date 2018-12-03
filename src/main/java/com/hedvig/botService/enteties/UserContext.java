@@ -1,7 +1,5 @@
 package com.hedvig.botService.enteties;
 
-import static com.hedvig.botService.chat.OnboardingConversationDevi.IN_OFFER;
-
 import com.google.common.collect.ImmutableMap;
 import com.hedvig.botService.chat.Conversation;
 import com.hedvig.botService.chat.ConversationFactory;
@@ -37,7 +35,6 @@ import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Version;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.val;
@@ -68,7 +65,7 @@ public class UserContext implements Serializable {
           put(
               "{FAMILY_NAME}",
               "T.ex vet jag inte vad heter i efternamn... "
-                  + OnboardingConversationDevi.emoji_flushed_face
+                  + OnboardingConversationDevi.Companion.getEmoji_flushed_face()
                   + " ?")
           .put("{HOUSE}", "T.ex vet jag inte om du bor i hus eller lägenhet?")
           .put("{KVM}", "T.ex vet jag inte hur stor din bostad är?")
@@ -76,7 +73,7 @@ public class UserContext implements Serializable {
           .put(
               "{NAME}",
               "T.ex vet jag inte vad heter... "
-                  + OnboardingConversationDevi.emoji_flushed_face
+                  + OnboardingConversationDevi.Companion.getEmoji_flushed_face()
                   + " ?")
           .put("{NR_PERSONS}", "Tex. hur många är ni i hushållet")
           .put(
@@ -89,7 +86,7 @@ public class UserContext implements Serializable {
 
   @Version private Long version;
 
-  @Getter private String memberId;
+  private String memberId;
 
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "user_data")
@@ -102,11 +99,9 @@ public class UserContext implements Serializable {
   public ConversationManager conversationManager;
 
   @OneToOne(cascade = CascadeType.ALL)
-  @Getter
   @Setter
   private MemberChat memberChat;
 
-  @Getter
   @Setter
   @OneToMany(mappedBy = "userContext", cascade = CascadeType.ALL)
   @MapKey(name = "referenceToken")
@@ -353,10 +348,22 @@ public class UserContext implements Serializable {
   }
 
   public boolean inOfferState() {
-    return Objects.equals(getDataEntry(IN_OFFER), "true");
+    return Objects.equals(getDataEntry(OnboardingConversationDevi.IN_OFFER), "true");
   }
 
   public void setInOfferState(boolean state) {
-    putUserData(IN_OFFER, Boolean.toString(state));
+    putUserData(OnboardingConversationDevi.MESSAGE_START_LOGIN, Boolean.toString(state));
+  }
+
+  public String getMemberId() {
+    return this.memberId;
+  }
+
+  public MemberChat getMemberChat() {
+    return this.memberChat;
+  }
+
+  public Map<String, BankIdSessionImpl> getBankIdStatus() {
+    return this.bankIdStatus;
   }
 }
