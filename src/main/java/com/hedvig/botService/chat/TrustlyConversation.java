@@ -15,7 +15,6 @@ import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.services.triggerService.TriggerService;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public class TrustlyConversation extends Conversation {

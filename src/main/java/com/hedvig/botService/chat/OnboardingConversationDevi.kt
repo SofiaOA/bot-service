@@ -14,15 +14,12 @@ import com.hedvig.botService.serviceIntegration.memberService.exceptions.ErrorTy
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService
 import com.hedvig.botService.services.events.*
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationEventPublisher
-import org.springframework.stereotype.Component
 import java.nio.charset.Charset
 import java.time.LocalDateTime
 import java.util.*
 
-@Component
-class OnboardingConversationDevi @Autowired
+class OnboardingConversationDevi
 constructor(
   private val memberService: MemberService,
   private val productPricingService: ProductPricingService,
@@ -256,13 +253,11 @@ constructor(
 
     this.createMessage(
       "message.medlem",
-      MessageBodySingleSelect(
+      body = MessageBodySingleSelect(
         "Välkommen tillbaka "
           + emoji_hug
           + "\n\n Logga in med BankID så är du inne i appen igen",
-        object : ArrayList<SelectItem>() {
-          init {
-            add(
+        listOf(
               SelectLink(
                 "Logga in",
                 "message.bankid.autostart.respond",
@@ -271,9 +266,9 @@ constructor(
                 false))
 
             // add(new SelectOption("Logga in", "message.bankidja"));
-          }
-        })
-    ) { m, uc ->
+
+        )
+    , callback = { m : MessageBodySingleSelect, uc : UserContext ->
       val obd = uc.onBoardingData
       if (m.selectedItem.value == "message.bankid.autostart.respond") {
         uc.putUserData(LOGIN, "true")
@@ -281,7 +276,7 @@ constructor(
       }
 
       ""
-    }
+    })
     setupBankidErrorHandlers("message.medlem")
 
     // Deprecated
@@ -294,20 +289,20 @@ constructor(
 
     this.createMessage(
       MESSAGE_FORSLAGSTART,
-      MessageBodySingleSelect(
+      body = MessageBodySingleSelect(
         "Första frågan! Bor du i lägenhet eller eget hus?",
         Lists.newArrayList<SelectItem>(
           SelectOption("Lägenhet", MESSAGE_LAGENHET_PRE),
           SelectOption("Hus", MESSAGE_HUS),
           SelectOption("Jag är redan medlem", "message.bankid.start"))),
-      "h_to_house")
+      avatarName = "h_to_house")
 
     this.createMessage(MESSAGE_LAGENHET_PRE, MessageBodyParagraph(emoji_hand_ok))
     this.addRelay(MESSAGE_LAGENHET_PRE, MESSAGE_LAGENHET)
 
     this.createMessage(
       MESSAGE_LAGENHET,
-      MessageBodySingleSelect(
+      body = MessageBodySingleSelect(
         "Har du BankID? I så fall kan vi hoppa över några frågor så du får se ditt prisförslag snabbare!",
         object : ArrayList<SelectItem>() {
           init {
@@ -342,7 +337,7 @@ constructor(
 
     this.createMessage(
       "message.bankid.start",
-      MessageBodySingleSelect(
+      body = MessageBodySingleSelect(
         "Bara att logga in så ser du din försäkring",
         Lists.newArrayList(
           SelectLink(
@@ -774,7 +769,7 @@ constructor(
 
     this.createMessage(
       "message.kontrakt",
-      MessageBodySingleSelect(
+      body = MessageBodySingleSelect(
         "Då är det bara att signera, sen är vi klara",
         object : ArrayList<SelectItem>() {
           init {
@@ -816,7 +811,7 @@ constructor(
 
     this.createMessage(
       "message.kontraktpop.startBankId",
-      MessageBodySingleSelect(
+      body = MessageBodySingleSelect(
         "För signeringen använder vi BankID",
         object : ArrayList<SelectItem>() {
           init {
@@ -1890,8 +1885,7 @@ constructor(
 */
     private val log = LoggerFactory.getLogger(OnboardingConversationDevi::class.java)
 
-    val emoji_smile = String(
-      byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0x98.toByte(), 0x81.toByte()),
+    val emoji_smile = String(byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0x98.toByte(), 0x81.toByte()),
       Charset.forName("UTF-8"))
     val emoji_hand_ok = String(
       byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0x91.toByte(), 0x8C.toByte()),
