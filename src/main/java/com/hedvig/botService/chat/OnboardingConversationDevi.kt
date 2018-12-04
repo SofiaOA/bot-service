@@ -15,10 +15,12 @@ import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingSer
 import com.hedvig.botService.services.events.*
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.stereotype.Component
 import java.nio.charset.Charset
 import java.time.LocalDateTime
 import java.util.*
 
+@Component
 class OnboardingConversationDevi
 constructor(
   private val memberService: MemberService,
@@ -46,8 +48,7 @@ constructor(
     this.createChatMessage(
       MESSAGE_ONBOARDINGSTART,
       MessageBodySingleSelect(
-        "Hej! Jag heter Hedvig "
-          + emoji_waving_hand
+        "Hej! Jag heter Hedvig 👋"
           + "\u000CJag behöver ställa några frågor till dig, för att kunna ge dig ett prisförslag på  en hemförsäkring"
           + "\u000CDu signar inte upp dig på något genom att fortsätta!",
         Lists.newArrayList<SelectItem>(
@@ -57,20 +58,32 @@ constructor(
     this.createChatMessage(
       MESSAGE_ONBOARDINGSTART_SHORT,
       MessageBodyParagraph(
-        "Hej! Jag heter Hedvig "
-          + emoji_waving_hand
-          + "\u000CJag behöver ställa några frågor till dig, för att kunna ge dig ett prisförslag på  en hemförsäkring"
-          + "\u000CDu signar inte upp dig på något genom att fortsätta!"))
+        "Hej! Jag heter Hedvig 👋"))
     this.addRelayToChatMessage(MESSAGE_ONBOARDINGSTART_SHORT, MESSAGE_FORSLAGSTART)
 
     this.createChatMessage(
       MESSAGE_ONBOARDINGSTART_ASK_NAME,
-      MessageBodyParagraph(
-        "Hej! Jag heter Hedvig "
-          + emoji_waving_hand
-          + "\u000CJag behöver ställa några frågor till dig, för att kunna ge dig ett prisförslag på  en hemförsäkring"
-          + "\u000CDu signar inte upp dig på något genom att fortsätta!"))
-    this.addRelayToChatMessage(MESSAGE_ONBOARDINGSTART_SHORT, MESSAGE_FORSLAGSTART)
+      WrappedMessage(MessageBodyText(
+        "Hej! Jag heter Hedvig 👋\u000CVad heter du?"))
+      { body, u, message ->
+        u.onBoardingData.firstName = body.text.trim()
+        addToChat(message, u)
+        MESSAGE_ONBOARDINGSTART_ASK_EMAIL
+      })
+
+    this.createChatMessage(
+      MESSAGE_ONBOARDINGSTART_ASK_EMAIL,
+      WrappedMessage(MessageBodyText(
+        "Trevligt att träffas {NAME}!\nFör att kunne ge dig ett prisförslag"
+      + " behöver jag ställa några snabba frågor"
+      + "\u000CFörst, vad är din mailadress?"))
+      { body, userContext, message ->
+        val trimmedEmail = body.text.trim()
+        userContext.onBoardingData.email = "Min email är $trimmedEmail"
+        addToChat(message, userContext)
+        MESSAGE_FORSLAGSTART
+      })
+
 
     this.createChatMessage(
       "message.membernotfound",
@@ -94,13 +107,10 @@ constructor(
       "message.signup.checkposition",
       MessageBodySingleSelect(
         "Tack!" + "\u000CJag hör av mig till dig snart, ha det fint så länge! ✌️",
-        object : ArrayList<SelectItem>() {
-          init {
-            add(
+        listOf(
               SelectOption(
                 "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))
-          }
-        }))
+        ))
 
     this.createChatMessage(
       MESSAGE_SIGNUP_NOT_ACTIVATED_YET,
@@ -108,13 +118,9 @@ constructor(
         "Hmm, det verkar inte som att du är aktiverad än 👀"
           + "\u000CTitta in igen när du fått aktiveringsmailet"
           + "\u000CJag hör av mig snart!",
-        object : ArrayList<SelectItem>() {
-          init {
-            add(
+        listOf(
               SelectOption(
-                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))
-          }
-        }))
+                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))))
 
     this.createChatMessage(
       MESSAGE_SIGNUP_NOT_REGISTERED_YET,
@@ -122,13 +128,9 @@ constructor(
         "Det ser inte ut som att du har skrivit upp dig på väntelistan än"
           + "\u000CMen nu har jag din mailadress, så jag lägger till den!"
           + "\u000CVi hörs snart!",
-        object : ArrayList<SelectItem>() {
-          init {
-            add(
+        listOf(
               SelectOption(
-                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))
-          }
-        }))
+                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))))
 
     this.createMessage(
       MESSAGE_NOTMEMBER,
@@ -156,58 +158,39 @@ constructor(
       "message.activate.code.used",
       MessageBodySingleSelect(
         "Det verkar som koden redan är använd... \u000CHar du aktiverat koden på en annan enhet så kan du logga in direkt med bankId.",
-        object : ArrayList<SelectItem>() {
-          init {
-            add(SelectOption("Jag är redan medlem och vill logga in", "message.medlem"))
-          }
-        }))
+        listOf(SelectOption("Jag är redan medlem och vill logga in", "message.medlem"))))
 
     // Deprecated
     this.createMessage(
       "message.signup.flerval",
       MessageBodySingleSelect(
         "",
-        object : ArrayList<SelectItem>() {
-          init {
-            add(
+        listOf(
               SelectOption(
-                "Kolla min plats på väntelistan", "message.signup.checkposition"))
-            add(
+                "Kolla min plats på väntelistan", "message.signup.checkposition"),
               SelectOption(
-                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))
-          }
-        }))
+                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))))
 
     this.createMessage(
       MESSAGE_WAITLIST_NOT_ACTIVATED,
       MessageBodySingleSelect(
         "Du verkar redan stå på väntelistan. Din plats är {SIGNUP_POSITION}!",
-        object : ArrayList<SelectItem>() {
-          init {
-            add(
+        listOf(
               SelectOption(
-                "Kolla min plats på väntelistan", "message.signup.checkposition"))
-            add(
+                "Kolla min plats på väntelistan", "message.signup.checkposition"),
               SelectOption(
-                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))
-          }
-        }))
+                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))))
 
     // Deprecated
     this.createMessage(
       "message.activate.nocode",
       MessageBodySingleSelect(
         "Jag känner inte igen den koden tyvärr $emoji_thinking",
-        object : ArrayList<SelectItem>() {
-          init {
-            add(
+        listOf(
               SelectOption(
-                "Kolla min plats på väntelistan", "message.signup.checkposition"))
-            add(
+                "Kolla min plats på väntelistan", "message.signup.checkposition"),
               SelectOption(
-                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))
-          }
-        }))
+                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))))
 
     this.createMessage(
       MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST,
@@ -227,11 +210,7 @@ constructor(
       "message.uwlimit.tack",
       MessageBodySingleSelect(
         "Tack! Jag hör av mig så fort jag kan",
-        object : ArrayList<SelectItem>() {
-          init {
-            add(SelectOption("Jag vill starta om chatten", "message.activate.ok.a"))
-          }
-        }))
+        listOf(SelectOption("Jag vill starta om chatten", "message.activate.ok.a"))))
 
     this.createMessage(
       "message.audiotest",
@@ -245,11 +224,7 @@ constructor(
       "message.fileupload.result",
       MessageBodySingleSelect(
         "Ok uppladdningen gick bra!",
-        object : ArrayList<SelectItem>() {
-          init {
-            add(SelectOption("Hem", MESSAGE_ONBOARDINGSTART))
-          }
-        }))
+        listOf(SelectOption("Hem", MESSAGE_ONBOARDINGSTART))))
 
     this.createMessage(
       "message.medlem",
@@ -290,12 +265,11 @@ constructor(
     this.createMessage(
       MESSAGE_FORSLAGSTART,
       body = MessageBodySingleSelect(
-        "Första frågan! Bor du i lägenhet eller eget hus?",
+        "Tack! Bor du i lägenhet eller eget hus",
         Lists.newArrayList<SelectItem>(
           SelectOption("Lägenhet", MESSAGE_LAGENHET_PRE),
           SelectOption("Hus", MESSAGE_HUS),
-          SelectOption("Jag är redan medlem", "message.bankid.start"))),
-      avatarName = "h_to_house")
+          SelectOption("Jag är redan medlem", "message.bankid.start"))))
 
     this.createMessage(MESSAGE_LAGENHET_PRE, MessageBodyParagraph(emoji_hand_ok))
     this.addRelay(MESSAGE_LAGENHET_PRE, MESSAGE_LAGENHET)
@@ -304,25 +278,20 @@ constructor(
       MESSAGE_LAGENHET,
       body = MessageBodySingleSelect(
         "Har du BankID? I så fall kan vi hoppa över några frågor så du får se ditt prisförslag snabbare!",
-        object : ArrayList<SelectItem>() {
-          init {
-            add(
+        listOf(
               SelectLink(
                 "Fortsätt med BankID",
                 "message.bankid.autostart.respond", null,
                 "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null,
-                false))
-            add(SelectOption("Fortsätt utan", "message.manuellnamn"))
-          }
-        })
-    ) { m, uc ->
+                false),
+      SelectOption("Fortsätt utan", "message.manuellnamn"))) ,
+    callback = { m, uc ->
       val obd = uc.onBoardingData
       if (m.selectedItem.value == "message.bankid.autostart.respond") {
         obd.bankIdMessage = MESSAGE_LAGENHET
       }
-
       ""
-    }
+    })
 
     setupBankidErrorHandlers(MESSAGE_LAGENHET)
 
@@ -1007,7 +976,7 @@ constructor(
   override fun init(userContext: UserContext) {
     log.info("Starting onboarding conversation")
     if (userContext.getDataEntry("{SIGNED_UP}") == null) {
-      startConversation(userContext, MESSAGE_ONBOARDINGSTART_SHORT) // Id of first message
+      startConversation(userContext, MESSAGE_ONBOARDINGSTART_ASK_NAME) // Id of first message
     } else {
       startConversation(userContext, MESSAGE_ACTIVATE_OK_B) // Id of first message
     }
@@ -1083,11 +1052,15 @@ constructor(
   }
 
   override fun receiveMessage(userContext: UserContext, m: Message) {
-
     var nxtMsg = ""
 
     if (!validateReturnType(m, userContext)) {
       return
+    }
+
+    //Generic Lambda
+    if(this.hasGenericCallback(m.baseMessageId)){
+      nxtMsg = this.execGenericCallback(m, userContext)
     }
 
     // Lambda
@@ -1623,7 +1596,7 @@ constructor(
         log.error("I dont know where to go next...")
         nxtMsg = "error"
       }
-    }// userContext.onboardingComplete(true);
+    }
 
     super.completeRequest(nxtMsg, userContext)
   }
@@ -1740,14 +1713,14 @@ constructor(
 
   private fun addBankIdErrorMessage(errorType: ErrorType, baseMessage: String, uc: UserContext) {
     val errorPostfix: String
-    when (errorType) {
-      ErrorType.EXPIRED_TRANSACTION -> errorPostfix = ".bankid.error.expiredTransaction"
-      ErrorType.CERTIFICATE_ERR -> errorPostfix = ".bankid.error.certificateError"
-      ErrorType.USER_CANCEL -> errorPostfix = ".bankid.error.userCancel"
-      ErrorType.CANCELLED -> errorPostfix = ".bankid.error.cancelled"
-      ErrorType.START_FAILED -> errorPostfix = ".bankid.error.startFailed"
-      ErrorType.INVALID_PARAMETERS -> errorPostfix = ".bankid.error.invalidParameters"
-      else -> errorPostfix = ""
+    errorPostfix = when (errorType) {
+      ErrorType.EXPIRED_TRANSACTION -> ".bankid.error.expiredTransaction"
+      ErrorType.CERTIFICATE_ERR -> ".bankid.error.certificateError"
+      ErrorType.USER_CANCEL -> ".bankid.error.userCancel"
+      ErrorType.CANCELLED -> ".bankid.error.cancelled"
+      ErrorType.START_FAILED -> ".bankid.error.startFailed"
+      ErrorType.INVALID_PARAMETERS -> ".bankid.error.invalidParameters"
+      else -> ""
     }
     val messageID = baseMessage + errorPostfix
     log.info("Adding bankIDerror message: {}", messageID)
@@ -1834,6 +1807,7 @@ constructor(
     const val MESSAGE_ONBOARDINGSTART = "message.onboardingstart"
     const val MESSAGE_ONBOARDINGSTART_SHORT = "message.onboardingstart.short"
     const val MESSAGE_ONBOARDINGSTART_ASK_NAME = "message.onboardingstart.ask.name"
+    const val MESSAGE_ONBOARDINGSTART_ASK_EMAIL = "message.onboardingstart.ask.email"
     const val MESSAGE_ACTIVATE_OK_A = "message.activate.ok.a"
     const val MESSAGE_ACTIVATE_OK_B = "message.activate.ok.b"
     const val MESSAGE_SIGNUP_TO_WAITLIST = "message.waitlist"

@@ -14,10 +14,12 @@ import java.util.*
 
 
 typealias SelectItemMessageCallback = (MessageBodySingleSelect, UserContext) -> String
+typealias GenericMessageCallback = (Message, UserContext) -> String
 
 abstract class Conversation internal constructor() {
 
   private val callbacks = TreeMap<String, SelectItemMessageCallback>()
+  val genericCallbacks = TreeMap<String, GenericMessageCallback>()
 
   private val messageList = TreeMap<String, Message>()
   private val relayList = TreeMap<String, String>()
@@ -226,6 +228,11 @@ abstract class Conversation internal constructor() {
 
   // ----------------------------------------------------------------------------------------------------------------- //
 
+  inline fun <reified T:MessageBody>createChatMessage(id:String, body:WrappedMessage<T>){
+    this.createChatMessage(id, body.message)
+    this.genericCallbacks[id] = {m,u -> body.callback(m.body as T, u, m)}
+  }
+
   fun createChatMessage(id: String, body: MessageBody) {
     this.createChatMessage(id, body, null)
   }
@@ -322,6 +329,14 @@ abstract class Conversation internal constructor() {
       ""
     }
 
+  }
+
+  fun hasGenericCallback(id: String): Boolean {
+    return genericCallbacks.containsKey(id)
+  }
+
+  fun execGenericCallback(m: Message, userContext: UserContext): String {
+    return this.genericCallbacks[m.baseMessageId]!!.invoke(m, userContext)
   }
 
   companion object {

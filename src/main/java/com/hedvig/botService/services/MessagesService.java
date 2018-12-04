@@ -43,7 +43,7 @@ public class MessagesService {
 
     val messages = uc.getMessages(intent, conversationFactory);
 
-    boolean hasClaim = this.claimsService.getActiveClaims(hid) > 0;
+    boolean hasClaim = false; // this.claimsService.getActiveClaims(hid) > 0;
 
     val options =
         Lists.newArrayList(

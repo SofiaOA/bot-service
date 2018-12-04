@@ -218,12 +218,12 @@ public class OnboardingConversationDeviTest {
   public void AddCorrectStartMessage_WhenInitWithMessageId() {
 
     testConversation.init(userContext,
-      OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
+      OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_ASK_NAME);
 
     assertThat(userContext.getMemberChat().chatHistory)
         .first()
         .hasFieldOrPropertyWithValue(
-            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
+            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_ASK_NAME);
   }
 
   @Test
@@ -234,7 +234,7 @@ public class OnboardingConversationDeviTest {
     assertThat(userContext.getMemberChat().chatHistory)
         .first()
         .hasFieldOrPropertyWithValue(
-            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
+            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_ASK_NAME);
   }
 
   @Test
