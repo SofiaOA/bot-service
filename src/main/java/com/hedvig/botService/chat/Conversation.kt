@@ -267,7 +267,7 @@ abstract class Conversation internal constructor() {
     }
 
     // The 'actual' message
-    val sWrite = String.format(CHAT_ID_FORMAT, id, pId++)
+    val sWrite = if (pId == 0) id else String.format(CHAT_ID_FORMAT, id, pId++)
     val sFinal = String.format(CHAT_ID_FORMAT, id, pId++)
     val s = paragraphs[paragraphs.size - 1] // Last paragraph is put on actual message
     body.text = s
