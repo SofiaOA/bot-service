@@ -272,7 +272,22 @@ constructor(
           SelectOption("Jag är redan medlem", "message.bankid.start"))))
 
     this.createMessage(MESSAGE_LAGENHET_PRE, MessageBodyParagraph(emoji_hand_ok))
-    this.addRelay(MESSAGE_LAGENHET_PRE, MESSAGE_LAGENHET)
+    this.addRelay(MESSAGE_LAGENHET_PRE, MESSAGE_LAGENHET_NO_PERSONNUMMER)
+
+    this.createChatMessage(
+      MESSAGE_LAGENHET_NO_PERSONNUMMER,
+      WrappedMessage(MessageBodyText("Vad är ditt personnumer? Jag behöver det så att jag kan hämta din adress 🏠")
+      ) { body, uc, m ->
+        uc.onBoardingData.let{
+          it.addressCity = "Stockholm"
+          it.addressStreet = "Drottninggatan"
+          it.addressZipCode = "11101"
+          it.familyName = "Svensson"
+        }
+        addToChat(m, uc)
+        MESSAGE_BANKIDJA
+      }
+    )
 
     this.createMessage(
       MESSAGE_LAGENHET,
@@ -1837,6 +1852,7 @@ constructor(
     val MESSAGE_START_LOGIN = "message.start.login"
     const val MESSAGE_LAGENHET_PRE = "message.lagenhet.pre"
     const val MESSAGE_LAGENHET = "message.lagenhet"
+    const val MESSAGE_LAGENHET_NO_PERSONNUMMER = "message.lagenhet.no.personnummer"
 
     const val MESSAGE_STUDENT_LIMIT_PERSONS = "message.student.limit.persons"
     const val MESSAGE_STUDENT_LIMIT_LIVING_SPACE = "message.student.limit.livingspace"
