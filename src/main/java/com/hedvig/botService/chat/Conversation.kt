@@ -83,7 +83,7 @@ abstract class Conversation internal constructor() {
 
   abstract fun canAcceptAnswerToQuestion(uc: UserContext): Boolean
 
-  protected open fun addToChat(m: Message?, userContext: UserContext) {
+  public open fun addToChat(m: Message?, userContext: UserContext) {
     m!!.render(userContext)
     log.info("Putting message: " + m.id + " content: " + m.body.text)
     userContext.addToHistory(m)
@@ -106,17 +106,13 @@ abstract class Conversation internal constructor() {
     header: MessageHeader = MessageHeader(MessageHeader.HEDVIG_USER_ID, -1),
     body: MessageBody,
     avatarName: String? = null,
-    delay: Int? = null,
-    callback: SelectItemMessageCallback? = null) {
+    delay: Int? = null) {
     val m = Message()
     m.id = id
     m.header = header
     m.body = body
     if (delay != null) {
       m.header.pollingInterval = valueOf(delay.toLong())
-    }
-    if(callback != null){
-      setMessageCallback(id, callback)
     }
     if(avatarName != null){
       m.header.avatarName = avatarName
@@ -212,7 +208,29 @@ abstract class Conversation internal constructor() {
 
   // ------------------------------------------------------------------------------- //
 
-  abstract fun receiveMessage(userContext: UserContext, m: Message)
+
+  fun receiveMessage(userContext: UserContext, m: Message) {
+    var nxtMsg:String? = null
+
+    //Generic Lambda
+    if (this.hasGenericCallback(m.baseMessageId)) {
+      nxtMsg = this.execGenericCallback(m, userContext)
+    }
+
+    if (this.hasSelectItemCallback(m.id) && m.body.javaClass == MessageBodySingleSelect::class.java) {
+      // MessageBodySingleSelect body = (MessageBodySingleSelect) m.body;
+      nxtMsg = this.execSelectItemCallback(m.id, m.body as MessageBodySingleSelect, userContext)
+      addToChat(m, userContext)
+    }
+
+    if(nxtMsg != null){
+      this.completeRequest(nxtMsg, userContext)
+    }else{
+      handleMessage(userContext, m)
+    }
+  }
+
+  abstract fun handleMessage(userContext: UserContext, m: Message)
 
   protected open fun completeRequest(nxtMsg: String, userContext: UserContext) {
     if (getMessage(nxtMsg) != null) {

@@ -92,7 +92,7 @@ public class MainConversation extends Conversation {
   }
 
   @Override
-  public void receiveMessage(UserContext userContext, Message m) {
+  public void handleMessage(UserContext userContext, Message m) {
 
     String nxtMsg = "";
 

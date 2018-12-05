@@ -67,7 +67,7 @@ public class TrustlyConversation extends Conversation {
   }
 
   @Override
-  public void receiveMessage(final UserContext userContext, final Message m) {
+  public void handleMessage(final UserContext userContext, final Message m) {
 
     String nxtMsg = "";
     /*
@@ -157,8 +157,9 @@ public class TrustlyConversation extends Conversation {
     return false;
   }
 
+
   @Override
-  protected void addToChat(Message m, UserContext userContext) {
+  public void addToChat(Message m, UserContext userContext) {
     if ((m.id.equals(START) || m.id.equals(CANCEL) || m.id.equals(FORCED_START))
         && m.header.fromId == MessageHeader.HEDVIG_USER_ID) {
       final UserData userData = userContext.getOnBoardingData();

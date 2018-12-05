@@ -143,7 +143,7 @@ public class SessionManagerTest {
 
     assertThat(Iterables.getLast(messages))
         .hasFieldOrPropertyWithValue(
-            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
+            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_ASK_NAME);
     assertThat(tolvanssonUserContext.getActiveConversation().get()).isNotNull();
   }
 

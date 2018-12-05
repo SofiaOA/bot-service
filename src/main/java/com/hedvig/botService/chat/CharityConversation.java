@@ -123,7 +123,7 @@ public class CharityConversation extends Conversation {
   }
 
   @Override
-  public void receiveMessage(UserContext userContext, Message m) {
+  public void handleMessage(UserContext userContext, Message m) {
 
     String nxtMsg = MESSAGE_KONTRAKT_CHARITY;
     switch (m.getBaseMessageId()) {

@@ -27,7 +27,8 @@ constructor(
   private val productPricingService: ProductPricingService,
   private val signupRepo: SignupCodeRepository,
   private val eventPublisher: ApplicationEventPublisher,
-  private val conversationFactory: ConversationFactory) : Conversation(), BankIdChat {
+  private val conversationFactory: ConversationFactory
+) : Conversation(), BankIdChat {
 
   var queuePos: Int? = null
 
@@ -53,18 +54,26 @@ constructor(
           + "\u000CDu signar inte upp dig på något genom att fortsätta!",
         Lists.newArrayList<SelectItem>(
           SelectOption("Låter bra!", MESSAGE_FORSLAGSTART),
-          SelectOption("Jag är redan medlem", "message.bankid.start"))))
+          SelectOption("Jag är redan medlem", "message.bankid.start")
+        )
+      )
+    )
 
     this.createChatMessage(
       MESSAGE_ONBOARDINGSTART_SHORT,
       MessageBodyParagraph(
-        "Hej! Jag heter Hedvig 👋"))
+        "Hej! Jag heter Hedvig 👋"
+      )
+    )
     this.addRelayToChatMessage(MESSAGE_ONBOARDINGSTART_SHORT, MESSAGE_FORSLAGSTART)
 
     this.createChatMessage(
       MESSAGE_ONBOARDINGSTART_ASK_NAME,
-      WrappedMessage(MessageBodyText(
-        "Hej! Jag heter Hedvig 👋\u000CVad heter du?"))
+      WrappedMessage(
+        MessageBodyText(
+          "Hej! Jag heter Hedvig 👋\u000CVad heter du?"
+        )
+      )
       { body, u, message ->
         u.onBoardingData.firstName = body.text.trim()
         addToChat(message, u)
@@ -73,10 +82,13 @@ constructor(
 
     this.createChatMessage(
       MESSAGE_ONBOARDINGSTART_ASK_EMAIL,
-      WrappedMessage(MessageBodyText(
-        "Trevligt att träffas {NAME}!\nFör att kunne ge dig ett prisförslag"
-      + " behöver jag ställa några snabba frågor"
-      + "\u000CFörst, vad är din mailadress?"))
+      WrappedMessage(
+        MessageBodyText(
+          "Trevligt att träffas {NAME}!\nFör att kunne ge dig ett prisförslag"
+            + " behöver jag ställa några snabba frågor"
+            + "\u000CFörst, vad är din mailadress?"
+        )
+      )
       { body, userContext, message ->
         val trimmedEmail = body.text.trim()
         userContext.onBoardingData.email = "Min email är $trimmedEmail"
@@ -89,18 +101,22 @@ constructor(
       "message.membernotfound",
       MessageBodySingleSelect(
         "Hmm, det verkar som att du inte är medlem här hos mig ännu" + "\u000CMen jag tar gärna fram ett försäkringsförslag till dig, det är precis som allt annat med mig superenkelt",
-        Lists.newArrayList<SelectItem>(SelectOption("Låter bra!", MESSAGE_FORSLAGSTART))))
+        Lists.newArrayList<SelectItem>(SelectOption("Låter bra!", MESSAGE_FORSLAGSTART))
+      )
+    )
 
     this.createMessage(
       MESSAGE_SIGNUP_TO_WAITLIST,
       MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
-      MessageBodyText("Det ordnar jag! Vad är din mailadress?"))
+      MessageBodyText("Det ordnar jag! Vad är din mailadress?")
+    )
     this.setExpectedReturnType(MESSAGE_SIGNUP_TO_WAITLIST, EmailAdress())
 
     this.createMessage(
       "message.signup.email",
       MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
-      MessageBodyText("Det ordnar jag! Vad är din mailadress?"))
+      MessageBodyText("Det ordnar jag! Vad är din mailadress?")
+    )
     this.setExpectedReturnType("message.signup.email", EmailAdress())
 
     this.createChatMessage(
@@ -108,9 +124,12 @@ constructor(
       MessageBodySingleSelect(
         "Tack!" + "\u000CJag hör av mig till dig snart, ha det fint så länge! ✌️",
         listOf(
-              SelectOption(
-                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))
-        ))
+          SelectOption(
+            "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST
+          )
+        )
+      )
+    )
 
     this.createChatMessage(
       MESSAGE_SIGNUP_NOT_ACTIVATED_YET,
@@ -119,8 +138,12 @@ constructor(
           + "\u000CTitta in igen när du fått aktiveringsmailet"
           + "\u000CJag hör av mig snart!",
         listOf(
-              SelectOption(
-                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))))
+          SelectOption(
+            "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST
+          )
+        )
+      )
+    )
 
     this.createChatMessage(
       MESSAGE_SIGNUP_NOT_REGISTERED_YET,
@@ -129,19 +152,27 @@ constructor(
           + "\u000CMen nu har jag din mailadress, så jag lägger till den!"
           + "\u000CVi hörs snart!",
         listOf(
-              SelectOption(
-                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))))
+          SelectOption(
+            "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST
+          )
+        )
+      )
+    )
 
     this.createMessage(
       MESSAGE_NOTMEMBER,
       MessageBodyParagraph(
-        "Okej! Då tar jag fram ett försäkringsförslag till dig på nolltid"))
+        "Okej! Då tar jag fram ett försäkringsförslag till dig på nolltid"
+      )
+    )
     this.addRelay(MESSAGE_NOTMEMBER, "message.notmember.start")
 
     this.createMessage(
       "message.notmember.start",
       MessageBodyParagraph(
-        "Jag ställer några snabba frågor så att jag kan räkna ut ditt pris"))
+        "Jag ställer några snabba frågor så att jag kan räkna ut ditt pris"
+      )
+    )
     this.addRelay("message.notmember.start", MESSAGE_FORSLAGSTART)
 
     // Deprecated
@@ -151,14 +182,18 @@ constructor(
         "Grattis! "
           + emoji_tada
           + " Nu kan du bli medlem hos Hedvig\u000CKolla din mail, där ska du ha fått en aktiveringkod som du ska ange här\u000CVi ses snart! "
-          + emoji_smile))
+          + emoji_smile
+      )
+    )
 
     // Deprecated
     this.createChatMessage(
       "message.activate.code.used",
       MessageBodySingleSelect(
         "Det verkar som koden redan är använd... \u000CHar du aktiverat koden på en annan enhet så kan du logga in direkt med bankId.",
-        listOf(SelectOption("Jag är redan medlem och vill logga in", "message.medlem"))))
+        listOf(SelectOption("Jag är redan medlem och vill logga in", "message.medlem"))
+      )
+    )
 
     // Deprecated
     this.createMessage(
@@ -166,20 +201,30 @@ constructor(
       MessageBodySingleSelect(
         "",
         listOf(
-              SelectOption(
-                "Kolla min plats på väntelistan", "message.signup.checkposition"),
-              SelectOption(
-                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))))
+          SelectOption(
+            "Kolla min plats på väntelistan", "message.signup.checkposition"
+          ),
+          SelectOption(
+            "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST
+          )
+        )
+      )
+    )
 
     this.createMessage(
       MESSAGE_WAITLIST_NOT_ACTIVATED,
       MessageBodySingleSelect(
         "Du verkar redan stå på väntelistan. Din plats är {SIGNUP_POSITION}!",
         listOf(
-              SelectOption(
-                "Kolla min plats på väntelistan", "message.signup.checkposition"),
-              SelectOption(
-                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))))
+          SelectOption(
+            "Kolla min plats på väntelistan", "message.signup.checkposition"
+          ),
+          SelectOption(
+            "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST
+          )
+        )
+      )
+    )
 
     // Deprecated
     this.createMessage(
@@ -187,14 +232,20 @@ constructor(
       MessageBodySingleSelect(
         "Jag känner inte igen den koden tyvärr $emoji_thinking",
         listOf(
-              SelectOption(
-                "Kolla min plats på väntelistan", "message.signup.checkposition"),
-              SelectOption(
-                "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST))))
+          SelectOption(
+            "Kolla min plats på väntelistan", "message.signup.checkposition"
+          ),
+          SelectOption(
+            "Jag har fått ett aktiveringsmail", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST
+          )
+        )
+      )
+    )
 
     this.createMessage(
       MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST,
-      MessageBodyText("Kul! Skriv in din mailadress här"))
+      MessageBodyText("Kul! Skriv in din mailadress här")
+    )
     this.setExpectedReturnType(MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST, EmailAdress())
 
     this.createMessage(MESSAGE_ACTIVATE_OK_A, MessageBodyParagraph("Välkommen!"), 1000)
@@ -203,63 +254,72 @@ constructor(
     this.createMessage(
       MESSAGE_ACTIVATE_OK_B,
       MessageBodyParagraph("Nu ska jag ta fram ett försäkringsförslag åt dig"),
-      2000)
+      2000
+    )
     this.addRelay(MESSAGE_ACTIVATE_OK_B, MESSAGE_FORSLAGSTART)
 
     this.createMessage(
       "message.uwlimit.tack",
       MessageBodySingleSelect(
         "Tack! Jag hör av mig så fort jag kan",
-        listOf(SelectOption("Jag vill starta om chatten", "message.activate.ok.a"))))
+        listOf(SelectOption("Jag vill starta om chatten", "message.activate.ok.a"))
+      )
+    )
 
     this.createMessage(
       "message.audiotest",
       MessageBodyAudio("Här kan du testa audio", "/claims/fileupload"),
-      2000)
+      2000
+    )
     this.createMessage(
       "message.phototest",
       MessageBodyPhotoUpload("Här kan du testa fotouppladdaren", "/asset/fileupload"),
-      2000)
+      2000
+    )
     this.createMessage(
       "message.fileupload.result",
       MessageBodySingleSelect(
         "Ok uppladdningen gick bra!",
-        listOf(SelectOption("Hem", MESSAGE_ONBOARDINGSTART))))
+        listOf(SelectOption("Hem", MESSAGE_ONBOARDINGSTART))
+      )
+    )
 
-    this.createMessage(
+    this.createChatMessage(
       "message.medlem",
-      body = MessageBodySingleSelect(
-        "Välkommen tillbaka "
-          + emoji_hug
-          + "\n\n Logga in med BankID så är du inne i appen igen",
-        listOf(
-              SelectLink(
-                "Logga in",
-                "message.bankid.autostart.respond",
-                null,
-                "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null,
-                false))
-
-            // add(new SelectOption("Logga in", "message.bankidja"));
-
+      WrappedMessage(
+        MessageBodySingleSelect(
+          "Välkommen tillbaka "
+            + emoji_hug
+            + "\n\n Logga in med BankID så är du inne i appen igen",
+          listOf(
+            SelectLink(
+              "Logga in",
+              "message.bankid.autostart.respond",
+              null,
+              "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null,
+              false
+            )
+          )
         )
-    , callback = { m : MessageBodySingleSelect, uc : UserContext ->
-      val obd = uc.onBoardingData
-      if (m.selectedItem.value == "message.bankid.autostart.respond") {
-        uc.putUserData(LOGIN, "true")
-        obd.bankIdMessage = "message.medlem"
-      }
+      ) { m: MessageBodySingleSelect, uc: UserContext, _ ->
+        val obd = uc.onBoardingData
+        if (m.selectedItem.value == "message.bankid.autostart.respond") {
+          uc.putUserData(LOGIN, "true")
+          obd.bankIdMessage = "message.medlem"
+        }
 
-      ""
-    })
+        m.selectedItem.value
+      })
     setupBankidErrorHandlers("message.medlem")
 
     // Deprecated
     this.createMessage(
       MESSAGE_PRE_FORSLAGSTART,
       MessageBodyParagraph(
-        "Toppen! Då ställer jag några frågor så att jag kan räkna ut ditt pris"),
-      1500)
+        "Toppen! Då ställer jag några frågor så att jag kan räkna ut ditt pris"
+      ),
+      1500
+    )
     this.addRelay(MESSAGE_PRE_FORSLAGSTART, MESSAGE_FORSLAGSTART)
 
     this.createMessage(
@@ -269,97 +329,119 @@ constructor(
         Lists.newArrayList<SelectItem>(
           SelectOption("Lägenhet", MESSAGE_LAGENHET_PRE),
           SelectOption("Hus", MESSAGE_HUS),
-          SelectOption("Jag är redan medlem", "message.bankid.start"))))
+          SelectOption("Jag är redan medlem", "message.bankid.start")
+        )
+      )
+    )
 
     this.createMessage(MESSAGE_LAGENHET_PRE, MessageBodyParagraph(emoji_hand_ok))
     this.addRelay(MESSAGE_LAGENHET_PRE, MESSAGE_LAGENHET_NO_PERSONNUMMER)
 
     this.createChatMessage(
       MESSAGE_LAGENHET_NO_PERSONNUMMER,
-      WrappedMessage(MessageBodyText("Vad är ditt personnumer? Jag behöver det så att jag kan hämta din adress 🏠")
+      WrappedMessage(
+        MessageBodyText("Vad är ditt personnumer? Jag behöver det så att jag kan hämta din adress 🏠")
       ) { body, uc, m ->
-        uc.onBoardingData.let{
+        uc.onBoardingData.let {
           it.addressCity = "Stockholm"
-          it.addressStreet = "Drottninggatan"
-          it.addressZipCode = "11101"
+          it.addressStreet = "Drottninggatan 1"
+          it.addressZipCode = "10001"
           it.familyName = "Svensson"
+          it.ssn = body.text.trim()
         }
+        body.text = "${body.text.dropLast(4)}-****"
         addToChat(m, uc)
         MESSAGE_BANKIDJA
       }
     )
 
-    this.createMessage(
+    this.createChatMessage(
       MESSAGE_LAGENHET,
-      body = MessageBodySingleSelect(
-        "Har du BankID? I så fall kan vi hoppa över några frågor så du får se ditt prisförslag snabbare!",
-        listOf(
-              SelectLink(
-                "Fortsätt med BankID",
-                "message.bankid.autostart.respond", null,
-                "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null,
-                false),
-      SelectOption("Fortsätt utan", "message.manuellnamn"))) ,
-    callback = { m, uc ->
-      val obd = uc.onBoardingData
-      if (m.selectedItem.value == "message.bankid.autostart.respond") {
-        obd.bankIdMessage = MESSAGE_LAGENHET
+      WrappedMessage(
+        MessageBodySingleSelect(
+          "Har du BankID? I så fall kan vi hoppa över några frågor så du får se ditt prisförslag snabbare!",
+          listOf(
+            SelectLink(
+              "Fortsätt med BankID",
+              "message.bankid.autostart.respond", null,
+              "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null,
+              false
+            ),
+            SelectOption("Fortsätt utan", "message.manuellnamn")
+          )
+        )
+      )
+      { m, uc, _ ->
+        val obd = uc.onBoardingData
+        if (m.selectedItem.value == "message.bankid.autostart.respond") {
+          obd.bankIdMessage = MESSAGE_LAGENHET
+        }
+        m.selectedItem.value
       }
-      ""
-    })
+    )
 
     setupBankidErrorHandlers(MESSAGE_LAGENHET)
 
     this.createMessage(
       "message.missing.bisnode.data",
-      MessageBodyParagraph("Jag hittade tyvärr inte dina uppgifter. Men..."))
+      MessageBodyParagraph("Jag hittade tyvärr inte dina uppgifter. Men...")
+    )
     this.addRelay("message.missing.bisnode.data", "message.manuellnamn")
 
     this.createMessage(
-      MESSAGE_START_LOGIN, MessageBodyParagraph("Välkommen tillbaka! $emoji_hug"), 1500)
+      MESSAGE_START_LOGIN, MessageBodyParagraph("Välkommen tillbaka! $emoji_hug"), 1500
+    )
     this.addRelay(MESSAGE_START_LOGIN, "message.bankid.start")
 
-    this.createMessage(
+    this.createChatMessage(
       "message.bankid.start",
-      body = MessageBodySingleSelect(
-        "Bara att logga in så ser du din försäkring",
-        Lists.newArrayList(
-          SelectLink(
-            "Logga in med BankID",
-            "message.bankid.autostart.respond", null,
-            "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null,
-            false),
-          SelectOption("Jag är inte medlem", MESSAGE_NOTMEMBER)))
-    ) { m, uc ->
-      val obd = uc.onBoardingData
-      if (m.selectedItem.value == "message.bankid.autostart.respond") {
-        obd.bankIdMessage = "message.bankid.start"
-      } else if (m.selectedItem.value == MESSAGE_NOTMEMBER) {
-        uc.putUserData(LOGIN, "false")
-      }
+      WrappedMessage(
+        MessageBodySingleSelect(
+          "Bara att logga in så ser du din försäkring",
+          Lists.newArrayList(
+            SelectLink(
+              "Logga in med BankID",
+              "message.bankid.autostart.respond", null,
+              "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null,
+              false
+            ),
+            SelectOption("Jag är inte medlem", MESSAGE_NOTMEMBER)
+          )
+        )
+      ) { m, uc, _ ->
+        val obd = uc.onBoardingData
+        if (m.selectedItem.value == "message.bankid.autostart.respond") {
+          obd.bankIdMessage = "message.bankid.start"
+        } else if (m.selectedItem.value == MESSAGE_NOTMEMBER) {
+          uc.putUserData(LOGIN, "false")
+        }
 
-      ""
-    }
-
+        m.selectedItem.value
+      })
     setupBankidErrorHandlers("message.bankid.start")
 
     this.createMessage(
       "message.bankid.start.manual",
       MessageBodyNumber(
-        "Om du anger ditt personnumer så får du använda bankId på din andra enhet$emoji_smile"))
+        "Om du anger ditt personnumer så får du använda bankId på din andra enhet$emoji_smile"
+      )
+    )
 
     this.createMessage(
       "message.bankid.error",
       MessageBodyParagraph("Hmm, det verkar inte som att ditt BankID svarar. Testa igen!"),
-      1500)
+      1500
+    )
 
     this.createMessage(
       "message.bankid.start.manual.error",
-      MessageBodyParagraph("Hmm, det verkar inte som att ditt BankID svarar. Testa igen!"))
+      MessageBodyParagraph("Hmm, det verkar inte som att ditt BankID svarar. Testa igen!")
+    )
     this.addRelay("message.bankid.start.manual.error", "message.bankid.start.manual")
 
     this.createMessage(
-      "message.bankid.autostart.respond", MessageBodyBankIdCollect("{REFERENCE_TOKEN}"))
+      "message.bankid.autostart.respond", MessageBodyBankIdCollect("{REFERENCE_TOKEN}")
+    )
 
     this.createChatMessage(
       MESSAGE_HUS,
@@ -370,24 +452,29 @@ constructor(
             add(SelectOption("Okej!", MESSAGE_NYHETSBREV))
             add(SelectOption("Tack, men nej tack", "message.avslutok"))
           }
-        }))
+        })
+    )
 
     this.createMessage(MESSAGE_NYHETSBREV, MessageBodyText("Topp! Vad är mailadressen?"))
     this.setExpectedReturnType(MESSAGE_NYHETSBREV, EmailAdress())
     this.createMessage(
       MESSAGE_TIPSA,
       MessageBodyText(
-        "Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmail till"))
+        "Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmail till"
+      )
+    )
     this.setExpectedReturnType(MESSAGE_TIPSA, EmailAdress())
     this.createMessage(
       MESSAGE_FRIFRAGA,
       MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
-      MessageBodyText("Fråga på!"))
+      MessageBodyText("Fråga på!")
+    )
 
     this.createMessage(
       MESSAGE_FRIONBOARDINGFRAGA,
       MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
-      MessageBodyText("Fråga på! "))
+      MessageBodyText("Fråga på! ")
+    )
 
     this.createMessage(
       MESSAGE_NAGOTMER,
@@ -400,7 +487,8 @@ constructor(
             add(SelectOption("Jag har en fråga", MESSAGE_FRIONBOARDINGFRAGA))
             add(SelectOption("Nej tack!", MESSAGE_AVSLUTOK))
           }
-        }))
+        })
+    )
 
     this.createMessage(
       MESSAGE_BANKIDJA,
@@ -411,17 +499,21 @@ constructor(
             add(SelectOption("Ja", MESSAGE_KVADRAT))
             add(SelectOption("Nej", MESSAGE_VARBORDUFELADRESS))
           }
-        }))
+        })
+    )
 
     this.createMessage(
       "message.bankidja.noaddress",
-      MessageBodyText("Tack {NAME}! Nu skulle jag behöva veta vilken gatuadress bor du på?"))
+      MessageBodyText("Tack {NAME}! Nu skulle jag behöva veta vilken gatuadress bor du på?")
+    )
 
     this.createMessage(
       MESSAGE_VARBORDUFELADRESS,
-      MessageBodyText("Inga problem! Vilken gatuadress bor du på?"))
+      MessageBodyText("Inga problem! Vilken gatuadress bor du på?")
+    )
     this.createMessage(
-      "message.varbordufelpostnr", MessageBodyNumber("Och vad har du för postnummer?"))
+      "message.varbordufelpostnr", MessageBodyNumber("Och vad har du för postnummer?")
+    )
     this.setExpectedReturnType("message.varbordufelpostnr", ZipCodeSweden())
 
     this.createMessage(MESSAGE_KVADRAT, MessageBodyNumber("Hur många kvadratmeter är lägenheten?"))
@@ -430,15 +522,19 @@ constructor(
     this.createChatMessage(
       "message.manuellnamn",
       MessageBodyText(
-        "Inga problem! Då ställer jag bara några extra frågor nu\u000CMen om du vill bli medlem sen så måste du signera med BankID, bara så du vet!\u000CVad heter du i förnamn?"))
+        "Inga problem! Då ställer jag bara några extra frågor nu\u000CMen om du vill bli medlem sen så måste du signera med BankID, bara så du vet!\u000CVad heter du i förnamn?"
+      )
+    )
 
     this.createMessage(
       "message.manuellfamilyname",
-      MessageBodyText("Kul att ha dig här {NAME}! Vad heter du i efternamn?"))
+      MessageBodyText("Kul att ha dig här {NAME}! Vad heter du i efternamn?")
+    )
 
     this.createMessage(
       "message.manuellpersonnr",
-      MessageBodyNumber("Tack! Vad är ditt personnummer? (12 siffror)"))
+      MessageBodyNumber("Tack! Vad är ditt personnummer? (12 siffror)")
+    )
     this.setExpectedReturnType("message.manuellpersonnr", SSNSweden())
     this.createMessage("message.varborduadress", MessageBodyText("Vilken gatuadress bor du på?"))
     this.createMessage("message.varbordupostnr", MessageBodyNumber("Vad är ditt postnummer?"))
@@ -453,7 +549,8 @@ constructor(
             add(SelectOption("Jag hyr den", ProductTypes.RENT.toString()))
             add(SelectOption("Jag äger den", ProductTypes.BRF.toString()))
           }
-        }))
+        })
+    )
 
     this.createMessage(
       "message.lghtyp.sublet",
@@ -464,7 +561,8 @@ constructor(
             add(SelectOption("Hyresrätt", ProductTypes.SUBLET_RENTAL.toString()))
             add(SelectOption("Bostadsrätt", ProductTypes.SUBLET_BRF.toString()))
           }
-        }))
+        })
+    )
 
     this.createMessage("message.pers", MessageBodyNumber("Okej! Hur många bor i lägenheten?"))
     this.setExpectedReturnType("message.pers", HouseholdMemberNumber())
@@ -479,30 +577,37 @@ constructor(
           SelectOption("Säkerhetsdörr", "safety.door"),
           SelectOption("Gallergrind", "safety.gate"),
           SelectOption("Inbrottslarm", "safety.burglaralarm"),
-          SelectOption("Inget av dessa", "safety.none", false, true))))
+          SelectOption("Inget av dessa", "safety.none", false, true)
+        )
+      )
+    )
 
     this.createMessage(
       MESSAGE_PHONENUMBER,
-      MessageBodyNumber("Nu är vi snart klara! Vad är ditt telefonnummer?"))
+      MessageBodyNumber("Nu är vi snart klara! Vad är ditt telefonnummer?")
+    )
     this.setExpectedReturnType(MESSAGE_PHONENUMBER, TextInput())
 
     // ---------- Move to after sign.
     this.createMessage(
       MESSAGE_EMAIL,
       MessageBodyText(
-        "Nu behöver jag bara din mailadress så att jag kan skicka en bekräftelse"))
+        "Nu behöver jag bara din mailadress så att jag kan skicka en bekräftelse"
+      )
+    )
     this.setExpectedReturnType(MESSAGE_EMAIL, EmailAdress())
 
     this.createMessage(
       MESSAGE_FORSAKRINGIDAG,
       MessageBodySingleSelect(
-        "Tackar! Har du någon hemförsäkring idag?",
+        "Har du någon hemförsäkring idag?",
         object : ArrayList<SelectItem>() {
           init {
             add(SelectOption("Ja", MESSAGE_FORSAKRINGIDAGJA))
-            add(SelectOption("Nej", MESSAGE_FORSLAG))
+            add(SelectOption("Nej", MESSAGE_FORSLAG2))
           }
-        }))
+        })
+    )
 
     this.createMessage(
       MESSAGE_FORSAKRINGIDAGJA,
@@ -518,7 +623,8 @@ constructor(
             add(SelectOption("Annat bolag", "message.bolag.annat.expand"))
             add(SelectOption("Ingen aning", "message.bolag.vetej"))
           }
-        }))
+        })
+    )
 
     this.createMessage(
       "message.bolag.annat.expand",
@@ -532,25 +638,30 @@ constructor(
             add(SelectOption("Vardia", "Vardia"))
             add(SelectOption("Annat bolag", MESSAGE_ANNATBOLAG))
           }
-        }))
+        })
+    )
 
     this.createMessage(
-      "message.bolag.vetej", MessageBodyParagraph("Inga problem, det kan vi ta senare"))
-    this.addRelay("message.bolag.vetej", MESSAGE_FORSLAG)
+      "message.bolag.vetej", MessageBodyParagraph("Inga problem, det kan vi ta senare")
+    )
+    this.addRelay("message.bolag.vetej", MESSAGE_FORSLAG2)
 
     this.createMessage(
-      MESSAGE_ANNATBOLAG, MessageBodyText("Okej, vilket försäkringsbolag har du?"), 2000)
+      MESSAGE_ANNATBOLAG, MessageBodyText("Okej, vilket försäkringsbolag har du?"), 2000
+    )
 
     this.createChatMessage(
       MESSAGE_BYTESINFO,
       MessageBodySingleSelect(
-        "Ja, ibland är det dags att prova något nytt. De kommer nog förstå\u000C" + "Om du blir medlem hos mig sköter jag bytet åt dig. Så när din gamla försäkring går ut, flyttas du automatiskt till din nya hos mig",
+        "👀\u000C" +
+          "Om du blir medlem hos mig sköter jag bytet åt dig. Så när din gamla försäkring går ut, flyttas du automatiskt till Hedvig",
         object : ArrayList<SelectItem>() {
           init {
-            add(SelectOption("Jag förstår", MESSAGE_FORSLAG)) // Create product
+            add(SelectOption("Jag förstår", MESSAGE_FORSLAG2)) // Create product
             add(SelectOption("Förklara mer", "message.bytesinfo3"))
           }
-        }))
+        })
+    )
 
     this.createChatMessage(
       "message.bytesinfo3",
@@ -563,59 +674,73 @@ constructor(
           + "Så du behöver aldrig vara orolig att gå utan försäkring efter att du skrivit på med mig",
         object : ArrayList<SelectItem>() {
           init {
-            add(SelectOption("Okej!", MESSAGE_FORSLAG)) // Create product
+            add(SelectOption("Okej!", MESSAGE_FORSLAG2)) // Create product
           }
-        }))
+        })
+    )
 
     this.createChatMessage(
       MESSAGE_50K_LIMIT,
       MessageBodySingleSelect(
-        "Okej! Dina prylar som du har hemma skyddas upp till en miljon kr 🏺🖼️\u000C" + "Äger du något som du tar med dig utanför hemmet som är värt över 50 000 kr? 💍⌚",
+        "Toppen!\u000CBra att veta: dina saker hemma skyddas upp till en miljon kr\u000C" + "Äger du något som du tar med dig utanför hemmet som är värt över 50 000 kr? 💍⌚",
         Lists.newArrayList<SelectItem>(
           SelectOption("Ja", MESSAGE_50K_LIMIT_YES),
-          SelectOption("Nej", MESSAGE_50K_LIMIT_NO))))
+          SelectOption("Nej", MESSAGE_50K_LIMIT_NO)
+        )
+      )
+    )
 
     this.createChatMessage(
       MESSAGE_50K_LIMIT_YES,
       MessageBodySingleSelect(
         "Okej!\u000COm du skaffar Hedvig är det enkelt att lägga till en separat objektsförsäkring efteråt",
-        Lists.newArrayList<SelectItem>(SelectOption("Jag förstår!", MESSAGE_50K_LIMIT_YES_YES))))
+        Lists.newArrayList<SelectItem>(SelectOption("Jag förstår!", MESSAGE_50K_LIMIT_YES_YES))
+      )
+    )
 
     this.createMessage(MESSAGE_50K_LIMIT_YES_YES, MessageBodyParagraph("Det fixar jag!"), 1500)
-    this.addRelay(MESSAGE_50K_LIMIT_YES_YES, MESSAGE_PHONENUMBER)
+    this.addRelay(MESSAGE_50K_LIMIT_YES_YES, MESSAGE_FORSAKRINGIDAG)
 
     this.createMessage(
       MESSAGE_50K_LIMIT_YES_NO,
       MessageBodyParagraph("Då skippar jag det $emoji_thumbs_up"),
-      2000)
-    this.addRelay(MESSAGE_50K_LIMIT_YES_NO, MESSAGE_PHONENUMBER)
+      2000
+    )
+    this.addRelay(MESSAGE_50K_LIMIT_YES_NO, MESSAGE_FORSAKRINGIDAG)
 
     this.createMessage(
       MESSAGE_50K_LIMIT_NO,
       MessageBodyParagraph("Vad bra! Då täcks dina prylar av drulleförsäkringen"),
-      2000)
+      2000
+    )
 
     this.createMessage(
       MESSAGE_50K_LIMIT_NO_1,
       MessageBodyParagraph(
-        "Köper du någon dyr pryl i framtiden så fixar jag så klart det också!"),
-      2000)
+        "Köper du någon dyr pryl i framtiden så fixar jag så klart det också!"
+      ),
+      2000
+    )
 
     this.addRelay(MESSAGE_50K_LIMIT_NO, MESSAGE_50K_LIMIT_NO_1)
 
-    this.addRelay(MESSAGE_50K_LIMIT_NO_1, MESSAGE_PHONENUMBER)
+    this.addRelay(MESSAGE_50K_LIMIT_NO_1, MESSAGE_FORSAKRINGIDAG)
 
     this.createMessage(
       MESSAGE_FORSLAG,
       MessageBodyParagraph("Sådär, det var all info jag behövde. Tack!"),
-      2000)
+      2000
+    )
 
     this.createMessage(
       MESSAGE_FORSLAG2,
       MessageBodySingleSelect(
-        "Nu går vi igenom ditt förslag!",
+        "Nu har jag allt jag behöver för att ta fram ditt förslag!",
         Lists.newArrayList<SelectItem>(
-          SelectLink.toOffer("Gå till mitt förslag 👏", "message.forslag.dashboard"))))
+          SelectLink.toOffer("Gå till mitt förslag 👏", "message.forslag.dashboard")
+        )
+      )
+    )
     this.addRelay(MESSAGE_FORSLAG, MESSAGE_FORSLAG2)
 
     this.createChatMessage(
@@ -631,10 +756,13 @@ constructor(
                 "Visa förslaget igen",
                 "message.forslag.dashboard",
                 "Offer", null, null,
-                false))
+                false
+              )
+            )
             add(SelectOption("Jag har en annan fråga", "message.quote.close"))
           }
-        }))
+        })
+    )
 
     this.createChatMessage(
       "message.skydd",
@@ -647,11 +775,14 @@ constructor(
                 "Visa förslaget igen",
                 "message.forslag.dashboard",
                 "Offer", null, null,
-                false))
+                false
+              )
+            )
             add(SelectOption("Jag har en annan fråga", "message.quote.close"))
             // add(new SelectOption("Jag vill bli medlem", "message.forslag"));
           }
-        }))
+        })
+    )
 
     this.createMessage(
       "message.frionboardingfragatack",
@@ -661,7 +792,8 @@ constructor(
           init {
             add(SelectOption("Jag har fler frågor", MESSAGE_FRIONBOARDINGFRAGA))
           }
-        }))
+        })
+    )
 
     this.createMessage(
       "message.frifragatack",
@@ -674,20 +806,27 @@ constructor(
                 "Visa förslaget igen",
                 "message.forslag.dashboard",
                 "Offer", null, null,
-                false))
+                false
+              )
+            )
             add(SelectOption("Jag har fler frågor", MESSAGE_FRIFRAGA))
           }
-        }))
+        })
+    )
 
     this.createChatMessage(
       "message.uwlimit.housingsize",
       MessageBodyText(
-        "Det var stort! För att kunna försäkra så stora lägenheter behöver vi ta några grejer över telefon\u000CVad är ditt nummer?"))
+        "Det var stort! För att kunna försäkra så stora lägenheter behöver vi ta några grejer över telefon\u000CVad är ditt nummer?"
+      )
+    )
 
     this.createChatMessage(
       "message.uwlimit.householdsize",
       MessageBodyText(
-        "Okej! För att kunna försäkra så många i samma lägenhet behöver vi ta några grejer över telefon\u000CVad är ditt nummer?"))
+        "Okej! För att kunna försäkra så många i samma lägenhet behöver vi ta några grejer över telefon\u000CVad är ditt nummer?"
+      )
+    )
 
     this.createChatMessage(
       "message.pris",
@@ -700,15 +839,20 @@ constructor(
                 "Visa förslaget igen",
                 "message.forslag.dashboard",
                 "Offer", null, null,
-                false))
+                false
+              )
+            )
             add(SelectOption("Jag har fler frågor", "message.quote.close"))
           }
-        }))
+        })
+    )
 
     this.createMessage(
       "message.mail",
       MessageBodyText(
-        "Tackar.\nOch din mailadress så jag kan skicka en bekräftelse när vi skrivit på?"))
+        "Tackar.\nOch din mailadress så jag kan skicka en bekräftelse när vi skrivit på?"
+      )
+    )
 
     // (FUNKTION: FYLL I MAILADRESS) = FÄLT
     this.setExpectedReturnType("message.mail", EmailAdress())
@@ -716,25 +860,30 @@ constructor(
     this.createMessage(
       "message.bankid.error.expiredTransaction",
       MessageBodyParagraph(BankIDStrings.expiredTransactionError),
-      1500)
+      1500
+    )
 
     this.createMessage(
       "message.bankid.error.certificateError",
       MessageBodyParagraph(BankIDStrings.certificateError),
-      1500)
+      1500
+    )
 
     this.createMessage(
       "message.bankid.error.userCancel",
       MessageBodyParagraph(BankIDStrings.userCancel),
-      1500)
+      1500
+    )
 
     this.createMessage(
-      "message.bankid.error.cancelled", MessageBodyParagraph(BankIDStrings.cancelled), 1500)
+      "message.bankid.error.cancelled", MessageBodyParagraph(BankIDStrings.cancelled), 1500
+    )
 
     this.createMessage(
       "message.bankid.error.startFailed",
       MessageBodyParagraph(BankIDStrings.startFailed),
-      1500)
+      1500
+    )
 
     this.createMessage("message.kontrakt.great", MessageBodyParagraph("Härligt!"), 1000)
     this.addRelay("message.kontrakt.great", "message.kontrakt")
@@ -742,94 +891,88 @@ constructor(
     this.createMessage(
       "message.kontrakt.signError",
       MessageBodyParagraph("Hmm nu blev något fel! Vi försöker igen $emoji_flushed_face"),
-      1000)
+      1000
+    )
     this.addRelay("message.kontrakt.signError", "message.kontrakt")
 
     this.createMessage(
       "message.kontrakt.signProcessError",
       MessageBodyParagraph("Vi försöker igen $emoji_flushed_face"),
-      1000)
+      1000
+    )
     this.addRelay("message.kontrakt.signProcessError", "message.kontrakt")
 
-    this.createMessage(
+    this.createChatMessage(
       "message.kontrakt",
-      body = MessageBodySingleSelect(
-        "Då är det bara att signera, sen är vi klara",
-        object : ArrayList<SelectItem>() {
-          init {
-            add(SelectOption("Okej!", "message.kontraktpop.startBankId"))
-            // add(new SelectLink("Läs igenom", "message.kontrakt", null, null,
-            // gatewayUrl + "/insurance/contract/{PRODUCT_ID}", false));
+      WrappedMessage(
+        MessageBodySingleSelect(
+          "Då är det bara att signera, sen är vi klara",
+          listOf(SelectOption("Okej!", "message.kontraktpop.startBankId"))
+        )
+      ) { m, userContext, _ ->
+        if (m.selectedItem.value == "message.kontrakt") {
+          m.text = m.selectedItem.text
+        } else {
+          val ud = userContext.onBoardingData
+
+          val signData: Optional<BankIdSignResponse>
+
+          val signText: String
+          signText = if (ud.currentInsurer != null) {
+            "Jag har tagit del av förköpsinformation och villkor och bekräftar genom att signera att jag vill byta till Hedvig när min gamla försäkring går ut. Jag ger också Hedvig fullmakt att byta försäkringen åt mig."
+          } else {
+            "Jag har tagit del av förköpsinformation och villkor och bekräftar genom att signera att jag skaffar en försäkring hos Hedvig."
           }
-        })
-    ) { m, userContext ->
-      if (m.selectedItem.value == "message.kontrakt") {
-        m.text = m.selectedItem.text
-        return@createMessage m.selectedItem.value
-      } else {
-        val ud = userContext.onBoardingData
 
-        val signData: Optional<BankIdSignResponse>
+          signData = memberService.sign(ud.ssn, signText, userContext.memberId)
 
-        val signText: String
-        signText = if (ud.currentInsurer != null) {
-          "Jag har tagit del av förköpsinformation och villkor och bekräftar genom att signera att jag vill byta till Hedvig när min gamla försäkring går ut. Jag ger också Hedvig fullmakt att byta försäkringen åt mig."
-        } else {
-          "Jag har tagit del av förköpsinformation och villkor och bekräftar genom att signera att jag skaffar en försäkring hos Hedvig."
+          if (signData.isPresent) {
+            userContext.startBankIdSign(signData.get())
+          } else {
+            log.error("Could not start signing process.")
+            return@WrappedMessage "message.kontrakt.signError"
+          }
+
         }
-
-        signData = memberService.sign(ud.ssn, signText, userContext.memberId)
-
-        if (signData.isPresent) {
-          userContext.startBankIdSign(signData.get())
-        } else {
-          log.error("Could not start signing process.")
-          return@createMessage "message.kontrakt.signError"
-        }
-        return@createMessage ""
+        m.selectedItem.value
       }
-    }
+    )
 
     this.createMessage(
-      "message.kontraktpop.bankid.collect", MessageBodyBankIdCollect("{REFERENCE_TOKEN}"))
+      "message.kontraktpop.bankid.collect", MessageBodyBankIdCollect("{REFERENCE_TOKEN}")
+    )
 
-    this.createMessage(
+    this.createChatMessage(
       "message.kontraktpop.startBankId",
-      body = MessageBodySingleSelect(
-        "För signeringen använder vi BankID",
-        object : ArrayList<SelectItem>() {
-          init {
-            add(
-              SelectLink(
-                "Öppna BankID",
-                "message.kontraktpop.bankid.collect", null,
-                "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null,
-                false))
-          }
-        })
-    ) { m, uc ->
-      val obd = uc.onBoardingData
-      if (m.selectedItem.value == "message.kontraktpop.bankid.collect") {
-        obd.bankIdMessage = "message.kontraktpop.startBankId"
+      WrappedMessage(
+        MessageBodySingleSelect(
+          "För signeringen använder vi BankID",
+          listOf(
+            SelectLink(
+              "Öppna BankID",
+              "message.kontraktpop.bankid.collect", null,
+              "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null,
+              false
+            )
+          )
+        )
+      ) { m, uc, _ ->
+        val obd = uc.onBoardingData
+        if (m.selectedItem.value == "message.kontraktpop.bankid.collect") {
+          obd.bankIdMessage = "message.kontraktpop.startBankId"
+        }
+
+        m.selectedItem.value
       }
+    )
 
-      ""
-    }
-
-    setupBankidErrorHandlers("message.kontraktpop.startBankId", "message.kontrakt")
+    setupBankidErrorHandlers ("message.kontraktpop.startBankId", "message.kontrakt")
 
     this.createMessage(
       "message.kontraktklar",
-      MessageBodyParagraph("Hurra! $emoji_tada Välkommen som medlem!"))
+      MessageBodyParagraph("Hurra! $emoji_tada Välkommen som medlem!")
+    )
     this.addRelay("message.kontraktklar", MESSAGE_EMAIL)
-
-    /*
- * this.createChatMessage("message.kontraktklar", new MessageBodySingleSelect("Hurra! "+ emoji_tada +
- * " Välkommen som medlem!"+
- * "\u000CJag skickar en bekräftelse till din mail. Visst stämmer det att du har " + EMAIL + "?",
- * new ArrayList<SelectItem>() {{ add(new SelectOption("Ja", "message.onboarding.end")); add(new
- * SelectOption("Nej", "message.kontrakt.email")); }} ));
- */
 
     this.createMessage("message.kontrakt.email", MessageBodyText("OK! Vad är din mailadress?"))
     this.setExpectedReturnType("message.kontrakt.email", EmailAdress())
@@ -842,16 +985,22 @@ constructor(
           init {
             add(
               SelectLink(
-                "Nu utforskar jag", "onboarding.done", "Dashboard", null, null, false))
+                "Nu utforskar jag", "onboarding.done", "Dashboard", null, null, false
+              )
+            )
           }
-        }))
+        })
+    )
 
     this.createMessage(
       "message.avslutok",
       MessageBodySingleSelect(
         "Okej! Trevligt att chattas, ha det fint och hoppas vi hörs igen!",
         Lists.newArrayList<SelectItem>(
-          SelectOption("Jag vill starta om chatten", MESSAGE_ONBOARDINGSTART_SHORT))))
+          SelectOption("Jag vill starta om chatten", MESSAGE_ONBOARDINGSTART_SHORT)
+        )
+      )
+    )
 
     this.createChatMessage(
       "message.quote.close",
@@ -868,9 +1017,12 @@ constructor(
                 "Visa förslaget igen",
                 "message.forslag.dashboard",
                 "Offer", null, null,
-                false))
+                false
+              )
+            )
           }
-        }))
+        })
+    )
 
     this.createMessage("message.bikedone", MessageBodyText("Nu har du sett hur det funkar..."))
 
@@ -886,7 +1038,8 @@ constructor(
             add(SelectOption("Ja", "message.studentja"))
             add(SelectOption("Nej", "message.studentnej"))
           }
-        }))
+        })
+    )
 
     this.createMessage("message.studentnej", MessageBodyParagraph("Okej, då vet jag"))
     this.addRelay("message.studentnej", MESSAGE_KVADRAT)
@@ -899,7 +1052,8 @@ constructor(
           init {
             add(SelectOption("Okej, toppen!", MESSAGE_KVADRAT))
           }
-        }))
+        })
+    )
 
     this.createChatMessage(
       MESSAGE_STUDENT_LIMIT_LIVING_SPACE,
@@ -907,7 +1061,11 @@ constructor(
         "Okej! För så stora lägenheter (över 50 kvm) gäller dessvärre inte studentförsäkringen\u000C" + "Men inga problem, du får den vanliga hemförsäkringen som ger ett bredare skydd och jag fixar ett grymt pris till dig ändå! 🙌",
         Lists.newArrayList<SelectItem>(
           SelectOption(
-            "Okej, jag förstår", MESSAGE_STUDENT_LIMIT_LIVING_SPACE_HOUSE_TYPE))))
+            "Okej, jag förstår", MESSAGE_STUDENT_LIMIT_LIVING_SPACE_HOUSE_TYPE
+          )
+        )
+      )
+    )
 
     this.createMessage(
       MESSAGE_STUDENT_LIMIT_LIVING_SPACE_HOUSE_TYPE,
@@ -918,25 +1076,32 @@ constructor(
             add(SelectOption("Jag hyr den", ProductTypes.RENT.toString()))
             add(SelectOption("Jag äger den", ProductTypes.BRF.toString()))
           }
-        }))
+        })
+    )
 
     this.createChatMessage(
       MESSAGE_STUDENT_LIMIT_PERSONS,
       MessageBodySingleSelect(
         "Okej! För så många personer (fler än 2) gäller dessvärre inte studentförsäkringen\u000C" + "Men inga problem, du får den vanliga hemförsäkringen som ger ett bredare skydd och jag fixar ett grymt pris till dig ändå! 🙌",
-        Lists.newArrayList<SelectItem>(SelectOption("Okej, jag förstår", MESSAGE_SAKERHET))))
+        Lists.newArrayList<SelectItem>(SelectOption("Okej, jag förstår", "message.student.25klimit"))
+      )
+    )
 
     this.createMessage(
       MESSAGE_STUDENT_ELIGIBLE_BRF,
       MessageBodySingleSelect(
         "Grymt! Då får du vår fantastiska studentförsäkring där drulle ingår och betalar bara 99 kr per månad! 🙌",
-        Lists.newArrayList<SelectItem>(SelectOption("Okej, nice!", MESSAGE_SAKERHET))))
+        Lists.newArrayList<SelectItem>(SelectOption("Okej, nice!", "message.student.25klimit"))
+      )
+    )
 
     this.createMessage(
       MESSAGE_STUDENT_ELIGIBLE_RENT,
       MessageBodySingleSelect(
         "Grymt! Då får du vår fantastiska studentförsäkring där drulle ingår och betalar bara 79 kr per månad! 🙌",
-        Lists.newArrayList<SelectItem>(SelectOption("Okej, nice!", MESSAGE_SAKERHET))))
+        Lists.newArrayList<SelectItem>(SelectOption("Okej, nice!", "message.student.25klimit"))
+      )
+    )
 
     this.createChatMessage(
       MESSAGE_STUDENT_25K_LIMIT,
@@ -944,7 +1109,10 @@ constructor(
         "Okej! Dina prylar som du har hemma skyddas upp till 200 000 kr 🏺🖼️\u000C" + "Äger du något som du tar med dig utanför hemmet som är värt över 25 000 kr? 💍⌚",
         Lists.newArrayList<SelectItem>(
           SelectOption("Ja", MESSAGE_50K_LIMIT_YES),
-          SelectOption("Nej", MESSAGE_50K_LIMIT_NO))))
+          SelectOption("Nej", MESSAGE_50K_LIMIT_NO)
+        )
+      )
+    )
   }
 
   private fun setupBankidErrorHandlers(messageId: String, optinalRelayId: String? = null) {
@@ -954,37 +1122,43 @@ constructor(
     this.createMessage(
       "$messageId.bankid.error.expiredTransaction",
       MessageBodyParagraph(BankIDStrings.expiredTransactionError),
-      1500)
+      1500
+    )
     this.addRelay("$messageId.bankid.error.expiredTransaction", relayId)
 
     this.createMessage(
       "$messageId.bankid.error.certificateError",
       MessageBodyParagraph(BankIDStrings.certificateError),
-      1500)
+      1500
+    )
     this.addRelay("$messageId.bankid.error.certificateError", relayId)
 
     this.createMessage(
       "$messageId.bankid.error.userCancel",
       MessageBodyParagraph(BankIDStrings.userCancel),
-      1500)
+      1500
+    )
     this.addRelay("$messageId.bankid.error.userCancel", relayId)
 
     this.createMessage(
       "$messageId.bankid.error.cancelled",
       MessageBodyParagraph(BankIDStrings.cancelled),
-      1500)
+      1500
+    )
     this.addRelay("$messageId.bankid.error.cancelled", relayId)
 
     this.createMessage(
       "$messageId.bankid.error.startFailed",
       MessageBodyParagraph(BankIDStrings.startFailed),
-      1500)
+      1500
+    )
     this.addRelay("$messageId.bankid.error.startFailed", relayId)
 
     this.createMessage(
       "$messageId.bankid.error.invalidParameters",
       MessageBodyParagraph(BankIDStrings.userCancel),
-      1500)
+      1500
+    )
     this.addRelay("$messageId.bankid.error.invalidParameters", relayId)
   }
 
@@ -1042,7 +1216,7 @@ constructor(
         if (relay != null) {
           completeRequest(relay, userContext)
         }
-        if (value == MESSAGE_FORSLAG) {
+        if (value == MESSAGE_FORSLAG2) {
           completeOnboarding(userContext)
         }
       }
@@ -1060,22 +1234,19 @@ constructor(
 
   private fun completeOnboarding(userContext: UserContext) {
     val productId = this.productPricingService.createProduct(
-      userContext.memberId, userContext.onBoardingData)
+      userContext.memberId, userContext.onBoardingData
+    )
     userContext.onBoardingData.productId = productId
     this.memberService.finalizeOnBoarding(
-      userContext.memberId, userContext.onBoardingData)
+      userContext.memberId, userContext.onBoardingData
+    )
   }
 
-  override fun receiveMessage(userContext: UserContext, m: Message) {
+  override fun handleMessage(userContext: UserContext, m: Message) {
     var nxtMsg = ""
 
     if (!validateReturnType(m, userContext)) {
       return
-    }
-
-    //Generic Lambda
-    if(this.hasGenericCallback(m.baseMessageId)){
-      nxtMsg = this.execGenericCallback(m, userContext)
     }
 
     // Lambda
@@ -1103,7 +1274,8 @@ constructor(
           } else { // Update position if there is a code
             userContext.putUserData(
               "{SIGNUP_POSITION}",
-              Objects.toString(getSignupQueuePosition(onBoardingData.email)))
+              Objects.toString(getSignupQueuePosition(onBoardingData.email))
+            )
           }
         }
       }
@@ -1204,37 +1376,40 @@ constructor(
           "message.signup.checkposition"
         }
         userContext.putUserData(
-          "{SIGNUP_POSITION}", Objects.toString(getSignupQueuePosition(userEmail)))
+          "{SIGNUP_POSITION}", Objects.toString(getSignupQueuePosition(userEmail))
+        )
       }
       "message.signup.flerval" -> userContext.putUserData(
         "{SIGNUP_POSITION}",
-        Objects.toString(getSignupQueuePosition(onBoardingData.email)))
+        Objects.toString(getSignupQueuePosition(onBoardingData.email))
+      )
       "message.waitlist.user.alreadyactive", "message.activate.nocode.tryagain", MESSAGE_CHECK_IF_ACTIVE_ON_WAITLIST -> {
         // Logic goes here
         val email = m.body.text.trim { it <= ' ' }.toLowerCase()
         when {
-            emailIsActivated(email) -> {
-              flagCodeAsUsed(email)
-              userContext.putUserData(SIGNED_UP, "true")
-              userContext.putUserData(EMAIL, email)
-              nxtMsg = MESSAGE_ACTIVATE_OK_A
-              addToChat(m, userContext)
+          emailIsActivated(email) -> {
+            flagCodeAsUsed(email)
+            userContext.putUserData(SIGNED_UP, "true")
+            userContext.putUserData(EMAIL, email)
+            nxtMsg = MESSAGE_ACTIVATE_OK_A
+            addToChat(m, userContext)
 
-            }
-            emailIsRegistered(email) == false -> {
-              onBoardingData.email = email
-              val signupCode = createSignupCode(m.body.text)
-              userContext.putUserData("{SIGNUP_CODE}", signupCode.code)
-              userContext.putUserData(EMAIL, email)
-              userContext.putUserData(
-                "{SIGNUP_POSITION}", Objects.toString(getSignupQueuePosition(email)))
-              nxtMsg = MESSAGE_SIGNUP_NOT_REGISTERED_YET
+          }
+          emailIsRegistered(email) == false -> {
+            onBoardingData.email = email
+            val signupCode = createSignupCode(m.body.text)
+            userContext.putUserData("{SIGNUP_CODE}", signupCode.code)
+            userContext.putUserData(EMAIL, email)
+            userContext.putUserData(
+              "{SIGNUP_POSITION}", Objects.toString(getSignupQueuePosition(email))
+            )
+            nxtMsg = MESSAGE_SIGNUP_NOT_REGISTERED_YET
 
-            }
-            else -> {
-              nxtMsg = MESSAGE_SIGNUP_NOT_ACTIVATED_YET
-              addToChat(m, userContext)
-            }
+          }
+          else -> {
+            nxtMsg = MESSAGE_SIGNUP_NOT_ACTIVATED_YET
+            addToChat(m, userContext)
+          }
         }
       }
       MESSAGE_SIGNUP_NOT_REGISTERED_YET, MESSAGE_SIGNUP_NOT_ACTIVATED_YET, "message.signup.checkposition" -> {
@@ -1249,7 +1424,8 @@ constructor(
           }
         }
       }
-      "message.uwlimit.housingsize", "message.uwlimit.householdsize" -> nxtMsg = handleUnderwritingLimitResponse(userContext, m, m.baseMessageId)
+      "message.uwlimit.housingsize", "message.uwlimit.householdsize" -> nxtMsg =
+        handleUnderwritingLimitResponse(userContext, m, m.baseMessageId)
       MESSAGE_TIPSA -> {
         onBoardingData.setRecommendFriendEmail(m.body.text)
         nxtMsg = MESSAGE_NAGOTMER
@@ -1275,7 +1451,7 @@ constructor(
         nxtMsg = if (nrPersons > 6) {
           "message.uwlimit.householdsize"
         } else {
-          handleStudentPolicyPersonLimit(MESSAGE_SAKERHET, userContext)
+          handleStudentPolicyPersonLimit(MESSAGE_50K_LIMIT, userContext)
         }
       }
       MESSAGE_KVADRAT -> {
@@ -1395,7 +1571,9 @@ constructor(
           this.createMessage(
             "message.missingvalue",
             MessageBodyText(
-              "Oj, nu verkar det som om jag saknar lite viktig information.$missingItems"))
+              "Oj, nu verkar det som om jag saknar lite viktig information.$missingItems"
+            )
+          )
 
           m.body.text = item.text
           nxtMsg = "message.missingvalue"
@@ -1449,7 +1627,8 @@ constructor(
         addToChat(m, userContext)
         if ((m.body as MessageBodySingleSelect)
             .selectedItem
-            .value == "message.kontrakt.email") {
+            .value == "message.kontrakt.email"
+        ) {
           // NOOP
           nxtMsg = "message.kontrakt.email"
         } else {
@@ -1539,7 +1718,8 @@ constructor(
   }
 
   private fun handle50KLimitAnswer(
-    userContext: UserContext, body: MessageBodySingleSelect): String {
+    userContext: UserContext, body: MessageBodySingleSelect
+  ): String {
     if (body.selectedItem.value.equals(MESSAGE_50K_LIMIT_YES_YES, ignoreCase = true)) {
       val userData = userContext.onBoardingData
       val studentPolicyEligibility = userData.studentPolicyEligibility
@@ -1549,19 +1729,22 @@ constructor(
         userContext.putUserData("{50K_LIMIT}", "true")
       }
     }
-    return MESSAGE_PHONENUMBER
+    return MESSAGE_FORSAKRINGIDAG
   }
 
   private fun handleFriFraga(userContext: UserContext, m: Message) {
     userContext.putUserData(
-      "{ONBOARDING_QUESTION_" + LocalDateTime.now().toString() + "}", m.body.text)
+      "{ONBOARDING_QUESTION_" + LocalDateTime.now().toString() + "}", m.body.text
+    )
     eventPublisher.publishEvent(
-      OnboardingQuestionAskedEvent(userContext.memberId, m.body.text))
+      OnboardingQuestionAskedEvent(userContext.memberId, m.body.text)
+    )
     addToChat(m, userContext)
   }
 
   private fun handleUnderwritingLimitResponse(
-    userContext: UserContext, m: Message, messageId: String): String {
+    userContext: UserContext, m: Message, messageId: String
+  ): String {
     userContext.putUserData("{PHONE_NUMBER}", m.body.text)
     val type = if (messageId.endsWith("householdsize"))
       UnderwritingLimitExcededEvent.UnderwritingType.HouseholdSize
@@ -1575,7 +1758,9 @@ constructor(
         m.body.text,
         onBoardingData.firstName,
         onBoardingData.familyName,
-        type))
+        type
+      )
+    )
 
     addToChat(m, userContext)
     return "message.uwlimit.tack"
@@ -1584,7 +1769,8 @@ constructor(
   private fun endConversation(userContext: UserContext) {
     userContext.completeConversation(this)
     userContext.startConversation(
-      conversationFactory.createConversation(CharityConversation::class.java))
+      conversationFactory.createConversation(CharityConversation::class.java)
+    )
   }
 
   /*
@@ -1641,16 +1827,16 @@ constructor(
   override fun bankIdAuthComplete(userContext: UserContext) {
 
     when {
-        userContext.onBoardingData.userHasSigned!! -> {
-          userContext.completeConversation(this)
-          val mc = conversationFactory.createConversation(MainConversation::class.java)
-          userContext.startConversation(mc)
-        }
-        userContext.getDataEntry(LOGIN) != null -> {
-          userContext.removeDataEntry(LOGIN)
-          addToChat(getMessage("message.membernotfound"), userContext)
-        }
-        else -> addToChat(getMessage(MESSAGE_BANKIDJA), userContext)
+      userContext.onBoardingData.userHasSigned!! -> {
+        userContext.completeConversation(this)
+        val mc = conversationFactory.createConversation(MainConversation::class.java)
+        userContext.startConversation(mc)
+      }
+      userContext.getDataEntry(LOGIN) != null -> {
+        userContext.removeDataEntry(LOGIN)
+        addToChat(getMessage("message.membernotfound"), userContext)
+      }
+      else -> addToChat(getMessage(MESSAGE_BANKIDJA), userContext)
     }
   }
 
@@ -1680,7 +1866,8 @@ constructor(
             .activeConversation
             .orElseThrow {
               RuntimeException(
-                "active conversation is for some reason not onboarding chat anymore")
+                "active conversation is for some reason not onboarding chat anymore"
+              )
             }
           onboardingConversation.conversationStatus = Conversation.conversationStatus.ONGOING
         }
@@ -1694,9 +1881,14 @@ constructor(
       val fiftyKLimit = userContext.getDataEntry("{50K_LIMIT}")
       val twentyFiveKLimit = userContext.getDataEntry(UserData.TWENTYFIVE_THOUSAND_LIMIT)
       when {
-          fiftyKLimit == "true" -> eventPublisher.publishEvent(RequestObjectInsuranceEvent(memberId, productType))
-          twentyFiveKLimit == "true" -> eventPublisher.publishEvent(RequestStudentObjectInsuranceEvent(memberId, productType))
-          else -> eventPublisher.publishEvent(MemberSignedEvent(memberId, productType))
+        fiftyKLimit == "true" -> eventPublisher.publishEvent(RequestObjectInsuranceEvent(memberId, productType))
+        twentyFiveKLimit == "true" -> eventPublisher.publishEvent(
+          RequestStudentObjectInsuranceEvent(
+            memberId,
+            productType
+          )
+        )
+        else -> eventPublisher.publishEvent(MemberSignedEvent(memberId, productType))
       }
       // userContext.completeConversation(this);
     }
@@ -1875,34 +2067,45 @@ constructor(
 */
     private val log = LoggerFactory.getLogger(OnboardingConversationDevi::class.java)
 
-    val emoji_smile = String(byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0x98.toByte(), 0x81.toByte()),
-      Charset.forName("UTF-8"))
+    val emoji_smile = String(
+      byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0x98.toByte(), 0x81.toByte()),
+      Charset.forName("UTF-8")
+    )
     val emoji_hand_ok = String(
       byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0x91.toByte(), 0x8C.toByte()),
-      Charset.forName("UTF-8"))
+      Charset.forName("UTF-8")
+    )
     val emoji_school_satchel = String(
       byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0x8E.toByte(), 0x92.toByte()),
-      Charset.forName("UTF-8"))
+      Charset.forName("UTF-8")
+    )
     val emoji_mag = String(
       byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0x94.toByte(), 0x8D.toByte()),
-      Charset.forName("UTF-8"))
+      Charset.forName("UTF-8")
+    )
     val emoji_tada = String(
       byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0x8E.toByte(), 0x89.toByte()),
-      Charset.forName("UTF-8"))
+      Charset.forName("UTF-8")
+    )
     val emoji_thumbs_up = String(
       byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0x91.toByte(), 0x8D.toByte()),
-      Charset.forName("UTF-8"))
+      Charset.forName("UTF-8")
+    )
     val emoji_hug = String(
       byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0xA4.toByte(), 0x97.toByte()),
-      Charset.forName("UTF-8"))
+      Charset.forName("UTF-8")
+    )
     val emoji_waving_hand = String(
       byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0x91.toByte(), 0x8B.toByte()),
-      Charset.forName("UTF-8"))
+      Charset.forName("UTF-8")
+    )
     val emoji_flushed_face = String(
       byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0x98.toByte(), 0xB3.toByte()),
-      Charset.forName("UTF-8"))
+      Charset.forName("UTF-8")
+    )
     val emoji_thinking = String(
       byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0xA4.toByte(), 0x94.toByte()),
-      Charset.forName("UTF-8"))
+      Charset.forName("UTF-8")
+    )
   }
 }

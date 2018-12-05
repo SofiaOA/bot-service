@@ -76,8 +76,8 @@ public class UserContext implements Serializable {
                   + OnboardingConversationDevi.Companion.getEmoji_flushed_face()
                   + " ?")
           .put("{NR_PERSONS}", "Tex. hur många är ni i hushållet")
-          .put(
-              "{SECURE_ITEMS_NO}", "T.ex skulle jag behöver veta hur många säkerhetsgrejer du har?")
+          //.put(
+          //    "{SECURE_ITEMS_NO}", "T.ex skulle jag behöver veta hur många säkerhetsgrejer du har?")
           .build();
 
   @Id
