@@ -970,7 +970,7 @@ constructor(
 
     this.createMessage(
       "message.kontraktklar",
-      MessageBodyParagraph("Hurra! $emoji_tada Välkommen som medlem!")
+      MessageBodyParagraph("Hurra! 🎉 Välkommen som medlem!")
     )
     this.addRelay("message.kontraktklar", MESSAGE_EMAIL)
 
@@ -1218,6 +1218,8 @@ constructor(
         }
         if (value == MESSAGE_FORSLAG2) {
           completeOnboarding(userContext)
+        }else if(value == "message.kontraktklar") {
+          endConversation(userContext)
         }
       }
       Conversation.EventTypes.ANIMATION_COMPLETE -> when (value) {
@@ -1876,6 +1878,7 @@ constructor(
       addToChat(getMessage("message.kontraktklar"), userContext)
       userContext.onBoardingData.userHasSigned = true
       userContext.setInOfferState(false)
+
       val productType = userContext.getDataEntry(UserData.HOUSE)
       val memberId = userContext.memberId
       val fiftyKLimit = userContext.getDataEntry("{50K_LIMIT}")
@@ -1919,8 +1922,7 @@ constructor(
   }
 
   private fun addBankIdErrorMessage(errorType: ErrorType, baseMessage: String, uc: UserContext) {
-    val errorPostfix: String
-    errorPostfix = when (errorType) {
+    val errorPostfix: String = when (errorType) {
       ErrorType.EXPIRED_TRANSACTION -> ".bankid.error.expiredTransaction"
       ErrorType.CERTIFICATE_ERR -> ".bankid.error.certificateError"
       ErrorType.USER_CANCEL -> ".bankid.error.userCancel"
@@ -2093,10 +2095,6 @@ constructor(
     )
     val emoji_hug = String(
       byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0xA4.toByte(), 0x97.toByte()),
-      Charset.forName("UTF-8")
-    )
-    val emoji_waving_hand = String(
-      byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0x91.toByte(), 0x8B.toByte()),
       Charset.forName("UTF-8")
     )
     val emoji_flushed_face = String(

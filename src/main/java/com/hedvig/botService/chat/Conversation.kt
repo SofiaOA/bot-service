@@ -217,12 +217,6 @@ abstract class Conversation internal constructor() {
       nxtMsg = this.execGenericCallback(m, userContext)
     }
 
-    if (this.hasSelectItemCallback(m.id) && m.body.javaClass == MessageBodySingleSelect::class.java) {
-      // MessageBodySingleSelect body = (MessageBodySingleSelect) m.body;
-      nxtMsg = this.execSelectItemCallback(m.id, m.body as MessageBodySingleSelect, userContext)
-      addToChat(m, userContext)
-    }
-
     if(nxtMsg != null){
       this.completeRequest(nxtMsg, userContext)
     }else{
