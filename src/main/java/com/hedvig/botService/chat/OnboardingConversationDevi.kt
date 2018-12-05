@@ -500,10 +500,14 @@ constructor(
     this.createChatMessage(
       MESSAGE_BANKIDJA,
       MessageBodySingleSelect(
-        "Tack {NAME}! Stämmer det att du bor på {ADDRESS}?",
-        listOf(SelectOption("Ja", MESSAGE_KVADRAT),
-            SelectOption("Nej", MESSAGE_VARBORDUFELADRESS))))
-
+        "Tack {NAME}! Är det lägenheten på {ADDRESS} jag ska ta fram ett förslag för?",
+        object : ArrayList<SelectItem>() {
+          init {
+            add(SelectOption("Ja", MESSAGE_KVADRAT))
+            add(SelectOption("Nej", MESSAGE_VARBORDUFELADRESS))
+          }
+        })
+    )
 
     this.createMessage(
       "message.bankidja.noaddress",
@@ -512,7 +516,7 @@ constructor(
 
     this.createMessage(
       MESSAGE_VARBORDUFELADRESS,
-      MessageBodyText("Inga problem! Vilken gatuadress bor du på?")
+      MessageBodyText("Inga problem! Vad är gatuadressen till lägenheten du vill försäkra?")
     )
     this.createMessage(
       "message.varbordufelpostnr", MessageBodyNumber("Och vad har du för postnummer?")
@@ -546,7 +550,7 @@ constructor(
     this.createMessage(
       "message.lghtyp",
       MessageBodySingleSelect(
-        "Hoppas du trivs! Hyr du eller äger du den?",
+        "Perfekt! Hyr du eller äger du den?",
         object : ArrayList<SelectItem>() {
           init {
             add(SelectOption("Jag hyr den", ProductTypes.RENT.toString()))
@@ -567,7 +571,7 @@ constructor(
         })
     )
 
-    this.createMessage("message.pers", MessageBodyNumber("Okej! Hur många bor i lägenheten?"))
+    this.createMessage("message.pers", MessageBodyNumber("Okej! Hur många bor där?"))
     this.setExpectedReturnType("message.pers", HouseholdMemberNumber())
 
     this.createMessage(
