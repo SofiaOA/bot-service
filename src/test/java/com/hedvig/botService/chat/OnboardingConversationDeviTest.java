@@ -1,5 +1,6 @@
 package com.hedvig.botService.chat;
 
+
 import static com.hedvig.botService.chat.OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES_YES;
 import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_FIRSTNAME;
 import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_LASTNAME;
@@ -153,7 +154,8 @@ public class OnboardingConversationDeviTest {
   public void
   DoNotSendNotificationEvent_WhenMessage_50K_LIMIT_YES_withAnswer_MESSAGE_50K_LIMIT_YES_YES() {
     Message m =
-        testConversation.getMessage(OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES + ".2");
+        testConversation.getMessage(
+          OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES + ".2");
     val choice =
         ((MessageBodySingleSelect) m.body)
             .choices
@@ -215,12 +217,13 @@ public class OnboardingConversationDeviTest {
   @Test
   public void AddCorrectStartMessage_WhenInitWithMessageId() {
 
-    testConversation.init(userContext, OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
+    testConversation.init(userContext,
+      OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_ASK_NAME);
 
     assertThat(userContext.getMemberChat().chatHistory)
         .first()
         .hasFieldOrPropertyWithValue(
-            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
+            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_ASK_NAME);
   }
 
   @Test
@@ -231,7 +234,7 @@ public class OnboardingConversationDeviTest {
     assertThat(userContext.getMemberChat().chatHistory)
         .first()
         .hasFieldOrPropertyWithValue(
-            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
+            "id", OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_ASK_NAME);
   }
 
   @Test
@@ -239,17 +242,20 @@ public class OnboardingConversationDeviTest {
 
     testConversation.receiveEvent(
         EventTypes.MESSAGE_FETCHED,
-        testConversation.findLastChatMessageId(OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT),
+        testConversation.findLastChatMessageId(
+          OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT),
         userContext);
 
     assertThat(userContext.getMemberChat().chatHistory)
         .first()
-        .hasFieldOrPropertyWithValue("id", OnboardingConversationDevi.MESSAGE_FORSLAGSTART);
+        .hasFieldOrPropertyWithValue("id",
+          OnboardingConversationDevi.MESSAGE_FORSLAGSTART);
   }
 
   @Test
   public void MessageForelegStartContainsOptionForExistingMembers() {
-    val message = testConversation.getMessage(OnboardingConversationDevi.MESSAGE_FORSLAGSTART);
+    val message = testConversation.getMessage(
+      OnboardingConversationDevi.MESSAGE_FORSLAGSTART);
 
     val body = (MessageBodySingleSelect) message.body;
 

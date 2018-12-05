@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
 
@@ -51,6 +52,7 @@ public class ConversationFactoryTest {
   @Before
   public void setUp() {
     springEnvironment = Mockito.mock(Environment.class);
+    MockitoAnnotations.initMocks(this);
     given(springEnvironment.acceptsProfiles("development")).willReturn(true);
   }
 

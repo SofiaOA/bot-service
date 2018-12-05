@@ -33,6 +33,6 @@ public class UserContextTest {
 
     then(mockConversation)
         .should(times(1))
-        .init(uc, OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_SHORT);
+        .init(uc, OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_ASK_NAME);
   }
 }

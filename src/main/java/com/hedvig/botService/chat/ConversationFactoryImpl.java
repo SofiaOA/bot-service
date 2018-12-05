@@ -63,7 +63,7 @@ public class ConversationFactoryImpl implements ConversationFactory {
       final OnboardingConversationDevi onboardingConversationDevi =
           new OnboardingConversationDevi(
               memberService, productPricingService, signupCodeRepository, eventPublisher, this);
-      onboardingConversationDevi.queuePos = queuePos;
+      onboardingConversationDevi.setQueuePos(queuePos);
       return onboardingConversationDevi;
     }
 

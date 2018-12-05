@@ -33,6 +33,7 @@ public class UserData {
   public static final String STUDENT_POLICY_ELIGIBILITY = "{STUDENT_POLICY_ELIGIBILITY}";
   public static final String TWENTYFIVE_THOUSAND_LIMIT = "{25K_LIMIT}";
   public static final String PHONE_NUMBER = "{PHONE_NUMBER}";
+  public static final String LOGIN = "{LOGIN}";
   private final UserContext ctx;
 
   public UserData(UserContext ctx) {

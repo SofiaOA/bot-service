@@ -52,6 +52,13 @@ public class Message {
 
   private String author;
 
+  public String getAuthor(){
+    return author;
+  }
+  public void setAuthor(String value) {
+    author = value;
+  }
+
   /** @return Message id without trailing numbers" */
   @JsonIgnore
   public String getBaseMessageId() {
