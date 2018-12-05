@@ -236,7 +236,7 @@ public class SessionManager {
       uc.getOnBoardingData().setEmail(email);
 
       Conversation onboardingConversation =
-          conversationFactory.createConversation(CharityConversation.class);
+          conversationFactory.createConversation(OnboardingConversationDevi.class);
       if (Objects.equals("true", uc.getDataEntry(LOGIN))) {
         uc.startConversation(onboardingConversation, MESSAGE_START_LOGIN);
       } else {
