@@ -79,6 +79,10 @@ public class ConversationFactoryImpl implements ConversationFactory {
       return new CallMeConversation(eventPublisher);
     }
 
+    if(conversationClass.equals(MemberSourceConversation.class)) {
+      return new MemberSourceConversation();
+    }
+
     return null;
   }
 

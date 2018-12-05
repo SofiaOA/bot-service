@@ -91,7 +91,8 @@ constructor(
       )
       { body, userContext, message ->
         val trimmedEmail = body.text.trim()
-        userContext.onBoardingData.email = "Min email är $trimmedEmail"
+        userContext.onBoardingData.email = trimmedEmail
+        body.text = "Min email är $trimmedEmail"
         addToChat(message, userContext)
         MESSAGE_FORSLAGSTART
       })
@@ -588,7 +589,6 @@ constructor(
     )
     this.setExpectedReturnType(MESSAGE_PHONENUMBER, TextInput())
 
-    // ---------- Move to after sign.
     this.createMessage(
       MESSAGE_EMAIL,
       MessageBodyText(
@@ -972,7 +972,6 @@ constructor(
       "message.kontraktklar",
       MessageBodyParagraph("Hurra! 🎉 Välkommen som medlem!")
     )
-    this.addRelay("message.kontraktklar", MESSAGE_EMAIL)
 
     this.createMessage("message.kontrakt.email", MessageBodyText("OK! Vad är din mailadress?"))
     this.setExpectedReturnType("message.kontrakt.email", EmailAdress())

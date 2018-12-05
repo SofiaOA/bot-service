@@ -1,15 +1,10 @@
 package com.hedvig.botService.chat;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.serviceIntegration.claimsService.ClaimsService;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.services.triggerService.TriggerService;
-import java.util.Arrays;
-import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +14,12 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.env.Environment;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 @RunWith(Parameterized.class)
 public class ConversationFactoryTest {
@@ -45,7 +46,8 @@ public class ConversationFactoryTest {
           ClaimsConversation.class,
           CharityConversation.class,
           MainConversation.class,
-          OnboardingConversationDevi.class
+          OnboardingConversationDevi.class,
+          MemberSourceConversation.class
         });
   }
 

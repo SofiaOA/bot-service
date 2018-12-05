@@ -1,20 +1,17 @@
 package com.hedvig.botService.chat;
 
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
-import com.hedvig.botService.enteties.message.SelectItem;
-import com.hedvig.botService.enteties.message.SelectLink;
-import com.hedvig.botService.enteties.message.SelectOption;
+import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.serviceIntegration.memberService.MemberService;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
+import lombok.val;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.val;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CharityConversation extends Conversation {
 
@@ -146,16 +143,11 @@ public class CharityConversation extends Conversation {
             memberService.selectCashback(userContext.getMemberId(), charityId.get());
 
             userContext.completeConversation(this);
-            if (productPricingService.isMemberInsuranceActive(userContext.getMemberId())) {
+
               nxtMsg = MESSAGE_KONTRAKT_CHARITY_TACK;
               addToChat(nxtMsg, userContext);
               userContext.startConversation(
-                  conversationFactory.createConversation(TrustlyConversation.class));
-            } else {
-
-              nxtMsg = MESSAGE_KONTRAKT_CHARITY_TACK_END;
-              addToChat(nxtMsg, userContext);
-            }
+                  conversationFactory.createConversation(MemberSourceConversation.class));
             return;
           }
 
