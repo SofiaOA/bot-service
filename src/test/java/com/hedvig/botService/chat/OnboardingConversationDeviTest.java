@@ -1,25 +1,6 @@
 package com.hedvig.botService.chat;
 
 
-import static com.hedvig.botService.chat.OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES_YES;
-import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_FIRSTNAME;
-import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_LASTNAME;
-import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_MEMBER_ID;
-import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_PHONE_NUMBER;
-import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_PRODUCT_TYPE;
-import static com.hedvig.botService.testHelpers.TestData.TOLVANSSON_SSN;
-import static com.hedvig.botService.testHelpers.TestData.addCityToContext;
-import static com.hedvig.botService.testHelpers.TestData.addFamilynameToContext;
-import static com.hedvig.botService.testHelpers.TestData.addFirstnameToContext;
-import static com.hedvig.botService.testHelpers.TestData.addFloorToContext;
-import static com.hedvig.botService.testHelpers.TestData.addSsnToContext;
-import static com.hedvig.botService.testHelpers.TestData.addStreetToContext;
-import static com.hedvig.botService.testHelpers.TestData.addZipCodeToContext;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
-
 import com.hedvig.botService.chat.Conversation.EventTypes;
 import com.hedvig.botService.enteties.SignupCodeRepository;
 import com.hedvig.botService.enteties.UserContext;
@@ -39,6 +20,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.context.ApplicationEventPublisher;
+
+import static com.hedvig.botService.chat.OnboardingConversationDevi.MESSAGE_50K_LIMIT_YES_YES;
+import static com.hedvig.botService.testHelpers.TestData.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OnboardingConversationDeviTest {
@@ -78,7 +66,7 @@ public class OnboardingConversationDeviTest {
     addCityToContext(userContext, TestData.TOLVANSSON_CITY);
     addZipCodeToContext(userContext, TestData.TOLVANSSON_ZIP);
 
-    Message m = testConversation.getMessage("message.bankidja");
+    Message m = testConversation.getMessage("message.bankidja.0");
     val body = (MessageBodySingleSelect) m.body;
     body.choices.get(1).selected = true;
 

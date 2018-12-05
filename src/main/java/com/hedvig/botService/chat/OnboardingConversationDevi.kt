@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import java.nio.charset.Charset
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -343,18 +344,23 @@ constructor(
       WrappedMessage(
         MessageBodyText("Vad är ditt personnumer? Jag behöver det så att jag kan hämta din adress 🏠")
       ) { body, uc, m ->
+
+        val trimmedSSN = body.text.trim()
+
         uc.onBoardingData.let {
           it.addressCity = "Stockholm"
           it.addressStreet = "Drottninggatan 1"
           it.addressZipCode = "10001"
           it.familyName = "Svensson"
           it.ssn = body.text.trim()
+          it.birthDate = LocalDate.parse("${trimmedSSN.substring(0, 4)}-${trimmedSSN.substring(4, 6)}-${trimmedSSN.substring(6, 8)}")
         }
         body.text = "${body.text.dropLast(4)}-****"
         addToChat(m, uc)
         MESSAGE_BANKIDJA
       }
     )
+    this.setExpectedReturnType(MESSAGE_LAGENHET_NO_PERSONNUMMER, SSNSweden())
 
     this.createChatMessage(
       MESSAGE_LAGENHET,
@@ -491,7 +497,7 @@ constructor(
         })
     )
 
-    this.createMessage(
+    this.createChatMessage(
       MESSAGE_BANKIDJA,
       MessageBodySingleSelect(
         "Tack {NAME}! Är det lägenheten på {ADDRESS} jag ska ta fram ett förslag för?",
