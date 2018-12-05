@@ -491,17 +491,19 @@ constructor(
         })
     )
 
-    this.createMessage(
+    this.createChatMessage(
       MESSAGE_BANKIDJA,
-      MessageBodySingleSelect(
+      WrappedMessage(MessageBodySingleSelect(
         "Tack {NAME}! Stämmer det att du bor på {ADDRESS}?",
-        object : ArrayList<SelectItem>() {
-          init {
-            add(SelectOption("Ja", MESSAGE_KVADRAT))
-            add(SelectOption("Nej", MESSAGE_VARBORDUFELADRESS))
-          }
-        })
-    )
+        listOf(SelectOption("Ja", MESSAGE_KVADRAT),
+            SelectOption("Nej", MESSAGE_VARBORDUFELADRESS))))
+      {
+        b, u, m ->
+          addToChat(m, u)
+
+        handleStudentEntrypoint(MESSAGE_KVADRAT, u)
+      })
+
 
     this.createMessage(
       "message.bankidja.noaddress",
