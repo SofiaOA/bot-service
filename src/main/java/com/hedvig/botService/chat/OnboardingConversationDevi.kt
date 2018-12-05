@@ -499,16 +499,10 @@ constructor(
 
     this.createChatMessage(
       MESSAGE_BANKIDJA,
-      WrappedMessage(MessageBodySingleSelect(
+      MessageBodySingleSelect(
         "Tack {NAME}! Stämmer det att du bor på {ADDRESS}?",
         listOf(SelectOption("Ja", MESSAGE_KVADRAT),
             SelectOption("Nej", MESSAGE_VARBORDUFELADRESS))))
-      {
-        b, u, m ->
-          addToChat(m, u)
-
-        handleStudentEntrypoint(MESSAGE_KVADRAT, u)
-      })
 
 
     this.createMessage(
