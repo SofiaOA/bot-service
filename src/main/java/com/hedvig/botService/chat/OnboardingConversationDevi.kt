@@ -606,7 +606,7 @@ constructor(
     this.createMessage(
       MESSAGE_FORSAKRINGIDAG,
       MessageBodySingleSelect(
-        "Har du någon hemförsäkring idag?",
+        "Har du någon hemförsäkring redan?I så fall sköter jag bytet åt dig ✌🏻?",
         object : ArrayList<SelectItem>() {
           init {
             add(SelectOption("Ja", MESSAGE_FORSAKRINGIDAGJA))
@@ -660,7 +660,7 @@ constructor(
       MESSAGE_BYTESINFO,
       MessageBodySingleSelect(
         "👀\u000C" +
-          "Om du blir medlem hos mig sköter jag bytet åt dig. Så när din gamla försäkring går ut, flyttas du automatiskt till Hedvig",
+          "Okej, när din gamla försäkring går ut, flyttas du automatiskt till Hedvig",
         object : ArrayList<SelectItem>() {
           init {
             add(SelectOption("Jag förstår", MESSAGE_FORSLAG2)) // Create product
@@ -688,7 +688,7 @@ constructor(
     this.createChatMessage(
       MESSAGE_50K_LIMIT,
       MessageBodySingleSelect(
-        "Toppen!\u000CBra att veta: dina saker hemma skyddas upp till en miljon kr\u000C" + "Äger du något som du tar med dig utanför hemmet som är värt över 50 000 kr? 💍⌚",
+        "Toppen!\u000CBra att veta: dina saker hemma skyddas av  upp till en miljon kr\u000C" + "Äger du något som du tar med dig utanför hemmet som är värt över 50 000 kr? 💍⌚",
         Lists.newArrayList<SelectItem>(
           SelectOption("Ja", MESSAGE_50K_LIMIT_YES),
           SelectOption("Nej", MESSAGE_50K_LIMIT_NO)
@@ -716,7 +716,7 @@ constructor(
 
     this.createMessage(
       MESSAGE_50K_LIMIT_NO,
-      MessageBodyParagraph("Vad bra! Då täcks dina prylar av drulleförsäkringen"),
+      MessageBodyParagraph("Vad bra! Då täcks dina prylar av drulleförsäkringen när du är ute på äventyr"),
       2000
     )
 
@@ -741,7 +741,7 @@ constructor(
     this.createMessage(
       MESSAGE_FORSLAG2,
       MessageBodySingleSelect(
-        "Nu har jag allt jag behöver för att ta fram ditt förslag!",
+        "Tack Sofia för att du svarat på alla frågor, nu har jag allt jag behöver för att ta fram ditt förslag!",
         Lists.newArrayList<SelectItem>(
           SelectLink.toOffer("Gå till mitt förslag 👏", "message.forslag.dashboard")
         )
