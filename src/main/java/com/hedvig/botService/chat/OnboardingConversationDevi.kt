@@ -51,7 +51,7 @@ constructor(
       MESSAGE_ONBOARDINGSTART,
       MessageBodySingleSelect(
         "Hej! Jag heter Hedvig 👋"
-          + "\u000CJag behöver ställa några frågor till dig, för att kunna ge dig ett prisförslag på  en hemförsäkring"
+          + "\u000CJag behöver ställa några frågor till dig, för att kunna ge dig ett prisförslag på en hemförsäkring"
           + "\u000CDu signar inte upp dig på något genom att fortsätta!",
         Lists.newArrayList<SelectItem>(
           SelectOption("Låter bra!", MESSAGE_FORSLAGSTART),
@@ -606,7 +606,7 @@ constructor(
     this.createMessage(
       MESSAGE_FORSAKRINGIDAG,
       MessageBodySingleSelect(
-        "Har du någon hemförsäkring redan?I så fall sköter jag bytet åt dig ✌🏻?",
+        "Har du någon hemförsäkring idag?",
         object : ArrayList<SelectItem>() {
           init {
             add(SelectOption("Ja", MESSAGE_FORSAKRINGIDAGJA))
@@ -660,7 +660,7 @@ constructor(
       MESSAGE_BYTESINFO,
       MessageBodySingleSelect(
         "👀\u000C" +
-          "Okej, när din gamla försäkring går ut, flyttas du automatiskt till Hedvig",
+          "Okej, om du blir medlem hos mig sköter jag bytet åt dig. Så när din gamla försäkring går ut, flyttas du automatiskt till Hedvig"
         object : ArrayList<SelectItem>() {
           init {
             add(SelectOption("Jag förstår", MESSAGE_FORSLAG2)) // Create product
