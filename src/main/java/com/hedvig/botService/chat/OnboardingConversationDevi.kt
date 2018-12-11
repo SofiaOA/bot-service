@@ -342,27 +342,40 @@ constructor(
         this.createChatMessage(
             MESSAGE_LAGENHET_NO_PERSONNUMMER,
             WrappedMessage(
-                MessageBodyText("Vad är ditt personnumer? Jag behöver det så att jag kan hämta din adress 🏠")
+                MessageBodyNumber("Vad är ditt personnumer? Jag behöver det så att jag kan hämta din adress 🏠")
             ) { body, uc, m ->
 
                 val trimmedSSN = body.text.trim()
-
-                uc.onBoardingData.let {
-                    it.addressCity = "Stockholm"
-                    it.addressStreet = "Drottninggatan 1"
-                    it.addressZipCode = "10001"
-                    it.familyName = "Svensson"
-                    it.ssn = body.text.trim()
-                    it.birthDate = LocalDate.parse(
-                        "${trimmedSSN.substring(0, 4)}-${trimmedSSN.substring(
-                            4,
-                            6
-                        )}-${trimmedSSN.substring(6, 8)}"
-                    )
-                }
-                body.text = "${body.text.dropLast(4)}-****"
+                body.text = "${trimmedSSN.dropLast(4)}-****"
                 addToChat(m, uc)
-                MESSAGE_BANKIDJA
+
+                val response = memberService.lookupAddressSWE(trimmedSSN)
+
+                if(response != null) {
+                    uc.onBoardingData.let {
+                        it.familyName = response.lastName
+                        it.firstName = response.firstName
+                        it.ssn = trimmedSSN
+                        it.birthDate = LocalDate.parse(
+                            "${trimmedSSN.substring(0, 4)}-${trimmedSSN.substring(
+                                4,
+                                6
+                            )}-${trimmedSSN.substring(6, 8)}"
+                        )
+
+                        if (response.address != null) {
+                            it.addressCity = response.address.city
+                            it.addressStreet = response.address.street
+                            it.addressZipCode = response.address.zipCode
+                        }
+                    }
+                }
+
+                if(response?.address != null){
+                    MESSAGE_BANKIDJA
+                }else {
+                    "message.missing.bisnode.data"
+                }
             }
         )
         this.setExpectedReturnType(MESSAGE_LAGENHET_NO_PERSONNUMMER, SSNSweden())
@@ -396,7 +409,7 @@ constructor(
 
         this.createMessage(
             "message.missing.bisnode.data",
-            MessageBodyParagraph("Jag hittade tyvärr inte dina uppgifter. Men...")
+            MessageBodyParagraph("Konstigt, just nu kan jag inte hitta din adress. Så jag böhöver ställa några extra frågor 😊")
         )
         this.addRelay("message.missing.bisnode.data", "message.manuellnamn")
 
@@ -2066,7 +2079,8 @@ constructor(
 
         @JvmField
         val IN_OFFER = "{IN_OFFER}"
-        private const val MESSAGE_BANKIDJA = "message.bankidja"
+        @JvmField
+        val MESSAGE_BANKIDJA = "message.bankidja"
         private const val MESSAGE_KVADRAT = "message.kvadrat"
         private const val MESSAGE_VARBORDUFELADRESS = "message.varbordufeladress"
         private const val MESSAGE_NOTMEMBER = "message.notmember"
@@ -2080,10 +2094,6 @@ constructor(
 
         val emoji_smile = String(
             byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0x98.toByte(), 0x81.toByte()),
-            Charset.forName("UTF-8")
-        )
-        val emoji_hand_ok = String(
-            byteArrayOf(0xF0.toByte(), 0x9F.toByte(), 0x91.toByte(), 0x8C.toByte()),
             Charset.forName("UTF-8")
         )
         val emoji_school_satchel = String(

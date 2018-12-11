@@ -4,6 +4,9 @@ import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdAuthResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdCollectResponse;
 import com.hedvig.botService.serviceIntegration.memberService.dto.BankIdSignResponse;
+import com.hedvig.botService.serviceIntegration.memberService.dto.LookupResponse;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,4 +30,7 @@ public interface MemberService {
   void selectCashback(String memberId, UUID charityId);
 
   void updateEmail(String memberId, String email);
+
+  @Nullable
+  LookupResponse lookupAddressSWE(String trimmedSSN);
 }
