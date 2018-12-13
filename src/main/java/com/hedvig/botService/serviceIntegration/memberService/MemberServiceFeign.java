@@ -4,7 +4,7 @@ import com.hedvig.botService.enteties.userContextHelpers.UserData;
 import com.hedvig.botService.serviceIntegration.memberService.dto.*;
 import com.hedvig.botService.web.dto.Member;
 import feign.FeignException;
-import kotlin.NotImplementedError;
+import lombok.val;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,8 +138,14 @@ public class MemberServiceFeign implements MemberService {
 
   @Nullable
   @Override
-  public LookupResponse lookupAddressSWE(String trimmedSSN) {
-    throw new NotImplementedError();
+  public LookupResponse lookupAddressSWE(String trimmedSSN, String memberId) {
+    try{
+      val response = this.client.lookupAddressSwe(new SweAddressRequest(trimmedSSN, memberId));
+      return new LookupResponse(response.getFirstName(), response.getLastName(), response.getAddress());
+    }catch (RuntimeException ex){
+      log.error("Caught error lookingup memberAddress", ex);
+      return null;
+    }
   }
 
   private void send(Runnable supplier) {

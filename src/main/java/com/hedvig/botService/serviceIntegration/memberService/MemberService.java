@@ -32,5 +32,5 @@ public interface MemberService {
   void updateEmail(String memberId, String email);
 
   @Nullable
-  LookupResponse lookupAddressSWE(String trimmedSSN);
+  LookupResponse lookupAddressSWE(String ssn, String memberId);
 }

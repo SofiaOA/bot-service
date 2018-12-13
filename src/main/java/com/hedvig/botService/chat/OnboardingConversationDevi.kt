@@ -349,7 +349,7 @@ constructor(
                 body.text = "${trimmedSSN.dropLast(4)}-****"
                 addToChat(m, uc)
 
-                val response = memberService.lookupAddressSWE(trimmedSSN)
+                val response = memberService.lookupAddressSWE(trimmedSSN, uc.memberId)
 
                 if(response != null) {
                     uc.onBoardingData.let {

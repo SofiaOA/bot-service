@@ -283,7 +283,7 @@ class OnboardingConversationDeviTest {
       val body = message.body as MessageBodyNumber
       body.text = "191212121212"
 
-      given(memberService.lookupAddressSWE("191212121212")).willReturn(LookupResponse("Tolvan", "Tolvansson", Address("SomeStreet 13", "Stockholm", "12345", "1004", 0)))
+      given(memberService.lookupAddressSWE("191212121212", "1337")).willReturn(LookupResponse("Tolvan", "Tolvansson", Address("SomeStreet 13", "Stockholm", "12345", "1004", 0)))
 
       testConversation.receiveMessage(userContext, message)
       assertThat(userContext.memberChat.chatHistory.findLast { it.id == message.id }?.body?.text).contains("19121212-****")
@@ -315,7 +315,7 @@ class OnboardingConversationDeviTest {
     val body = message.body as MessageBodyNumber
     body.text = "191212121212"
 
-    given(memberService.lookupAddressSWE("191212121212")).willReturn(LookupResponse("Tolvan", "Tolvansson", null))
+    given(memberService.lookupAddressSWE("191212121212", "1337")).willReturn(LookupResponse("Tolvan", "Tolvansson", null))
 
     testConversation.receiveMessage(userContext, message)
 
@@ -342,7 +342,7 @@ class OnboardingConversationDeviTest {
     val body = message.body as MessageBodyNumber
     body.text = "191212121212"
 
-    given(memberService.lookupAddressSWE("191212121212")).willReturn(null)
+    given(memberService.lookupAddressSWE("191212121212", "1337")).willReturn(null)
 
     testConversation.receiveMessage(userContext, message)
 
