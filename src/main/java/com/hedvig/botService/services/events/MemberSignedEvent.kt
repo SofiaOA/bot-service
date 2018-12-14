@@ -1,6 +1,6 @@
 package com.hedvig.botService.services.events
 
-class MemberSignedEvent (
+data class MemberSignedEvent(
     val memberId: String,
     val productType: String
-  )
+)
