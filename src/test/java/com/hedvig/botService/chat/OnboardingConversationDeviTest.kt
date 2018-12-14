@@ -4,6 +4,7 @@ package com.hedvig.botService.chat
 import com.hedvig.botService.chat.Conversation.EventTypes
 import com.hedvig.botService.chat.OnboardingConversationDevi.Companion.MESSAGE_50K_LIMIT_YES_YES
 import com.hedvig.botService.chat.OnboardingConversationDevi.Companion.MESSAGE_BANKIDJA
+import com.hedvig.botService.chat.OnboardingConversationDevi.Companion.MESSAGE_VARBORDUFELADRESS
 import com.hedvig.botService.enteties.SignupCodeRepository
 import com.hedvig.botService.enteties.UserContext
 import com.hedvig.botService.enteties.message.Message
@@ -263,7 +264,7 @@ class OnboardingConversationDeviTest {
     }
 
     @Test
-    fun ressageForelegStartContainsOptionForExistingMembers() {
+    fun messageForslagStartContainsOptionForExistingMembers() {
         val message = testConversation.getMessage(
             OnboardingConversationDevi.MESSAGE_FORSLAGSTART
         )
@@ -359,6 +360,37 @@ class OnboardingConversationDeviTest {
       assertThat(it.floor).isEqualTo(0)
     }
 
+  }
+
+  @Test
+  fun receiveMessageBANKIDJA_whenAddressIsWrong_removeAddressFromUserContext(){
+    userContext.onBoardingData.let {
+      it.addressCity = "Stockholm"
+      it.addressStreet = "Somestreet 13"
+      it.addressZipCode = "12345"
+    }
+
+    val message = getMessage(OnboardingConversationDevi.MESSAGE_BANKIDJA+".0")
+    (message.body as MessageBodySingleSelect).choices.findLast { it.value == MESSAGE_VARBORDUFELADRESS }!!.selected = true
+
+    testConversation.receiveMessage(userContext, message)
+
+    userContext.onBoardingData.let {
+      assertThat(it.addressCity).isNull()
+      assertThat(it.addressStreet).isNull()
+      assertThat(it.addressZipCode).isNull()
+    }
+  }
+
+  @Test
+  fun reciveMessageBANKIDJA_whenAddressIsWrong_nextMessageIs_MESSAGE_VARBORDUFELADRESS(){
+
+    val message = getMessage(OnboardingConversationDevi.MESSAGE_BANKIDJA+".0")
+    (message.body as MessageBodySingleSelect).choices.findLast { it.value == MESSAGE_VARBORDUFELADRESS }!!.selected = true
+
+    testConversation.receiveMessage(userContext, message)
+    val lastMessage = userContext.memberChat.chatHistory.last()
+    assertThat(lastMessage.baseMessageId).isEqualTo(MESSAGE_VARBORDUFELADRESS)
   }
 
 

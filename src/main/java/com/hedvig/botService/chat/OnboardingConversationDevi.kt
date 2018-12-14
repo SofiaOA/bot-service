@@ -351,7 +351,7 @@ constructor(
 
                 val response = memberService.lookupAddressSWE(trimmedSSN, uc.memberId)
 
-                if(response != null) {
+                if (response != null) {
                     uc.onBoardingData.let {
                         it.familyName = response.lastName
                         it.firstName = response.firstName
@@ -371,9 +371,9 @@ constructor(
                     }
                 }
 
-                if(response?.address != null){
+                if (response?.address != null) {
                     MESSAGE_BANKIDJA
-                }else {
+                } else {
                     "message.missing.bisnode.data"
                 }
             }
@@ -517,15 +517,30 @@ constructor(
 
         this.createChatMessage(
             MESSAGE_BANKIDJA,
-            MessageBodySingleSelect(
+            WrappedMessage(MessageBodySingleSelect(
                 "Tack {NAME}! Är det lägenheten på {ADDRESS} jag ska ta fram ett förslag för?",
-                object : ArrayList<SelectItem>() {
-                    init {
-                        add(SelectOption("Ja", MESSAGE_KVADRAT))
-                        add(SelectOption("Nej", MESSAGE_VARBORDUFELADRESS))
+                listOf(
+                    SelectOption("Ja", MESSAGE_KVADRAT),
+                    SelectOption("Nej", MESSAGE_VARBORDUFELADRESS)
+                )
+
+            )){body,uc,m ->
+                val item = body.selectedItem
+                body.text = item.text
+                addToChat(m, uc)
+                when {
+                    item.value == MESSAGE_KVADRAT -> handleStudentEntrypoint(MESSAGE_KVADRAT, uc)
+                    item.value == MESSAGE_VARBORDUFELADRESS -> {
+                        val obd = uc.onBoardingData
+                        obd.clearAddress()
+                        item.value
                     }
-                })
+                    else -> item.value
+                }
+            }
         )
+
+
 
         this.createMessage(
             "message.bankidja.noaddress",
@@ -1336,17 +1351,6 @@ constructor(
                 m.body.text = item.text
                 nxtMsg = "message.pers"
             }
-            MESSAGE_BANKIDJA -> {
-                val item = (m.body as MessageBodySingleSelect).selectedItem
-                m.body.text = item.text
-                addToChat(m, userContext)
-                if (item.value == MESSAGE_KVADRAT) {
-                    nxtMsg = handleStudentEntrypoint(MESSAGE_KVADRAT, userContext)
-                } else if (item.value == MESSAGE_VARBORDUFELADRESS) {
-                    val obd = userContext.onBoardingData
-                    obd.clearAddress()
-                }
-            }
 
             "message.student" -> {
                 val sitem2 = (m.body as MessageBodySingleSelect).selectedItem
@@ -2082,7 +2086,7 @@ constructor(
         @JvmField
         val MESSAGE_BANKIDJA = "message.bankidja"
         private const val MESSAGE_KVADRAT = "message.kvadrat"
-        private const val MESSAGE_VARBORDUFELADRESS = "message.varbordufeladress"
+        @JvmField val MESSAGE_VARBORDUFELADRESS = "message.varbordufeladress"
         private const val MESSAGE_NOTMEMBER = "message.notmember"
 
         /*
