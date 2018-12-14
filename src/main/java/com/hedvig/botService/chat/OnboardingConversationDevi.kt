@@ -76,27 +76,32 @@ constructor(
                 )
             )
             { body, u, message ->
-                u.onBoardingData.firstName = body.text.trim()
+                u.onBoardingData.firstName = body.text.trim().toLowerCase().capitalize()
                 addToChat(message, u)
-                MESSAGE_ONBOARDINGSTART_ASK_EMAIL
+                MESSAGE_ONBOARDINGSTART_REPLY_NAME
             })
 
         this.createChatMessage(
-            MESSAGE_ONBOARDINGSTART_ASK_EMAIL,
-            WrappedMessage(
-                MessageBodyText(
-                    "Trevligt att träffas {NAME}!\nFör att kunne ge dig ett prisförslag"
-                            + " behöver jag ställa några snabba frågor"
-                            + "\u000CFörst, vad är din mailadress?"
-                )
+            MESSAGE_ONBOARDINGSTART_REPLY_NAME,
+            MessageBodySingleSelect(
+                "Trevligt att träffas {NAME}!\nFör att kunne ge dig ett prisförslag"
+                        + " behöver jag ställa några snabba frågor"
+                // + "\u000C"
+                , SelectOption("Okej", MESSAGE_ONBOARDINGSTART_ASK_EMAIL),
+                SelectOption("Jag är redan medlem", "message.bankid.start")
             )
-            { body, userContext, message ->
+        )
+
+        this.createChatMessage(
+            MESSAGE_ONBOARDINGSTART_ASK_EMAIL,
+            WrappedMessage(MessageBodyNumber("Först, vad är din mailadress?")) { body, userContext, message ->
                 val trimmedEmail = body.text.trim()
                 userContext.onBoardingData.email = trimmedEmail
                 body.text = "Min email är $trimmedEmail"
                 addToChat(message, userContext)
                 MESSAGE_FORSLAGSTART
-            })
+            }
+        )
 
 
         this.createChatMessage(
@@ -423,15 +428,13 @@ constructor(
             WrappedMessage(
                 MessageBodySingleSelect(
                     "Bara att logga in så ser du din försäkring",
-                    Lists.newArrayList(
-                        SelectLink(
-                            "Logga in med BankID",
-                            "message.bankid.autostart.respond", null,
-                            "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null,
-                            false
-                        ),
-                        SelectOption("Jag är inte medlem", MESSAGE_NOTMEMBER)
-                    )
+                    SelectLink(
+                        "Logga in med BankID",
+                        "message.bankid.autostart.respond", null,
+                        "bankid:///?autostarttoken={AUTOSTART_TOKEN}&redirect={LINK_URI}", null,
+                        false
+                    ),
+                    SelectOption("Jag är inte medlem", MESSAGE_NOTMEMBER)
                 )
             ) { m, uc, _ ->
                 val obd = uc.onBoardingData
@@ -472,12 +475,9 @@ constructor(
             MESSAGE_HUS,
             MessageBodySingleSelect(
                 "Åh, typiskt! Just nu försäkrar jag bara lägenheter\u000C" + "Om du vill ge mig din mailadress så kan jag höra av mig när jag försäkrar annat också",
-                object : ArrayList<SelectItem>() {
-                    init {
-                        add(SelectOption("Okej!", MESSAGE_NYHETSBREV))
-                        add(SelectOption("Tack, men nej tack", "message.avslutok"))
-                    }
-                })
+                SelectOption("Okej!", MESSAGE_NYHETSBREV),
+                SelectOption("Tack, men nej tack", "message.avslutok")
+            )
         )
 
         this.createMessage(MESSAGE_NYHETSBREV, MessageBodyText("Topp! Vad är mailadressen?"))
@@ -505,26 +505,20 @@ constructor(
             MESSAGE_NAGOTMER,
             MessageBodySingleSelect(
                 "Tack! Vill du hitta på något mer nu när vi har varandra på tråden?",
-                object : ArrayList<SelectItem>() {
-                    init {
-                        // add(new SelectOption("Jag vill tipsa någon om dig",
-                        // MESSAGE_TIPSA));
-                        add(SelectOption("Jag har en fråga", MESSAGE_FRIONBOARDINGFRAGA))
-                        add(SelectOption("Nej tack!", MESSAGE_AVSLUTOK))
-                    }
-                })
+                SelectOption("Jag har en fråga", MESSAGE_FRIONBOARDINGFRAGA),
+                SelectOption("Nej tack!", MESSAGE_AVSLUTOK)
+            )
         )
 
         this.createChatMessage(
             MESSAGE_BANKIDJA,
-            WrappedMessage(MessageBodySingleSelect(
-                "Tack {NAME}! Är det lägenheten på {ADDRESS} jag ska ta fram ett förslag för?",
-                listOf(
+            WrappedMessage(
+                MessageBodySingleSelect(
+                    "Tack {NAME}! Är det lägenheten på {ADDRESS} jag ska ta fram ett förslag för?",
                     SelectOption("Ja", MESSAGE_KVADRAT),
                     SelectOption("Nej", MESSAGE_VARBORDUFELADRESS)
                 )
-
-            )){body,uc,m ->
+            ) { body, uc, m ->
                 val item = body.selectedItem
                 body.text = item.text
                 addToChat(m, uc)
@@ -2042,6 +2036,7 @@ constructor(
         const val MESSAGE_ONBOARDINGSTART = "message.onboardingstart"
         const val MESSAGE_ONBOARDINGSTART_SHORT = "message.onboardingstart.short"
         const val MESSAGE_ONBOARDINGSTART_ASK_NAME = "message.onboardingstart.ask.name"
+        const val MESSAGE_ONBOARDINGSTART_REPLY_NAME = "message.onboardingstart.reply.name"
         const val MESSAGE_ONBOARDINGSTART_ASK_EMAIL = "message.onboardingstart.ask.email"
         const val MESSAGE_ACTIVATE_OK_A = "message.activate.ok.a"
         const val MESSAGE_ACTIVATE_OK_B = "message.activate.ok.b"
@@ -2086,7 +2081,8 @@ constructor(
         @JvmField
         val MESSAGE_BANKIDJA = "message.bankidja"
         private const val MESSAGE_KVADRAT = "message.kvadrat"
-        @JvmField val MESSAGE_VARBORDUFELADRESS = "message.varbordufeladress"
+        @JvmField
+        val MESSAGE_VARBORDUFELADRESS = "message.varbordufeladress"
         private const val MESSAGE_NOTMEMBER = "message.notmember"
 
         /*

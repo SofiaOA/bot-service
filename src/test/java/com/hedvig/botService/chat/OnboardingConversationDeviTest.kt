@@ -4,13 +4,11 @@ package com.hedvig.botService.chat
 import com.hedvig.botService.chat.Conversation.EventTypes
 import com.hedvig.botService.chat.OnboardingConversationDevi.Companion.MESSAGE_50K_LIMIT_YES_YES
 import com.hedvig.botService.chat.OnboardingConversationDevi.Companion.MESSAGE_BANKIDJA
+import com.hedvig.botService.chat.OnboardingConversationDevi.Companion.MESSAGE_ONBOARDINGSTART_REPLY_NAME
 import com.hedvig.botService.chat.OnboardingConversationDevi.Companion.MESSAGE_VARBORDUFELADRESS
 import com.hedvig.botService.enteties.SignupCodeRepository
 import com.hedvig.botService.enteties.UserContext
-import com.hedvig.botService.enteties.message.Message
-import com.hedvig.botService.enteties.message.MessageBodyNumber
-import com.hedvig.botService.enteties.message.MessageBodySingleSelect
-import com.hedvig.botService.enteties.message.SelectItem
+import com.hedvig.botService.enteties.message.*
 import com.hedvig.botService.enteties.userContextHelpers.UserData
 import com.hedvig.botService.serviceIntegration.memberService.MemberService
 import com.hedvig.botService.serviceIntegration.memberService.dto.Address
@@ -275,6 +273,26 @@ class OnboardingConversationDeviTest {
             .extracting("text", "value")
             .contains(tuple("Jag är redan medlem", "message.bankid.start"))
     }
+
+  @Test
+  fun messageAskName_whenMemberEntersTheirName_capitalizedNameCorrectly(){
+    val message = getMessage(OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_ASK_NAME+".2")
+
+    val body = message.body as MessageBodyText
+    body.text = "TOLVAN"
+
+    testConversation.receiveMessage(userContext, message)
+    assertThat(userContext.memberChat.chatHistory.findLast { it.id == message.id }?.body?.text).contains("TOLVAN")
+
+    val paragraphMessage = userContext.memberChat.chatHistory.last()
+    testConversation.receiveEvent(EventTypes.MESSAGE_FETCHED, paragraphMessage.id,  userContext = userContext)
+
+    val lastMessage = userContext.memberChat.chatHistory.last()
+    assertThat(lastMessage.baseMessageId).isEqualTo(MESSAGE_ONBOARDINGSTART_REPLY_NAME)
+    assertThat(lastMessage.body.text).contains("Tolvan")
+
+    assertThat(userContext.onBoardingData.firstName).isEqualTo("Tolvan")
+  }
 
 
     @Test
