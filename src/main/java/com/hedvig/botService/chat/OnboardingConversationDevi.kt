@@ -94,7 +94,7 @@ constructor(
 
         this.createChatMessage(
             MESSAGE_ONBOARDINGSTART_ASK_EMAIL,
-            WrappedMessage(MessageBodyNumber("Först, vad är din mailadress?")) { body, userContext, message ->
+            WrappedMessage(MessageBodyText("Först, vad är din mailadress?"),KeyboardTypes.EMAIL_ADDRESS) { body, userContext, message ->
                 val trimmedEmail = body.text.trim()
                 userContext.onBoardingData.email = trimmedEmail
                 body.text = "Min email är $trimmedEmail"
@@ -102,6 +102,7 @@ constructor(
                 MESSAGE_FORSLAGSTART
             }
         )
+        this.setExpectedReturnType(MESSAGE_ONBOARDINGSTART_ASK_EMAIL, EmailAdress())
 
 
         this.createChatMessage(

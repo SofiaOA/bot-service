@@ -1,13 +1,11 @@
 package com.hedvig.botService.enteties.message;
 
-import javax.annotation.Nullable;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.ToString;
 import lombok.val;
+
+import javax.annotation.Nullable;
+import javax.persistence.*;
 
 @Entity
 @ToString
@@ -36,6 +34,11 @@ public class MessageHeader {
 
   public Boolean
       shouldRequestPushNotifications; // Should responding to this message prompt user to turn on
+
+  @Nullable
+  @Transient
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public KeyboardTypes keyboardType;
   // push notifications
 
   public MessageHeader(long hedvigUserId, long timeStamp) {
