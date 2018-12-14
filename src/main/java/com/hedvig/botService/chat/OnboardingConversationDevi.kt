@@ -715,7 +715,7 @@ constructor(
         this.createChatMessage(
             MESSAGE_50K_LIMIT,
             MessageBodySingleSelect(
-                "Toppen!\u000CBra att veta: dina saker hemma skyddas av Hedvig upp till en miljon kr\u000C" + "Äger du något som du tar med dig utanför hemmet som är värt över 50 000 kr? 💍⌚",
+                "Toppen!\u000CBra att veta: Hedvig skyddar dina saker hemma till ett sammanlagt värde av 1 000 000 kr\u000C" + "Äger du något som du tar med dig utanför hemmet som är värt över 50 000 kr? 💍⌚",
                 Lists.newArrayList<SelectItem>(
                     SelectOption("Ja", MESSAGE_50K_LIMIT_YES),
                     SelectOption("Nej", MESSAGE_50K_LIMIT_NO)
@@ -1792,7 +1792,7 @@ constructor(
     private fun endConversation(userContext: UserContext) {
         userContext.completeConversation(this)
         userContext.startConversation(
-            conversationFactory.createConversation(CharityConversation::class.java)
+            conversationFactory.createConversation(MemberSourceConversation::class.java)
         )
     }
 
