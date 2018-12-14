@@ -87,7 +87,7 @@ constructor(
                 "Trevligt att träffas {NAME}!\u000CFör att kunne ge dig ett prisförslag"
                         + " behöver jag ställa några snabba frågor"
                 // + "\u000C"
-                , SelectOption("Okej", MESSAGE_ONBOARDINGSTART_ASK_EMAIL),
+                , SelectOption("Okej!", MESSAGE_ONBOARDINGSTART_ASK_EMAIL),
                 SelectOption("Jag är redan medlem", "message.bankid.start")
             )
         )
@@ -334,11 +334,8 @@ constructor(
             MESSAGE_FORSLAGSTART,
             body = MessageBodySingleSelect(
                 "Tack! Bor du i lägenhet eller eget hus",
-                Lists.newArrayList<SelectItem>(
                     SelectOption("Lägenhet", MESSAGE_LAGENHET_PRE),
-                    SelectOption("Hus", MESSAGE_HUS),
-                    SelectOption("Jag är redan medlem", "message.bankid.start")
-                )
+                    SelectOption("Hus", MESSAGE_HUS)
             )
         )
 
@@ -348,7 +345,7 @@ constructor(
         this.createChatMessage(
             MESSAGE_LAGENHET_NO_PERSONNUMMER,
             WrappedMessage(
-                MessageBodyNumber("Vad är ditt personnumer? Jag behöver det så att jag kan hämta din adress 🏠")
+                MessageBodyNumber("Vad är ditt personnumer? Jag behöver det så att jag kan hämta din adress ☺️")
             ) { body, uc, m ->
 
                 val trimmedSSN = body.text.trim()
@@ -521,7 +518,7 @@ constructor(
                 )
             ) { body, uc, m ->
                 val item = body.selectedItem
-                body.text = item.text
+                body.text = if  (item.value == MESSAGE_KVADRAT) "Yes, stämmer bra!" else "Nix"
                 addToChat(m, uc)
                 when {
                     item.value == MESSAGE_KVADRAT -> handleStudentEntrypoint(MESSAGE_KVADRAT, uc)
@@ -768,9 +765,9 @@ constructor(
         this.createMessage(
             MESSAGE_FORSLAG2,
             MessageBodySingleSelect(
-                "Tack {NAME} för att du svarat på alla frågor! Nu har jag allt jag behöver för att ta fram ditt förslag",
+                "Sådärja, tack {NAME}! Ditt förslag är nu klart!",
                 Lists.newArrayList<SelectItem>(
-                    SelectLink.toOffer("Gå till mitt förslag 👏", "message.forslag.dashboard")
+                    SelectLink.toOffer("Visa mig förslaget 👏", "message.forslag.dashboard")
                 )
             )
         )
@@ -1065,12 +1062,9 @@ constructor(
             "message.student",
             MessageBodySingleSelect(
                 "Okej! Jag ser att du är under 30. Är du kanske student? $emoji_school_satchel",
-                object : ArrayList<SelectItem>() {
-                    init {
-                        add(SelectOption("Ja", "message.studentja"))
-                        add(SelectOption("Nej", "message.studentnej"))
-                    }
-                })
+                SelectOption("Ja", "message.studentja"),
+                SelectOption("Nej", "message.studentnej")
+            )
         )
 
         this.createMessage("message.studentnej", MessageBodyParagraph("Okej, då vet jag"))
@@ -1350,9 +1344,11 @@ constructor(
             "message.student" -> {
                 val sitem2 = (m.body as MessageBodySingleSelect).selectedItem
                 if (sitem2.value == "message.studentja") {
-                    m.body.text = sitem2.text
+                    m.body.text = "Yes"
                     addToChat(m, userContext)
                     userContext.putUserData("{STUDENT}", "1")
+                }else{
+                    m.body.text = "Nix"
                 }
             }
 
