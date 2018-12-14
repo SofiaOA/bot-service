@@ -78,7 +78,7 @@ class MemberSourceConversation() : Conversation() {
 
         this.createChatMessage(
             "membersource.thanks",
-            MessageBodySingleSelect("Tack!", listOf(SelectLink.toDashboard("Börja utforska appen", "expore")))
+            MessageBodySingleSelect("Toppen, tack!", listOf(SelectLink.toDashboard("Börja utforska appen", "expore")))
         )
     }
 

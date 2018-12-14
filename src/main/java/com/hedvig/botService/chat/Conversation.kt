@@ -173,7 +173,7 @@ abstract class Conversation internal constructor() {
           + messageId
           + " to "
           + type.javaClass.name)
-      getMessage(messageId)!!.expectedType = type
+      getMessage(findLastChatMessageId(messageId))!!.expectedType = type
     } else {
       log.error("ERROR: ------------> Message not found: $messageId")
     }

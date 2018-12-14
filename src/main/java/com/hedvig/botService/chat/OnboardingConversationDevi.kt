@@ -84,7 +84,7 @@ constructor(
         this.createChatMessage(
             MESSAGE_ONBOARDINGSTART_REPLY_NAME,
             MessageBodySingleSelect(
-                "Trevligt att träffas {NAME}!\nFör att kunne ge dig ett prisförslag"
+                "Trevligt att träffas {NAME}!\u000CFör att kunne ge dig ett prisförslag"
                         + " behöver jag ställa några snabba frågor"
                 // + "\u000C"
                 , SelectOption("Okej", MESSAGE_ONBOARDINGSTART_ASK_EMAIL),
@@ -1003,7 +1003,7 @@ constructor(
 
         this.createMessage(
             "message.kontraktklar",
-            MessageBodyParagraph("Hurra! 🎉 Välkommen som medlem!")
+            MessageBodyParagraph("Hurra! 🎉 Välkommen som medlem {NAME}!")
         )
 
         this.createMessage("message.kontrakt.email", MessageBodyText("OK! Vad är din mailadress?"))
