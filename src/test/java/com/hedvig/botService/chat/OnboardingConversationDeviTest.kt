@@ -294,6 +294,14 @@ class OnboardingConversationDeviTest {
     assertThat(userContext.onBoardingData.firstName).isEqualTo("Tolvan")
   }
 
+  @Test
+  fun messageAskEmail_setsKeyoardTypeTo_email(){
+    val message = getMessage(OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_ASK_EMAIL + ".0")
+
+    assertThat(message.header.keyboardType).isEqualTo(KeyboardTypes.EMAIL_ADDRESS)
+
+  }
+
 
   @Test
   fun lookupAddressDetails_whenMemberEntersTheirSSN() {
