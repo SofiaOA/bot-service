@@ -380,7 +380,7 @@ constructor(
             WrappedMessage(
                 MessageBodyText(
                     "Konstigt, just nu kan jag inte hitta din adress. Så jag behöver ställa några extra frågor 😊\u000C"
-                            + "Men om du vill bli medlem sen så måste du signera med BankID, bara så du vet!\u000CVad heter du i efternamn?\""
+                            + "Vad heter du i efternamn?"
                 )
             ) { b, uc, m ->
                 uc.onBoardingData.familyName = b.text.trim().toLowerCase().capitalize()
