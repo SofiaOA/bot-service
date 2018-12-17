@@ -306,17 +306,15 @@ abstract class Conversation internal constructor() {
       return false
     }
 
-    val msg = createBackOfficeMessage(uc, message, messageId, userId)
+    val msg = createBackOfficeMessage(uc, message, messageId)
+    msg.author = getUserId(userId)
+
     uc.memberChat.addToHistory(msg)
     return true
   }
 
-  protected open fun createBackOfficeMessage(uc: UserContext, message: String, id: String): Message {
-    return createBackOfficeMessage(uc, message, id, null)
-  }
 
-
-  protected fun createBackOfficeMessage(uc: UserContext, message: String, id: String, userId: String?): Message {
+  open fun createBackOfficeMessage(uc: UserContext, message: String, id: String): Message {
     val msg = Message()
     val selectionItems = getSelectItemsForAnswer(uc)
     msg.body = MessageBodySingleSelect(message, selectionItems)
@@ -325,7 +323,6 @@ abstract class Conversation internal constructor() {
     msg.header.messageId = null
     msg.body.id = null
     msg.id = id
-    msg.author = getUserId(userId)
 
     return msg
   }

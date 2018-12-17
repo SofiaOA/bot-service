@@ -2,21 +2,18 @@ package com.hedvig.botService.chat;
 
 import com.google.common.collect.Lists;
 import com.hedvig.botService.enteties.UserContext;
-import com.hedvig.botService.enteties.message.Message;
-import com.hedvig.botService.enteties.message.MessageBodyFileUpload;
-import com.hedvig.botService.enteties.message.MessageBodySingleSelect;
-import com.hedvig.botService.enteties.message.MessageBodyText;
-import com.hedvig.botService.enteties.message.MessageHeader;
-import com.hedvig.botService.enteties.message.SelectItem;
+import com.hedvig.botService.enteties.message.*;
 import com.hedvig.botService.serviceIntegration.productPricing.ProductPricingService;
 import com.hedvig.botService.services.events.FileUploadedEvent;
 import com.hedvig.botService.services.events.OnboardingFileUploadedEvent;
 import com.hedvig.botService.services.events.OnboardingQuestionAskedEvent;
 import com.hedvig.botService.services.events.QuestionAskedEvent;
-import java.time.Clock;
-import java.util.List;
 import lombok.val;
 import org.springframework.context.ApplicationEventPublisher;
+
+import javax.validation.constraints.NotNull;
+import java.time.Clock;
+import java.util.List;
 
 public class FreeChatConversation extends Conversation {
 
@@ -120,8 +117,9 @@ public class FreeChatConversation extends Conversation {
     completeRequest(nxtMsg, userContext);
   }
 
+  @NotNull
   @Override
-  protected Message createBackOfficeMessage(UserContext uc, String message, String id) {
+  public Message createBackOfficeMessage(UserContext uc, String message, String id) {
     Message msg = new Message();
     msg.body = new MessageBodyText(message);
     msg.header = MessageHeader.createRichTextHeader();
