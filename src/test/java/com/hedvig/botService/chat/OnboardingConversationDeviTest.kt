@@ -361,7 +361,7 @@ class OnboardingConversationDeviTest {
     testConversation.receiveMessage(userContext, message)
 
     val lastMessage = userContext.memberChat.chatHistory.last()
-    assertThat(lastMessage.baseMessageId).isEqualTo("message.missing.bisnode.data")
+    assertThat(lastMessage.baseMessageId).isEqualTo("message.lagenhet.addressnotfound")
 
     userContext.onBoardingData.let {
       assertThat(it.ssn).isEqualTo("191212121212")
