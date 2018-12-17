@@ -39,7 +39,7 @@ abstract class Conversation internal constructor() {
 
   fun getMessage(key: String): Message? {
     val m = messageList[key]
-    if (m == null) log.info("Message not found with id: $key")
+    if (m == null) log.error("Message not found with id: $key")
     return m
   }
 

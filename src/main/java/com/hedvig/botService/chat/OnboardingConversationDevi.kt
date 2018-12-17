@@ -274,23 +274,6 @@ constructor(
             )
         )
 
-        this.createMessage(
-            "message.audiotest",
-            MessageBodyAudio("Här kan du testa audio", "/claims/fileupload"),
-            2000
-        )
-        this.createMessage(
-            "message.phototest",
-            MessageBodyPhotoUpload("Här kan du testa fotouppladdaren", "/asset/fileupload"),
-            2000
-        )
-        this.createMessage(
-            "message.fileupload.result",
-            MessageBodySingleSelect(
-                "Ok uppladdningen gick bra!",
-                listOf(SelectOption("Hem", MESSAGE_ONBOARDINGSTART))
-            )
-        )
 
         this.createChatMessage(
             "message.medlem",
@@ -998,9 +981,16 @@ constructor(
 
         setupBankidErrorHandlers("message.kontraktpop.startBankId", "message.kontrakt")
 
+        //Deperecated 2018-12-17
         this.createMessage(
             "message.kontraktklar",
             MessageBodyParagraph("Hurra! 🎉 Välkommen som medlem {NAME}!")
+        )
+
+
+        this.createMessage(
+            "message.kontraktklar.ss",
+            MessageBodySingleSelect("Hurra! 🎉 Välkommen som medlem {NAME}!", SelectLink.toDashboard("Börja utforska appen", "message.noop"))
         )
 
         this.createMessage("message.kontrakt.email", MessageBodyText("OK! Vad är din mailadress?"))
@@ -1244,7 +1234,8 @@ constructor(
                 }
                 if (value == MESSAGE_FORSLAG2) {
                     completeOnboarding(userContext)
-                } else if (value == "message.kontraktklar") {
+                } else //Deprecated 2018-12-17
+                    if (value == "message.kontraktklar") {
                     endConversation(userContext)
                 }
             }
@@ -1350,17 +1341,6 @@ constructor(
                 }else{
                     m.body.text = "Nix"
                 }
-            }
-
-            "message.audiotest", "message.phototest" -> nxtMsg = "message.fileupload.result"
-            MESSAGE_FORSLAGSTART -> onBoardingData.houseType = (m.body as MessageBodySingleSelect).selectedItem.value
-            "message.kontrakt.email" -> {
-                onBoardingData.email = m.body.text
-                memberService.updateEmail(userContext.memberId, m.body.text.trim { it <= ' ' })
-                m.body.text = m.body.text
-                addToChat(m, userContext)
-                endConversation(userContext)
-                return
             }
 
             MESSAGE_NYHETSBREV -> {
@@ -1554,7 +1534,6 @@ constructor(
                 userContext.putUserData("{PHONE_NUMBER}", trim)
                 m.body.text = "Mitt telefonnummer är $trim"
                 addToChat(m, userContext)
-                // nxtMsg = MESSAGE_EMAIL;
                 nxtMsg = MESSAGE_FORSAKRINGIDAG
             }
             MESSAGE_EMAIL -> {
@@ -1640,24 +1619,6 @@ constructor(
             }
 
             "message.kontrakt" -> completeOnboarding(userContext)
-
-            "message.kontraktklar" -> {
-                m.body.text = (m.body as MessageBodySingleSelect).selectedItem.text
-                addToChat(m, userContext)
-                if ((m.body as MessageBodySingleSelect)
-                        .selectedItem
-                        .value == "message.kontrakt.email"
-                ) {
-                    // NOOP
-                    nxtMsg = "message.kontrakt.email"
-                } else {
-                    endConversation(userContext)
-                    return
-                }
-            }
-
-            else -> {
-            }
         }
 
         /*
@@ -1787,9 +1748,6 @@ constructor(
 
     private fun endConversation(userContext: UserContext) {
         userContext.completeConversation(this)
-        userContext.startConversation(
-            conversationFactory.createConversation(MemberSourceConversation::class.java)
-        )
     }
 
     /*
@@ -1892,7 +1850,7 @@ constructor(
                 }
             }
 
-            addToChat(getMessage("message.kontraktklar"), userContext)
+            addToChat(getMessage("message.kontraktklar.ss"), userContext)
             userContext.onBoardingData.userHasSigned = true
             userContext.setInOfferState(false)
 
@@ -1910,7 +1868,6 @@ constructor(
                 )
                 else -> eventPublisher.publishEvent(MemberSignedEvent(memberId, productType))
             }
-            // userContext.completeConversation(this);
         }
     }
 

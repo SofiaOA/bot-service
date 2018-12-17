@@ -263,9 +263,11 @@ class OnboardingConversationDeviTest {
 
   @Test
   fun messageOnboardingStart_ContainsOptionForExistingMembers() {
-    val message = testConversation.getMessage(testConversation.findLastChatMessageId(
-      OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART
-    ))
+    val message = testConversation.getMessage(
+      testConversation.findLastChatMessageId(
+        OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART
+      )
+    )
 
     val body = message!!.body as MessageBodySingleSelect
 
