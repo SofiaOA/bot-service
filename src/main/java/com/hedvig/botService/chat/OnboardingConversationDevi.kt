@@ -94,7 +94,7 @@ constructor(
 
         this.createChatMessage(
             MESSAGE_ONBOARDINGSTART_ASK_EMAIL,
-            WrappedMessage(MessageBodyText("Först, vad är din mailadress?"),KeyboardTypes.EMAIL_ADDRESS) { body, userContext, message ->
+            WrappedMessage(MessageBodyText("Först, vad är din mailadress?",KeyboardType.EMAIL_ADDRESS)) { body, userContext, message ->
                 val trimmedEmail = body.text.trim()
                 userContext.onBoardingData.email = trimmedEmail
                 body.text = "Min email är $trimmedEmail"
@@ -345,7 +345,7 @@ constructor(
         this.createChatMessage(
             MESSAGE_LAGENHET_NO_PERSONNUMMER,
             WrappedMessage(
-                MessageBodyNumber("Vad är ditt personnumer? Jag behöver det så att jag kan hämta din adress ☺️")
+                MessageBodyNumber("Vad är ditt personnumer? Jag behöver det så att jag kan hämta din adress ☺️", "ååååmmddxxxx")
             ) { body, uc, m ->
 
                 val trimmedSSN = body.text.trim()

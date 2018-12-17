@@ -1,8 +1,7 @@
 package com.hedvig.botService.chat
 
 import com.hedvig.botService.enteties.UserContext
-import com.hedvig.botService.enteties.message.KeyboardTypes
 import com.hedvig.botService.enteties.message.Message
 import com.hedvig.botService.enteties.message.MessageBody
 
-data class WrappedMessage<T: MessageBody>(val message:T, val keyboardType: KeyboardTypes? = null, val callback:(T, UserContext, Message) -> String)
+data class WrappedMessage<T: MessageBody>(val message:T, val callback:(T, UserContext, Message) -> String)
