@@ -391,7 +391,7 @@ class OnboardingConversationDeviTest {
     assertThat(lastMessage.baseMessageId).isEqualTo("message.lagenhet.addressnotfound")
 
     userContext.onBoardingData.let {
-      assertThat(it.ssn).isNull()
+      assertThat(it.ssn).isEqualTo("191212121212")
       assertThat(it.familyName).isNull()
       assertThat(it.birthDate).isNull()
       assertThat(it.addressStreet).isNull()

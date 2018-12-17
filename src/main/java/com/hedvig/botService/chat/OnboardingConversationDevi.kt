@@ -343,13 +343,13 @@ constructor(
                 body.text = "${trimmedSSN.dropLast(4)}-****"
                 addToChat(m, uc)
 
+                uc.onBoardingData.ssn = trimmedSSN
                 val response = memberService.lookupAddressSWE(trimmedSSN, uc.memberId)
 
                 if (response != null) {
                     uc.onBoardingData.let {
                         it.familyName = response.lastName
                         it.firstName = response.firstName
-                        it.ssn = trimmedSSN
                         it.birthDate = LocalDate.parse(
                             "${trimmedSSN.substring(0, 4)}-${trimmedSSN.substring(
                                 4,
@@ -1861,6 +1861,7 @@ constructor(
             addToChat(getMessage("message.kontraktklar.ss"), userContext)
             userContext.onBoardingData.userHasSigned = true
             userContext.setInOfferState(false)
+            userContext.setOnboardingComplete()
 
             val productType = userContext.getDataEntry(UserData.HOUSE)
             val memberId = userContext.memberId
