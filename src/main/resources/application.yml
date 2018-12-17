@@ -1,24 +1,14 @@
 server:
   port: 4081
 
-    
-management:
-  security:
-    enabled: false
-
-hedvig:
+cloud.aws.stack.auto: false
 
 spring:
   jpa:
     generate-ddl: true
     properties:
       hibernate:
-#        generate_statistics: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        hbm2ddl:
-       #   auto: update
-      javax:
-        persistence:
     hibernate:
       ddl-auto: none
       show_sql: true
@@ -29,9 +19,14 @@ spring:
     serialization:
       write_dates_as_timestamps: false
 
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 3000
+        readTimeout: 3000
+        loggerLevel: full
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/bot-service
-    username: postgres
-    password: iambatman
-    platform: POSTGRESQL
+http.connection.timeout: 3000
+http.socket.timeout: 3000
+http.connection-manager.timeout: 3000
