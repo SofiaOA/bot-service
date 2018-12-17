@@ -707,7 +707,7 @@ constructor(
             MessageBodySingleSelect(
                 "Toppen!\u000CÄger du något som du tar med dig utanför hemmet som är värt över 50 000 kr? 💍⌚",
 
-                SelectOption("Ja, berätta om hemförsäkringen", MESSAGE_50K_LIMIT_YES),
+                SelectOption("Ja, berätta om objektsförsäkring", MESSAGE_50K_LIMIT_YES),
                 SelectOption("Nej, gå vidare utan", MESSAGE_50K_LIMIT_NO)
             )
         )
