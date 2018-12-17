@@ -276,7 +276,7 @@ class OnboardingConversationDeviTest {
 
   @Test
   fun messageAskName_whenMemberEntersTheirName_capitalizedNameCorrectly() {
-    val message = getMessage(OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_ASK_NAME + ".2")
+    val message = getMessage(OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_ASK_NAME)
 
     val body = message.body as MessageBodyText
     body.text = "TOLVAN"
@@ -296,16 +296,16 @@ class OnboardingConversationDeviTest {
 
   @Test
   fun messageAskEmail_setsKeyoardTypeTo_email(){
-    val message = getMessage(OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_ASK_EMAIL + ".0")
+    val message = getMessage(OnboardingConversationDevi.MESSAGE_ONBOARDINGSTART_ASK_EMAIL)
 
-    assertThat(message.header.keyboardType).isEqualTo(KeyboardTypes.EMAIL_ADDRESS)
+    assertThat((message.body as MessageBodyText).keyboardType).isEqualTo(KeyboardType.EMAIL_ADDRESS)
 
   }
 
 
   @Test
   fun lookupAddressDetails_whenMemberEntersTheirSSN() {
-    val message = getMessage(OnboardingConversationDevi.MESSAGE_LAGENHET_NO_PERSONNUMMER + ".0")
+    val message = getMessage(OnboardingConversationDevi.MESSAGE_LAGENHET_NO_PERSONNUMMER)
 
     val body = message.body as MessageBodyNumber
     body.text = "191212121212"
@@ -343,7 +343,7 @@ class OnboardingConversationDeviTest {
 
   @Test
   fun lookupAddressDetails_whenAddressLookupReturnsNullAddress() {
-    val message = getMessage(OnboardingConversationDevi.MESSAGE_LAGENHET_NO_PERSONNUMMER + ".0")
+    val message = getMessage(OnboardingConversationDevi.MESSAGE_LAGENHET_NO_PERSONNUMMER)
 
     val body = message.body as MessageBodyNumber
     body.text = "191212121212"
@@ -376,7 +376,7 @@ class OnboardingConversationDeviTest {
 
   @Test
   fun lookupAddressDetails_whenAddressLookupReturnsNoMatch() {
-    val message = getMessage(OnboardingConversationDevi.MESSAGE_LAGENHET_NO_PERSONNUMMER + ".0")
+    val message = getMessage(OnboardingConversationDevi.MESSAGE_LAGENHET_NO_PERSONNUMMER)
 
     val body = message.body as MessageBodyNumber
     body.text = "191212121212"
@@ -408,7 +408,7 @@ class OnboardingConversationDeviTest {
       it.addressZipCode = "12345"
     }
 
-    val message = getMessage(OnboardingConversationDevi.MESSAGE_BANKIDJA + ".0")
+    val message = getMessage(OnboardingConversationDevi.MESSAGE_BANKIDJA)
     (message.body as MessageBodySingleSelect).choices.findLast { it.value == MESSAGE_VARBORDUFELADRESS }!!.selected =
       true
 
@@ -424,7 +424,7 @@ class OnboardingConversationDeviTest {
   @Test
   fun reciveMessageBANKIDJA_whenAddressIsWrong_nextMessageIs_MESSAGE_VARBORDUFELADRESS() {
 
-    val message = getMessage(OnboardingConversationDevi.MESSAGE_BANKIDJA + ".0")
+    val message = getMessage(OnboardingConversationDevi.MESSAGE_BANKIDJA)
     (message.body as MessageBodySingleSelect).choices.findLast { it.value == MESSAGE_VARBORDUFELADRESS }!!.selected =
       true
 
@@ -435,6 +435,6 @@ class OnboardingConversationDeviTest {
 
 
   fun getMessage(id: String): Message {
-    return testConversation.getMessage(id)!!
+    return testConversation.getMessage(testConversation.findLastChatMessageId(id))!!
   }
 }

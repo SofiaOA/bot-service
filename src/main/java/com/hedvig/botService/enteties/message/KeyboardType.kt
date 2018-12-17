@@ -2,7 +2,7 @@ package com.hedvig.botService.enteties.message
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-enum class KeyboardTypes {
+enum class KeyboardType {
     @JsonProperty("default")
     DEFAULT,
     @JsonProperty("number-pad")

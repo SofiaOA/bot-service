@@ -106,13 +106,10 @@ abstract class Conversation internal constructor() {
     header: MessageHeader = MessageHeader(MessageHeader.HEDVIG_USER_ID, -1),
     body: MessageBody,
     avatarName: String? = null,
-    delay: Int? = null,
-    keyboardType: KeyboardTypes? = null) {
+    delay: Int? = null) {
     val m = Message()
     m.id = id
-    if(keyboardType!=null){
-      header.keyboardType = keyboardType
-    }
+
     m.header = header
     m.body = body
     if (delay != null) {
@@ -247,7 +244,7 @@ abstract class Conversation internal constructor() {
   // ----------------------------------------------------------------------------------------------------------------- //
 
   inline fun <reified T:MessageBody>createChatMessage(id:String, message:WrappedMessage<T>){
-    this.createChatMessage(id, avatar = null, body = message.message, keyboardType = message.keyboardType)
+    this.createChatMessage(id, avatar = null, body = message.message)
     this.genericCallbacks[id] = {m,u -> message.callback(m.body as T, u, m)}
   }
 
@@ -258,7 +255,7 @@ abstract class Conversation internal constructor() {
   /*
  * Splits the message text into separate messages based on \f and adds 'Hedvig is thinking' messages in between
  * */
-  fun createChatMessage(id: String, body: MessageBody, avatar: String?, keyboardType:KeyboardTypes? = null) {
+  fun createChatMessage(id: String, body: MessageBody, avatar: String?) {
     val paragraphs = body.text.split("\u000C".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
     var pId = 0
     val delayFactor = 25 // Milliseconds per character TODO: Externalize this!
@@ -292,9 +289,9 @@ abstract class Conversation internal constructor() {
     // createMessage(sWrite, new MessageBodyParagraph(""), "h_symbol",(s.length()*delayFactor));
     createMessage(sWrite, body = MessageBodyParagraph(""), delay = s.length * delayFactor)
     if (avatar != null) {
-      createMessage(sFinal, body = body, avatarName = avatar, keyboardType = keyboardType)
+      createMessage(sFinal, body = body, avatarName = avatar)
     } else {
-      createMessage(sFinal, body = body, keyboardType = keyboardType)
+      createMessage(sFinal, body = body)
     }
     msgs.add(sWrite)
     msgs.add(sFinal)

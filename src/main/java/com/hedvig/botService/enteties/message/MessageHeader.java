@@ -1,6 +1,5 @@
 package com.hedvig.botService.enteties.message;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.ToString;
 import lombok.val;
 
@@ -34,12 +33,6 @@ public class MessageHeader {
 
   public Boolean
       shouldRequestPushNotifications; // Should responding to this message prompt user to turn on
-
-  @Nullable
-  @Transient
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  public KeyboardTypes keyboardType;
-  // push notifications
 
   public MessageHeader(long hedvigUserId, long timeStamp) {
     this.fromId = hedvigUserId;
