@@ -94,7 +94,12 @@ constructor(
 
         this.createChatMessage(
             MESSAGE_ONBOARDINGSTART_ASK_EMAIL,
-            WrappedMessage(MessageBodyText("Först, vad är din mailadress?",KeyboardType.EMAIL_ADDRESS)) { body, userContext, message ->
+            WrappedMessage(
+                MessageBodyText(
+                    "Först, vad är din mailadress?",
+                    KeyboardType.EMAIL_ADDRESS
+                )
+            ) { body, userContext, message ->
                 val trimmedEmail = body.text.trim()
                 userContext.onBoardingData.email = trimmedEmail
                 body.text = "Min email är $trimmedEmail"
@@ -317,8 +322,8 @@ constructor(
             MESSAGE_FORSLAGSTART,
             body = MessageBodySingleSelect(
                 "Tack! Bor du i lägenhet eller eget hus",
-                    SelectOption("Lägenhet", MESSAGE_LAGENHET_PRE),
-                    SelectOption("Hus", MESSAGE_HUS)
+                SelectOption("Lägenhet", MESSAGE_LAGENHET_PRE),
+                SelectOption("Hus", MESSAGE_HUS)
             )
         )
 
@@ -328,7 +333,10 @@ constructor(
         this.createChatMessage(
             MESSAGE_LAGENHET_NO_PERSONNUMMER,
             WrappedMessage(
-                MessageBodyNumber("Vad är ditt personnumer? Jag behöver det så att jag kan hämta din adress ☺️", "ååååmmddxxxx")
+                MessageBodyNumber(
+                    "Vad är ditt personnumer? Jag behöver det så att jag kan hämta din adress ☺️",
+                    "ååååmmddxxxx"
+                )
             ) { body, uc, m ->
 
                 val trimmedSSN = body.text.trim()
@@ -360,11 +368,26 @@ constructor(
                 if (response?.address != null) {
                     MESSAGE_BANKIDJA
                 } else {
-                    "message.missing.bisnode.data"
+                    "message.lagenhet.addressnotfound"
                 }
             }
         )
         this.setExpectedReturnType(MESSAGE_LAGENHET_NO_PERSONNUMMER, SSNSweden())
+
+
+        this.createChatMessage(
+            "message.lagenhet.addressnotfound",
+            WrappedMessage(
+                MessageBodyText(
+                    "Konstigt, just nu kan jag inte hitta din adress. Så jag behöver ställa några extra frågor 😊\u000C"
+                            + "Men om du vill bli medlem sen så måste du signera med BankID, bara så du vet!\u000CVad heter du i efternamn?\""
+                )
+            ) { b, uc, m ->
+                uc.onBoardingData.familyName = b.text.trim().toLowerCase().capitalize()
+                addToChat(m, uc)
+
+                "message.varborduadress"
+            })
 
         this.createChatMessage(
             MESSAGE_LAGENHET,
@@ -395,7 +418,9 @@ constructor(
 
         this.createMessage(
             "message.missing.bisnode.data",
-            MessageBodyParagraph("Konstigt, just nu kan jag inte hitta din adress. Så jag böhöver ställa några extra frågor 😊")
+            MessageBodyParagraph(
+                "Konstigt, just nu kan jag inte hitta din adress. Så jag behöver ställa några extra frågor 😊"
+            )
         )
         this.addRelay("message.missing.bisnode.data", "message.manuellnamn")
 
@@ -501,7 +526,7 @@ constructor(
                 )
             ) { body, uc, m ->
                 val item = body.selectedItem
-                body.text = if  (item.value == MESSAGE_KVADRAT) "Yes, stämmer bra!" else "Nix"
+                body.text = if (item.value == MESSAGE_KVADRAT) "Yes, stämmer bra!" else "Nix"
                 addToChat(m, uc)
                 when {
                     item.value == MESSAGE_KVADRAT -> handleStudentEntrypoint(MESSAGE_KVADRAT, uc)
@@ -559,24 +584,19 @@ constructor(
             "message.lghtyp",
             MessageBodySingleSelect(
                 "Perfekt! Hyr du eller äger du den?",
-                object : ArrayList<SelectItem>() {
-                    init {
-                        add(SelectOption("Jag hyr den", ProductTypes.RENT.toString()))
-                        add(SelectOption("Jag äger den", ProductTypes.BRF.toString()))
-                    }
-                })
+                SelectOption("Jag hyr den", ProductTypes.RENT.toString()),
+                SelectOption("Jag äger den", ProductTypes.BRF.toString())
+            )
         )
+
 
         this.createMessage(
             "message.lghtyp.sublet",
             MessageBodySingleSelect(
                 "Okej! Är lägenheten du hyr i andra hand en hyresrätt eller bostadsrätt?",
-                object : ArrayList<SelectItem>() {
-                    init {
-                        add(SelectOption("Hyresrätt", ProductTypes.SUBLET_RENTAL.toString()))
-                        add(SelectOption("Bostadsrätt", ProductTypes.SUBLET_BRF.toString()))
-                    }
-                })
+                SelectOption("Hyresrätt", ProductTypes.SUBLET_RENTAL.toString()),
+                SelectOption("Bostadsrätt", ProductTypes.SUBLET_BRF.toString())
+            )
         )
 
         this.createMessage("message.pers", MessageBodyNumber("Okej! Hur många bor där?"))
@@ -615,44 +635,34 @@ constructor(
             MESSAGE_FORSAKRINGIDAG,
             MessageBodySingleSelect(
                 "Har du någon hemförsäkring idag?",
-                object : ArrayList<SelectItem>() {
-                    init {
-                        add(SelectOption("Ja", MESSAGE_FORSAKRINGIDAGJA))
-                        add(SelectOption("Nej", MESSAGE_FORSLAG2))
-                    }
-                })
+                SelectOption("Ja", MESSAGE_FORSAKRINGIDAGJA),
+                SelectOption("Nej", MESSAGE_FORSLAG2)
+            )
         )
 
         this.createMessage(
             MESSAGE_FORSAKRINGIDAGJA,
             MessageBodySingleSelect(
                 "Okej! Vilket försäkringsbolag har du?",
-                object : ArrayList<SelectItem>() {
-                    init {
-                        add(SelectOption("If", "if"))
-                        add(SelectOption("Folksam", "Folksam"))
-                        add(SelectOption("Trygg-Hansa", "Trygg-Hansa"))
-                        add(SelectOption("Länsförsäkringar", "Länsförsäkringar"))
-                        // add(new SelectOption("Moderna", "Moderna"));
-                        add(SelectOption("Annat bolag", "message.bolag.annat.expand"))
-                        add(SelectOption("Ingen aning", "message.bolag.vetej"))
-                    }
-                })
+                SelectOption("If", "if"),
+                SelectOption("Folksam", "Folksam"),
+                SelectOption("Trygg-Hansa", "Trygg-Hansa"),
+                SelectOption("Länsförsäkringar", "Länsförsäkringar"),
+                SelectOption("Annat bolag", "message.bolag.annat.expand"),
+                SelectOption("Ingen aning", "message.bolag.vetej")
+            )
         )
 
         this.createMessage(
             "message.bolag.annat.expand",
             MessageBodySingleSelect(
                 "Okej! Är det något av dessa kanske?",
-                object : ArrayList<SelectItem>() {
-                    init {
-                        add(SelectOption("Moderna", "Moderna"))
-                        add(SelectOption("ICA", "ICA"))
-                        add(SelectOption("Gjensidige", "Gjensidige"))
-                        add(SelectOption("Vardia", "Vardia"))
-                        add(SelectOption("Annat bolag", MESSAGE_ANNATBOLAG))
-                    }
-                })
+                SelectOption("Moderna", "Moderna"),
+                SelectOption("ICA", "ICA"),
+                SelectOption("Gjensidige", "Gjensidige"),
+                SelectOption("Vardia", "Vardia"),
+                SelectOption("Annat bolag", MESSAGE_ANNATBOLAG)
+            )
         )
 
         this.createMessage(
@@ -696,10 +706,9 @@ constructor(
             MESSAGE_50K_LIMIT,
             MessageBodySingleSelect(
                 "Toppen!\u000CÄger du något som du tar med dig utanför hemmet som är värt över 50 000 kr? 💍⌚",
-                Lists.newArrayList<SelectItem>(
-                    SelectOption("Ja", MESSAGE_50K_LIMIT_YES),
-                    SelectOption("Nej", MESSAGE_50K_LIMIT_NO)
-                )
+
+                SelectOption("Ja, berätta om hemförsäkringen", MESSAGE_50K_LIMIT_YES),
+                SelectOption("Nej, gå vidare utan", MESSAGE_50K_LIMIT_NO)
             )
         )
 
@@ -707,7 +716,7 @@ constructor(
             MESSAGE_50K_LIMIT_YES,
             MessageBodySingleSelect(
                 "Okej!\u000COm du skaffar Hedvig är det enkelt att lägga till en separat objektsförsäkring efteråt",
-                Lists.newArrayList<SelectItem>(SelectOption("Jag förstår!", MESSAGE_50K_LIMIT_YES_YES))
+                SelectOption("Jag förstår!", MESSAGE_50K_LIMIT_YES_YES)
             )
         )
 
@@ -987,10 +996,12 @@ constructor(
             MessageBodyParagraph("Hurra! 🎉 Välkommen som medlem {NAME}!")
         )
 
-
         this.createMessage(
             "message.kontraktklar.ss",
-            MessageBodySingleSelect("Hurra! 🎉 Välkommen som medlem {NAME}!", SelectLink.toDashboard("Börja utforska appen", "message.noop"))
+            MessageBodySingleSelect(
+                "Hurra! 🎉 Välkommen som medlem {NAME}!",
+                SelectLink.toDashboard("Börja utforska appen 💥", "message.noop")
+            )
         )
 
         this.createMessage("message.kontrakt.email", MessageBodyText("OK! Vad är din mailadress?"))
@@ -1087,12 +1098,9 @@ constructor(
             MESSAGE_STUDENT_LIMIT_LIVING_SPACE_HOUSE_TYPE,
             MessageBodySingleSelect(
                 "Hyr du eller äger du lägenheten?",
-                object : ArrayList<SelectItem>() {
-                    init {
-                        add(SelectOption("Jag hyr den", ProductTypes.RENT.toString()))
-                        add(SelectOption("Jag äger den", ProductTypes.BRF.toString()))
-                    }
-                })
+                SelectOption("Jag hyr den", ProductTypes.RENT.toString()),
+                SelectOption("Jag äger den", ProductTypes.BRF.toString())
+            )
         )
 
         this.createChatMessage(
@@ -1236,8 +1244,8 @@ constructor(
                     completeOnboarding(userContext)
                 } else //Deprecated 2018-12-17
                     if (value == "message.kontraktklar") {
-                    endConversation(userContext)
-                }
+                        endConversation(userContext)
+                    }
             }
             Conversation.EventTypes.ANIMATION_COMPLETE -> when (value) {
                 "animation.bike" -> completeRequest("message.bikedone", userContext)
@@ -1338,7 +1346,7 @@ constructor(
                     m.body.text = "Yes"
                     addToChat(m, userContext)
                     userContext.putUserData("{STUDENT}", "1")
-                }else{
+                } else {
                     m.body.text = "Nix"
                 }
             }

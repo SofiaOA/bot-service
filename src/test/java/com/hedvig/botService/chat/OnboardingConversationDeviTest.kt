@@ -388,7 +388,7 @@ class OnboardingConversationDeviTest {
     testConversation.receiveMessage(userContext, message)
 
     val lastMessage = userContext.memberChat.chatHistory.last()
-    assertThat(lastMessage.baseMessageId).isEqualTo("message.missing.bisnode.data")
+    assertThat(lastMessage.baseMessageId).isEqualTo("message.lagenhet.addressnotfound")
 
     userContext.onBoardingData.let {
       assertThat(it.ssn).isNull()
@@ -399,6 +399,21 @@ class OnboardingConversationDeviTest {
       assertThat(it.addressCity).isNull()
       assertThat(it.floor).isEqualTo(0)
     }
+  }
+
+  @Test
+  fun receiveMessageLagenhetAddressnotfound_then(){
+    val message = getMessage("message.lagenhet.addressnotfound")
+    message.body.text = "tolvansson"
+
+    testConversation.receiveMessage(userContext, message)
+
+    userContext.onBoardingData.let {
+      assertThat(it.familyName).isEqualTo("Tolvansson")
+    }
+
+    val lastMessage = userContext.memberChat.chatHistory.last()
+    assertThat(lastMessage.baseMessageId).isEqualTo("message.varborduadress")
 
   }
 
@@ -424,7 +439,7 @@ class OnboardingConversationDeviTest {
   }
 
   @Test
-  fun reciveMessageBANKIDJA_whenAddressIsWrong_nextMessageIs_MESSAGE_VARBORDUFELADRESS() {
+  fun receiveMessageBANKIDJA_whenAddressIsWrong_nextMessageIs_MESSAGE_VARBORDUFELADRESS() {
 
     val message = getMessage(OnboardingConversationDevi.MESSAGE_BANKIDJA)
     (message.body as MessageBodySingleSelect).choices.findLast { it.value == MESSAGE_VARBORDUFELADRESS }!!.selected =
