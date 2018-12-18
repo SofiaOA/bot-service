@@ -32,5 +32,5 @@ public class MessageBodyText extends MessageBody {
   public KeyboardType keyboardType = KeyboardType.DEFAULT;
 
   @Transient
-  String placeholder;
+  public String placeholder;
 }
