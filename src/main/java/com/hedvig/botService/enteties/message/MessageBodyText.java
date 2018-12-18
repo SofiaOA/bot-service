@@ -22,6 +22,11 @@ public class MessageBodyText extends MessageBody {
     this.keyboardType = keyboardType;
   }
 
+  public MessageBodyText(String content, KeyboardType keyboardType, String placeholder) {
+    this(content, keyboardType);
+    this.placeholder = placeholder;
+  }
+
   MessageBodyText() {}
 
   public KeyboardType keyboardType = KeyboardType.DEFAULT;

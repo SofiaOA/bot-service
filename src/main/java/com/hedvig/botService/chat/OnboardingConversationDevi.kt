@@ -72,7 +72,7 @@ constructor(
             MESSAGE_ONBOARDINGSTART_ASK_NAME,
             WrappedMessage(
                 MessageBodyText(
-                    "Hej! Jag heter Hedvig 👋\u000CVad heter du?"
+                    "Hej! Jag heter Hedvig 👋\u000CVad heter du?", KeyboardType.DEFAULT, "Förnamn"
                 )
             )
             { body, u, message ->
@@ -705,7 +705,7 @@ constructor(
         this.createChatMessage(
             MESSAGE_50K_LIMIT,
             MessageBodySingleSelect(
-                "Toppen!\u000CÄger du något som du tar med dig utanför hemmet som är värt över 50 000 kr? 💍⌚",
+                "Toppen!\u000CÄger du något som du tar med dig utanför hemmet som är värt över 50 000 kr som du vill försäkra? 💍⌚",
 
                 SelectOption("Ja, berätta om objektsförsäkring", MESSAGE_50K_LIMIT_YES),
                 SelectOption("Nej, gå vidare utan", MESSAGE_50K_LIMIT_NO)
@@ -1130,10 +1130,10 @@ constructor(
         this.createChatMessage(
             MESSAGE_STUDENT_25K_LIMIT,
             MessageBodySingleSelect(
-                "Okej! Dina prylar som du har hemma skyddas upp till 200 000 kr 🏺🖼️\u000C" + "Äger du något som du tar med dig utanför hemmet som är värt över 25 000 kr? 💍⌚",
+                "Okej!\u000C" + "Äger du något som du tar med dig utanför hemmet som är värt över 25 000 kr som du vill försäkra? 💍⌚",
                 Lists.newArrayList<SelectItem>(
-                    SelectOption("Ja", MESSAGE_50K_LIMIT_YES),
-                    SelectOption("Nej", MESSAGE_50K_LIMIT_NO)
+                    SelectOption("Ja, berätta om objektsförsäkring", MESSAGE_50K_LIMIT_YES),
+                    SelectOption("Nej, gå vidare utan", MESSAGE_50K_LIMIT_NO)
                 )
             )
         )
