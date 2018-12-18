@@ -4,7 +4,6 @@ import lombok.ToString;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Transient;
 
 @Entity
 @DiscriminatorValue("text")
@@ -30,7 +29,6 @@ public class MessageBodyText extends MessageBody {
   MessageBodyText() {}
 
   public KeyboardType keyboardType = KeyboardType.DEFAULT;
-
-  @Transient
+  
   public String placeholder;
 }
