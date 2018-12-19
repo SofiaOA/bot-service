@@ -526,6 +526,7 @@ constructor(
                 )
             ) { body, uc, m ->
                 val item = body.selectedItem
+                body.text = if (item.value == MESSAGE_KVADRAT) "Yes, stämmer bra!" else "Nix"
                 addToChat(m, uc)
                 when {
                     item.value == MESSAGE_KVADRAT -> handleStudentEntrypoint(MESSAGE_KVADRAT, uc)
