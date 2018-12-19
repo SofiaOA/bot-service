@@ -321,7 +321,7 @@ constructor(
         this.createMessage(
             MESSAGE_FORSLAGSTART,
             body = MessageBodySingleSelect(
-                "Tack! Bor du i lägenhet eller eget hus",
+                "Tack! Bor du i lägenhet eller eget hus?",
                 SelectOption("Lägenhet", MESSAGE_LAGENHET_PRE),
                 SelectOption("Hus", MESSAGE_HUS)
             )
@@ -521,12 +521,11 @@ constructor(
             WrappedMessage(
                 MessageBodySingleSelect(
                     "Tack {NAME}! Är det lägenheten på {ADDRESS} jag ska ta fram ett förslag för?",
-                    SelectOption("Ja", MESSAGE_KVADRAT),
-                    SelectOption("Nej", MESSAGE_VARBORDUFELADRESS)
+                    SelectOption("Yes, stämmer bra!", MESSAGE_KVADRAT),
+                    SelectOption("Nix", MESSAGE_VARBORDUFELADRESS)
                 )
             ) { body, uc, m ->
                 val item = body.selectedItem
-                body.text = if (item.value == MESSAGE_KVADRAT) "Yes, stämmer bra!" else "Nix"
                 addToChat(m, uc)
                 when {
                     item.value == MESSAGE_KVADRAT -> handleStudentEntrypoint(MESSAGE_KVADRAT, uc)
