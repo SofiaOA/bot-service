@@ -72,7 +72,7 @@ constructor(
             MESSAGE_ONBOARDINGSTART_ASK_NAME,
             WrappedMessage(
                 MessageBodyText(
-                    "Hej! Jag heter Hedvig 👋\u000CVad heter du?", KeyboardType.DEFAULT, "Förnamn"
+                    "Hej! Jag heter Hedvig 👋\u000CVad heter du?", TextContentType.GIVEN_NAME, KeyboardType.DEFAULT, "Förnamn"
                 )
             )
             { body, u, message ->
@@ -97,6 +97,7 @@ constructor(
             WrappedMessage(
                 MessageBodyText(
                     "Först, vad är din mailadress?",
+                    TextContentType.EMAIL_ADDRESS,
                     KeyboardType.EMAIL_ADDRESS
                 )
             ) { body, userContext, message ->
@@ -121,14 +122,14 @@ constructor(
         this.createMessage(
             MESSAGE_SIGNUP_TO_WAITLIST,
             MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
-            MessageBodyText("Det ordnar jag! Vad är din mailadress?")
+            MessageBodyText("Det ordnar jag! Vad är din mailadress?", TextContentType.EMAIL_ADDRESS, KeyboardType.EMAIL_ADDRESS)
         )
         this.setExpectedReturnType(MESSAGE_SIGNUP_TO_WAITLIST, EmailAdress())
 
         this.createMessage(
             "message.signup.email",
             MessageHeader(MessageHeader.HEDVIG_USER_ID, -1, true),
-            MessageBodyText("Det ordnar jag! Vad är din mailadress?")
+            MessageBodyText("Det ordnar jag! Vad är din mailadress?", TextContentType.EMAIL_ADDRESS, KeyboardType.EMAIL_ADDRESS)
         )
         this.setExpectedReturnType("message.signup.email", EmailAdress())
 
@@ -381,7 +382,7 @@ constructor(
                 MessageBodyText(
                     "Konstigt, just nu kan jag inte hitta din adress. Så jag behöver ställa några extra frågor 😊\u000C"
                             + "Vad heter du i efternamn?"
-                )
+                , TextContentType.FAMILY_NAME, KeyboardType.DEFAULT)
             ) { b, uc, m ->
                 uc.onBoardingData.familyName = b.text.trim().toLowerCase().capitalize()
                 addToChat(m, uc)
@@ -486,12 +487,14 @@ constructor(
             )
         )
 
-        this.createMessage(MESSAGE_NYHETSBREV, MessageBodyText("Topp! Vad är mailadressen?"))
+        this.createMessage(MESSAGE_NYHETSBREV, MessageBodyText("Topp! Vad är mailadressen?", TextContentType.EMAIL_ADDRESS, KeyboardType.EMAIL_ADDRESS))
         this.setExpectedReturnType(MESSAGE_NYHETSBREV, EmailAdress())
         this.createMessage(
             MESSAGE_TIPSA,
             MessageBodyText(
-                "Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmail till"
+                "Kanon! Fyll i mailadressen till den du vill att jag ska skicka ett tipsmail till",
+                TextContentType.EMAIL_ADDRESS,
+                KeyboardType.EMAIL_ADDRESS
             )
         )
         this.setExpectedReturnType(MESSAGE_TIPSA, EmailAdress())
@@ -544,12 +547,14 @@ constructor(
 
         this.createMessage(
             "message.bankidja.noaddress",
-            MessageBodyText("Tack {NAME}! Nu skulle jag behöva veta vilken gatuadress bor du på?")
+            MessageBodyText("Tack {NAME}! Nu skulle jag behöva veta vilken gatuadress bor du på?",
+                TextContentType.STREET_ADDRESS_LINE1, KeyboardType.DEFAULT)
         )
 
         this.createMessage(
             MESSAGE_VARBORDUFELADRESS,
-            MessageBodyText("Inga problem! Vad är gatuadressen till lägenheten du vill försäkra?")
+            MessageBodyText("Inga problem! Vad är gatuadressen till lägenheten du vill försäkra?",
+                TextContentType.STREET_ADDRESS_LINE1, KeyboardType.DEFAULT)
         )
         this.createMessage(
             "message.varbordufelpostnr", MessageBodyNumber("Och vad har du för postnummer?")
@@ -563,12 +568,13 @@ constructor(
             "message.manuellnamn",
             MessageBodyText(
                 "Inga problem! Då ställer jag bara några extra frågor nu\u000CMen om du vill bli medlem sen så måste du signera med BankID, bara så du vet!\u000CVad heter du i förnamn?"
+            ,TextContentType.GIVEN_NAME, KeyboardType.DEFAULT
             )
         )
 
         this.createMessage(
             "message.manuellfamilyname",
-            MessageBodyText("Kul att ha dig här {NAME}! Vad heter du i efternamn?")
+            MessageBodyText("Kul att ha dig här {NAME}! Vad heter du i efternamn?", TextContentType.FAMILY_NAME, KeyboardType.DEFAULT)
         )
 
         this.createMessage(
@@ -576,8 +582,8 @@ constructor(
             MessageBodyNumber("Tack! Vad är ditt personnummer? (12 siffror)")
         )
         this.setExpectedReturnType("message.manuellpersonnr", SSNSweden())
-        this.createMessage("message.varborduadress", MessageBodyText("Vilken gatuadress bor du på?"))
-        this.createMessage("message.varbordupostnr", MessageBodyNumber("Vad är ditt postnummer?"))
+        this.createMessage("message.varborduadress", MessageBodyText("Vilken gatuadress bor du på?", TextContentType.STREET_ADDRESS_LINE1, KeyboardType.DEFAULT))
+        this.createMessage("message.varbordupostnr", MessageBodyNumber("Vad är ditt postnummer?", TextContentType.POSTAL_CODE))
         this.setExpectedReturnType("message.varbordupostnr", ZipCodeSweden())
 
         this.createMessage(
@@ -626,7 +632,7 @@ constructor(
         this.createMessage(
             MESSAGE_EMAIL,
             MessageBodyText(
-                "Nu behöver jag bara din mailadress så att jag kan skicka en bekräftelse"
+                "Nu behöver jag bara din mailadress så att jag kan skicka en bekräftelse", TextContentType.EMAIL_ADDRESS, KeyboardType.EMAIL_ADDRESS
             )
         )
         this.setExpectedReturnType(MESSAGE_EMAIL, EmailAdress())
@@ -839,14 +845,16 @@ constructor(
         this.createChatMessage(
             "message.uwlimit.housingsize",
             MessageBodyText(
-                "Det var stort! För att kunna försäkra så stora lägenheter behöver vi ta några grejer över telefon\u000CVad är ditt nummer?"
+                "Det var stort! För att kunna försäkra så stora lägenheter behöver vi ta några grejer över telefon\u000CVad är ditt nummer?",
+                TextContentType.TELEPHONE_NUMBER, KeyboardType.DEFAULT
             )
         )
 
         this.createChatMessage(
             "message.uwlimit.householdsize",
             MessageBodyText(
-                "Okej! För att kunna försäkra så många i samma lägenhet behöver vi ta några grejer över telefon\u000CVad är ditt nummer?"
+                "Okej! För att kunna försäkra så många i samma lägenhet behöver vi ta några grejer över telefon\u000CVad är ditt nummer?",
+                TextContentType.TELEPHONE_NUMBER, KeyboardType.DEFAULT
             )
         )
 
@@ -872,7 +880,8 @@ constructor(
         this.createMessage(
             "message.mail",
             MessageBodyText(
-                "Tackar.\nOch din mailadress så jag kan skicka en bekräftelse när vi skrivit på?"
+                "Tackar.\nOch din mailadress så jag kan skicka en bekräftelse när vi skrivit på?",
+                TextContentType.EMAIL_ADDRESS, KeyboardType.EMAIL_ADDRESS
             )
         )
 
@@ -1004,7 +1013,7 @@ constructor(
             )
         )
 
-        this.createMessage("message.kontrakt.email", MessageBodyText("OK! Vad är din mailadress?"))
+        this.createMessage("message.kontrakt.email", MessageBodyText("OK! Vad är din mailadress?", TextContentType.EMAIL_ADDRESS, KeyboardType.EMAIL_ADDRESS))
         this.setExpectedReturnType("message.kontrakt.email", EmailAdress())
 
         this.createMessage(

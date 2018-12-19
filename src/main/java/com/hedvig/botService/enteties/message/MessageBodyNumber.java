@@ -19,6 +19,15 @@ public class MessageBodyNumber extends MessageBodyText {
     this.placeholder = placeholder;
   }
 
+  public MessageBodyNumber(String content, TextContentType textContentType){
+    super(content, textContentType, KeyboardType.NUMBER_PAD);
+  }
+
+  public MessageBodyNumber(String content, TextContentType textContentType, String placeholder){
+    super(content, textContentType, KeyboardType.NUMBER_PAD);
+    this.placeholder = placeholder;
+  }
+
   MessageBodyNumber() {}
 
 
